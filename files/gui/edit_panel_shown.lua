@@ -1,6 +1,6 @@
 if not held_wand then return end
 
-local actions_per_row = math.floor( screen_width / ( 20 + 2 ) - 3 )
+local actions_per_row = math.floor( full_screen_width / ( 20 + 2 ) - 3 )
 do
 	local actions_per_row_limit = tonumber( mod_setting_get( "wand_edit_panel_max_actions_per_row" ) )
 	if actions_per_row_limit and actions_per_row_limit ~= 0 then
@@ -88,7 +88,7 @@ end
 local permanent_rows_num = math.ceil( #permanent_actions / actions_per_row )
 if not_showing_all and panel_row_offset > 0 then
 	GuiLayoutBeginVertical( gui, 0, screen_height * 0.96 - ( rows_num + permanent_rows_num + 1 ) * ( 20 + 2 ) + 2, true )
-		GuiLayoutBeginHorizontal( gui, horizontal_centered_x(1), 0 )
+		GuiLayoutBeginHorizontal( gui, horizontal_centered_x(1), 0, true )
 			if GuiImageButton( gui, next_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/pageup.png" ) then
 				edit_panel_state.set_offset( panel_row_offset - 1 )
 			end

@@ -1,4 +1,4 @@
-GuiLayoutAddVerticalSpacing( gui, 5 )
+GuiLayoutAddVerticalSpacing( gui, 360 * 0.05 )
 local x_pos = ( screen_width + 4 * ( 20 + 2 ) ) * 0.5
 local highest_dps = GlobalsGetValue( "spell_lab_shugged_recent_highest_dps","" )
 if #highest_dps > 0 then

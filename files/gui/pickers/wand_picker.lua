@@ -1,7 +1,7 @@
 local picker = {}
 picker.menu = function()
 	GuiBeginAutoBox( gui )
-		GuiLayoutBeginVertical( gui, 5, 24 )
+		GuiLayoutBeginVertical( gui, 640 * 0.05, 360 * 0.24, true )
 			GuiLayoutBeginHorizontal( gui, 0, 0 )
 				GuiLayoutBeginVertical( gui, 0, 0 )
 					local precise_mode = mod_setting_get( "wand_picker_precise_mode" )
@@ -48,7 +48,7 @@ picker.menu = function()
 							end
 						GuiLayoutEnd( gui )
 					end
-					GuiLayoutBeginHorizontal( gui, 0, 2 )
+					GuiLayoutBeginHorizontal( gui, 0, 360 * 0.02, true )
 					if GuiButton( gui, 0, 0, wrap_key( "wand_picker_spawn_wand" ), next_id() ) then
 						if player then
 							local x, y = EntityGetTransform( player )
@@ -65,45 +65,41 @@ picker.menu = function()
 					end
 					if held_wand then
 						if GuiButton( gui, 8, 0, wrap_key( "wand_picker_copy_held_wand" ), next_id() ) then
-							if held_wand then
-								local stats = WANDS.wand_get_stats( held_wand )
-								if stats then
-									for k,v in pairs( stats ) do
-										for _,stat_data in ipairs( wand_stats ) do
-											if stat_data.stat == k then
-												stat_data.current = v
-												break
-											end
-										end
+							if not held_wand then goto skip end
+							local stats = WANDS.wand_get_stats( held_wand )
+							if not stats then goto skip end
+							for k,v in pairs( stats ) do
+								for _,stat_data in ipairs( wand_stats ) do
+									if stat_data.stat == k then
+										stat_data.current = v
+										break
 									end
 								end
 							end
+							::skip::
 						end
 						if GuiButton( gui, 8, 0, wrap_key( "wand_picker_update_held_wand" ), next_id() ) then
-							if player then
-								local held_wand = get_entity_held_or_random_wand( player, false )
-								if held_wand then
-									local x, y = EntityGetTransform( player )
-									local wand_data = {
-										stats = {}
-									}
-									for _,stat_data in ipairs( wand_stats ) do
-										wand_data.stats[stat_data.stat] = stat_data.current
+							if player and held_wand then
+								local x, y = EntityGetTransform( player )
+								local wand_data = {
+									stats = {}
+								}
+								for _,stat_data in ipairs( wand_stats ) do
+									wand_data.stats[stat_data.stat] = stat_data.current
+								end
+								local do_update = true
+								local deck_capacity = wand_data.stats.capacity + WANDS.wand_get_num_actions_permanent( wand )
+								if not WANDS.wand_check_actions_out_of_bound( held_wand, deck_capacity ) then
+									if not shift then
+										GamePrint( text_get_translated( "wand_picker_exploding_actions" ) )
+										do_update = false
 									end
-									local do_update = true
-									local deck_capacity = wand_data.stats.capacity + WANDS.wand_get_num_actions_permanent( wand )
-									if not WANDS.wand_check_actions_out_of_bound( held_wand, deck_capacity ) then
-										if not shift then
-											GamePrint( text_get_translated( "wand_picker_exploding_actions" ) )
-											do_update = false
-										end
-									end
-									if do_update then
-										wand_data.stats.shuffle_deck_when_empty = wand_data.stats.shuffle_deck_when_empty == 1
-										WANDS.initialize_wand( held_wand, wand_data, false )
-										WANDS.wand_explode_actions_out_of_bound( held_wand )
-										force_refresh_held_wands()
-									end
+								end
+								if do_update then
+									wand_data.stats.shuffle_deck_when_empty = wand_data.stats.shuffle_deck_when_empty == 1
+									WANDS.initialize_wand( held_wand, wand_data, false )
+									WANDS.wand_explode_actions_out_of_bound( held_wand )
+									force_refresh_held_wands()
 								end
 							end
 						end

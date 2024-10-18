@@ -40,7 +40,7 @@ if initialized == false then
 		return GameTextGetTranslatedOrNot( wrap_key( key ) )
 	end
 
-	local version = "Shugged v1.6.2"
+	local version = "Shugged v1.6.3"
 
 	function maxn( t )
 		local result = table.maxn( t )
@@ -103,7 +103,21 @@ if initialized == false then
 
 	function get_held_wand()
 		if not player then return end
-		return get_entity_held_or_random_wand( player, false )
+		local wands
+		for _, child_id in ipairs( EntityGetAllChildren( player ) or {} ) do
+			if EntityGetName( child_id ) == "inventory_quick" then
+				wands = EntityGetAllChildren( child_id, "wand" )
+				break
+			end
+		end
+		if not wands or #wands == 0 then return end
+		local inv2 = EntityGetFirstComponent( player, "Inventory2Component" )
+		local active_item = ComponentGetValue2( inv2, "mActiveItem" )
+		for _, wand_id in pairs( wands ) do
+			if wand_id == active_item then
+				return wand_id
+			end
+		end
 	end
 
 	function get_screen_position( x, y )
@@ -499,6 +513,7 @@ if initialized == false then
 		now = GameGetFrameNum()
 		id_offset = 0
 		GuiStartFrame( gui )
+		screen_width, screen_height = GuiGetScreenDimensions( gui )
 		GuiIdPushString( gui, "spell_lab_shugged" )
 		GuiOptionsAdd( gui, GUI_OPTION.NoPositionTween )
 
@@ -664,7 +679,7 @@ if initialized == false then
 		end
 
 		if is_panel_open and not GameIsInventoryOpen() and player and not GameHasFlagRun( "gkbrkn_config_menu_open" ) then
-			GuiLayoutBeginVertical( gui, 0, 2 )
+			GuiLayoutBeginVertical( gui, 0, 360 * 0.02, true )
 				GuiLayoutBeginHorizontal( gui, horizontal_centered_x(8,4), percent_to_ui_scale_y(2), true )
 					if GlobalsGetValue( "spell_lab_shugged_checkpoint", "0" ) == "0" then
 						GuiOptionsAddForNextWidget( gui, GUI_OPTION.DrawSemiTransparent )

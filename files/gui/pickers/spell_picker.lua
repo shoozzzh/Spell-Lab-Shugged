@@ -215,7 +215,7 @@ picker.menu = function()
 	end
 	local adjusted_columns = 8
 	
-	GuiLayoutBeginVertical( gui, 5, 16 )
+	GuiLayoutBeginVertical( gui, 640 * 0.05, 360 * 0.16, true )
 		local scroll_id = next_id() + filter_type
 		local rows = math.max( 1, math.ceil( #actions_data_to_show / adjusted_columns ) )
 		GuiBeginScrollContainer( gui, scroll_id, 0, 0, 174, filter_type ~= FILTER_TYPE_SEARCH and math.min( rows * 20, 160 ) or 98 )
@@ -398,21 +398,23 @@ picker.menu = function()
 		GuiTooltip( gui, tooltip_text, "" )
 		if hover then filter_type = i end
 	end
-	GuiLayoutBeginVertical( gui, 1, 16 )
-	for i = 0, 7 do
-		show_filter( i, type_text[i] )
-	end
-	GuiLayoutEnd( gui )
-	GuiLayoutBeginVertical( gui, 35, 16 )
-		show_filter( FILTER_TYPE_SEARCH, wrap_key( "action_search" ) )
-		show_filter( FILTER_TYPE_RECENT, wrap_key( "action_recent" ), function( left_click, right_click )
-			if right_click then
-				if shift then
-					clear_action_history()
+	GuiLayoutBeginHorizontal( gui, 0, 360 * 0.16, true, 0, 0 )
+		GuiLayoutBeginVertical( gui, 640 * 0.01, 0, true )
+		for i = 0, 7 do
+			show_filter( i, type_text[i] )
+		end
+		GuiLayoutEnd( gui )
+		GuiLayoutBeginVertical( gui, 640 * 0.34 - 20 + 10, 0, true )
+			show_filter( FILTER_TYPE_SEARCH, wrap_key( "action_search" ) )
+			show_filter( FILTER_TYPE_RECENT, wrap_key( "action_recent" ), function( left_click, right_click )
+				if right_click then
+					if shift then
+						clear_action_history()
+					end
 				end
-			end
-		end )
-		show_filter( FILTER_TYPE_IN_INV, wrap_key( "action_in_inv" ) )
+			end )
+			show_filter( FILTER_TYPE_IN_INV, wrap_key( "action_in_inv" ) )
+		GuiLayoutEnd( gui )
 	GuiLayoutEnd( gui )
 end
 

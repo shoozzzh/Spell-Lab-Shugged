@@ -89,7 +89,9 @@ function OnWorldInitialized()
 	GlobalsSetValue( "mod_button_tr_width", tostring( mod_button_reservation + 15 ) )
 end
 
+-- local gui_ = GuiCreate()
 function OnWorldPreUpdate()
+	-- full_screen_width, full_screen_height = GuiGetScreenDimensions( gui_ )
 	dofile( "mods/spell_lab_shugged/files/gui/update.lua" )
 end
 
