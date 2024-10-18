@@ -1,0 +1,18 @@
+<Entity name="spell_lab_shugged_better_all_seeing_eye">
+	<InheritTransformComponent only_position="1" />
+	<_Transform scale.x="12" scale.y="12" />
+	<LightComponent
+		r="255"
+		g="255"
+		b="255"
+		radius="1000">
+	</LightComponent>
+	<SpriteComponent
+		offset_x="540"
+		offset_y="540"
+		alpha="1.0"
+		image_file="mods/spell_lab_shugged/files/entities/fog_of_war_hole_ultimate.png"
+		smooth_filtering="1"
+		fog_of_war_hole="1">
+	</SpriteComponent>
+</Entity>

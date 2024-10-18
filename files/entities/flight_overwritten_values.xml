@@ -1,0 +1,4 @@
+<Entity name="spell_lab_shugged_flight_overwritten_values" >
+	<InheritTransformComponent/>
+	<CharacterPlatformingComponent _enabled="0" />
+</Entity>

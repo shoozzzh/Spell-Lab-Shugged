@@ -1,0 +1,7 @@
+<Entity>
+	<InheritTransformComponent/>
+	<GameEffectComponent effect="WET"     frames="1" />
+	<GameEffectComponent effect="OILED"   frames="1" />
+	<GameEffectComponent effect="ON_FIRE" frames="1" />
+	<GameEffectComponent effect="BLOODY"  frames="1" />
+</Entity>

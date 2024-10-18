@@ -1,0 +1,27 @@
+<Entity>
+	<LuaComponent script_damage_received="mods/spell_lab_shugged/files/entities/dummy_target/dps_tracker.lua" />
+	<LuaComponent
+		script_source_file="mods/spell_lab_shugged/files/entities/dummy_target/load_child.lua"
+		execute_on_added="1"
+		remove_after_executed="1">
+	</LuaComponent>
+
+	<VariableStorageComponent name="spell_lab_shugged_last_hit_frame" />
+	<VariableStorageComponent name="spell_lab_shugged_first_hit_frame" />
+	<VariableStorageComponent name="spell_lab_shugged_current_dps" />
+	<VariableStorageComponent name="spell_lab_shugged_highest_dps" />
+	<VariableStorageComponent name="spell_lab_shugged_total_damage" />
+	
+	<VariableStorageComponent name="gkbrkn_always_show_damage_numbers" />
+	<VariableStorageComponent name="gkbrkn_no_health_bar" />
+	<VariableStorageComponent name="gkbrkn_no_custom_damage_numbers" />
+
+	<ItemComponent
+		custom_pickup_string="$spell_lab_shugged_dummy_target_interact"
+		item_pickup_radius="20"
+		is_pickable="1"
+		play_spinning_animation="0">
+	</ItemComponent>
+
+	<LuaComponent script_item_picked_up="mods/spell_lab_shugged/files/entities/dummy_target/dummy_target_interacted.lua" />
+</Entity>

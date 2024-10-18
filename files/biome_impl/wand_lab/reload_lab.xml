@@ -1,0 +1,15 @@
+<Entity tags="spell_lab_shugged_lab_reloader" >
+	<ItemComponent
+		_enabled="1"
+		custom_pickup_string="$spell_lab_shugged_spell_lab_reloader_interact"
+		item_pickup_radius="20"
+		is_pickable="1"
+		play_spinning_animation="0">
+	</ItemComponent>
+	<SpriteComponent
+		image_file="data/ui_gfx/gun_actions/recharge.png"
+		offset_x="8"
+		offset_y="17">
+	</SpriteComponent>
+	<LuaComponent script_item_picked_up="mods/spell_lab_shugged/files/biome_impl/wand_lab/reload_lab.lua" />
+</Entity>
