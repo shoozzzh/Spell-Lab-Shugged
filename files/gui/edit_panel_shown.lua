@@ -1,6 +1,6 @@
 if not held_wand then return end
 
-local actions_per_row = math.floor( full_screen_width / ( 20 + 2 ) - 3 )
+local actions_per_row = math.floor( screen_width / ( 20 + 2 ) - 3 )
 do
 	local actions_per_row_limit = tonumber( mod_setting_get( "wand_edit_panel_max_actions_per_row" ) )
 	if actions_per_row_limit and actions_per_row_limit ~= 0 then
