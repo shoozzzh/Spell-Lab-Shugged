@@ -9,7 +9,7 @@ local function get_all_wands_in_inventory()
 end
 for _, wand_id in ipairs( get_all_wands_in_inventory() or {} ) do
 	local edit_panel_state = access_edit_panel_state( wand_id )
-	if not edit_panel_state.get_force_compact_enabled() then return end
+	if edit_panel_state.get_force_compact_enabled() then goto continue end
 	local current_state = edit_panel_state.get()
 	local current_permanent_state = edit_panel_state.get_permanent()
 	local new_state_table, new_permanent_table = read_state_table_from_wand( wand_id )
@@ -73,4 +73,6 @@ for _, wand_id in ipairs( get_all_wands_in_inventory() or {} ) do
 	if diff then
 		edit_panel_state.set_both( table_to_state_str( new_state_table ), permanent_table_to_state_str( new_permanent_table ), wrap_key( "operation_read_from_wand" ) )
 	end
+
+	::continue::
 end
