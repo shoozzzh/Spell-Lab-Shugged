@@ -365,7 +365,7 @@ picker.menu = function()
 					end
 				end )
 
-				local ordinal_y = y + height + 3
+				local ordinal_y = y + row_height
 				for i, c in ipairs( keyboard[1] ) do
 					show_keyboard_key( c, x + i * key_width - key_width, ordinal_y, key_width )
 				end
