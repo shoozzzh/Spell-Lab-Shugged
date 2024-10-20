@@ -423,7 +423,7 @@ local metadata_to_show = {
 		{ wrap_key( "projectile_speed" ), function( data ) return format_range( data.speed_min, data.speed_max ) end },
 		{ wrap_key( "projectile_air_friction" ), function( data ) return data.air_friction end },
 		{ wrap_key( "projectile_innate_spread" ), function( data ) if data.direction_random_rad ~= nil and tonumber(data.direction_random_rad) ~= 0 then return GameTextGet( wrap_key( "degrees" ), format_value( data.direction_random_rad * 180 / math.pi, 1, false, FORMAT.Round ) ) end end },
-		{ wrap_key( "projectile_gravity" ), function( data ) if data.gravity ~= nil and tonumber(data.gravity) ~= 0 then return format_value( data.gravity, 0 ) end end },
+		{ wrap_key( "projectile_gravity" ), function( data ) if data.gravity ~= nil and tonumber(data.gravity) ~= 0 then return data.gravity end end },
 		{ wrap_key( "projectile_lifetime" ), function( data )
 			if not data.lifetime then return end
 			local result
@@ -443,18 +443,15 @@ local metadata_to_show = {
 		{ wrap_key( "projectile_friendly_fire" ), function( data ) if data.friendly_fire == "1" then return "$menu_yes" end end },
 		{ wrap_key( "projectile_shooter_collision_protection" ), function( data )
 			if data.collide_with_shooter_frames and data.collide_with_shooter_frames ~= "-1" then
-				return GameTextGet( wrap_key( "frames" ), format_value( data.collide_with_shooter_frames, 0 ) )
+				return GameTextGet( wrap_key( "frames" ), data.collide_with_shooter_frames )
 			end
 		end },
 		{ wrap_key( "projectile_explosion_enabled" ), function( data ) return "$menu_" .. ( ( data.on_death_explode == "1" or data.on_lifetime_out_explode == "1" ) and "yes" or "no" ) end },
 		{ wrap_key( "projectile_explosion_radius" ), function( data ) if data.explosion_radius ~= nil then return format_value( data.explosion_radius, 0 ) end end },
 		{ wrap_key( "projectile_explosion_damage" ), function( data ) if data.explosion_damage ~= nil then return format_value( data.explosion_damage * 25, 2, false, FORMAT.Round ) end end },
-		{ wrap_key( "projectile_explosion_dont_damage_shooter" ), function( data )
-			if data.explosion_dont_damage_shooter and data.explosion_dont_damage_shooter ~= "0" then
-				return "$menu_yes"
-			end
-		end },
+		{ wrap_key( "projectile_explosion_dont_damage_shooter" ), function( data ) if data.explosion_dont_damage_shooter and data.explosion_dont_damage_shooter ~= "0" then return "$menu_yes" end end },
 		{ wrap_key( "projectile_timer_time" ), function( data ) if data.timer_time ~= nil then return GameTextGet( wrap_key( "frames" ), format_value( data.timer_time, 0 ) ) end end },
+		{ wrap_key( "projectile_die_on_low_velocity" ), function( data ) if data.die_on_low_velocity == "1" then return data.die_on_low_velocity_limit or "50" end end }
 	}
 }
 
