@@ -26,7 +26,6 @@ ModTextFileSetContent( "data/scripts/projectiles/neutralized.lua",
 local mod_setting_prefix = "spell_lab_shugged."
 
 local default_settings = {
-	["edit_wands_everywhere"] = 1,
 	["quick_spell_picker"] = true,
 	["invincible"] = true,
 	["spell_replacement"] = true,
