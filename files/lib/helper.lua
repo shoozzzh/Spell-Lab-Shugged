@@ -49,6 +49,11 @@ local chinese_languages = {
 	["完全汉化"] = true,
 }
 
+function separator( text )
+	return ( chinese_languages[ GameTextGetTranslatedOrNot( "$current_language" ) ]
+	and ten_thousands_separator or thousands_separator )( text )
+end
+
 local inf = 1 / 0
 local threshold = 10 ^ 10
 function format_damage( damage )
@@ -60,8 +65,6 @@ function format_damage( damage )
 		and ( damage > threshold or -damage > threshold ) then
 		return string.format( "%.10e", damage )
 	end
-	local separator_func = chinese_languages[ GameTextGetTranslatedOrNot( "$current_language" ) ]
-	and ten_thousands_separator or thousands_separator
-	return separator_func( string.format( "%.2f", damage ) )
+	return separator( string.format( "%.2f", damage ) )
 end
 
