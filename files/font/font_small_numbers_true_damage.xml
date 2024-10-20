@@ -18,6 +18,6 @@
     <Char id = "44" rect_h = "10" rect_w = "3" rect_x = "71" rect_y = "1" ></Char>
     <Char id = "45" rect_h = "10" rect_w = "5" rect_x = "75" rect_y = "1" ></Char>
     <Char id = "43" rect_h = "10" rect_w = "5" rect_x = "81" rect_y = "1" ></Char>
-    <Char id = "101" rect_h = "10" rect_w = "5" rect_x = "97" rect_y = "1" ></Char>
+    <Char id = "101" rect_h = "10" rect_w = "5" rect_x = "87" rect_y = "1" ></Char>
     <Char id = "105" rect_h = "10" rect_w = "14" rect_x = "93" rect_y = "1" ></Char>
 </FontData>
