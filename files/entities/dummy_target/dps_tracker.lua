@@ -2,21 +2,13 @@ dofile_once( "mods/spell_lab_shugged/files/lib/helper.lua" )
 dofile_once( "mods/spell_lab_shugged/files/lib/variables.lua" )
 dofile_once( "data/scripts/lib/utilities.lua" )
 
-chinese_languages = {
-	["简体中文"] = true,
-	["喵体中文"] = true,
-	["汪体中文"] = true,
-	["完全汉化"] = true,
-}
-function set_text( entity_id, tag_sprite, value, offset_y )
+local function set_text( entity_id, tag_sprite, value, offset_y )
 	local child_id = EntityGetAllChildren( entity_id, "spell_lab_shugged_dummy_target_child" )[1]
 	if not EntityGetIsAlive( child_id ) then return end
 	local sprite_comp = EntityGetFirstComponent( child_id, "SpriteComponent", tag_sprite )
 	if not sprite_comp then return end
-	local separator_func = chinese_languages[ GameTextGetTranslatedOrNot( "$current_language" ) ] and ten_thousands_separator or thousands_separator
-	local text, num_separators = separator_func( string.format( "%.2f", value ) )
-	-- num_non_separators * 2 + num_separators * 1 + num_points * 1 + math.ceil( 0.5 )
-	ComponentSetValue2( sprite_comp, "offset_x", #text * 2 - 0.5 - num_separators )
+	local text = format_damage( value )
+	ComponentSetValue2( sprite_comp, "offset_x", center_text( text ) )
 	ComponentSetValue2( sprite_comp, "text", text )
 	EntityRefreshSprite( entity_id, sprite_comp )
 end
@@ -57,10 +49,10 @@ function damage_received( damage, message, entity_thats_responsible, is_fatal )
 	local total_damage_comp = get_variable_storage_component( entity_id, "spell_lab_shugged_total_damage" )
 	local total_damage = ( reset and 0 or ComponentGetValue2( total_damage_comp, "value_float" ) ) + damage
 	ComponentSetValue2( total_damage_comp, "value_float", total_damage )
-	set_text( entity_id, "spell_lab_shugged_total_damage", total_damage * 25 )
+	set_text( entity_id, "spell_lab_shugged_total_damage", total_damage )
 
 	local average_dps = total_damage / ( now - first_hit_frame + 1 ) * 60
-	set_text( entity_id, "spell_lab_shugged_average_dps", average_dps * 25 )
+	set_text( entity_id, "spell_lab_shugged_average_dps", average_dps )
 
 	local child_id = EntityGetAllChildren( entity_id, "spell_lab_shugged_dummy_target_child" )
 	if EntityGetIsAlive( child_id ) then

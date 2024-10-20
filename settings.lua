@@ -22,6 +22,8 @@ local function load_mod_settings()
 			no_weather_description = "开启时，天气将锁定为晴朗状态",
 			show_icon_unlocked = "标记已解锁法术",
 			show_icon_unlocked_description = "开启时，将在已解锁法术右上角显示图标，以便重新锁定它们",
+			dummy_target_show_full_damage_number = "伤害测试假人显示完整伤害数字",
+			dummy_target_show_full_damage_number_description = "开启时，将以完整形式而不是科学计数法显示伤害数字",
 		}
 	else
 		text = {
@@ -38,6 +40,8 @@ local function load_mod_settings()
 			no_weather_description = "Should we disable all kinds of rain or snow?",
 			show_icon_unlocked = "Mark Out Unlocked Spells",
 			show_icon_unlocked_description = "Should we mark out unlocked spells with a small icon in the top right corner?",
+			dummy_target_show_full_damage_number = "Show Full Damage Number in dummy target",
+			dummy_target_show_full_damage_number_description = "Should dummy targets always has full-length damage numbers shown?",
 		}
 	end
 	mod_settings = {
@@ -88,6 +92,13 @@ local function load_mod_settings()
 			id                 = "show_icon_unlocked",
 			ui_name            = text.show_icon_unlocked,
 			ui_description     = text.show_icon_unlocked_description,
+			value_default      = false,
+			scope              = MOD_SETTING_SCOPE_RUNTIME,
+		},
+		{
+			id                 = "dummy_target_show_full_damage_number",
+			ui_name            = text.dummy_target_show_full_damage_number,
+			ui_description     = text.dummy_target_show_full_damage_number_description,
 			value_default      = false,
 			scope              = MOD_SETTING_SCOPE_RUNTIME,
 		},
