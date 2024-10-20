@@ -887,7 +887,7 @@ if initialized == false then
 				GuiLayoutEnd( gui )
 
 				if mod_setting_get( "show_toggle_options" ) then
-					GuiLayoutBeginHorizontal( gui, horizontal_centered_x(10,4), percent_to_ui_scale_y(2), true )
+					GuiLayoutBeginHorizontal( gui, horizontal_centered_x(9,4), percent_to_ui_scale_y(2), true )
 						do_flag_toggle_image_button( "mods/spell_lab_shugged/files/gui/buttons/disable_projectiles.png", "disable_casting" )
 						do_flag_toggle_image_button( "mods/spell_lab_shugged/files/gui/buttons/disable_toxic_statuses.png", "disable_toxic_statuses" )
 						do_flag_toggle_image_button( "mods/spell_lab_shugged/files/gui/buttons/invincible.png", "invincible", "$status_protection_all" )
@@ -914,7 +914,6 @@ if initialized == false then
 						end
 						GuiTooltip( gui, text_get_translated( world_state_unlimited_spells and "disable" or "enable" ) .. text_get_translated( "$perk_unlimited_spells" ), "" )
 
-						do_flag_toggle_image_button( "mods/spell_lab_shugged/files/gui/buttons/fxcrit.png", "force_fxcrit" )
 						local desc = wrap_key( "creative_mode_flight_description" )
 						if DebugGetIsDevBuild() then
 							desc = GameTextGetTranslatedOrNot( desc ) .. "\n" .. text_get_translated( "creative_mode_flight_note_dev_exe" )

@@ -26,7 +26,7 @@ ModTextFileSetContent( "data/scripts/projectiles/neutralized.lua",
 local mod_setting_prefix = "spell_lab_shugged."
 
 local default_settings = {
-	["edit_wands_everywhere"] = true,
+	["edit_wands_everywhere"] = 1,
 	["quick_spell_picker"] = true,
 	["invincible"] = true,
 	["spell_replacement"] = true,
@@ -64,11 +64,6 @@ function OnPlayerSpawned( player_id )
 		GlobalsSetValue( "spell_lab_shugged.refresh_player_state", "1" )
 		EntityAddComponent2( player_id, "LuaComponent", { script_source_file="mods/spell_lab_shugged/files/scripts/player_update.lua", execute_every_n_frame=1 })
 		EntityAddComponent2( player_id, "LuaComponent", { script_shot="mods/spell_lab_shugged/files/scripts/player_shot.lua" })
-		for i = 0, GameGetGameEffectCount( player_id, "NO_WAND_EDITING" ) - GameGetGameEffectCount( player_id, "EDIT_WANDS_EVERYWHERE" ) do
-			local effect_comp, effect_id = GetGameEffectLoadTo( player_id, "EDIT_WANDS_EVERYWHERE", true )
-			ComponentSetValue2( effect_comp, "frames", -1 )
-			EntityAddTag( effect_id, "spell_lab_shugged_effect_edit_wands_everywhere" )
-		end
 	end
 end
 
