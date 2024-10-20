@@ -1,6 +1,0 @@
-<Entity tags="wand">
-	<Base file="mods/spell_lab_shugged/files/entities/wands/wand_1.xml" >
-        <AbilityComponent sprite_file="mods/spell_lab_shugged/files/entities/wands/wand_2_sprite.xml" ></AbilityComponent>
-    </Base>
-</Entity>
-
