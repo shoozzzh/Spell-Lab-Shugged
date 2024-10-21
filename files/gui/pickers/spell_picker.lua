@@ -280,7 +280,11 @@ picker.menu = function()
 							if not held_wand then return end
 							local do_replace = mod_setting_get( "replace_mode" )
 							if shift then do_replace = not do_replace end
-							set_action( access_edit_panel_state( held_wand ), action.id, action.max_uses, do_replace, EntityGetWandCapacity( held_wand ), right_click )
+							local uses_remaining = nil
+							if not world_state_unlimited_spells or action.never_unlimited then
+								uses_remaining = action.max_uses
+							end
+							set_action( access_edit_panel_state( held_wand ), action.id, uses_remaining, do_replace, EntityGetWandCapacity( held_wand ), right_click )
 							if filter_type ~= FILTER_TYPE_RECENT then
 								new_action_history_entry( action.id )
 							end
