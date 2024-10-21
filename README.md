@@ -6,7 +6,7 @@
 [Wand Editor](https://github.com/KagiamamaHIna/Wand-Editor) 本模组的不安全模组竞争者。
 
 # Spell Lab Shugged
-A mod that provide assistance for making wand recipes. It is based on the abandoned Spell Lab, and plenty of changes are made to bring it to some modernized level.<br>
+A mod that provides assistance for making wand recipes. It is based on the abandoned Spell Lab, and plenty of changes are made to bring it to some modernized level.<br>
 <br>
 Check the description in the [Steam Workshop Page](https://steamcommunity.com/sharedfiles/filedetails/?id=3284126816) to get further infomation.<br>
 # Check Also
