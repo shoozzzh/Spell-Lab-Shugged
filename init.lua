@@ -27,11 +27,9 @@ local mod_setting_prefix = "spell_lab_shugged."
 
 local default_settings = {
 	["quick_spell_picker"] = true,
-	["invincible"] = true,
 	["spell_replacement"] = true,
 	["show_toggle_options"] = true,
 	["show_locked_spells"] = true,
-	["better_all_seeing_eye"] = true,
 }
 
 if ModSettingGet( mod_setting_prefix .. "no_weather" ) then
