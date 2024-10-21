@@ -59,8 +59,12 @@ function OnPlayerSpawned( player_id )
 	end
 	if not_inited then
 		GlobalsSetValue( "spell_lab_shugged.refresh_player_state", "1" )
-		EntityAddComponent2( player_id, "LuaComponent", { script_source_file="mods/spell_lab_shugged/files/scripts/player_update.lua", execute_every_n_frame=1 })
-		EntityAddComponent2( player_id, "LuaComponent", { script_shot="mods/spell_lab_shugged/files/scripts/player_shot.lua" })
+		EntityAddComponent2( player_id, "LuaComponent", {
+			script_source_file="mods/spell_lab_shugged/files/scripts/player_update.lua",
+			execute_on_added = true,
+			execute_every_n_frame = 1,
+		} )
+		EntityAddComponent2( player_id, "LuaComponent", { script_shot = "mods/spell_lab_shugged/files/scripts/player_shot.lua" })
 	end
 end
 
