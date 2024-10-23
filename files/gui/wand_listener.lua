@@ -7,7 +7,26 @@ local function get_all_wands_in_inventory()
 		end
 	end
 end
-for _, wand_id in ipairs( get_all_wands_in_inventory() or {} ) do
+
+local wands_to_listen
+local wand_listener_type = mod_setting_get( "wand_listener_type" )
+if wand_listener_type == "INV" then
+	wands_to_listen = get_all_wands_in_inventory()
+elseif wand_listener_type == "HAND" then
+	wands_to_listen = { held_wand }
+elseif wand_listener_type == "PANEL" then
+	if mod_setting_get( "show_wand_edit_panel" ) then
+		wands_to_listen = { held_wand }
+	else
+		wands_to_listen = {}
+	end
+else
+	GamePrint( "Something is very wrong!" )
+	print( "Something is very wrong!" )
+	wands_to_listen = {}
+end
+
+for _, wand_id in ipairs( wands_to_listen ) do
 	local edit_panel_state = access_edit_panel_state( wand_id )
 	if edit_panel_state.get_force_compact_enabled() then goto continue end
 	local current_state = edit_panel_state.get()

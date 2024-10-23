@@ -24,6 +24,13 @@ local function load_mod_settings()
 			show_icon_unlocked_description = "开启时，将在已解锁法术右上角显示图标，以便重新锁定它们",
 			dummy_target_show_full_damage_number = "伤害测试假人显示完整伤害数字",
 			dummy_target_show_full_damage_number_description = "开启时，将以完整形式而不是科学计数法显示伤害数字",
+			wand_listener_type = "法杖监听",
+			wand_listener_type_description = "法杖编辑面板应该从哪些法杖监听外部操作？\n该设置不影响编辑，但会影响历史记录的产生数量",
+			wand_listener_type_values = {
+				{ "INV", "背包中所有法杖" },
+				{ "HAND", "手持法杖" },
+				{ "PANEL", "手持法杖（仅法杖编辑面板显示时）" },
+			}
 		}
 	else
 		text = {
@@ -42,6 +49,13 @@ local function load_mod_settings()
 			show_icon_unlocked_description = "Should we mark out unlocked spells with a small icon in the top right corner?",
 			dummy_target_show_full_damage_number = "Show Full Damage Number in dummy target",
 			dummy_target_show_full_damage_number_description = "Should dummy targets always has full-length damage numbers shown?",
+			wand_listener_type = "Wand Listening",
+			wand_listener_type_description = "From which wand(s) should be listened to track any external options?\nValue doesn't change the way you edit wand, but changes how many histories will be created",
+			wand_listener_type_values = {
+				{ "INV", "All Wands in Inventory" },
+				{ "HAND", "Held Wand" },
+				{ "PANEL", "Held Wand(Only when the wand edit panel is open)" },
+			}
 		}
 	end
 	mod_settings = {
@@ -100,6 +114,14 @@ local function load_mod_settings()
 			ui_name            = text.dummy_target_show_full_damage_number,
 			ui_description     = text.dummy_target_show_full_damage_number_description,
 			value_default      = false,
+			scope              = MOD_SETTING_SCOPE_RUNTIME,
+		},
+		{
+			id                 = "wand_listener_type",
+			ui_name            = text.wand_listener_type,
+			ui_description     = text.wand_listener_type_description,
+			value_default      = text.wand_listener_type_values[1][1],
+			values             = text.wand_listener_type_values,
 			scope              = MOD_SETTING_SCOPE_RUNTIME,
 		},
 	}
