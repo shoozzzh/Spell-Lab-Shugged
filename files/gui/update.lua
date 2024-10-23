@@ -134,9 +134,9 @@ if initialized == false then
 		if not player then return end
 		local inv2_comp = EntityGetFirstComponent( player, "Inventory2Component" )
 		if inv2_comp then
-			ComponentSetValue2( inventory2, "mForceRefresh", true )
-			ComponentSetValue2( inventory2, "mActualActiveItem", 0 )
-			ComponentSetValue2( inventory2, "mDontLogNextItemEquip", true )
+			ComponentSetValue2( inv2_comp, "mForceRefresh", true )
+			ComponentSetValue2( inv2_comp, "mActualActiveItem", 0 )
+			ComponentSetValue2( inv2_comp, "mDontLogNextItemEquip", true )
 		end
 	end
 
