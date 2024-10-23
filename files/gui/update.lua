@@ -9,11 +9,12 @@ if initialized == false then
 	dofile_once( "data/scripts/gun/gun.lua" )
 	dofile_once( "data/scripts/lib/utilities.lua" )
 	dofile_once( "mods/spell_lab_shugged/files/lib/helper.lua")
+	dofile_once( "mods/spell_lab_shugged/files/gui/get_player.lua" )
 	WANDS = dofile_once( "mods/spell_lab_shugged/files/lib/wands.lua")
 	dofile_once( "data/scripts/debug/keycodes.lua" )
 	smallfolk = dofile_once( "mods/spell_lab_shugged/files/lib/smallfolk.lua" )
 
-	player = EntityGetWithTag( "player_unit" )[1]
+	player = get_player()
 
 	gui = gui or GuiCreate()
 	GuiStartFrame( gui )
@@ -130,13 +131,12 @@ if initialized == false then
 	end
 
 	function force_refresh_held_wands()
-		local player = EntityGetWithTag( "player_unit" )[1]
-		if player then
-			local inventory2 = EntityGetFirstComponent( player, "Inventory2Component" )
-			if inventory2 ~= nil then
-				ComponentSetValue2( inventory2, "mForceRefresh", true )
-				ComponentSetValue2( inventory2, "mActualActiveItem", 0 )
-			end
+		if not player then return end
+		local inv2_comp = EntityGetFirstComponent( player, "Inventory2Component" )
+		if inv2_comp then
+			ComponentSetValue2( inventory2, "mForceRefresh", true )
+			ComponentSetValue2( inventory2, "mActualActiveItem", 0 )
+			ComponentSetValue2( inventory2, "mDontLogNextItemEquip", true )
 		end
 	end
 
@@ -523,7 +523,7 @@ if initialized == false then
 			world_state_unlimited_spells = ComponentGetValue2( comp_worldstate, "perk_infinite_spells" )
 		end
 
-		player = EntityGetWithTag( "player_unit" )[1]
+		player = get_player()
 		held_wand = get_held_wand()
 
 		dofile( "mods/spell_lab_shugged/files/gui/wand_listener.lua" )
