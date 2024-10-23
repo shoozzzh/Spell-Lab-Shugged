@@ -72,6 +72,7 @@ for _, wand_id in ipairs( get_all_wands_in_inventory() or {} ) do
 
 	if diff then
 		edit_panel_state.set_both( table_to_state_str( new_state_table ), permanent_table_to_state_str( new_permanent_table ), wrap_key( "operation_read_from_wand" ) )
+		edit_panel_state.done_sync()
 	end
 
 	::continue::
