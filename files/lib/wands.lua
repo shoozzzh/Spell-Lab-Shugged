@@ -435,12 +435,13 @@ function WANDS.wand_get_data( wand )
 end
 
 function WANDS.initialize_wand( wand, wand_data, do_clear_actions )
-	if do_clear_actions ~= false then WANDS.wand_clear_actions( wand ) end
+	do_clear_actions = do_clear_actions ~= false
+	if do_clear_actions then WANDS.wand_clear_actions( wand ) end
 	local ability = EntityGetFirstComponentIncludingDisabled( wand, "AbilityComponent" )
 	local item = EntityGetFirstComponent( wand, "ItemComponent" )
-	if wand_data.name ~= nil then
+	if wand_data.name then
 		ComponentSetValue2( ability, "ui_name", wand_data.name )
-		if item ~= nil then
+		if item then
 			ComponentSetValue2( item, "item_name", wand_data.name )
 			ComponentSetValue2( item, "always_use_item_name_in_ui", true )
 		end
@@ -449,9 +450,14 @@ function WANDS.initialize_wand( wand, wand_data, do_clear_actions )
 	for stat,value in pairs( wand_data.stats or {} ) do
 		WANDS.ability_component_set_stat( ability, stat, value )
 	end
+
 	if wand_data.stats.capacity then
-		local deck_capacity = wand_data.stats.capacity + ( do_clear_actions and #( wand_data.all_actions or {} )
-			or WANDS.wand_get_num_actions_permanent( wand ) )
+		local deck_capacity = wand_data.stats.capacity
+		if do_clear_actions then
+			deck_capacity = deck_capacity + WANDS.actions_get_num_permanent( wand_data.all_actions )
+		else
+			deck_capacity = deck_capacity + WANDS.wand_get_num_actions_permanent( wand )
+		end
 		ComponentObjectSetValue2( ability, "gun_config", "deck_capacity", deck_capacity )
 	end
 
@@ -459,59 +465,10 @@ function WANDS.initialize_wand( wand, wand_data, do_clear_actions )
 		WANDS.ability_component_set_stat( ability, stat, Random( range[1], range[2] ) )
 	end
 
-	for stat,random_values in pairs( wand_data.stat_randoms or {} ) do
-		WANDS.ability_component_set_stat( ability, stat, random_values[ Random( 1, #random_values ) ] )
-	end
-
 	WANDS.ability_component_set_stat( ability, "mana", WANDS.ability_component_get_stat( ability, "mana_max" ) )
 
 	for _, action in pairs( wand_data.permanent_actions or {} ) do
 		AddGunActionPermanent( wand, action.id )
-	end
-
-	--for _,actions in pairs( wand_data.actions or {} ) do
-	if wand_data.actions then
-		for action_index=1,#wand_data.actions,1 do
-			local actions = wand_data.actions[action_index]
-			if actions ~= nil then
-				local random_action = actions[ Random( 1, #actions ) ]
-				if random_action ~= nil then
-					if type( random_action ) == "table" then
-						local amount = random_action.amount or 1
-						for _=1,amount,1 do
-							local action_entity = CreateItemActionEntity( random_action.action )
-							if action_entity then
-								local item = EntityGetFirstComponentIncludingDisabled( action_entity, "ItemComponent" )
-								if random_action.locked == true then
-									ComponentSetValue2( item, "is_frozen", true )
-								end
-								if random_action.permanent == true then
-									ComponentSetValue2( item, "permanently_attached", true )
-								end
-								if random_action.x ~= nil then
-									ComponentSetValue2( item, "inventory_slot", random_action.x, 0 )
-								else
-									ComponentSetValue2( item, "inventory_slot", action_index - 1, 0 )
-								end
-								EntitySetComponentsWithTagEnabled( action_entity, "enabled_in_world", false )
-								EntityAddChild( wand, action_entity )
-							end
-						end
-					else
-						local action_entity = CreateItemActionEntity( random_action )
-						if action_entity then
-							local item = EntityGetFirstComponentIncludingDisabled( action_entity, "ItemComponent" )
-							if item ~= nil then
-								ComponentSetValue2( item, "inventory_slot", action_index - 1, 0 )
-							end
-							EntitySetComponentsWithTagEnabled( action_entity, "enabled_in_world", false )
-							EntityAddChild( wand, action_entity )
-							--AddGunAction( wand, random_action )
-						end
-					end
-				end
-			end
-		end
 	end
 
 	if wand_data.absolute_actions then
@@ -583,10 +540,6 @@ function WANDS.initialize_wand( wand, wand_data, do_clear_actions )
 			SetWandSprite( wand, ability, dynamic_wand.file, dynamic_wand.grip_x, dynamic_wand.grip_y, ( dynamic_wand.tip_x - dynamic_wand.grip_x ), ( dynamic_wand.tip_y - dynamic_wand.grip_y ) )
 			EntityRefreshSprite( wand, EntityGetFirstComponent( wand, "SpriteComponent", "item" ) )
 		end
-	end
-
-	if wand_data.callback ~= nil then
-		wand_data.callback( wand, ability )
 	end
 end
 
