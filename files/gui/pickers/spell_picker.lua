@@ -91,7 +91,6 @@ function show_keyboard_key( character, x, y, key_width, clicked_func )
 	end
 
 	GuiOptionsAddForNextWidget( gui, GUI_OPTION.Layout_NoLayouting )
-	GuiOptionsAddForNextWidget( gui, GUI_OPTION.HandleDoubleClickAsClick )
 	local button_text = ""
 	local text_width,_ = GuiGetTextDimensions( gui, button_text )
 	while text_width < key_width do

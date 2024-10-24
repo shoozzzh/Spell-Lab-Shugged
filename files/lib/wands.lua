@@ -454,7 +454,7 @@ function WANDS.initialize_wand( wand, wand_data, do_clear_actions )
 	if wand_data.stats.capacity then
 		local deck_capacity = wand_data.stats.capacity
 		if do_clear_actions then
-			deck_capacity = deck_capacity + WANDS.actions_get_num_permanent( wand_data.all_actions )
+			deck_capacity = deck_capacity + WANDS.actions_get_num_permanent( wand_data.all_actions or {} )
 		else
 			deck_capacity = deck_capacity + WANDS.wand_get_num_actions_permanent( wand )
 		end

@@ -41,7 +41,7 @@ if initialized == false then
 		return GameTextGetTranslatedOrNot( wrap_key( key ) )
 	end
 
-	local version = "Shugged v1.6.5"
+	local version = "Shugged v1.6.6"
 
 	function maxn( t )
 		local result = table.maxn( t )
@@ -239,8 +239,6 @@ if initialized == false then
 		end
 		local this_action_metadata = action_metadata[ action_id ]
 
-		GuiOptionsAddForNextWidget( gui, GUI_OPTION.HandleDoubleClickAsClick )
-		GuiOptionsAddForNextWidget( gui, GUI_OPTION.ClickCancelsDoubleClick )
 		GuiImageButton( gui, next_id(), 2, 2, "", image_sprite )
 		left_click,right_click,hover,x1,y1 = previous_data( gui )
 
@@ -516,6 +514,8 @@ if initialized == false then
 		screen_width, screen_height = GuiGetScreenDimensions( gui )
 		GuiIdPushString( gui, "spell_lab_shugged" )
 		GuiOptionsAdd( gui, GUI_OPTION.NoPositionTween )
+		GuiOptionsAdd( gui, GUI_OPTION.HandleDoubleClickAsClick )
+		GuiOptionsAdd( gui, GUI_OPTION.ClickCancelsDoubleClick )
 
 		world_state = GameGetWorldStateEntity()
 		if EntityGetIsAlive( world_state ) then
@@ -957,7 +957,6 @@ if initialized == false then
 				end
 			end
 		end
-		GuiOptionsAddForNextWidget( gui, GUI_OPTION.HandleDoubleClickAsClick )
 		GuiOptionsAddForNextWidget( gui, GUI_OPTION.NonInteractive )
 		GuiOptionsAddForNextWidget( gui, GUI_OPTION.AlwaysClickable )
 		if GuiImageButton( gui, next_id(), screen_width - 14 - current_button_reservation, 2, "", "mods/spell_lab_shugged/files/gui/wrench.png" ) then
