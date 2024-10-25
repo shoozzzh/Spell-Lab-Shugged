@@ -53,6 +53,7 @@ function do_picker_button( filepath, picker, option_text, click_callback )
 	end
 	local result
 	if GuiImageButton( gui, next_id(), 0, 0, "", filepath ) then
+		sound_button_clicked()
 		result = change_picker( picker )
 		if click_callback then
 			click_callback( result )

@@ -27,7 +27,11 @@ picker.menu = function()
 					GuiLayoutBeginHorizontal( gui, 0, 0 )
 						for _, p in ipairs( saved_spell_group ) do
 							do_action_button( p[1], 0, 0, selected_spell_group_index == index, function()
-								selected_spell_group_index = index
+								if selected_spell_group_index ~= index then
+									selected_spell_group_index = index
+								else
+									selected_spell_group_index = 0
+								end
 							end, function()
 								local common_actions = {}
 								for i, pair in ipairs( saved_spell_group ) do
@@ -53,6 +57,7 @@ picker.buttons = function()
 		if held_wand and mod_setting_get( "show_wand_edit_panel" ) then
 			if GuiImageButton( gui, next_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/save_wand.png" ) then
 				if not held_wand then return end
+				sound_button_clicked()
 				local edit_panel_state = access_edit_panel_state( held_wand )
 				local actions_to_save = {}
 				for s, a, u in state_str_iter_actions( edit_panel_state.get() ) do
@@ -70,8 +75,11 @@ picker.buttons = function()
 		end
 
 		if GuiImageButton( gui, next_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/delete_wand.png" ) then
-			table.remove( saved_spell_groups, selected_spell_group_index )
-			serialize_saved_spell_groups()
+			if selected_spell_group_index ~= 0 then
+				sound_button_clicked()
+				table.remove( saved_spell_groups, selected_spell_group_index )
+				serialize_saved_spell_groups()
+			end
 		end
 		GuiTooltip( gui, wrap_key( "spell_group_box_delete" ), "" )
 
@@ -79,10 +87,11 @@ picker.buttons = function()
 			GuiImageButton( gui, next_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/load_into_wand.png" )
 			local left_click, right_click = previous_data( gui )
 			if left_click or right_click then
-				local saved_spell_group = saved_spell_groups[selected_spell_group_index]
+				local saved_spell_group = saved_spell_groups[ selected_spell_group_index ]
 				local do_replace = mod_setting_get( "replace_mode" )
 				if shift then do_replace = not do_replace end
 				if saved_spell_group and held_wand then
+					sound_button_clicked()
 					set_action_group( access_edit_panel_state( held_wand ), saved_spell_group, do_replace, EntityGetWandCapacity( held_wand ), right_click )
 				end
 			end

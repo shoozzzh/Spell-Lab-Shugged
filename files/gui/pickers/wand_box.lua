@@ -263,6 +263,7 @@ picker.buttons = function()
 		if #current_page < 100 then
 			if GuiImageButton( gui, next_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/save_wand.png" ) then
 				if held_wand then
+					sound_button_clicked()
 					local data = WANDS.wand_get_data( held_wand )
 					table.insert( current_page, data )
 					serialize_wand_box_page( wand_box_current_page_index )
@@ -282,6 +283,7 @@ picker.buttons = function()
 		end
 		if #selected_indexes > 0 then
 			if GuiImageButton( gui, next_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/delete_wand.png" ) then
+				sound_button_clicked()
 				if not wand_box_delete_wand_confirming then
 					wand_box_delete_wand_confirming = true
 				else
@@ -313,6 +315,7 @@ picker.buttons = function()
 				if GuiImageButton( gui, next_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/load_into_wand.png" ) then
 					for i = 1, #current_page do
 						if wand_box_selected_indexes[ i ] then
+							sound_button_clicked()
 							local saved_wand = current_page[ i ]
 							WANDS.initialize_wand( held_wand, saved_wand )
 							force_refresh_held_wands()
@@ -346,11 +349,15 @@ picker.buttons = function()
 					WANDS.initialize_wand( wand_, wand )
 				end
 			end
+			if #wands_to_load > 0 then
+				sound_button_clicked()
+			end
 		end
 		GuiTooltip( gui, wrap_key( "wand_box_load_to_world" ), "" )
 
 		if wand_box_current_page_index > 1 then
 			if GuiImageButton( gui, next_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/pagelast.png" ) then
+				sound_button_clicked()
 				wand_box_current_page_index = wand_box_current_page_index - 1
 				wand_box_remove_page_confirming = false
 				wand_box_selected_indexes = {}
@@ -363,6 +370,7 @@ picker.buttons = function()
 		end
 		if wand_box_current_page_index < mod_setting_get( "wand_box_page_max_index" ) then
 			if GuiImageButton( gui, next_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/pagenext.png" ) then
+				sound_button_clicked()
 				wand_box_current_page_index = wand_box_current_page_index + 1
 				wand_box_remove_page_confirming = false
 				wand_box_selected_indexes = {}
@@ -375,12 +383,14 @@ picker.buttons = function()
 		end
 
 		if GuiImageButton( gui, next_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/pagenew.png" ) then
+			sound_button_clicked()
 			wand_box_remove_page_confirming = false
 			wand_box_new_page( wand_box_current_page_index, {} )
 			wand_box_selected_indexes = {}
 		end
 		GuiTooltip( gui, wrap_key( "wand_box_new_page" ), "" )
 		if GuiImageButton( gui, next_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/pagedelete.png" ) then
+			sound_button_clicked()
 			if not wand_box_remove_page_confirming then
 				wand_box_remove_page_confirming = true
 			else

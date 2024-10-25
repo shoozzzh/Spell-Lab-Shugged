@@ -30,7 +30,9 @@ local function load_mod_settings()
 				{ "INV", "背包中所有法杖" },
 				{ "HAND", "手持法杖" },
 				{ "PANEL", "手持法杖（仅法杖编辑面板显示时）" },
-			}
+			},
+			button_click_sound = "按钮点击音效",
+			action_button_click_sound = "法术按钮点击音效",
 		}
 	else
 		text = {
@@ -55,7 +57,9 @@ local function load_mod_settings()
 				{ "INV", "All Wands in Inventory" },
 				{ "HAND", "Held Wand" },
 				{ "PANEL", "Held Wand(Only when the wand edit panel is open)" },
-			}
+			},
+			button_click_sound = "Button Click Sound",
+			action_button_click_sound = "Spell Button Click sound",
 		}
 	end
 	mod_settings = {
@@ -122,6 +126,18 @@ local function load_mod_settings()
 			ui_description     = text.wand_listener_type_description,
 			value_default      = text.wand_listener_type_values[1][1],
 			values             = text.wand_listener_type_values,
+			scope              = MOD_SETTING_SCOPE_RUNTIME,
+		},
+		{
+			id                 = "button_click_sound",
+			ui_name            = text.button_click_sound,
+			value_default      = false,
+			scope              = MOD_SETTING_SCOPE_RUNTIME,
+		},
+		{
+			id                 = "action_button_click_sound",
+			ui_name            = text.action_button_click_sound,
+			value_default      = false,
 			scope              = MOD_SETTING_SCOPE_RUNTIME,
 		},
 	}

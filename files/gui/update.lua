@@ -62,6 +62,18 @@ if initialized == false then
 		return left_click,right_click,hover,x,y,width,height,draw_x,draw_y,draw_width,draw_height
 	end
 
+	function sound_button_clicked()
+		if mod_setting_get( "button_click_sound" ) then
+			GamePlaySound( "data/audio/Desktop/ui.bank", "ui/button_click", GameGetCameraPos() )
+		end
+	end
+
+	function sound_action_button_clicked()
+		if mod_setting_get( "action_button_click_sound" ) then
+			GamePlaySound( "data/audio/Desktop/ui.bank", "ui/button_click", GameGetCameraPos() )
+		end
+	end
+
 	type_text = {
 		[ACTION_TYPE_MODIFIER]          = "$inventory_actiontype_modifier",
 		[ACTION_TYPE_PROJECTILE]        = "$inventory_actiontype_projectile",
@@ -189,6 +201,7 @@ if initialized == false then
 			GuiOptionsAddForNextWidget( gui, GUI_OPTION.DrawSemiTransparent )
 		end
 		if GuiImageButton( gui, next_id(), 0, 0, "", filepath ) then
+			sound_button_clicked()
 			local new = not ModSettingGet( mod_settings_key )
 			ModSettingSet( mod_settings_key, new )
 			if click_callback then
@@ -224,7 +237,6 @@ if initialized == false then
 		GuiImage( gui, next_id(), -20, 0, "mods/spell_lab_shugged/files/gui/buttons/spell_box"..spell_box_suffix..".png", 1.0, 1.0, 0 )
 	end
 
-	-- TODO fix this when you learn how to
 	function do_action_button( action_id, x, y, selected, click_callback, tooltip_func, uses_remaining, note, extra_gui, empty_slot_show_tooltip, no_title )
 		if x == nil then x = 0 end
 		if y == nil then y = 0 end
@@ -278,8 +290,11 @@ if initialized == false then
 			local _,_,_,x,y,_,_,_,_,_,_ = previous_data( gui )
 			extra_gui( x, y, this_action_data, uses_remaining )
 		end
-		if click_callback and ( left_click or right_click ) then
-			click_callback( left_click, right_click )
+		if left_click or right_click then
+			sound_action_button_clicked()
+			if click_callback then
+				click_callback( left_click, right_click )
+			end
 		end
 	end
 
@@ -623,6 +638,7 @@ if initialized == false then
 				GuiOptionsAddForNextWidget( gui, GUI_OPTION.DrawSemiTransparent )
 			end
 			if GuiImageButton( gui, next_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/force_compact.png" ) then
+				sound_button_clicked()
 				edit_panel_state.set_force_compact_enabled( not force_compact_enabled )
 				edit_panel_state.force_sync()
 			end
@@ -632,6 +648,7 @@ if initialized == false then
 				GuiOptionsAddForNextWidget( gui, GUI_OPTION.DrawSemiTransparent )
 			end
 			if GuiImageButton( gui, next_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/automatic_capacity.png" ) then
+				sound_button_clicked()
 				edit_panel_state.set_autocap_enabled( not autocap_enabled )
 				if autocap_enabled and edit_panel_state.get_force_compact_enabled() then
 					local new_capacity = 0
@@ -664,6 +681,7 @@ if initialized == false then
 			local operation_to_redo = edit_panel_state.peek_redo()
 			if operation_to_undo then
 				if GuiImageButton( gui, next_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/undo.png" ) then
+					sound_button_clicked()
 					edit_panel_state.undo()
 				end
 				GuiTooltip( gui, text_get_translated( "undo" ) .. " " .. GameTextGetTranslatedOrNot( operation_to_undo ),
@@ -671,6 +689,7 @@ if initialized == false then
 			else cant_undo() end
 			if operation_to_redo then
 				if GuiImageButton( gui, next_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/redo.png" ) then
+					sound_button_clicked()
 					edit_panel_state.redo()
 				end
 				GuiTooltip( gui, text_get_translated( "redo" ) .. " " .. GameTextGetTranslatedOrNot( operation_to_redo ),
@@ -688,6 +707,7 @@ if initialized == false then
 					do
 						local left_click, right_click = previous_data( gui )
 						if left_click then
+							sound_button_clicked()
 							if GlobalsGetValue( "spell_lab_shugged_checkpoint", "0" ) == "0" then
 								local px, py = EntityGetTransform( player )
 								GlobalsSetValue( "spell_lab_shugged_checkpoint", math.floor( px )..","..math.floor( py ) )
@@ -707,6 +727,7 @@ if initialized == false then
 								GlobalsSetValue( "spell_lab_shugged_checkpoint", "0" )
 							end
 						elseif right_click then
+							sound_button_clicked()
 							EntityLoad( "mods/spell_lab_shugged/files/biome_impl/wand_lab/wand_lab.xml", 14600, -6000 )
 						end
 					end
@@ -738,6 +759,7 @@ if initialized == false then
 					GuiTooltip( gui, wrap_key( "shortcut_tips_title" ), wrap_key( "shortcut_tips" ) )
 
 					if GuiImageButton( gui, next_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/clear_projectiles.png" ) then
+						sound_button_clicked()
 						for k,v in pairs( EntityGetWithTag( "projectile" ) or {} ) do
 							local projectile = EntityGetFirstComponent( v, "ProjectileComponent" )
 							if projectile ~= nil then
@@ -758,22 +780,26 @@ if initialized == false then
 					GuiTooltip( gui, wrap_key( "clear_projectiles" ), "" )
 					if GuiImageButton( gui, next_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/clear_wait.png" ) then
 						if player then
+							local did = false
 							for k,v in pairs( EntityGetWithTag("wand") ) do
 								if EntityGetRootEntity( v ) == player then
 									local ability = EntityGetFirstComponentIncludingDisabled( v, "AbilityComponent" )
 									if ability then
+										did = true
 										ComponentSetValue2( ability, "mReloadFramesLeft", 0 )
 										ComponentSetValue2( ability, "mNextFrameUsable", now )
 										ComponentSetValue2( ability, "mReloadNextFrameUsable", now )
 									end
 								end
 							end
+							if did then sound_button_clicked() end
 						end
 					end
 					GuiTooltip( gui, wrap_key( "wand_ready" ), "" )
 
 					if GuiImageButton( gui, next_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/clear_wand.png" ) then
 						if held_wand then
+							sound_button_clicked()
 							access_edit_panel_state( held_wand ).set( "", wrap_key( "operation_clear_held_wand" ) )
 							-- WANDS.wand_clear_actions( held_wand )
 							-- force_refresh_held_wands()
@@ -795,6 +821,7 @@ if initialized == false then
 					do
 						local left_click,right_click = previous_data( gui )
 						if left_click then
+							sound_button_clicked()
 							local effect_to_remove = EntityGetWithTag( "spell_lab_shugged_effect_no_wand_editing" )[1]
 							if effect_to_remove then
 								EntityKill( effect_to_remove )
@@ -804,6 +831,7 @@ if initialized == false then
 								EntityAddTag( effect_id, "spell_lab_shugged_effect_edit_wands_everywhere" )
 							end
 						elseif right_click then
+							sound_button_clicked()
 							local effect_to_remove = EntityGetWithTag( "spell_lab_shugged_effect_edit_wands_everywhere" )[1]
 							if effect_to_remove then
 								EntityKill( effect_to_remove )
@@ -834,9 +862,11 @@ if initialized == false then
 					do
 						local left_click,right_click = previous_data( gui )
 						if left_click then
+							sound_button_clicked()
 							local x,y = get_player_or_camera_position()
 							EntityLoad( "mods/spell_lab_shugged/files/entities/dummy_target/dummy_target.xml", x, y )
 						elseif right_click then
+							sound_button_clicked()
 							local x,y = get_player_or_camera_position()
 							EntityLoad( "mods/spell_lab_shugged/files/entities/dummy_target/dummy_target_final.xml", x, y )
 						end
@@ -846,6 +876,7 @@ if initialized == false then
 						GuiOptionsAddForNextWidget( gui, GUI_OPTION.DrawSemiTransparent )
 					end
 					if GuiImageButton( gui, next_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/transform_into_target_dummy.png" ) then
+						sound_button_clicked()
 						selecting_mortal_to_transform = not selecting_mortal_to_transform
 					end
 					GuiTooltip( gui, wrap_key( "transform_mortal_into_target_dummy" ), wrap_key( "transform_mortal_into_target_dummy_description" ) )
@@ -876,10 +907,12 @@ if initialized == false then
 							},
 						}
 						if left_click then
+							sound_button_clicked()
 							local x, y = get_player_or_camera_position()
 							local wand = EntityLoad( "data/entities/items/wand_level_01.xml", x, y )
 							WANDS.initialize_wand( wand, wand_data )
 						elseif right_click and held_wand then
+							sound_button_clicked()
 							WANDS.initialize_wand( held_wand, wand_data, false )
 						end
 					end
@@ -899,6 +932,7 @@ if initialized == false then
 							GuiOptionsAddForNextWidget( gui, GUI_OPTION.DrawSemiTransparent )
 						end
 						if GuiImageButton( gui, next_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/unlimited_spells.png" ) then
+							sound_button_clicked()
 							if EntityGetIsAlive( world_state ) then
 								local comp_worldstate = EntityGetFirstComponent( world_state, "WorldStateComponent" )
 								ComponentSetValue2( comp_worldstate, "perk_infinite_spells", not world_state_unlimited_spells )
@@ -960,7 +994,7 @@ if initialized == false then
 		GuiOptionsAddForNextWidget( gui, GUI_OPTION.NonInteractive )
 		GuiOptionsAddForNextWidget( gui, GUI_OPTION.AlwaysClickable )
 		if GuiImageButton( gui, next_id(), screen_width - 14 - current_button_reservation, 2, "", "mods/spell_lab_shugged/files/gui/wrench.png" ) then
-			GamePlaySound( "data/audio/Desktop/ui.bank", "ui/button_click", GameGetCameraPos() )
+			sound_button_clicked()
 			is_panel_open = not is_panel_open
 		end
 		
