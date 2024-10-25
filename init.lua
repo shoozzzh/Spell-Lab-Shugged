@@ -14,14 +14,8 @@ local twitchy_effect = ModTextFileGetContent( "data/scripts/status_effects/twitc
 ModTextFileSetContent( "data/scripts/status_effects/twitchy.lua",
 	'if EntityHasTag( EntityGetRootEntity( GetUpdatedEntityID() ), "player_unit" ) and ModSettingGet( "spell_lab_shugged.disable_toxic_statuses" ) then EntityKill( GetUpdatedEntityID() ) return end\n'
 	.. twitchy_effect )
-local twitchy_effect2 = ModTextFileGetContent( "data/scripts/status_effects/twitchy_shot.lua" )
-ModTextFileSetContent( "data/scripts/status_effects/twitchy_shot.lua",
-	'if EntityHasTag( EntityGetRootEntity( GetUpdatedEntityID() ), "player_unit" ) and ModSettingGet( "spell_lab_shugged.disable_toxic_statuses" ) then shot = function() EntityKill( GetUpdatedEntityID() ) end return end\n'
-	.. twitchy_effect2 )
-local neutralized_effect = ModTextFileGetContent( "data/scripts/projectiles/neutralized.lua" )
-ModTextFileSetContent( "data/scripts/projectiles/neutralized.lua",
-	'if EntityHasTag( EntityGetRootEntity( GetUpdatedEntityID() ), "player_unit" ) and ModSettingGet( "spell_lab_shugged.disable_toxic_statuses" ) then shot = function() EntityKill( GetUpdatedEntityID() ) end return end\n'
-	.. neutralized_effect )
+ModLuaFileAppend( "data/scripts/status_effects/twitchy_shot.lua", "mods/spell_lab_shugged/files/scripts/no_toxic_effects_on_shot.lua" )
+ModLuaFileAppend( "data/scripts/projectiles/neutralized.lua"    , "mods/spell_lab_shugged/files/scripts/no_toxic_effects_on_shot.lua" )
 
 local mod_setting_prefix = "spell_lab_shugged."
 
