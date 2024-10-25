@@ -17,7 +17,7 @@ local function load_mod_settings()
 			wand_edit_panel_history_limit = "法杖编辑面板历史记录最大条数",
 			wand_edit_panel_history_limit_description = "法杖编辑面板保留最近操作的数量，默认为 30",
 			action_history_limit = "法术使用记录最大条数",
-			action_history_limit_description = "法术选取菜单保留最近使用过的法术的数量，默认为 96",
+			action_history_limit_description = "法术选取菜单保留的法术使用记录条数，默认为 96",
 			no_weather = "禁用天气",
 			no_weather_description = "开启时，天气将锁定为晴朗状态",
 			show_icon_unlocked = "标记已解锁法术",
@@ -56,7 +56,7 @@ local function load_mod_settings()
 			wand_listener_type_values = {
 				{ "INV", "All Wands in Inventory" },
 				{ "HAND", "Held Wand" },
-				{ "PANEL", "Held Wand(Only when the wand edit panel is open)" },
+				{ "PANEL", "Held Wand(Only when the wand edit panel is shown)" },
 			},
 			button_click_sound = "Button Click Sound",
 			action_button_click_sound = "Spell Button Click sound",

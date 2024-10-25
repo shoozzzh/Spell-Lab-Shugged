@@ -22,6 +22,7 @@ elseif wand_listener_type == "PANEL" then
 	end
 else
 	GamePrint( "Something is very wrong!" )
+	GamePrintImportant( "Something is very wrong!" )
 	print( "Something is very wrong!" )
 	wands_to_listen = {}
 end
