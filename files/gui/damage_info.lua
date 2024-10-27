@@ -10,7 +10,7 @@ if #total_damage > 0 then
 	GuiTextCentered( gui, x_pos, 0, text_get_translated( "damage_info_total_damage" ) .. total_damage )
 end
 
-local player_projectiles = EntityGetWithTag("projectile_player") or {}
+local player_projectiles = EntityGetWithTag( "spell_lab_shugged_player_projectile" ) or {}
 local total_projectile_damage = 0
 local total_projectiles = #player_projectiles
 for k,v in pairs( player_projectiles ) do

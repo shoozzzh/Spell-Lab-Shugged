@@ -1,2 +1,3 @@
--- delete this after 1.7.0
-function shot( projectile_entity ) end
+function shot( proj_id )
+	EntityAddTag( proj_id, "spell_lab_shugged_player_projectile" )
+end

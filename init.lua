@@ -2,13 +2,13 @@ dofile_once( "mods/spell_lab_shugged/files/lib/wands.lua" )
 dofile_once( "mods/spell_lab_shugged/files/lib/helper.lua" )
 ModLuaFileAppend( "data/scripts/gun/gun.lua", "mods/spell_lab_shugged/files/append/gun.lua" )
 
-local translations = ModTextFileGetContent("mods/spell_lab_shugged/files/translations.csv")
+local translations = ModTextFileGetContent( "mods/spell_lab_shugged/files/translations.csv" )
 local main = "data/translations/common.csv"
-local main_content = ModTextFileGetContent(main)
+local main_content = ModTextFileGetContent( main )
 if main_content:sub( #main_content, #main_content ) ~= "\n" then
 	main_content = main_content .. "\n"
 end
-ModTextFileSetContent(main, main_content .. translations:gsub("^[^\n]*\n", "", 1))
+ModTextFileSetContent( main, main_content .. translations:gsub( "^[^\n]*\n", "", 1 ) )
 
 local twitchy_effect = ModTextFileGetContent( "data/scripts/status_effects/twitchy.lua" )
 ModTextFileSetContent( "data/scripts/status_effects/twitchy.lua",
@@ -67,22 +67,11 @@ function OnPlayerSpawned( player_id )
 	if not_inited then
 		GlobalsSetValue( "spell_lab_shugged.refresh_player_state", "1" )
 		EntityAddComponent2( player_id, "LuaComponent", {
-			script_source_file="mods/spell_lab_shugged/files/scripts/player_update.lua",
+			script_source_file = "mods/spell_lab_shugged/files/scripts/player_update.lua",
 			execute_on_added = true,
 			execute_every_n_frame = 1,
 		} )
 		EntityAddComponent2( player_id, "LuaComponent", { script_shot = "mods/spell_lab_shugged/files/scripts/player_shot.lua" })
-	end
-end
-
-function OnPausedChanged( is_paused )
-	local entities_to_hide = EntityGetWithTag("hide_on_pause")
-	for _,v in pairs( entities_to_hide or {} ) do
-		local sprites = EntityGetComponentIncludingDisabled( v, "SpriteComponent" )
-		for _,sprite in pairs( sprites or {} ) do
-			EntitySetComponentIsEnabled( v, sprite, not is_paused )
-			EntityRefreshSprite( v, sprite )
-		end
 	end
 end
 
@@ -92,9 +81,7 @@ function OnWorldInitialized()
 	GlobalsSetValue( "mod_button_tr_width", tostring( mod_button_reservation + 15 ) )
 end
 
--- local gui_ = GuiCreate()
 function OnWorldPreUpdate()
-	-- full_screen_width, full_screen_height = GuiGetScreenDimensions( gui_ )
 	dofile( "mods/spell_lab_shugged/files/gui/update.lua" )
 end
 
