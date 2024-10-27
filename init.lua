@@ -1,5 +1,3 @@
-dofile_once( "mods/spell_lab_shugged/files/lib/wands.lua" )
-dofile_once( "mods/spell_lab_shugged/files/lib/helper.lua" )
 ModLuaFileAppend( "data/scripts/gun/gun.lua", "mods/spell_lab_shugged/files/append/gun.lua" )
 
 local translations = ModTextFileGetContent( "mods/spell_lab_shugged/files/translations.csv" )
