@@ -164,7 +164,7 @@ picker.menu = function()
 						local item_action_comp = EntityGetFirstComponentIncludingDisabled( child_2_id, "ItemActionComponent" )
 						if item_action_comp then
 							unsorted[ ComponentGetValue2( item_action_comp, "action_id" ) or "" ] = true
-						elseif EntityHasTag( child_2_id, "wand" ) then
+						elseif EntityHasTag( child_2_id, "wand" ) and not mod_setting_get( "include_spells_in_non_inv_wand" ) then
 							for _, child_3_id in ipairs( EntityGetAllChildren( child_2_id ) or {} ) do
 								local item_action_comp = EntityGetFirstComponentIncludingDisabled( child_3_id, "ItemActionComponent" )
 								if item_action_comp then
@@ -178,11 +178,25 @@ picker.menu = function()
 
 			local px, py = get_player_or_camera_position()
 			for _, card_id in ipairs( EntityGetInRadiusWithTag( px, py, 180, "card_action" ) ) do
+				-- exclude those in non-inv wands, because of an issue which nolla is responsible for
+				if not mod_setting_get( "include_spells_in_non_inv_wand" ) and EntityGetParent( card_id ) ~= 0 then goto continue end
+
 				local item_action_comp = EntityGetFirstComponentIncludingDisabled( card_id, "ItemActionComponent" )
 				if not item_action_comp then goto continue end
 
 				unsorted[ ComponentGetValue2( item_action_comp, "action_id" ) or "" ] = true
 				::continue::
+			end
+			if mod_setting_get( "include_spells_in_non_inv_wand" ) then
+				for _, wand_id in ipairs( EntityGetInRadiusWithTag( px, py, 180, "wand" ) ) do
+					for _, card_id in ipairs( EntityGetAllChildren( wand_id, "card_action" ) or {} ) do
+						local item_action_comp = EntityGetFirstComponentIncludingDisabled( card_id, "ItemActionComponent" )
+						if not item_action_comp then goto continue end
+
+						unsorted[ ComponentGetValue2( item_action_comp, "action_id" ) or "" ] = true
+						::continue::
+					end
+				end
 			end
 
 			unsorted[""] = nil

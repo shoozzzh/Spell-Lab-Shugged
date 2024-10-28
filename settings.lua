@@ -33,6 +33,8 @@ local function load_mod_settings()
 			},
 			button_click_sound = "按钮点击音效",
 			action_button_click_sound = "法术按钮点击音效",
+			include_spells_in_non_inv_wand = "背包/附近页面显示附近法杖中法术",
+			include_spells_in_non_inv_wand_description = "开启时，法术选取菜单的背包/附近页面将显示附近法杖中法术",
 		}
 	else
 		text = {
@@ -60,6 +62,8 @@ local function load_mod_settings()
 			},
 			button_click_sound = "Button Click Sound",
 			action_button_click_sound = "Spell Button Click sound",
+			include_spells_in_non_inv_wand = "Include Spells In Nearby Wands",
+			include_spells_in_non_inv_wand_description = "Should spells in nearby wands be shown in Inv/Nearby page of the spell picker?",
 		}
 	end
 	mod_settings = {
@@ -137,6 +141,13 @@ local function load_mod_settings()
 		{
 			id                 = "action_button_click_sound",
 			ui_name            = text.action_button_click_sound,
+			value_default      = false,
+			scope              = MOD_SETTING_SCOPE_RUNTIME,
+		},
+		{
+			id                 = "include_spells_in_non_inv_wand",
+			ui_name            = text.include_spells_in_non_inv_wand,
+			ui_description     = text.include_spells_in_non_inv_wand_description,
 			value_default      = false,
 			scope              = MOD_SETTING_SCOPE_RUNTIME,
 		},
