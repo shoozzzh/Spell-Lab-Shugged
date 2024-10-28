@@ -51,15 +51,15 @@ elseif on_setting_turning_off( "force_2gcedge" ) then
 end
 
 if settings[ "no_polymorphing" ] == nil then
-	settings[ "no_polymorphing" ] = EntityHasTag( entity_id, "polymorphable_NOT" )
+	settings[ "no_polymorphing" ] = EntityGetWithName( "spell_lab_shugged_no_polymorphing" ) ~= 0
 end
 
 if on_setting_turning_on( "no_polymorphing" ) then
-	EntityAddTag( entity_id, "polymorphable_NOT" )
+	local effect = GetGameEffectLoadTo( entity_id, "PROTECTION_POLYMORPH", true )
+	ComponentSetValue2( effect, "frames", -1 )
+	EntitySetName( ComponentGetEntity( effect ), "spell_lab_shugged_invincible" )
 elseif on_setting_turning_off( "no_polymorphing" ) then
-	if not GameHasFlagRun( "ending_game_completed_with_34_orbs" ) then
-		EntityRemoveTag( entity_id, "polymorphable_NOT" )
-	end
+	EntityKill( EntityGetWithName( "spell_lab_shugged_no_polymorphing" ) )
 end
 
 if settings[ "invincible" ] == nil then

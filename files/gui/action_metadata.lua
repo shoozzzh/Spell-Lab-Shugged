@@ -76,7 +76,7 @@ function get_action_metadata( action_id )
 		end
 		local xml_content = read_xml_content( filepath )
 		if not xml_content then
-			print( "Spell " .. tostring( action_id ) .. " has a wrong argument in its Reflection_RegisterProjectile(). Blame the author of that spell if you see this" )
+			print( "Spell " .. tostring( action_id ) .. " has a wrong argument in its Reflection_RegisterProjectile(). You might want to blame the author of that spell if you see this" )
 			return
 		end
 		local properties
@@ -135,11 +135,7 @@ function get_action_metadata( action_id )
 		local vel_comp = xml_content:first_of( "VelocityComponent" )
 		if vel_comp then
 			properties.gravity = vel_comp.attr.gravity_y or 400
-			if vel_comp.attr.air_friction and tonumber( vel_comp.attr.air_friction ) ~= nil then
-				properties.air_friction = vel_comp.attr.air_friction
-			else
-				properties.air_friction = "0.55"
-			end
+			properties.air_friction = vel_comp.attr.air_friction or 0.55
 		end
 
 		if last_projectile_timer_time then
