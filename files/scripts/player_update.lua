@@ -57,7 +57,7 @@ end
 if on_setting_turning_on( "no_polymorphing" ) then
 	local effect = GetGameEffectLoadTo( entity_id, "PROTECTION_POLYMORPH", true )
 	ComponentSetValue2( effect, "frames", -1 )
-	EntitySetName( ComponentGetEntity( effect ), "spell_lab_shugged_invincible" )
+	EntitySetName( ComponentGetEntity( effect ), "spell_lab_shugged_no_polymorphing" )
 elseif on_setting_turning_off( "no_polymorphing" ) then
 	EntityKill( EntityGetWithName( "spell_lab_shugged_no_polymorphing" ) )
 end
