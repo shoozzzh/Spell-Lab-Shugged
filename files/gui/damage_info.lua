@@ -1,11 +1,11 @@
 GuiLayoutAddVerticalSpacing( gui, 360 * 0.05 )
 local x_pos = ( screen_width + 4 * ( 20 + 2 ) ) * 0.5
-local highest_dps = GlobalsGetValue( "spell_lab_shugged_recent_highest_dps","" )
+local highest_dps = GlobalsGetValue( "spell_lab_shugged_recent_highest_dps", "" )
 if #highest_dps > 0 then
 	GuiTextCentered( gui, x_pos, 0, text_get_translated( "damage_info_dps" ) .. highest_dps )
 end
 
-local total_damage = GlobalsGetValue( "spell_lab_shugged_recent_total_damage","" )
+local total_damage = GlobalsGetValue( "spell_lab_shugged_recent_total_damage", "" )
 if #total_damage > 0 then
 	GuiTextCentered( gui, x_pos, 0, text_get_translated( "damage_info_total_damage" ) .. total_damage )
 end

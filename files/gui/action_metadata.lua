@@ -135,7 +135,7 @@ function get_action_metadata( action_id )
 		local vel_comp = xml_content:first_of( "VelocityComponent" )
 		if vel_comp then
 			properties.gravity = vel_comp.attr.gravity_y or 400
-			if vel_comp.attr.air_friction and tonumber( vel_comp.attr.air_friction ) ~= 0 then
+			if vel_comp.attr.air_friction and tonumber( vel_comp.attr.air_friction ) ~= nil then
 				properties.air_friction = vel_comp.attr.air_friction
 			else
 				properties.air_friction = "0.55"
