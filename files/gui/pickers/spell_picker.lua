@@ -226,100 +226,68 @@ picker.menu = function()
 			::continue::
 		end
 	end
-	local adjusted_columns = 8
 	
 	GuiLayoutBeginVertical( gui, 640 * 0.05, 360 * 0.16, true )
-		local scroll_id = next_id() + filter_type
-		local rows = math.max( 1, math.ceil( #actions_data_to_show / adjusted_columns ) )
-		GuiBeginScrollContainer( gui, scroll_id, 0, 0, 174, filter_type ~= FILTER_TYPE_SEARCH and math.min( rows * 20, 160 ) or 98 )
-			local _,_,_,x,y,width,height,_,_,_,_ = previous_data( gui )
-			local mx, my = DEBUG_GetMouseWorld()
-			mx, my = get_screen_position( mx, my )
-			-- extra 2 pixels for the margins
-			if -2 <= mx - x and mx - x <= width + 2 and -2 <= my - y and my - y <= height + 2 then
-				GuiIdPushString( gui, "NO_MORE_WAND_SWITCHING" )
-				GuiAnimateBegin( gui )
-				GuiAnimateAlphaFadeIn( gui, 1, 0, 0, true )
-				GuiOptionsAddForNextWidget( gui, GUI_OPTION.Layout_NoLayouting )
-				GuiOptionsAddForNextWidget( gui, GUI_OPTION.AlwaysClickable )
-				GuiBeginScrollContainer( gui, 2, mx - 25, my - 25, 50, 50, false, 0, 0 )
-				GuiEndScrollContainer( gui )
-				GuiAnimateEnd( gui )
-				GuiIdPop( gui )
-				ModTextFileSetContent_Saved( "mods/spell_lab_shugged/scroll_box_hovered.txt", "true" )
-			else
-				ModTextFileSetContent_Saved( "mods/spell_lab_shugged/scroll_box_hovered.txt", "false" )
-			end
-			GuiLayoutBeginVertical( gui, 0, 0 )
-				local action_index = 1
-				local action = actions_data_to_show[action_index]
-				while action do
-					GuiLayoutBeginHorizontal( gui, 0, 0 )
-					local actions_in_row = 0
-					while action and actions_in_row < adjusted_columns do
-						do_action_button( action.id, 0, 0, false, function( left_click, right_click )
-							local is_unlocked_action = action_data.spawn_requires_flag and HasFlagPersistent( action_data.spawn_requires_flag ) 
-							if ctrl and shift then
-								if is_unlocked_action then
-									RemoveFlagPersistent( action.spawn_requires_flag )
-								end
-								return
-							end
+		local first_scroll_id = next_id()
+		for i = 0 + 1, 10 do
+			next_id()
+		end
 
-							if not mod_setting_get( "quick_spell_picker" ) or not mod_setting_get( "show_wand_edit_panel" ) or not held_wand then
-								if not player then return end
-								local x, y = EntityGetTransform( player )
-								local action_entity = CreateItemActionEntity( action.id, x, y )
-								local inventory_full
-								local player_child_entities = EntityGetAllChildren( player )
-								if not player_child_entities then return end
-								for i,child_entity in ipairs( player_child_entities ) do
-									if EntityGetName( child_entity ) == "inventory_full" then
-										inventory_full = child_entity
-										break
-									end
-								end
-								-- set inventory contents
-								if inventory_full then
-									EntitySetComponentsWithTagEnabled( action_entity, "enabled_in_world", false )
-									EntityAddChild( inventory_full, action_entity )
-									GamePrint( GameTextGet( wrap_key( "action_added_to_inventory" ), GameTextGetTranslatedOrNot( action.name ) ) )
-									if filter_type ~= FILTER_TYPE_RECENT then
-										new_action_history_entry( action.id )
-									end
-								end
-								return
-							end
-							if not held_wand then return end
-							local do_replace = mod_setting_get( "replace_mode" )
-							if shift then do_replace = not do_replace end
-							local uses_remaining = nil
-							if not world_state_unlimited_spells or action.never_unlimited then
-								uses_remaining = action.max_uses
-							end
-							set_action( access_edit_panel_state( held_wand ), action.id, uses_remaining, do_replace, EntityGetWandCapacity( held_wand ), right_click )
-							if filter_type ~= FILTER_TYPE_RECENT then
-								new_action_history_entry( action.id )
-							end
-						end, do_verbose_tooltip, action.max_uses, nil, show_locked_state, false, true )
-						actions_in_row = actions_in_row + 1
-						::continue::
+		local height = nil
+		if filter_type == FILTER_TYPE_SEARCH then
+			height = 98
+		end
 
-						action_index = action_index + 1
-						action = actions_data_to_show[ action_index ]
+		do_scroll_table( first_scroll_id + filter_type, SCROLL_TABLE_WIDTH, height, actions_data_to_show, function( action )
+			do_action_button( action.id, 0, 0, false, function( left_click, right_click )
+				local is_unlocked_action = action_data.spawn_requires_flag and HasFlagPersistent( action_data.spawn_requires_flag ) 
+				if ctrl and shift then
+					if is_unlocked_action then
+						RemoveFlagPersistent( action.spawn_requires_flag )
 					end
-					GuiLayoutEnd( gui )
-					GuiLayoutAddVerticalSpacing( gui, -2 )
-					--GuiLayoutAddHorizontalSpacing( gui, -2 )
+					return
 				end
-				if action_index == 1 then -- no actions to show
-					GuiText( gui, 0, 0, wrap_key( "spell_picker_nothing" ) )
+
+				if not mod_setting_get( "quick_spell_picker" ) or not mod_setting_get( "show_wand_edit_panel" ) or not held_wand then
+					if not player then return end
+					local x, y = EntityGetTransform( player )
+					local action_entity = CreateItemActionEntity( action.id, x, y )
+					local inventory_full
+					local player_child_entities = EntityGetAllChildren( player )
+					if not player_child_entities then return end
+					for i,child_entity in ipairs( player_child_entities ) do
+						if EntityGetName( child_entity ) == "inventory_full" then
+							inventory_full = child_entity
+							break
+						end
+					end
+					-- set inventory contents
+					if inventory_full then
+						EntitySetComponentsWithTagEnabled( action_entity, "enabled_in_world", false )
+						EntityAddChild( inventory_full, action_entity )
+						GamePrint( GameTextGet( wrap_key( "action_added_to_inventory" ), GameTextGetTranslatedOrNot( action.name ) ) )
+						if filter_type ~= FILTER_TYPE_RECENT then
+							new_action_history_entry( action.id )
+						end
+					end
+					return
 				end
-			GuiLayoutEnd( gui )
-		GuiEndScrollContainer( gui )
+				if not held_wand then return end
+				local do_replace = mod_setting_get( "replace_mode" )
+				if shift then do_replace = not do_replace end
+				local uses_remaining = nil
+				if not world_state_unlimited_spells or action.never_unlimited then
+					uses_remaining = action.max_uses
+				end
+				set_action( access_edit_panel_state( held_wand ), action.id, uses_remaining, do_replace, EntityGetWandCapacity( held_wand ), right_click )
+				if filter_type ~= FILTER_TYPE_RECENT then
+					new_action_history_entry( action.id )
+				end
+			end, do_verbose_tooltip, action.max_uses, nil, show_locked_state, false, true )
+		end )
 
 		if filter_type == FILTER_TYPE_SEARCH then
-			GuiBeginScrollContainer( gui, next_id(), 0, 8, 174, 50 )
+			GuiBeginScrollContainer( gui, next_id(), 0, 8, SCROLL_TABLE_WIDTH, 50 )
 				local row_height = 13
 				local key_width = 13
 				local big_key_width = 1.5 * key_width

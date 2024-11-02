@@ -142,6 +142,27 @@ if initialized == false then
 		return ax + screen_width * 0.5, ay + screen_height * 0.5
 	end
 
+	function scroll_box_no_wand_switching()
+		local _,_,_,x,y,width,height,_,_,_,_ = previous_data( gui )
+		local mx, my = DEBUG_GetMouseWorld()
+		mx, my = get_screen_position( mx, my )
+		-- extra 2 pixels for the margins
+		if -2 <= mx - x and mx - x <= width + 2 and -2 <= my - y and my - y <= height + 2 then
+			GuiIdPushString( gui, "NO_MORE_WAND_SWITCHING" )
+			GuiAnimateBegin( gui )
+			GuiAnimateAlphaFadeIn( gui, 1, 0, 0, true )
+			GuiOptionsAddForNextWidget( gui, GUI_OPTION.Layout_NoLayouting )
+			GuiOptionsAddForNextWidget( gui, GUI_OPTION.AlwaysClickable )
+			GuiBeginScrollContainer( gui, 2, mx - 25, my - 25, 50, 50, false, 0, 0 )
+			GuiEndScrollContainer( gui )
+			GuiAnimateEnd( gui )
+			GuiIdPop( gui )
+			ModTextFileSetContent_Saved( "mods/spell_lab_shugged/scroll_box_hovered.txt", "true" )
+		else
+			ModTextFileSetContent_Saved( "mods/spell_lab_shugged/scroll_box_hovered.txt", "false" )
+		end
+	end
+
 	function force_refresh_held_wands()
 		if not player then return end
 		local inv2_comp = EntityGetFirstComponent( player, "Inventory2Component" )
@@ -195,6 +216,40 @@ if initialized == false then
 
 	wand_stats = dofile( "mods/spell_lab_shugged/files/gui/wand_stats.lua" )
 
+	SCROLL_TABLE_WIDTH = 174
+
+	function do_scroll_table( scroll_id, width, height, cell_list, cell_gui_func, row_size, height_limit )
+		row_size = row_size or 8
+		height_limit = height_limit or 160
+		if not height then
+			local num_rows = math.max( 1, math.ceil( #cell_list / row_size ) )
+			height = math.min( num_rows * 20, height_limit )
+		end
+
+		GuiBeginScrollContainer( gui, scroll_id, 0, 0, width, math.max( height, 20 ) )
+			scroll_box_no_wand_switching()
+			GuiLayoutBeginVertical( gui, 0, 0 )
+				local index = 1
+				local cell = cell_list[ index ]
+				while cell do
+					GuiLayoutBeginHorizontal( gui, 0, 0 )
+						local cells_in_row = 0
+						while cell and cells_in_row < row_size do
+							cell_gui_func( cell, index )
+							cells_in_row = cells_in_row + 1
+							index = index + 1
+							cell = cell_list[ index ]
+						end
+					GuiLayoutEnd( gui )
+					GuiLayoutAddVerticalSpacing( gui, -2 )
+				end
+				if index == 1 then -- no cell to show
+					GuiText( gui, 0, 0, wrap_key( "scroll_table_nothing" ) )
+				end
+			GuiLayoutEnd( gui )
+		GuiEndScrollContainer( gui )
+	end
+
 	function do_flag_toggle_image_button( filepath, flag, option_text, click_callback, description )
 		local mod_settings_key = mod_settings_prefix .. flag
 		if not ModSettingGet( mod_settings_key ) then
@@ -217,7 +272,7 @@ if initialized == false then
 		end
 	end
 
-	function do_action_image( gui, id, action_id, x, y, alpha, scale_x, scale_y, rotation )
+	function do_action_image( id, action_id, x, y, alpha, scale_x, scale_y, rotation )
 		x = x or 0
 		y = y or 0
 		alpha = alpha or 1.0
@@ -252,7 +307,7 @@ if initialized == false then
 		local this_action_metadata = action_metadata[ action_id ]
 
 		GuiImageButton( gui, next_id(), 2, 2, "", image_sprite )
-		left_click,right_click,hover,x1,y1 = previous_data( gui )
+		local left_click,right_click,hover = previous_data( gui )
 
 		if selected then
 			spell_box_suffix = spell_box_suffix .. "_active"
@@ -298,6 +353,31 @@ if initialized == false then
 		end
 	end
 
+	function do_fake_action_button( action_type, action_sprite, uses_remaining, action_data, action_metadata )
+		GuiImageButton( gui, next_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/transparent_20x20.png" )
+		local left_click,right_click,hover,x1,y1 = previous_data( gui )
+
+		local spell_box_suffix = tostring( action_type or ACTION_TYPE_PROJECTILE )
+		if hover then
+			spell_box_suffix = spell_box_suffix .. "_hover"
+		end
+
+		GuiLayoutBeginLayer( gui )
+			GuiZSetForNextWidget( gui, 0 )
+			local sprite_width, sprite_height = GuiGetImageDimensions( gui, action_sprite )
+			GuiOptionsAddForNextWidget( gui, GUI_OPTION.NonInteractive )
+			-- GuiOptionsAddForNextWidget( gui, GUI_OPTION.Layout_NoLayouting )
+			GuiImageButton( gui, next_id(), x1 + ( 20 - sprite_width ) / 2--[[ - 20]], y1 + ( 20 - sprite_height ) / 2, "", action_sprite, 1 )
+			GuiZSetForNextWidget( gui, 1 )
+			GuiImage( gui, next_id(), --[[-( 2 + sprite_width / 2 + 10 )]]x1, y1, "mods/spell_lab_shugged/files/gui/buttons/spell_box_"..spell_box_suffix..".png", 1.0, 1.0, 0 )
+			if uses_remaining then
+				show_uses_remaining( x1, y1, nil, uses_remaining )
+			end
+		GuiLayoutEndLayer( gui )
+
+		return left_click, right_click
+	end
+
 	function show_permanent_icon( x, y )
 		GuiOptionsAddForNextWidget( gui, GUI_OPTION.Layout_NoLayouting )
 		GuiImage( gui, next_id(), x-2, y-2, "data/ui_gfx/inventory/icon_gun_permanent_actions.png", 1.0, 1.0, 0 )
@@ -314,7 +394,7 @@ if initialized == false then
 		end
 	end
 
-	function show_uses_remaining( x, y, this_action_data, uses_remaining )
+	function show_uses_remaining( x, y, _, uses_remaining )
 		if not uses_remaining then return end
 		GuiOptionsAddForNextWidget( gui, GUI_OPTION.Layout_NoLayouting )
 		GuiText( gui, x-2, y-2, tostring( uses_remaining ), 1, "data/fonts/font_pixel_noshadow.xml", true )
@@ -699,7 +779,7 @@ if initialized == false then
 
 		if is_panel_open and not GameIsInventoryOpen() and player and not GameHasFlagRun( "gkbrkn_config_menu_open" ) then
 			GuiLayoutBeginVertical( gui, 0, 360 * 0.02, true )
-				GuiLayoutBeginHorizontal( gui, horizontal_centered_x(8,4), percent_to_ui_scale_y(2), true )
+				GuiLayoutBeginHorizontal( gui, horizontal_centered_x(9,4), percent_to_ui_scale_y(2), true )
 					if GlobalsGetValue( "spell_lab_shugged_checkpoint", "0" ) == "0" then
 						GuiOptionsAddForNextWidget( gui, GUI_OPTION.DrawSemiTransparent )
 					end
@@ -749,6 +829,7 @@ if initialized == false then
 							mod_setting_set( "show_wand_edit_panel", true )
 						end
 					end )
+					do_picker_button( "mods/spell_lab_shugged/files/gui/buttons/wand_list.png", PICKERS.ShotEffects, "shot_effects" )
 					do_flag_toggle_image_button( "mods/spell_lab_shugged/files/gui/buttons/show_toggles.png", "show_toggle_options", "toggle_options" )
 					do_flag_toggle_image_button( "mods/spell_lab_shugged/files/gui/buttons/damage_info.png", "damage_info" )
 					do_flag_toggle_image_button( "mods/spell_lab_shugged/files/gui/buttons/show_wand_edit_panel.png", "show_wand_edit_panel", "wand_edit_panel" )

@@ -4,6 +4,7 @@ PICKERS = {
 	WandPicker = "wand_picker",
 	WandBox = "wand_box",
 	SpellGroupBox = "spell_group_box",
+	ShotEffects = "shot_effects",
 }
 
 local pickers_data = {}

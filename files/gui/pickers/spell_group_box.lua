@@ -18,33 +18,24 @@ end
 local picker = {}
 local selected_spell_group_index = 0
 picker.menu = function()
-	GuiLayoutBeginVertical( gui, 5, 16 )
-		local scroll_id = next_id()
-		local rows = #saved_spell_groups
-		GuiBeginScrollContainer( gui, scroll_id, 0, 0, 174, math.min( rows * 20, 160 ) )
-			GuiLayoutBeginVertical( gui, 0, 0 )
-				for index, saved_spell_group in ipairs( saved_spell_groups ) do
-					GuiLayoutBeginHorizontal( gui, 0, 0 )
-						for _, p in ipairs( saved_spell_group ) do
-							do_action_button( p[1], 0, 0, selected_spell_group_index == index, function()
-								if selected_spell_group_index ~= index then
-									selected_spell_group_index = index
-								else
-									selected_spell_group_index = 0
-								end
-							end, function()
-								local common_actions = {}
-								for i, pair in ipairs( saved_spell_group ) do
-									common_actions[ i - 1 ] = pair[ 1 ]
-								end
-								do_simple_common_action_list( common_actions, #saved_spell_group - 1 )
-							end, p[2], text_get_translated( "spell_group_select" ), nil, true )
-						end
-					GuiLayoutEnd( gui )
-					GuiLayoutAddVerticalSpacing( gui, 2 )
-				end
-			GuiLayoutEnd( gui )
-		GuiEndScrollContainer( gui )
+	GuiLayoutBeginVertical( gui, 640 * 0.05, 360 * 0.16, true )
+		do_scroll_table( next_id(), SCROLL_TABLE_WIDTH, nil, saved_spell_groups, function( saved_spell_group )
+			for _, p in ipairs( saved_spell_group ) do
+				do_action_button( p[1], 0, 0, selected_spell_group_index == index, function()
+					if selected_spell_group_index ~= index then
+						selected_spell_group_index = index
+					else
+						selected_spell_group_index = 0
+					end
+				end, function()
+					local common_actions = {}
+					for i, pair in ipairs( saved_spell_group ) do
+						common_actions[ i - 1 ] = pair[ 1 ]
+					end
+					do_simple_common_action_list( common_actions, #saved_spell_group - 1 )
+				end, p[2], text_get_translated( "spell_group_select" ), nil, true )
+			end
+		end, 1 )
 	GuiLayoutEnd( gui )
 end
 
