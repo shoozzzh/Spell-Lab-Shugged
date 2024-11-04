@@ -41,12 +41,14 @@ shot_effect_entries = {
 		extra_modifiers = "bounce",
 	},
 	{
+		id = "PROJECTILE_HOMING_SHOOTER_WIZARD",
 		icon = "data/ui_gfx/status_indicators/homing_shooter.png",
 		name = "$status_homing_shooter",
 		desc = "$statusdesc_homing_shooter",
 		extra_modifiers = "projectile_homing_shooter_wizard",
 	},
 	{
+		id = "essence_alcohol",
 		icon = "data/items_gfx/essences/essence_alcohol.png",
 		name = "$item_essence_alcohol",
 		desc = "$itemdesc_essence_alcohol",
@@ -66,6 +68,7 @@ shot_effect_entries = {
 		extra_modifiers = "slow_firing",
 	},
 	{
+		id = "STATUS_TWITCHY",
 		icon = "data/ui_gfx/status_indicators/twitchy.png",
 		name = "$status_twitchy",
 		desc = "$statusdesc_twitchy",
@@ -73,6 +76,7 @@ shot_effect_entries = {
 		max_count = 1,
 	},
 	{
+		id = "STATUS_NEUTRALIZED",
 		icon = "data/ui_gfx/status_indicators/neutralized.png",
 		name = "$effect_neutralized",
 		desc = "$effectdesc_neutralized",
