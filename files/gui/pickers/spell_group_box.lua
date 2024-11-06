@@ -19,7 +19,7 @@ local picker = {}
 local selected_spell_group_index = 0
 picker.menu = function()
 	GuiLayoutBeginVertical( gui, 640 * 0.05, 360 * 0.16, true )
-		do_scroll_table( next_id(), SCROLL_TABLE_WIDTH, nil, saved_spell_groups, function( saved_spell_group )
+		do_scroll_table( next_id(), nil, nil, saved_spell_groups, function( saved_spell_group )
 			for _, p in ipairs( saved_spell_group ) do
 				do_action_button( p[1], 0, 0, selected_spell_group_index == index, function()
 					if selected_spell_group_index ~= index then

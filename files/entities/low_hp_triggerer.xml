@@ -1,0 +1,8 @@
+<Entity>
+	<InheritTransformComponent/>
+	<LuaComponent
+		script_source_file="mods/spell_lab_shugged/files/entities/low_hp_triggerer.lua"
+		execute_every_n_frame="1"
+		remove_after_executed="1">
+	</LuaComponent>
+</Entity>

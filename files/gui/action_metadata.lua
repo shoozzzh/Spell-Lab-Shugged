@@ -1,61 +1,10 @@
-local nxml = dofile_once( "mods/spell_lab_shugged/files/lib/nxml.lua" )
-local TYPE_ADJUSTMENT = {
+dofile_once( "mods/spell_lab_shugged/files/lib/entity_xml_parser.lua" )
+TYPE_ADJUSTMENT = {
 	Add = 1,
 	Set = 2,
 }
-function read_xml_content( filepath )
-	if not filepath or not ModDoesFileExist( filepath ) then return nil end
-	local xml_content = nxml.parse( ModTextFileGetContent( filepath ) )
-	local children_to_add = {}
-	for basefile in xml_content:each_child() do
-		if basefile.name ~= "Base" then goto continue end
-		local include_children = basefile.attr.include_children
-		local basefile_content = read_xml_content( basefile.attr.file )
-		if not basefile_content then goto continue end
-
-		for child in basefile:each_child() do
-			local child_to_edit
-			for c in basefile_content:each_of( child.name ) do
-				if not c.attr.edited then
-					child_to_edit = c
-					break
-				end
-			end
-			if child_to_edit == nil then
-				print_error( "base file used incorrectly in file: " .. basefile.attr.file .. " name: " .. child.name .. " path: " .. filepath )
-				break
-			end
-
-			for k, v in pairs( child.attr ) do
-				child_to_edit.attr[k] = v
-			end
-			for object in child:each_child() do
-				local object_to_edit = child_to_edit:first_of( object.name )
-				if object_to_edit then
-					for k, v in pairs( object.attr ) do
-						object_to_edit[k] = v
-					end
-				else
-					table.insert( child_to_edit.children, object )
-				end
-			end
-			child_to_edit.attr.edited = true
-		end
-		for child in basefile_content:each_child() do
-			if child.name ~= "Entity" or include_children == "1" then
-				child.attr.edited = nil
-				table.insert( children_to_add, child )
-			end
-		end
-		::continue::
-	end
-	for _, child in ipairs( children_to_add ) do
-		xml_content:add_child( child )
-	end
-	return xml_content
-end
-function get_action_metadata( action_id )
-	if not action_data[action_id] then return end
+function get_action_metadata( this_action_data )
+	if not this_action_data then return end
 	local metadata = {
 		c = {},
 		projectiles = nil,
@@ -74,9 +23,9 @@ function get_action_metadata( action_id )
 			metadata.projectiles[filepath].projectiles = metadata.projectiles[filepath].projectiles + 1
 			return
 		end
-		local xml_content = read_xml_content( filepath )
+		local xml_content = parse_entity_xml( filepath )
 		if not xml_content then
-			print( "Spell " .. tostring( action_id ) .. " has a wrong argument in its Reflection_RegisterProjectile(). You might want to blame the author of that spell if you see this" )
+			print( "Spell " .. tostring( this_action_data.action_id ) .. " has a wrong argument in its Reflection_RegisterProjectile(). You might want to blame the author of that spell if you see this" )
 			return
 		end
 		local properties
@@ -271,7 +220,7 @@ function get_action_metadata( action_id )
 			shot_effects.recoil_knockback = recoil
 		end]]
 
-		local action_action = action_data[action_id].action
+		local action_action = this_action_data.action
 		local action_env = getfenv( action_action )
 		action_env.add_projectile_trigger_timer = add_projectile_trigger_timer_injected
 		setfenv( action_action, action_env )
@@ -281,7 +230,7 @@ function get_action_metadata( action_id )
 		draw_actions = _draw_actions
 		c.draw_actions = draws
 		c.reload_time = current_reload_time
-		c.mana = action_data[action_id].mana
+		c.mana = this_action_data.mana
 		if rawget( shot_effects, "spell_lab_shugged_count_recoil_set" ) == 1 then
 			if rawget( shot_effects, "spell_lab_shugged_count_recoil_get" ) == 1 then
 				c.spell_lab_shugged_recoil = { value = shot_effects.spell_lab_shugged_recoil_knockback, type = TYPE_ADJUSTMENT.Add }
@@ -292,7 +241,7 @@ function get_action_metadata( action_id )
 		c.lifetime_cap = { nil, nil }
 		if #c.extra_entities > 0 then
 			string.gsub( c.extra_entities, "[^,]+", function( extra_entity )
-				local extra_entity_content = read_xml_content( extra_entity )
+				local extra_entity_content = parse_entity_xml( extra_entity )
 				if extra_entity_content == nil then return end
 				for lifetime_comp in extra_entity_content:each_of( "LifetimeComponent" ) do
 					local lifetime = tonumber( lifetime_comp.attr.lifetime )
@@ -365,8 +314,35 @@ if player then EntityRemoveTag( player, "player_unit" ) end
 
 local action_metadata = {}
 for _, action in pairs( actions ) do
-	action_metadata[ action.id ] = get_action_metadata( action.id )
+	action_metadata[ action.id ] = get_action_metadata( action )
 end
+local extra_modifier_metadata = {}
+local extra_modifier_blacklist = { "damage_projectile_boost" }
+for id, action in pairs( extra_modifiers ) do
+	for _, bad_extra_modifier_id in ipairs( extra_modifier_blacklist ) do
+		if id == bad_extra_modifier_id then
+			goto continue
+		end
+	end
+	do
+		local fake_action = {
+			id = "FAKE_ACTION_" .. string.upper( id ),
+			mana = 0,
+			action = action,
+		}
+		local metadata = get_action_metadata( fake_action ).c
+		for k, v in pairs( metadata ) do
+			if k == "mana" and v == 0 then
+				metadata[ k ] = nil
+				break
+			end
+		end
+		extra_modifier_metadata[ id ] = metadata
+
+	end
+	::continue::
+end
+
 if player then EntityAddTag( player, "player_unit" ) end
 
 local metadata_to_show = {
@@ -376,11 +352,11 @@ local metadata_to_show = {
 		{ "mana"                    , "$inventory_manadrain", nil, function(value) return format_value( value, 0 ) end },
 		{ "fire_rate_wait"          , "$inventory_castdelay", 0, function(value) return format_value( value / 60, 3, true, FORMAT.Round ) .. " s (" .. GameTextGet( wrap_key( "frames" ), format_value( value, 0 ) ) .. ")" end },
 		{ "speed_multiplier"        , "$inventory_mod_speed", 1, function(value) return "x " .. format_value( value, 2 ) end },
-		{ "lifetime_add"            , wrap_key( "lifetime_add" ), 0, function(value) return format_value( value, 0 ) end },
+		{ "lifetime_add"            , wrap_key( "lifetime_add" ), 0, function(value) return format_value( value, 0, true ) end },
 		{ "lifetime_cap"            , wrap_key( "lifetime_cap" ), nil, function(value) return format_range( value[1], value[2] ) end },
 		{ "reload_time"             , "$inventory_rechargetime", 0, function(value) return format_value( value / 60, 3, true, FORMAT.Round ) .. " s (" .. GameTextGet( wrap_key( "frames" ), format_value( value, 0 ) ) .. ")" end },
 		{ "spread_degrees"          , "$inventory_spread", 0, function(value) return GameTextGet( wrap_key( "degrees" ), format_value( value, 3, true, FORMAT.Round ) ) end },
-		{ "damage_critical_chance"  , "$inventory_mod_critchance", 0, function(value) return format_value( value, 0 ) .. "%" end },
+		{ "damage_critical_chance"  , "$inventory_mod_critchance", 0, function(value) return format_value( value, 0, true ) .. "%" end },
 		{ "explosion_radius"        , "$inventory_explosion_radius", 0, function(value) return format_value( value, 0, true, FORMAT.Ceiling ) end },
 		{ "damage_projectile_add"   , "$inventory_mod_damage", 0, function(value) return format_value( value * 25, 2, true, FORMAT.Ceiling ) end },
 		{ "damage_ice_add"          , "$inventory_mod_damage_ice", 0, function(value) return format_value( value * 25, 2, true, FORMAT.Ceiling ) end },
@@ -451,4 +427,36 @@ local metadata_to_show = {
 	}
 }
 
-return { action_metadata, metadata_to_show }
+function c_metadata_to_lines( this_c_metadata )
+	local c_lines = {}
+	for _, d in ipairs( metadata_to_show.c ) do
+		local value = this_c_metadata[d[1]]
+		if value ~= nil and value ~= d[3] then
+			local text = tostring( d[4]( value ) )
+			if text ~= "nil" then
+				table.insert( c_lines, { d[2], text } )
+			end
+		end
+	end
+	return c_lines
+end
+
+function proj_metadata_to_lines( this_projectiles_metadata )
+	local num_lines = 0
+	local projectiles_lines = {}
+	for proj_index, data in ipairs( this_projectiles_metadata or {} ) do
+		local proj_lines = {}
+		for _, d in ipairs( metadata_to_show.projectiles ) do
+			local value = d[2]( data )
+			if value then
+				table.insert( proj_lines, { d[1], value } )
+			end
+		end
+		projectiles_lines[ proj_index ] = proj_lines
+		num_lines = num_lines + #proj_lines
+	end
+	num_lines = num_lines + #projectiles_lines
+	return projectiles_lines, num_lines
+end
+
+return { action_metadata, extra_modifier_metadata, metadata_to_show }

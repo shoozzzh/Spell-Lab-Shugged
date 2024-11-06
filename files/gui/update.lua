@@ -103,7 +103,8 @@ if initialized == false then
 		sorted_actions[action.type][ #sorted_actions[action.type] + 1 ] = action
 		action_data[action.id] = action
 	end
-	action_metadata, metadata_to_show = unpack( dofile( "mods/spell_lab_shugged/files/gui/action_metadata.lua" ) )
+	action_metadata, extra_modifier_metadata, metadata_to_show =
+		unpack( dofile( "mods/spell_lab_shugged/files/gui/action_metadata.lua" ) )
 	local is_panel_open = false
 
 	function get_player_or_camera_position()
@@ -221,6 +222,7 @@ if initialized == false then
 	function do_scroll_table( scroll_id, width, height, cell_list, cell_gui_func, row_size, height_limit )
 		row_size = row_size or 8
 		height_limit = height_limit or 160
+		width = width or SCROLL_TABLE_WIDTH
 		if not height then
 			local num_rows = math.max( 1, math.ceil( #cell_list / row_size ) )
 			height = math.min( num_rows * 20, height_limit )
@@ -353,22 +355,44 @@ if initialized == false then
 		end
 	end
 
-	function do_fake_action_button( action_type, action_sprite, uses_remaining, action_data, action_metadata )
+	function do_fake_action_button( action_type, action_sprite, name, desc, type, semi_transparent, uses_remaining, properties )
 		GuiImageButton( gui, next_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/transparent_20x20.png" )
 		local left_click,right_click,hover,x1,y1 = previous_data( gui )
+		do_custom_tooltip( function()
+			GuiLayoutBeginVertical( gui, 0, 0, true )
+				GuiText( gui, 0, 0, name )
+				if type then
+					GuiColorSetForNextWidget( gui, 0.5, 0.5, 1.0, 1.0 )
+					GuiText( gui, 0, 0, type )
+				end
+				GuiColorSetForNextWidget( gui, 0.811, 0.811, 0.811, 1.0 )
+				GuiText( gui, 0, 0, desc )
+				if properties and #properties > 0 then
+					GuiLayoutAddVerticalSpacing( gui, 5 )
+					do_property_list( properties )
+				end
+			GuiLayoutEnd( gui )
+		end )
 
 		local spell_box_suffix = tostring( action_type or ACTION_TYPE_PROJECTILE )
 		if hover then
 			spell_box_suffix = spell_box_suffix .. "_hover"
 		end
 
+		
+
 		GuiLayoutBeginLayer( gui )
 			GuiZSetForNextWidget( gui, 0 )
 			local sprite_width, sprite_height = GuiGetImageDimensions( gui, action_sprite )
 			GuiOptionsAddForNextWidget( gui, GUI_OPTION.NonInteractive )
-			-- GuiOptionsAddForNextWidget( gui, GUI_OPTION.Layout_NoLayouting )
+			if semi_transparent then
+				GuiOptionsAddForNextWidget( gui, GUI_OPTION.DrawSemiTransparent )
+			end
 			GuiImageButton( gui, next_id(), x1 + ( 20 - sprite_width ) / 2--[[ - 20]], y1 + ( 20 - sprite_height ) / 2, "", action_sprite, 1 )
 			GuiZSetForNextWidget( gui, 1 )
+			if semi_transparent then
+				GuiOptionsAddForNextWidget( gui, GUI_OPTION.DrawSemiTransparent )
+			end
 			GuiImage( gui, next_id(), --[[-( 2 + sprite_width / 2 + 10 )]]x1, y1, "mods/spell_lab_shugged/files/gui/buttons/spell_box_"..spell_box_suffix..".png", 1.0, 1.0, 0 )
 			if uses_remaining then
 				show_uses_remaining( x1, y1, nil, uses_remaining )
@@ -400,39 +424,30 @@ if initialized == false then
 		GuiText( gui, x-2, y-2, tostring( uses_remaining ), 1, "data/fonts/font_pixel_noshadow.xml", true )
 	end
 
+	function do_property_list( lines )
+		for _, p in ipairs( lines ) do
+			local name = p[1]
+			local value = p[2]
+			GuiLayoutBeginHorizontal( gui, 0, 0 )
+				GuiColorSetForNextWidget( gui, 0.811, 0.811, 0.811, 1.0 )
+				GuiText( gui, 0, 0, name )
+				GuiColorSetForNextWidget( gui, 1.0, 0.75, 0.5, 1.0 )
+				local _,_,_,_,_,width,_,_,_,_,_ = previous_data( gui )
+				GuiText( gui, 72 - width, 0, tostring( value ) )
+			GuiLayoutEnd( gui )
+			GuiLayoutAddVerticalSpacing( gui, -2 )
+		end
+	end
+
 	function do_verbose_tooltip( this_action_data, this_action_metadata )
-		local num_lines = 0
+		local num_lines = 1 -- wait
 		local other_offset = 0
 
-		if this_action_metadata.projectiles then
-			num_lines = num_lines + 1
-		end
+		local c_lines = c_metadata_to_lines( this_action_metadata.c )
+		num_lines = num_lines + #c_lines
 
-		local c_lines = {}
-		for _, d in ipairs( metadata_to_show.c ) do
-			local value = this_action_metadata.c[d[1]]
-			if value ~= nil and value ~= d[3] then
-				local text = tostring( d[4]( value ) )
-				if text ~= "nil" then
-					table.insert( c_lines, { d[2], text } )
-					num_lines = num_lines + 1
-				end
-			end
-		end
-
-		local projectiles_lines = {}
-		for proj_index, data in ipairs( this_action_metadata.projectiles or {} ) do
-			num_lines = num_lines + 1
-			local proj_lines = {}
-			for _, d in ipairs( metadata_to_show.projectiles ) do
-				local value = d[2]( data )
-				if value then
-					table.insert( proj_lines, { d[1], value } )
-					num_lines = num_lines + 1
-				end
-			end
-			projectiles_lines[ proj_index ] = proj_lines
-		end
+		local projectiles_lines, num_proj_lines = proj_metadata_to_lines( this_action_metadata.projectiles )
+		num_lines = num_lines + num_proj_lines
 
 		GuiColorSetForNextWidget( gui, 0, 0, 0, 0 )
 		GuiText( gui, 0, 0, " " )
@@ -463,18 +478,7 @@ if initialized == false then
 			GuiText( gui, 0, 0, wrap_key( "spell_data" ) )
 		end
 
-		for _, p in ipairs( c_lines ) do
-			local name = p[1]
-			local text = p[2]
-			GuiLayoutBeginHorizontal( gui, 0, 0 )
-				GuiColorSetForNextWidget( gui, 0.811, 0.811, 0.811, 1.0 )
-				GuiText( gui, 0, 0, name )
-				GuiColorSetForNextWidget( gui, 1.0, 0.75, 0.5, 1.0 )
-				local _,_,_,_,_,width,_,_,_,_,_ = previous_data( gui )
-				GuiText( gui, 72 - width, 0, text )
-			GuiLayoutEnd( gui )
-			GuiLayoutAddVerticalSpacing( gui, -2 )
-		end
+		do_property_list( c_lines )
 
 		local only_one_proj = #projectiles_lines == 1
 		for proj_index, proj_lines in ipairs( projectiles_lines ) do
@@ -483,18 +487,7 @@ if initialized == false then
 			else
 				GuiText( gui, 0, 0, GameTextGet( wrap_key( "projectile_nth_data" ), tostring( proj_index ) ) )
 			end
-			for _, p in ipairs( proj_lines ) do
-				local name = p[1]
-				local value = p[2]
-				GuiLayoutBeginHorizontal( gui, 0, 0 )
-					GuiColorSetForNextWidget( gui, 0.811, 0.811, 0.811, 1.0 )
-					GuiText( gui, 0, 0, name )
-					GuiColorSetForNextWidget( gui, 1.0, 0.75, 0.5, 1.0 )
-					local _,_,_,_,_,width,_,_,_,_,_ = previous_data( gui )
-					GuiText( gui, 72 - width, 0, tostring( value ) )
-				GuiLayoutEnd( gui )
-				GuiLayoutAddVerticalSpacing( gui, -2 )
-			end
+			do_property_list( proj_lines )
 		end
 	end
 
@@ -829,7 +822,7 @@ if initialized == false then
 							mod_setting_set( "show_wand_edit_panel", true )
 						end
 					end )
-					do_picker_button( "mods/spell_lab_shugged/files/gui/buttons/wand_list.png", PICKERS.ShotEffects, "shot_effects" )
+					do_picker_button( "mods/spell_lab_shugged/files/gui/buttons/shot_effects.png", PICKERS.ShotEffects, "shot_effects" )
 					do_flag_toggle_image_button( "mods/spell_lab_shugged/files/gui/buttons/show_toggles.png", "show_toggle_options", "toggle_options" )
 					do_flag_toggle_image_button( "mods/spell_lab_shugged/files/gui/buttons/damage_info.png", "damage_info" )
 					do_flag_toggle_image_button( "mods/spell_lab_shugged/files/gui/buttons/show_wand_edit_panel.png", "show_wand_edit_panel", "wand_edit_panel" )
