@@ -23,41 +23,18 @@ on_setting_turning_off = on_setting_turning_off or function( setting_name )
 	return result
 end
 
-if settings[ "force_2gcedge" ] == nil then
-	settings[ "force_2gcedge" ] = #EntityGetAllChildren( entity_id, "spell_lab_shugged_force_2gcedge" ) > 0
-end
-
-if on_setting_turning_on( "force_2gcedge" ) then
-	local effects = { "DAMAGE_MULTIPLIER", "DAMAGE_MULTIPLIER", "LOW_HP_DAMAGE_BOOST" }
-	for k,v in pairs( effects ) do
-		local effect = GetGameEffectLoadTo( entity_id, v, true )
-		ComponentSetValue2( effect, "frames", -1 )
-		EntityAddTag( ComponentGetEntity( effect ), "spell_lab_shugged_force_2gcedge" )
-	end
-	local damage_models = EntityGetComponent( entity_id, "DamageModelComponent" )
-	for index,damage_model in pairs( damage_models or {} ) do
-		local max_hp = ComponentGetValue2( damage_model, "max_hp" )
-		ComponentSetValue2( damage_model, "hp", max_hp / 5 )
-	end
-elseif on_setting_turning_off( "force_2gcedge" ) then
-	for _, child_id in ipairs( EntityGetAllChildren( entity_id, "spell_lab_shugged_force_2gcedge" ) or {} ) do
-		EntityKill( child_id )
-	end
-	local damage_models = EntityGetComponent( entity_id, "DamageModelComponent" )
-	for index,damage_model in pairs( damage_models or {} ) do
-		local max_hp = ComponentGetValue2( damage_model, "max_hp" )
-		ComponentSetValue2( damage_model, "hp", max_hp )
-	end
-end
-
 if settings[ "no_polymorphing" ] == nil then
 	settings[ "no_polymorphing" ] = EntityGetWithName( "spell_lab_shugged_no_polymorphing" ) ~= 0
 end
 
 if on_setting_turning_on( "no_polymorphing" ) then
-	local effect = GetGameEffectLoadTo( entity_id, "PROTECTION_POLYMORPH", true )
-	ComponentSetValue2( effect, "frames", -1 )
-	EntitySetName( ComponentGetEntity( effect ), "spell_lab_shugged_no_polymorphing" )
+	local effect_entity = EntityCreateNew( "spell_lab_shugged_no_polymorphing" )
+	EntityAddChild( entity_id, effect_entity )
+	EntityAddComponent2( effect_entity, "InheritTransformComponent" )
+	EntityAddComponent2( effect_entity, "GameEffectComponent", {
+		effect = "PROTECTION_POLYMORPH",
+		frames = -1,
+	} )
 elseif on_setting_turning_off( "no_polymorphing" ) then
 	EntityKill( EntityGetWithName( "spell_lab_shugged_no_polymorphing" ) )
 end
@@ -67,15 +44,13 @@ if settings[ "invincible" ] == nil then
 end
 
 if on_setting_turning_on( "invincible" ) then
-	local effect = GetGameEffectLoadTo( entity_id, "PROTECTION_ALL", true )
-	ComponentSetValue2( effect, "frames", -1 )
-	EntitySetName( ComponentGetEntity( effect ), "spell_lab_shugged_invincible" )
-	-- EntityAddComponent2( ComponentGetEntity( effect ), "UIIconComponent", {
-	-- 	icon_sprite_file="data/ui_gfx/status_indicators/protection_all.png",
-	-- 	name="$status_protection_all",
-	-- 	description="$statusdesc_protection_all",
-	-- 	is_perk=false,
-	-- } )
+	local effect_entity = EntityCreateNew( "spell_lab_shugged_invincible" )
+	EntityAddChild( entity_id, effect_entity )
+	EntityAddComponent2( effect_entity, "InheritTransformComponent" )
+	EntityAddComponent2( effect_entity, "GameEffectComponent", {
+		effect = "PROTECTION_ALL",
+		frames = -1,
+	} )
 elseif on_setting_turning_off( "invincible" ) then
 	EntityKill( EntityGetWithName( "spell_lab_shugged_invincible" ) )
 end
@@ -123,7 +98,7 @@ if ModSettingGet( mod_setting_prefix .. "disable_toxic_statuses" ) then
 				local ctrl_comp = EntityGetFirstComponentIncludingDisabled( entity_id, "ControlsComponent" )
 				ComponentSetValue2( ctrl_comp, "enabled", true )
 			end
-			EntityKill( ComponentGetEntity( effect ) )
+			EntityRemoveComponent( ComponentGetEntity( effect ), effect )
 			effect = GameGetGameEffect( entity_id, status_name )
 		end
 	end

@@ -56,13 +56,12 @@ end
 
 local inf = 1 / 0
 local threshold = 10 ^ 10
-function format_damage( damage )
+function format_damage( damage, never_use_scientific_notation, result_inf )
 	if damage == inf then
-		return "i"
+		return result_inf or "∞"
 	end
 	damage = damage * 25
-	if not ModSettingGet( "spell_lab_shugged.dummy_target_show_full_damage_number" )
-		and ( damage > threshold or -damage > threshold ) then
+	if not never_use_scientific_notation and ( damage > threshold or -damage > threshold ) then
 		return string.format( "%.10e", damage )
 	end
 	return separator( string.format( "%.2f", damage ) )

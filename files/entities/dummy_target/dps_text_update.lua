@@ -9,7 +9,7 @@ local dps = ComponentGetValue2( dps_comp, "value_float" )
 ComponentSetValue2( dps_comp, "value_float", 0 )
 local sprite_comp = EntityGetFirstComponent( entity_id, "SpriteComponent", "spell_lab_shugged_dps" )
 if sprite_comp then
-	local text = format_damage( dps )
+	local text = format_damage( dps, ModSettingGet( "spell_lab_shugged.dummy_target_show_full_damage_number" ), "i" )
 	ComponentSetValue2( sprite_comp, "offset_x", center_text( text ) )
 	ComponentSetValue2( sprite_comp, "text", text )
 	EntityRefreshSprite( entity_id, sprite_comp )
@@ -19,7 +19,7 @@ local highest_dps_comp = get_variable_storage_component( parent_id, "spell_lab_s
 local highest_dps = ComponentGetValue2( highest_dps_comp, "value_float" )
 local sprite_comp = EntityGetFirstComponent( entity_id, "SpriteComponent", "spell_lab_shugged_highest_dps" )
 if sprite_comp then
-	local text = format_damage( highest_dps )
+	local text = format_damage( highest_dps, ModSettingGet( "spell_lab_shugged.dummy_target_show_full_damage_number" ), "i" )
 	ComponentSetValue2( sprite_comp, "offset_x", center_text( text ) )
 	ComponentSetValue2( sprite_comp, "text", text )
 	EntityRefreshSprite( entity_id, sprite_comp )

@@ -1,0 +1,6 @@
+<Entity name="spell_lab_shugged_hp_fixer" >
+	<LuaComponent
+		script_source_file="mods/spell_lab_shugged/files/entities/hp_fixer.lua"
+		execute_every_n_frame="1">
+	</LuaComponent>
+</Entity>

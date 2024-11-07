@@ -240,7 +240,7 @@ picker.menu = function()
 
 		do_scroll_table( first_scroll_id + filter_type, nil, height, actions_data_to_show, function( action )
 			do_action_button( action.id, 0, 0, false, function( left_click, right_click )
-				local is_unlocked_action = action_data.spawn_requires_flag and HasFlagPersistent( action_data.spawn_requires_flag ) 
+				local is_unlocked_action = action.spawn_requires_flag and HasFlagPersistent( action.spawn_requires_flag ) 
 				if ctrl and shift then
 					if is_unlocked_action then
 						RemoveFlagPersistent( action.spawn_requires_flag )

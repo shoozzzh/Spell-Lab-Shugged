@@ -410,9 +410,11 @@ if initialized == false then
 	function show_locked_state( x, y, this_action_data )
 		if not this_action_data or not this_action_data.spawn_requires_flag then return end
 		if HasFlagPersistent( this_action_data.spawn_requires_flag ) then
-			GuiOptionsAddForNextWidget( gui, GUI_OPTION.Layout_NoLayouting )
-			GuiImage( gui, next_id(), x+14, y-2, "mods/spell_lab_shugged/files/gui/unlocked.png", 0.3, 1.0, 0 )
-		elseif mod_setting_get( "show_icon_unlocked" ) then
+			if mod_setting_get( "show_icon_unlocked" ) then
+				GuiOptionsAddForNextWidget( gui, GUI_OPTION.Layout_NoLayouting )
+				GuiImage( gui, next_id(), x+14, y-2, "mods/spell_lab_shugged/files/gui/unlocked.png", 0.3, 1.0, 0 )
+			end
+		else
 			GuiOptionsAddForNextWidget( gui, GUI_OPTION.Layout_NoLayouting )
 			GuiImage( gui, next_id(), x+14, y-2, "mods/spell_lab_shugged/files/gui/locked.png", 1.0, 1.0, 0 )
 		end
@@ -828,7 +830,7 @@ if initialized == false then
 					do_flag_toggle_image_button( "mods/spell_lab_shugged/files/gui/buttons/show_wand_edit_panel.png", "show_wand_edit_panel", "wand_edit_panel" )
 				GuiLayoutEnd( gui )
 
-				GuiLayoutBeginHorizontal( gui, horizontal_centered_x(8,4), percent_to_ui_scale_y(2), true )
+				GuiLayoutBeginHorizontal( gui, horizontal_centered_x(9,4), percent_to_ui_scale_y(2), true )
 					GuiImageButton( gui, next_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/shortcut_tips.png" )
 					GuiTooltip( gui, wrap_key( "shortcut_tips_title" ), wrap_key( "shortcut_tips" ) )
 
@@ -898,20 +900,32 @@ if initialized == false then
 							sound_button_clicked()
 							local effect_to_remove = EntityGetWithTag( "spell_lab_shugged_effect_no_wand_editing" )[1]
 							if effect_to_remove then
+								EntityRemoveTag( effect_to_remove, "spell_lab_shugged_effect_no_wand_editing" )
+								EntityRemoveFromParent( effect_to_remove )
 								EntityKill( effect_to_remove )
 							else
-								local effect_comp, effect_id = GetGameEffectLoadTo( player, "EDIT_WANDS_EVERYWHERE", true )
-								ComponentSetValue2( effect_comp, "frames", -1 )
+								local effect_id = EntityCreateNew()
+								EntityAddChild( player, effect_id )
+								EntityAddComponent2( effect_id, "GameEffectComponent", {
+									effect = "EDIT_WANDS_EVERYWHERE",
+									frames = -1,
+								} )
 								EntityAddTag( effect_id, "spell_lab_shugged_effect_edit_wands_everywhere" )
 							end
 						elseif right_click then
 							sound_button_clicked()
 							local effect_to_remove = EntityGetWithTag( "spell_lab_shugged_effect_edit_wands_everywhere" )[1]
 							if effect_to_remove then
+								EntityRemoveTag( effect_to_remove, "spell_lab_shugged_effect_edit_wands_everywhere" )
+								EntityRemoveFromParent( effect_to_remove )
 								EntityKill( effect_to_remove )
 							else
-								local effect_comp, effect_id = GetGameEffectLoadTo( player, "NO_WAND_EDITING", true )
-								ComponentSetValue2( effect_comp, "frames", -1 )
+								local effect_id = EntityCreateNew()
+								EntityAddChild( player, effect_id )
+								EntityAddComponent2( effect_id, "GameEffectComponent", {
+									effect = "NO_WAND_EDITING",
+									frames = -1,
+								} )
 								EntityAddTag( effect_id, "spell_lab_shugged_effect_no_wand_editing" )
 							end
 						end
@@ -919,8 +933,8 @@ if initialized == false then
 					do
 						local a = #EntityGetWithTag( "spell_lab_shugged_effect_edit_wands_everywhere" )
 						local b = #EntityGetWithTag( "spell_lab_shugged_effect_no_wand_editing" )
-						local c = num_effects_positive - a
-						local d = num_effects_negative - b
+						local c = GameGetGameEffectCount( player, "EDIT_WANDS_EVERYWHERE" ) - a
+						local d = GameGetGameEffectCount( player, "NO_WAND_EDITING" ) - b
 						local t = { GameTextGet( wrap_key( "edit_wands_everywhere_lose" ), GameTextGetTranslatedOrNot( "$perk_edit_wands_everywhere" ) ) }
 						if num_effects_positive > 0 then
 							table.insert( t, GameTextGet( wrap_key( "edit_wands_everywhere_num" ), c, a, GameTextGetTranslatedOrNot( "$perk_edit_wands_everywhere" ) ) )
@@ -931,6 +945,39 @@ if initialized == false then
 						
 						GuiTooltip( gui, GameTextGet( wrap_key( "edit_wands_everywhere_gain" ), GameTextGetTranslatedOrNot( "$perk_edit_wands_everywhere" ) ), table.concat( t, "\n" ) )
 					end
+					local hp_fixer = EntityGetWithName( "spell_lab_shugged_hp_fixer" )
+					if hp_fixer ~= 0 then
+						local hp_comp = get_variable_storage_component( hp_fixer, "hp" )
+						local max_hp_comp = get_variable_storage_component( hp_fixer, "max_hp" )
+						local hp_fixed_to = ComponentGetValue2( hp_comp, "value_float" )
+						local max_hp_fixed_to = ComponentGetValue2( hp_comp, "value_float" )
+						if GuiImageButton( gui, next_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/heart.png" ) then
+							sound_button_clicked()
+							EntityRemoveFromParent( hp_fixer )
+							EntityKill( hp_fixer )
+						end
+						local _,_,_,x,y = previous_data( gui )
+						GuiTooltip( gui, GameTextGet( wrap_key( "hp_fixed_to" ),
+							format_damage( hp_fixed_to ), format_damage( max_hp_fixed_to ) ), "" )
+						GuiZSetForNextWidget( gui, -1 )
+						GuiOptionsAddForNextWidget( gui, GUI_OPTION.Layout_NoLayouting )
+						GuiImage( gui, next_id(), x - 2, y - 2, "mods/spell_lab_shugged/files/gui/locked.png", 1.0, 1.0, 0 )
+					else
+						if GuiImageButton( gui, next_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/heart.png" ) then
+							sound_button_clicked()
+							if shift then
+								EntityAddChild( player, EntityLoad( "mods/spell_lab_shugged/files/entities/hp_fixer.xml" ) )
+							else
+								local damage_model = EntityGetFirstComponentIncludingDisabled( player, "DamageModelComponent" )
+								if damage_model then
+									local max_hp = ComponentGetValue2( damage_model, "max_hp" )
+									ComponentSetValue2( damage_model, "hp", max_hp )
+								end
+							end
+						end
+						GuiTooltip( gui, wrap_key( "full_hp_description" ), "" )
+					end
+
 
 					GuiImageButton( gui, next_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/spawn_target_dummy.png" )
 					do
@@ -994,12 +1041,11 @@ if initialized == false then
 				GuiLayoutEnd( gui )
 
 				if mod_setting_get( "show_toggle_options" ) then
-					GuiLayoutBeginHorizontal( gui, horizontal_centered_x(9,4), percent_to_ui_scale_y(2), true )
+					GuiLayoutBeginHorizontal( gui, horizontal_centered_x(8,4), percent_to_ui_scale_y(2), true )
 						do_flag_toggle_image_button( "mods/spell_lab_shugged/files/gui/buttons/disable_projectiles.png", "disable_casting" )
 						do_flag_toggle_image_button( "mods/spell_lab_shugged/files/gui/buttons/disable_toxic_statuses.png", "disable_toxic_statuses" )
 						do_flag_toggle_image_button( "mods/spell_lab_shugged/files/gui/buttons/invincible.png", "invincible", "$status_protection_all" )
 						do_flag_toggle_image_button( "mods/spell_lab_shugged/files/gui/buttons/disable_polymorphing.png", "no_polymorphing", "$status_protection_polymorph" )
-						do_flag_toggle_image_button( "mods/spell_lab_shugged/files/gui/buttons/2gcedge.png", "force_2gcedge" )
 						do_flag_toggle_image_button( "mods/spell_lab_shugged/files/gui/buttons/no_recoil.png", "no_recoil" )
 
 						if not world_state_unlimited_spells then

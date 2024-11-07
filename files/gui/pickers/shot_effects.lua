@@ -120,9 +120,13 @@ for _, shot_effect in ipairs( shot_effect_entries ) do
 end
 
 local function add_shot_effect( shot_effect )
-	local entity_id = EntityLoad( "mods/spell_lab_shugged/files/entities/shot_effect_entity.xml" )
+	local entity_id = EntityCreateNew()
 	EntityAddChild( player, entity_id )
+	EntityAddComponent2( entity_id, "InheritTransformComponent" )
+	EntityAddTag( entity_id, "spell_lab_shugged_shot_effect" )
+
 	EntityAddComponent2( entity_id, "VariableStorageComponent", { value_string = shot_effect.id } )
+
 	for _, extra_modifier in ipairs( shot_effect.extra_modifier or {} ) do
 		EntityAddComponent2( entity_id, "ShotEffectComponent", { extra_modifier = extra_modifier } )
 	end
