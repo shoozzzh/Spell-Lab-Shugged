@@ -1096,21 +1096,12 @@ if initialized == false then
 		if current_button_reservation > mod_button_reservation then
 			current_button_reservation = mod_button_reservation
 		elseif current_button_reservation < mod_button_reservation then
-			current_button_reservation = math.max( 0, mod_button_reservation + (current_button_reservation - mod_button_reservation ) )
+			current_button_reservation = math.max( 0, mod_button_reservation + ( current_button_reservation - mod_button_reservation ) )
 		else
 			current_button_reservation = mod_button_reservation
 		end
 		GlobalsSetValue( "mod_button_tr_current", tostring( current_button_reservation + 15 ) )
-		if player then
-			local platform_shooter_player = EntityGetFirstComponent( player, "PlatformShooterPlayerComponent" )
-			if platform_shooter_player then
-				local is_gamepad = ComponentGetValue2( platform_shooter_player, "mHasGamepadControlsPrev" )
-				if is_gamepad then
-					GuiOptionsAddForNextWidget( gui, GUI_OPTION.NonInteractive )
-					GuiOptionsAddForNextWidget( gui, GUI_OPTION.AlwaysClickable )
-				end
-			end
-		end
+		
 		GuiOptionsAddForNextWidget( gui, GUI_OPTION.NonInteractive )
 		GuiOptionsAddForNextWidget( gui, GUI_OPTION.AlwaysClickable )
 		if GuiImageButton( gui, next_id(), screen_width - 14 - current_button_reservation, 2, "", "mods/spell_lab_shugged/files/gui/wrench.png" ) then
