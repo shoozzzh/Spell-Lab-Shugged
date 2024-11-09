@@ -41,8 +41,8 @@ shot_effect_entries = {
 		related_perk = "LOW_RECOIL",
 		extra_modifier = "low_recoil",
 		metadata = {
-			{ wrap_key( "recoil" ), { TYPE_ADJUSTMENT.Add, -16 } },
 			{ "speed_multiplier", 0.8 },
+			{ wrap_key( "recoil" ), { TYPE_ADJUSTMENT.Add, -16 } },
 		},
 		properties = {
 			{ wrap_key( "recoil" ), "x 0.5" },
@@ -95,12 +95,15 @@ shot_effect_entries = {
 	},
 	{
 		related_custom_effect = "data/entities/misc/effect_twitchy.xml",
-		script_shot = "mods/spell_lab_shugged/files/scripts/saved/twitchy_shot.lua",
+		shot_script = "data/scripts/status_effects/twitchy_shot.lua",
 		max_count = 1,
+		metadata = {
+			{ "friendly_fire", true },
+		},
 	},
 	{
 		related_custom_effect = "data/entities/misc/neutralized.xml",
-		script_shot = "mods/spell_lab_shugged/files/scripts/saved/neutralized.lua",
+		shot_script = "data/scripts/projectiles/neutralized.lua",
 		max_count = 1,
 	},
 }

@@ -1,4 +1,5 @@
-ModLuaFileAppend( "data/scripts/gun/gun.lua", "mods/spell_lab_shugged/files/append/gun.lua" )
+ModLuaFileAppend( "data/scripts/gun/gun.lua", "mods/spell_lab_shugged/files/append/gun/no_recoil.lua" )
+ModLuaFileAppend( "data/scripts/gun/gun.lua", "mods/spell_lab_shugged/files/append/gun/cast_delay_fixer.lua" )
 
 local translations = ModTextFileGetContent( "mods/spell_lab_shugged/files/translations.csv" )
 local main = "data/translations/common.csv"
@@ -8,38 +9,68 @@ if main_content:sub( #main_content, #main_content ) ~= "\n" then
 end
 ModTextFileSetContent( main, main_content .. translations:gsub( "^[^\n]*\n", "", 1 ) )
 
-local saved_effect_path = "mods/spell_lab_shugged/files/scripts/saved/"
+local injected_lua_folder = "mods/spell_lab_shugged/files/scripts/saved/"
 
-local twitchy_effect_path = "data/scripts/status_effects/twitchy.lua"
-local twitchy_effect2_path = "data/scripts/status_effects/twitchy_shot.lua"
-if ModDoesFileExist( twitchy_effect_path ) then
-	local twitchy_effect = ModTextFileGetContent( twitchy_effect_path )
-	ModTextFileSetContent( saved_effect_path .. "twitchy.lua", twitchy_effect )
-	ModTextFileSetContent( twitchy_effect_path,
-		'if EntityHasTag( EntityGetRootEntity( GetUpdatedEntityID() ), "player_unit" ) and ModSettingGet( "spell_lab_shugged.disable_toxic_statuses" ) then EntityKill( GetUpdatedEntityID() ) return end\n'
-		.. twitchy_effect )
+local twitchy_effect_path = "data/entities/misc/effect_twitchy.xml"
+local twitchy_effect = ModTextFileGetContent( twitchy_effect_path )
+if ModDoesFileExist( twitchy_effect_path ) and twitchy_effect then
+	local twitchy_lua_path = "data/scripts/status_effects/twitchy.lua"
+	if ModDoesFileExist( twitchy_lua_path ) then
+		local twitchy_lua = ModTextFileGetContent( twitchy_lua_path )
+		ModTextFileSetContent( injected_lua_folder .. "twitchy.lua",
+			[[if EntityHasTag( EntityGetRootEntity( GetUpdatedEntityID() ), "player_unit" ) and ModSettingGet( "spell_lab_shugged.disable_toxic_statuses" ) then
+				if EntityGetParent( GetUpdatedEntityID() ) ~= 0 then
+					EntityKill( GetUpdatedEntityID() )
+				else
+					EntityRemoveComponent( GetUpdatedEntityID(), GetUpdatedComponentID() )
+				end
+				return
+			end\n]] .. twitchy_lua )
+		twitchy_effect = twitchy_effect:gsub( twitchy_lua_path:gsub( "%.", "%." ), injected_lua_folder .. "twitchy.lua" )
+	end
+
+	local twitchy_lua2_path = "data/scripts/status_effects/twitchy_shot.lua"
+	if ModDoesFileExist( twitchy_lua2_path ) then
+		local twitchy_lua2 = ModTextFileGetContent( twitchy_lua2_path )
+		ModTextFileSetContent( injected_lua_folder .. "twitchy_shot.lua",
+			twitchy_lua2 .. [[
+			local old_shot = shot
+			function shot( entity_id )
+				if EntityHasTag( EntityGetRootEntity( GetUpdatedEntityID() ), "player_unit" ) and ModSettingGet( "spell_lab_shugged.disable_toxic_statuses" ) then
+					if EntityGetParent( GetUpdatedEntityID() ) ~= 0 then
+						EntityKill( GetUpdatedEntityID() )
+					else
+						EntityRemoveComponent( GetUpdatedEntityID(), GetUpdatedComponentID() )
+					end
+					return
+				end
+				old_shot()
+			end]] )
+		twitchy_effect = twitchy_effect:gsub( twitchy_lua_path:gsub( "%.", "%." ), injected_lua_folder .. "twitchy_shot.lua" )
+	end
+
+	ModTextFileSetContent( twitchy_effect_path, twitchy_effect )
 end
-if ModDoesFileExist( twitchy_effect2_path ) then
-	local twitchy_effect2 = ModTextFileGetContent( twitchy_effect2_path )
-	ModTextFileSetContent( saved_effect_path .. "twitchy_shot.lua", twitchy_effect2 )
-	ModTextFileSetContent( twitchy_effect2_path, twitchy_effect2:gsub( "function shot%( entity_id %)",
-		[[function shot( entity_id ) local root_id = EntityGetRootEntity( GetUpdatedEntityID() )
-		if EntityHasTag( root_id, "player_unit" ) and ModSettingGet( "spell_lab_shugged.disable_toxic_statuses" ) then
-			EntityKill( GetUpdatedEntityID() )
-			return
-		end]] ) )
-end
-local neutralized_effect_path = "data/scripts/projectiles/neutralized.lua"
-if ModDoesFileExist( neutralized_effect_path ) then
-	local neutralized_effect = ModTextFileGetContent( neutralized_effect_path )
-	ModTextFileSetContent( saved_effect_path .. "neutralized.lua", neutralized_effect )
-	ModTextFileSetContent( neutralized_effect_path,
-		neutralized_effect:gsub( "function shot%( projectile_id %)",
-		[[function shot( projectile_id ) local root_id = EntityGetRootEntity( GetUpdatedEntityID() )
-		if EntityHasTag( root_id, "player_unit" ) and ModSettingGet( "spell_lab_shugged.disable_toxic_statuses" ) then
-			EntityKill( GetUpdatedEntityID() )
-			return
-		end]] ) )
+
+local neutralized_effect_path = "data/entities/misc/neutralized.xml"
+local neutralized_effect = ModTextFileGetContent( neutralized_effect_path )
+if ModDoesFileExist( neutralized_effect_path ) and neutralized_effect then
+	local neutralized_lua_path = "data/scripts/projectiles/neutralized.lua"
+	if ModDoesFileExist( neutralized_lua_path ) then
+		local neutralized_lua = ModTextFileGetContent( neutralized_lua_path )
+		ModTextFileSetContent( injected_lua_folder .. "neutralized.lua",
+			neutralized_lua .. [[
+			function shot( projectile_id )
+				if EntityHasTag( EntityGetRootEntity( GetUpdatedEntityID() ), "player_unit" ) and ModSettingGet( "spell_lab_shugged.disable_toxic_statuses" ) then
+					EntityKill( GetUpdatedEntityID() )
+					return
+				end
+				old_shot()
+			end]] )
+		neutralized_effect = neutralized_effect:gsub( neutralized_lua_path:gsub( "%.", "%." ), injected_lua_folder .. "neutralized.lua" )
+	end
+
+	ModTextFileSetContent( neutralized_effect_path, neutralized_effect )
 end
 
 local mod_setting_prefix = "spell_lab_shugged."

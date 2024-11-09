@@ -339,7 +339,6 @@ if initialized == false then
 				GuiLayoutEnd( gui )
 			end, nil, 10, 0 )
 		end
-		GuiZSet( gui, 0 )
 
 		GuiZSetForNextWidget( gui, 1 )
 		GuiImage( gui, next_id(), -20, 0, "mods/spell_lab_shugged/files/gui/buttons/spell_box"..spell_box_suffix..".png", 1.0, 1.0, 0 )
@@ -355,12 +354,16 @@ if initialized == false then
 		end
 	end
 
-	function do_fake_action_button( action_type, action_sprite, name, desc, type, semi_transparent, uses_remaining, properties )
+	function do_fake_action_button( action_type, action_sprite, name, id, desc, type, semi_transparent, uses_remaining, properties )
 		GuiImageButton( gui, next_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/transparent_20x20.png" )
 		local left_click,right_click,hover,x1,y1 = previous_data( gui )
 		do_custom_tooltip( function()
 			GuiLayoutBeginVertical( gui, 0, 0, true )
 				GuiText( gui, 0, 0, name )
+				if id then
+					GuiColorSetForNextWidget( gui, 0.5, 0.5, 0.5, 1.0 )
+					GuiText( gui, 0, 0, id )
+				end
 				if type then
 					GuiColorSetForNextWidget( gui, 0.5, 0.5, 1.0, 1.0 )
 					GuiText( gui, 0, 0, type )
@@ -372,14 +375,12 @@ if initialized == false then
 					do_property_list( properties )
 				end
 			GuiLayoutEnd( gui )
-		end )
+		end, nil, 10, 0 )
 
 		local spell_box_suffix = tostring( action_type or ACTION_TYPE_PROJECTILE )
 		if hover then
 			spell_box_suffix = spell_box_suffix .. "_hover"
 		end
-
-		
 
 		GuiLayoutBeginLayer( gui )
 			GuiZSetForNextWidget( gui, 0 )
@@ -403,6 +404,7 @@ if initialized == false then
 	end
 
 	function show_permanent_icon( x, y )
+		GuiZSetForNextWidget( gui, -1 )
 		GuiOptionsAddForNextWidget( gui, GUI_OPTION.Layout_NoLayouting )
 		GuiImage( gui, next_id(), x-2, y-2, "data/ui_gfx/inventory/icon_gun_permanent_actions.png", 1.0, 1.0, 0 )
 	end
@@ -496,7 +498,6 @@ if initialized == false then
 	function do_custom_tooltip( callback, z, x_offset, y_offset )
 		if z == nil then z = -12 end
 		local left_click,right_click,hover,x,y,width,height,draw_x,draw_y,draw_width,draw_height = previous_data( gui )
-		local screen_width,screen_height = GuiGetScreenDimensions( gui )
 		if x_offset == nil then x_offset = 0 end
 		if y_offset == nil then y_offset = 0 end
 		if hover then
@@ -509,6 +510,7 @@ if initialized == false then
 					GuiEndAutoBoxNinePiece( gui )
 				GuiLayoutEnd( gui )
 			GuiLayoutEndLayer( gui )
+			GuiZSet( gui, 0 )
 		end
 	end
 
@@ -1116,14 +1118,16 @@ if initialized == false then
 			if x < mx and mx < x + width and y < my and my < y + height then
 				local text = wrap_key( ( is_panel_open and "hide" or "show" ) .. "_spell_lab" )
 				local text_width = GuiGetTextDimensions( gui, text )
-				GuiZSet( gui, -100 )
+				GuiZSetForNextWidget( gui, -100 )
 				GuiLayoutBeginLayer( gui )
 					GuiLayoutBeginVertical( gui, ( x + width - text_width - 24 ), ( y + 10 ), true )
 						GuiBeginAutoBox( gui )
+							GuiZSetForNextWidget( gui, -100 )
 							GuiText( gui, 0, 0, text )
+							GuiZSetForNextWidget( gui, -100 )
 							GuiColorSetForNextWidget( gui, 0.5, 0.5, 0.5, 1.0 )
 							GuiText( gui, 0, 0, version )
-							GuiZSetForNextWidget( gui, -99 )
+						GuiZSetForNextWidget( gui, -99 )
 						GuiEndAutoBoxNinePiece( gui )
 					GuiLayoutEnd( gui )
 				GuiLayoutEndLayer( gui )

@@ -234,7 +234,6 @@ picker.menu = function()
 							do_wand_stats( gui, saved_wand.stats )
 						end
 					end )
-					GuiZSet( gui, 0 )
 					if saved_wand then
 						local dynamic_wand_data = WANDS.wand_get_dynamic_wand_data_from_stats( saved_wand.stats )
 						if dynamic_wand_data then

@@ -14,6 +14,11 @@ end
 
 dofile_once( "mods/spell_lab_shugged/files/lib/entity_xml_parser.lua" )
 
+local SHOT_EFFECT_TYPE = {
+	extra_modifier = wrap_key( "shot_effect_type_extra_modifier" ),
+	shot_script    = wrap_key( "shot_effect_type_shot_script" ),
+	game_effect    = wrap_key( "shot_effect_type_game_effect" ),
+}
 local SHOT_EFFECT_SOURCE_TYPE = {
 	Perk         = wrap_key( "shot_effect_source_type_perk" ),
 	Status       = wrap_key( "shot_effect_source_type_status" ),
@@ -84,13 +89,18 @@ for _, shot_effect in ipairs( shot_effect_entries ) do
 		goto continue
 	end
 
-	local keys = { "extra_modifier", "script_shot", "game_effect", "custom_child_entity" }
+	local keys = { "extra_modifier", "shot_script", "game_effect", "custom_child_entity" }
 	for _, key in ipairs( keys ) do
 		local value = shot_effect[ key ]
-		if type( value ) ~= "table" then
-			data[ key ] = { value }
-		else
-			data[ key ] = value
+		if value ~= nil then
+			if type( value ) ~= "table" then
+				data[ key ] = { value }
+			else
+				data[ key ] = value
+			end
+			if SHOT_EFFECT_TYPE[ key ] then
+				data.type = data.type or SHOT_EFFECT_TYPE[ key ]
+			end
 		end
 	end
 
@@ -130,8 +140,8 @@ local function add_shot_effect( shot_effect )
 	for _, extra_modifier in ipairs( shot_effect.extra_modifier or {} ) do
 		EntityAddComponent2( entity_id, "ShotEffectComponent", { extra_modifier = extra_modifier } )
 	end
-	for _, script_shot in ipairs( shot_effect.script_shot or {} ) do
-		EntityAddComponent2( entity_id, "LuaComponent", { script_shot = script_shot } )
+	for _, shot_script in ipairs( shot_effect.shot_script or {} ) do
+		EntityAddComponent2( entity_id, "LuaComponent", { script_shot = shot_script } )
 	end
 	for _, game_effect in ipairs( shot_effect.game_effect or {} ) do
 		EntityAddComponent2( entity_id, "GameEffectComponent", { effect = game_effect } )
@@ -182,8 +192,8 @@ picker.menu = function()
 			end
 
 			local left_click, right_click = do_fake_action_button(
-				shot_effect.equivalent_action_type, shot_effect.icon, shot_effect.name, shot_effect.desc,
-				source_type_shown, count == 0, count_shown, shot_effect.properties )
+				shot_effect.equivalent_action_type, shot_effect.icon, shot_effect.name, source_type_shown, shot_effect.desc,
+				shot_effect.type, count == 0, count_shown, shot_effect.properties )
 			if left_click then
 				if not max_count_valid or count < max_count or unsafe_count_allowed then
 					add_shot_effect( shot_effect )

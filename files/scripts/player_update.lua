@@ -98,7 +98,14 @@ if ModSettingGet( mod_setting_prefix .. "disable_toxic_statuses" ) then
 				local ctrl_comp = EntityGetFirstComponentIncludingDisabled( entity_id, "ControlsComponent" )
 				ComponentSetValue2( ctrl_comp, "enabled", true )
 			end
-			EntityRemoveComponent( ComponentGetEntity( effect ), effect )
+			local effect_entity = ComponentGetEntity( effect )
+			if not EntityHasTag( effect_entity, "player_unit" )
+				and not EntityHasTag( effect_entity, "polymorphed_player" ) then
+				EntityKill( effect_entity )
+			else
+				EntityRemoveComponent( effect_entity, effect )
+			end
+			print( status_name, effect_entity, effect )
 			effect = GameGetGameEffect( entity_id, status_name )
 		end
 	end
