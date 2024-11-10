@@ -3,7 +3,7 @@ function StartReload( reload_time )
 	do
 		if not EntityHasTag( GetUpdatedEntityID(), "player_unit" ) then goto skip end
 
-		if GlobalsGetValue( "spell_lab_shugged.wand_reload_time_fixed_to_raw_value", "0" ) == "1" then
+		if GlobalsGetValue( "spell_lab_shugged.wand_cast_delay_fixed_to_raw_value", "" ) ~= "" then
 			reload_time = gun.reload_time
 			goto skip
 		end
@@ -27,7 +27,7 @@ function register_action( ... )
 	do
 		if not EntityHasTag( GetUpdatedEntityID(), "player_unit" ) then goto skip end
 
-		if GlobalsGetValue( "spell_lab_shugged.wand_cast_delay_fixed_to_raw_value", "0" ) == "1" then
+		if GlobalsGetValue( "spell_lab_shugged.wand_cast_delay_fixed_to_raw_value", "" ) ~= "" then
 			c.fire_rate_wait = state_from_game.fire_rate_wait
 			goto skip
 		end

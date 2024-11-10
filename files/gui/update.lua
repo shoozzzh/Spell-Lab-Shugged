@@ -174,6 +174,22 @@ if initialized == false then
 		end
 	end
 
+	function clear_inventory_wands_wait()
+		local did = false
+		for k,v in pairs( EntityGetWithTag( "wand" ) ) do
+			if EntityGetRootEntity( v ) == player then
+				local ability = EntityGetFirstComponentIncludingDisabled( v, "AbilityComponent" )
+				if ability then
+					did = true
+					ComponentSetValue2( ability, "mReloadFramesLeft", 0 )
+					ComponentSetValue2( ability, "mNextFrameUsable", now )
+					ComponentSetValue2( ability, "mReloadNextFrameUsable", now )
+				end
+			end
+		end
+		return did
+	end
+
 	function is_action_unlocked( action )
 		if action then
 			return not action.spawn_requires_flag or HasFlagPersistent( action.spawn_requires_flag )
@@ -856,31 +872,72 @@ if initialized == false then
 						end
 					end
 					GuiTooltip( gui, wrap_key( "clear_projectiles" ), "" )
-					if GuiImageButton( gui, next_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/clear_wait.png" ) then
-						if player then
-							local did = false
-							for k,v in pairs( EntityGetWithTag("wand") ) do
-								if EntityGetRootEntity( v ) == player then
-									local ability = EntityGetFirstComponentIncludingDisabled( v, "AbilityComponent" )
-									if ability then
-										did = true
-										ComponentSetValue2( ability, "mReloadFramesLeft", 0 )
-										ComponentSetValue2( ability, "mNextFrameUsable", now )
-										ComponentSetValue2( ability, "mReloadNextFrameUsable", now )
-									end
+
+					do
+						local raw_value_key = "spell_lab_shugged.wand_cast_delay_fixed_to_raw_value"
+						local cast_delay_key = "spell_lab_shugged.wand_cast_delay_fixed_to"
+						local reload_time_key = "spell_lab_shugged.wand_reload_time_fixed_to"
+
+						local fixed_to_raw_value = GlobalsGetValue( raw_value_key, "0" ) == "1"
+						local cast_delay_fixed_to = tonumber( GlobalsGetValue( cast_delay_key, "" ) )
+						local reload_time_fixed_to = tonumber( GlobalsGetValue( reload_time_key, "" ) )
+
+						if fixed_to_raw_value or ( cast_delay_fixed_to and reload_time_fixed_to ) then
+							local left_click, right_click = GuiImageButton( gui, next_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/clear_wait.png" )
+							if left_click then
+								if clear_inventory_wands_wait() then sound_button_clicked() end
+							elseif right_click then
+								if fixed_to_raw_value then
+									GlobalsSetValue( raw_value_key, "" )
+									sound_button_clicked()
+								elseif cast_delay_fixed_to and reload_time_fixed_to then
+									GlobalsSetValue( cast_delay_key, "" )
+									GlobalsSetValue( reload_time_key, "" )
+									sound_button_clicked()
 								end
 							end
-							if did then sound_button_clicked() end
+							local _,_,_,x,y = previous_data( gui )
+							if fixed_to_raw_value then
+								local raw_value_text = GameTextGetTranslatedOrNot( wrap_key( "wand_raw_value" ) )
+								GuiTooltip( gui, wrap_key( "wand_ready" ), GameTextGet( wrap_key( "wand_cast_delay_fixed_to" ), raw_value_text, raw_value_text ) )
+							elseif cast_delay_fixed_to and reload_time_fixed_to then
+								GuiTooltip( gui, wrap_key( "wand_ready" ), GameTextGet( wrap_key( "wand_cast_delay_fixed_to" ),
+								format_time( cast_delay_fixed_to ), format_time( reload_time_fixed_to ) ) )
+							end
+							GuiZSetForNextWidget( gui, -1 )
+							GuiOptionsAddForNextWidget( gui, GUI_OPTION.Layout_NoLayouting )
+							GuiImage( gui, next_id(), x - 2, y - 2, "mods/spell_lab_shugged/files/gui/locked.png", 1.0, 1.0, 0 )
+						else
+							local left_click, right_click = GuiImageButton( gui, next_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/clear_wait.png" )
+							if shift and left_click then
+								if held_wand then
+									local ab_comp = EntityGetFirstComponentIncludingDisabled( held_wand, "AbilityComponent" )
+									if ab_comp then
+										local cast_delay = WANDS.ability_component_get_stat( ab_comp, "fire_rate_wait" )
+										local reload_time = WANDS.ability_component_get_stat( ab_comp, "reload_time" )
+										GlobalsSetValue( cast_delay_key, tostring( cast_delay ) )
+										GlobalsSetValue( reload_time_key, tostring( reload_time ) )
+										sound_button_clicked()
+									end
+								end
+							elseif shift and right_click then
+								GlobalsSetValue( cast_delay_key, "0" )
+								GlobalsSetValue( reload_time_key, "0" )
+								sound_button_clicked()
+							elseif alt and ( left_click or right_click ) then
+								GlobalsSetValue( raw_value_key, "1" )
+								sound_button_clicked()
+							elseif left_click then
+								if clear_inventory_wands_wait() then sound_button_clicked() end
+							end
 						end
+						GuiTooltip( gui, wrap_key( "wand_ready" ), wrap_key( "wand_ready_description" ) )
 					end
-					GuiTooltip( gui, wrap_key( "wand_ready" ), "" )
 
 					if GuiImageButton( gui, next_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/clear_wand.png" ) then
 						if held_wand then
 							sound_button_clicked()
 							access_edit_panel_state( held_wand ).set( "", wrap_key( "operation_clear_held_wand" ) )
-							-- WANDS.wand_clear_actions( held_wand )
-							-- force_refresh_held_wands()
 						end
 					end
 					GuiTooltip( gui, wrap_key( "clear_held_wand" ), "" )
@@ -953,7 +1010,8 @@ if initialized == false then
 						local max_hp_comp = get_variable_storage_component( hp_fixer, "max_hp" )
 						local hp_fixed_to = ComponentGetValue2( hp_comp, "value_float" )
 						local max_hp_fixed_to = ComponentGetValue2( hp_comp, "value_float" )
-						if GuiImageButton( gui, next_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/heart.png" ) then
+						local _,right_click = GuiImageButton( gui, next_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/heart.png" )
+						if right_click then
 							sound_button_clicked()
 							EntityRemoveFromParent( hp_fixer )
 							EntityKill( hp_fixer )
@@ -977,7 +1035,7 @@ if initialized == false then
 								end
 							end
 						end
-						GuiTooltip( gui, wrap_key( "full_hp_description" ), "" )
+						GuiTooltip( gui, wrap_key( "full_hp" ), "" )
 					end
 
 

@@ -67,3 +67,6 @@ function format_damage( damage, never_use_scientific_notation, result_inf )
 	return separator( string.format( "%.2f", damage ) )
 end
 
+function format_time( time )
+	return ( math.floor( time * 100 / 60 + 0.5 ) / 100 ) .. " s ("..math.floor( time + 0.5 ) .. "f)"
+end

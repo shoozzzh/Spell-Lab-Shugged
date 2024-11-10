@@ -196,17 +196,17 @@ picker.menu = function()
 				shot_effect.type, count == 0, count_shown, shot_effect.properties )
 			if left_click then
 				if not max_count_valid or count < max_count or unsafe_count_allowed then
+					sound_button_clicked()
 					add_shot_effect( shot_effect )
 				elseif max_count == 1 and count == 1 then
+					sound_button_clicked()
 					remove_shot_effect( shot_effect )
 				end
 			elseif right_click then
 				if count > 0 then
+					sound_button_clicked()
 					remove_shot_effect( shot_effect )
 				end
-			end
-			if left_click or right_click then
-				sound_button_clicked()
 			end
 		end )
 	GuiLayoutEnd( gui )

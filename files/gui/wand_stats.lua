@@ -62,7 +62,7 @@ return {
 		min = -21, max = 240,
 		formatter = " ",
 		value_callback = function( value ) return math.floor( value + 0.5 ) end,
-		text_callback = function( value ) return ( math.floor( value / 60 * 100 + 0.5 ) / 100 ) .. " s ("..math.floor(value + 0.5).."f)" end,
+		text_callback = format_time,
 		buttons_precise_mode = {
 			{
 				text = "[1f]",
@@ -85,7 +85,7 @@ return {
 		min = -21, max = 240,
 		formatter = " ",
 		value_callback = function( value ) return math.floor( value + 0.5 ) end,
-		text_callback = function( value ) return ( math.floor( value / 60 * 100 + 0.5 ) / 100 ) .. " s ("..math.floor(value + 0.5).."f)" end,
+		text_callback = format_time,
 		buttons_precise_mode = {
 			{
 				text = "[1f]",
