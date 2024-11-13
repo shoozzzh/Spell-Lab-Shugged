@@ -1,5 +1,6 @@
 ModLuaFileAppend( "data/scripts/gun/gun.lua", "mods/spell_lab_shugged/files/append/gun/no_recoil.lua" )
 ModLuaFileAppend( "data/scripts/gun/gun.lua", "mods/spell_lab_shugged/files/append/gun/cast_delay_fixer.lua" )
+ModLuaFileAppend( "data/scripts/gun/gun.lua", "mods/spell_lab_shugged/files/append/gun/disable_casting.lua" )
 
 local translations = ModTextFileGetContent( "mods/spell_lab_shugged/files/translations.csv" )
 local main = "data/translations/common.csv"
@@ -25,7 +26,8 @@ if ModDoesFileExist( twitchy_effect_path ) and twitchy_effect then
 					EntityRemoveComponent( GetUpdatedEntityID(), GetUpdatedComponentID() )
 				end
 				return
-			end\n]] .. twitchy_lua )
+			end
+			]] .. twitchy_lua )
 		twitchy_effect = twitchy_effect:gsub( twitchy_lua_path:gsub( "%.", "%." ), injected_lua_folder .. "twitchy.lua" )
 	end
 
@@ -73,6 +75,23 @@ if ModDoesFileExist( neutralized_effect_path ) and neutralized_effect then
 	ModTextFileSetContent( neutralized_effect_path, neutralized_effect )
 end
 
+function OnModPostInit()
+	local nxml = dofile_once( "mods/spell_lab_shugged/files/lib/nxml.lua" )
+	dofile_once( "mods/spell_lab_shugged/files/scripts/toxic_effect_entities.lua" )
+	for _, effect_path in ipairs( toxic_effect_entities ) do
+		local effect = ModTextFileGetContent( effect_path )
+		if ModDoesFileExist( effect_path ) and effect then
+			local parsed = nxml.parse( effect )
+			table.insert( parsed.children, 1, nxml.new_element( "LuaComponent", {
+				script_source_file = "mods/spell_lab_shugged/files/scripts/remove_toxic_effect.lua",
+				execute_on_added = true,
+				remove_after_executed = true,
+			} ) )
+			ModTextFileSetContent( effect_path, tostring( parsed ) )
+		end
+	end
+end
+
 local mod_setting_prefix = "spell_lab_shugged."
 
 local default_settings = {
@@ -83,7 +102,9 @@ local default_settings = {
 }
 
 if ModSettingGet( mod_setting_prefix .. "no_weather" ) then
-	ModLuaFileAppend( "data/scripts/init.lua", "mods/spell_lab_shugged/files/append/init.lua" )
+	local init_lua_path = "data/scripts/init.lua"
+	ModLuaFileAppend( init_lua_path, "mods/spell_lab_shugged/files/append/init.lua" )
+	ModTextFileSetContent( init_lua_path, ModTextFileGetContent( init_lua_path ) ) -- refresh it
 end
 
 ModTextFileSetContent_Saved = ModTextFileSetContent
@@ -94,7 +115,9 @@ for key, value in pairs( default_settings ) do
 	end
 end
 
+dofile_once( "mods/spell_lab_shugged/files/lib/controls_freezing_utils.lua" )
 function OnPlayerSpawned( player_id )
+	unfreeze_controls()
 	GlobalsSetValue( "mod_button_tr_width", "0" )
 	if not GameHasFlagRun( "spell_lab_shugged_init" ) then
 		EntityLoad( "mods/spell_lab_shugged/files/biome_impl/wand_lab/wand_lab.xml", 14600, -6000 )

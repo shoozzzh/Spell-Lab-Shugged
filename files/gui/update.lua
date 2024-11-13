@@ -143,10 +143,27 @@ if initialized == false then
 		return ax + screen_width * 0.5, ay + screen_height * 0.5
 	end
 
+	function get_world_position( x, y )
+		local camera_x, camera_y = GameGetCameraPos()
+		local res_width = MagicNumbersGetValue( "VIRTUAL_RESOLUTION_X" )
+		local res_height = MagicNumbersGetValue( "VIRTUAL_RESOLUTION_Y" )
+		local ax, ay = x - screen_width * 0.5, y - screen_height * 0.5
+		local wx = ax * res_width / screen_width + camera_x
+		local wy = ay * res_height / screen_height + camera_y
+		return wx, wy
+	end
+
+	local cached_mouse_x, cached_mouse_y
+	function get_mouse_pos_on_screen()
+		if not cached_mouse_x or not cached_mouse_y then
+			cached_mouse_x, cached_mouse_y = get_screen_position( DEBUG_GetMouseWorld() )
+		end
+		return cached_mouse_x, cached_mouse_y
+	end
+
 	function scroll_box_no_wand_switching()
 		local _,_,_,x,y,width,height,_,_,_,_ = previous_data( gui )
-		local mx, my = DEBUG_GetMouseWorld()
-		mx, my = get_screen_position( mx, my )
+		local mx, my = get_mouse_pos_on_screen()
 		-- extra 2 pixels for the margins
 		if -2 <= mx - x and mx - x <= width + 2 and -2 <= my - y and my - y <= height + 2 then
 			GuiIdPushString( gui, "NO_MORE_WAND_SWITCHING" )
@@ -174,20 +191,25 @@ if initialized == false then
 		end
 	end
 
-	function clear_inventory_wands_wait()
+	function clear_held_wand_wait()
 		local did = false
-		for k,v in pairs( EntityGetWithTag( "wand" ) ) do
-			if EntityGetRootEntity( v ) == player then
-				local ability = EntityGetFirstComponentIncludingDisabled( v, "AbilityComponent" )
-				if ability then
-					did = true
-					ComponentSetValue2( ability, "mReloadFramesLeft", 0 )
-					ComponentSetValue2( ability, "mNextFrameUsable", now )
-					ComponentSetValue2( ability, "mReloadNextFrameUsable", now )
-				end
-			end
+		local ab_comp = EntityGetFirstComponentIncludingDisabled( v, "AbilityComponent" )
+		if ab_comp then
+			did = true
+			ComponentSetValue2( ab_comp, "mReloadFramesLeft", 0 )
+			ComponentSetValue2( ab_comp, "mNextFrameUsable", now )
+			ComponentSetValue2( ab_comp, "mReloadNextFrameUsable", now )
 		end
 		return did
+	end
+
+	function block_upcoming_wand_shooting()
+		if not held_wand then return end
+		local ab_comp = EntityGetFirstComponentIncludingDisabled( held_wand, "AbilityComponent" )
+		if not ab_comp then return end
+		ComponentSetValue2( ab_comp, "mReloadFramesLeft", math.max( 10, ComponentGetValue2( ab_comp, "mReloadFramesLeft" ) ) )
+		ComponentSetValue2( ab_comp, "mNextFrameUsable", math.max( now + 10, ComponentGetValue2( ab_comp, "mNextFrameUsable" ) ) )
+		ComponentSetValue2( ab_comp, "mReloadNextFrameUsable", math.max( now + 10, ComponentGetValue2( ab_comp, "mReloadNextFrameUsable" ) ) )
 	end
 
 	function is_action_unlocked( action )
@@ -609,12 +631,85 @@ if initialized == false then
 			end
 		end
 	end
+
 	dofile_once( "mods/spell_lab_shugged/files/gui/edit_panel_api.lua" )
+
+	dofile_once( "mods/spell_lab_shugged/files/gui/keyboard_listener.lua" )
+	dofile_once( "mods/spell_lab_shugged/files/gui/keyboard_focus.lua" )
+
+	function show_edit_panel_toggle_options()
+		local edit_panel_state = access_edit_panel_state( held_wand )
+		local force_compact_enabled = edit_panel_state.get_force_compact_enabled()
+		if not force_compact_enabled then
+			GuiOptionsAddForNextWidget( gui, GUI_OPTION.DrawSemiTransparent )
+		end
+		if GuiImageButton( gui, next_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/force_compact.png" ) then
+			sound_button_clicked()
+			edit_panel_state.set_force_compact_enabled( not force_compact_enabled )
+			edit_panel_state.force_sync()
+		end
+		GuiTooltip( gui, text_get_translated( force_compact_enabled and "disable" or "enable" ) .. text_get_translated( "wand_force_compact" ), text_get_translated( "wand_force_compact_description" ) .. "\n" .. text_get_translated( "inventory_get_ignored" )  )
+		local autocap_enabled = edit_panel_state.get_autocap_enabled()
+		if not autocap_enabled then
+			GuiOptionsAddForNextWidget( gui, GUI_OPTION.DrawSemiTransparent )
+		end
+		if GuiImageButton( gui, next_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/automatic_capacity.png" ) then
+			sound_button_clicked()
+			edit_panel_state.set_autocap_enabled( not autocap_enabled )
+			if autocap_enabled and edit_panel_state.get_force_compact_enabled() then
+				local new_capacity = 0
+				for _ in state_str_iter_permanent_actions( edit_panel_state.get_permanent() ) do
+					new_capacity = new_capacity + 1
+				end
+				local temp = 0
+				for _, a, _ in state_str_iter_actions( edit_panel_state.get() ) do
+					temp = temp + 1
+					if a and a ~= "" then
+						new_capacity = new_capacity + temp
+						temp = 0
+					end
+				end
+				WANDS.wand_set_stat( held_wand, "deck_capacity", new_capacity )
+			end
+		end
+		GuiTooltip( gui, text_get_translated( autocap_enabled and "disable" or "enable" ) .. text_get_translated( "automatic_capacity" ), wrap_key( "automatic_capacity_description" ) )
+		local function cant_undo()
+			GuiOptionsAddForNextWidget( gui, GUI_OPTION.DrawSemiTransparent )
+			GuiImageButton( gui, next_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/undo.png" )
+			GuiTooltip( gui, text_get_translated( "cant_undo" ), "" )
+		end
+		local function cant_redo()
+			GuiOptionsAddForNextWidget( gui, GUI_OPTION.DrawSemiTransparent )
+			GuiImageButton( gui, next_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/redo.png" )
+			GuiTooltip( gui, text_get_translated( "cant_redo" ), "" )
+		end
+		local operation_to_undo = edit_panel_state.peek_undo()
+		local operation_to_redo = edit_panel_state.peek_redo()
+		if operation_to_undo then
+			if GuiImageButton( gui, next_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/undo.png" ) then
+				sound_button_clicked()
+				edit_panel_state.undo()
+			end
+			GuiTooltip( gui, text_get_translated( "undo" ) .. " " .. GameTextGetTranslatedOrNot( operation_to_undo ),
+				GameTextGet( wrap_key( "current_history" ), edit_panel_state.get_current_history_index() ) )
+		else cant_undo() end
+		if operation_to_redo then
+			if GuiImageButton( gui, next_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/redo.png" ) then
+				sound_button_clicked()
+				edit_panel_state.redo()
+			end
+			GuiTooltip( gui, text_get_translated( "redo" ) .. " " .. GameTextGetTranslatedOrNot( operation_to_redo ),
+				GameTextGet( wrap_key( "current_history" ), edit_panel_state.get_current_history_index() ) )
+		else cant_redo() end
+		do_flag_toggle_image_button( "mods/spell_lab_shugged/files/gui/buttons/automatic_capacity.png", "gif_mode" )
+	end
 
 	function do_gui()
 		ctrl = InputIsKeyDown( Key_LCTRL ) or InputIsKeyDown( Key_RCTRL )
 		shift = InputIsKeyDown( Key_LSHIFT ) or InputIsKeyDown( Key_RSHIFT )
 		alt = InputIsKeyDown( Key_LALT ) or InputIsKeyDown( Key_RALT )
+
+		cached_mouse_x, cached_mouse_y = nil, nil
 
 		now = GameGetFrameNum()
 		id_offset = 0
@@ -635,6 +730,8 @@ if initialized == false then
 		held_wand = get_held_wand()
 
 		dofile( "mods/spell_lab_shugged/files/gui/wand_listener.lua" )
+
+		update_keyboard_input( listen_keyboard() )
 
 		if selecting_mortal_to_transform then
 			if shift then
@@ -722,72 +819,6 @@ if initialized == false then
 				end
 				selecting_mortal_to_transform = false
 			end
-		end
-
-		function show_edit_panel_toggle_options()
-			local edit_panel_state = access_edit_panel_state( held_wand )
-			local force_compact_enabled = edit_panel_state.get_force_compact_enabled()
-			if not force_compact_enabled then
-				GuiOptionsAddForNextWidget( gui, GUI_OPTION.DrawSemiTransparent )
-			end
-			if GuiImageButton( gui, next_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/force_compact.png" ) then
-				sound_button_clicked()
-				edit_panel_state.set_force_compact_enabled( not force_compact_enabled )
-				edit_panel_state.force_sync()
-			end
-			GuiTooltip( gui, text_get_translated( force_compact_enabled and "disable" or "enable" ) .. text_get_translated( "wand_force_compact" ), text_get_translated( "wand_force_compact_description" ) .. "\n" .. text_get_translated( "inventory_get_ignored" )  )
-			local autocap_enabled = edit_panel_state.get_autocap_enabled()
-			if not autocap_enabled then
-				GuiOptionsAddForNextWidget( gui, GUI_OPTION.DrawSemiTransparent )
-			end
-			if GuiImageButton( gui, next_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/automatic_capacity.png" ) then
-				sound_button_clicked()
-				edit_panel_state.set_autocap_enabled( not autocap_enabled )
-				if autocap_enabled and edit_panel_state.get_force_compact_enabled() then
-					local new_capacity = 0
-					for _ in state_str_iter_permanent_actions( edit_panel_state.get_permanent() ) do
-						new_capacity = new_capacity + 1
-					end
-					local temp = 0
-					for _, a, _ in state_str_iter_actions( edit_panel_state.get() ) do
-						temp = temp + 1
-						if a and a ~= "" then
-							new_capacity = new_capacity + temp
-							temp = 0
-						end
-					end
-					WANDS.wand_set_stat( held_wand, "deck_capacity", new_capacity )
-				end
-			end
-			GuiTooltip( gui, text_get_translated( autocap_enabled and "disable" or "enable" ) .. text_get_translated( "automatic_capacity" ), wrap_key( "automatic_capacity_description" ) )
-			local function cant_undo()
-				GuiOptionsAddForNextWidget( gui, GUI_OPTION.DrawSemiTransparent )
-				GuiImageButton( gui, next_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/undo.png" )
-				GuiTooltip( gui, text_get_translated( "cant_undo" ), "" )
-			end
-			local function cant_redo()
-				GuiOptionsAddForNextWidget( gui, GUI_OPTION.DrawSemiTransparent )
-				GuiImageButton( gui, next_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/redo.png" )
-				GuiTooltip( gui, text_get_translated( "cant_redo" ), "" )
-			end
-			local operation_to_undo = edit_panel_state.peek_undo()
-			local operation_to_redo = edit_panel_state.peek_redo()
-			if operation_to_undo then
-				if GuiImageButton( gui, next_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/undo.png" ) then
-					sound_button_clicked()
-					edit_panel_state.undo()
-				end
-				GuiTooltip( gui, text_get_translated( "undo" ) .. " " .. GameTextGetTranslatedOrNot( operation_to_undo ),
-					GameTextGet( wrap_key( "current_history" ), edit_panel_state.get_current_history_index() ) )
-			else cant_undo() end
-			if operation_to_redo then
-				if GuiImageButton( gui, next_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/redo.png" ) then
-					sound_button_clicked()
-					edit_panel_state.redo()
-				end
-				GuiTooltip( gui, text_get_translated( "redo" ) .. " " .. GameTextGetTranslatedOrNot( operation_to_redo ),
-					GameTextGet( wrap_key( "current_history" ), edit_panel_state.get_current_history_index() ) )
-			else cant_redo() end
 		end
 
 		if is_panel_open and not GameIsInventoryOpen() and player and not GameHasFlagRun( "gkbrkn_config_menu_open" ) then
@@ -885,7 +916,7 @@ if initialized == false then
 						if fixed_to_raw_value or ( cast_delay_fixed_to and reload_time_fixed_to ) then
 							local left_click, right_click = GuiImageButton( gui, next_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/clear_wait.png" )
 							if left_click then
-								if clear_inventory_wands_wait() then sound_button_clicked() end
+								if clear_held_wand_wait() then sound_button_clicked() end
 							elseif right_click then
 								if fixed_to_raw_value then
 									GlobalsSetValue( raw_value_key, "" )
@@ -928,7 +959,7 @@ if initialized == false then
 								GlobalsSetValue( raw_value_key, "1" )
 								sound_button_clicked()
 							elseif left_click then
-								if clear_inventory_wands_wait() then sound_button_clicked() end
+								if clear_held_wand_wait() then sound_button_clicked() end
 							end
 						end
 						GuiTooltip( gui, wrap_key( "wand_ready" ), wrap_key( "wand_ready_description" ) )
@@ -1118,7 +1149,9 @@ if initialized == false then
 								ComponentSetValue2( comp_worldstate, "perk_infinite_spells", not world_state_unlimited_spells )
 							end
 							if not world_state_unlimited_spells then
-								GameRegenItemActionsInPlayer( player )
+								if not mod_setting_get( "zero_uses" ) then
+									GameRegenItemActionsInPlayer( player )
+								end
 								local inventory2 = EntityGetFirstComponent( player, "Inventory2Component" )
 								if inventory2 ~= nil then
 									ComponentSetValue2( inventory2, "mForceRefresh", true )
@@ -1149,6 +1182,8 @@ if initialized == false then
 			if mod_setting_get( "show_wand_edit_panel" ) then
 				dofile( "mods/spell_lab_shugged/files/gui/edit_panel_shown.lua" )
 			end
+		else
+			change_keyboard_focus( Focus_PlayerControls )
 		end
 
 		local mod_button_reservation = tonumber( GlobalsGetValue( "spell_lab_shugged_mod_button_reservation", "0" ) )
@@ -1170,8 +1205,7 @@ if initialized == false then
 		end
 		
 		do
-			local mx, my = DEBUG_GetMouseWorld()
-			mx, my = get_screen_position( mx, my )
+			local mx, my = get_mouse_pos_on_screen()
 			local _,_,_,x,y,width,height,_,_,_,_ = previous_data( gui )
 			if x < mx and mx < x + width and y < my and my < y + height then
 				local text = wrap_key( ( is_panel_open and "hide" or "show" ) .. "_spell_lab" )

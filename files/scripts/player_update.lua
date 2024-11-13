@@ -55,22 +55,6 @@ elseif on_setting_turning_off( "invincible" ) then
 	EntityKill( EntityGetWithName( "spell_lab_shugged_invincible" ) )
 end
 
-if settings[ "disable_casting" ] == nil then
-	settings[ "disable_casting" ] = EntityGetFirstComponent( entity_id, "GunComponent" ) == nil
-end
-
-if on_setting_turning_on( "disable_casting" ) then
-	local gun_comp = EntityGetFirstComponentIncludingDisabled( entity_id, "GunComponent" )
-	if gun_comp then
-		EntitySetComponentIsEnabled( entity_id, gun_comp, false )
-	end
-elseif on_setting_turning_off( "disable_casting" ) then
-	local gun_comp = EntityGetFirstComponentIncludingDisabled( entity_id, "GunComponent" )
-	if gun_comp then
-		EntitySetComponentIsEnabled( entity_id, gun_comp, true )
-	end
-end
-
 if settings[ "disable_toxic_statuses" ] == nil then
 	settings[ "disable_toxic_statuses" ] = EntityHasTag( entity_id, "glue_NOT" )
 end
@@ -81,33 +65,28 @@ elseif on_setting_turning_off( "disable_toxic_statuses" ) then
 	EntityRemoveTag( entity_id, "glue_NOT" )
 end
 
+-- broad-spectrum protection
 if ModSettingGet( mod_setting_prefix .. "disable_toxic_statuses" ) then
-	local toxic_statuses = {
-		"TELEPORTATION",
-		"UNSTABLE_TELEPORTATION",
-		"BLINDNESS",
-		"MOVEMENT_SLOWER",
-		"CONFUSION",
-		"FROZEN",
-		"ELECTROCUTION",
+	local toxic_game_effects = {
+		TELEPORTATION          = true,
+		UNSTABLE_TELEPORTATION = true,
+		BLINDNESS              = true,
+		CONFUSION              = true,
+		MOVEMENT_SLOWER        = true,
+		FROZEN                 = true,
+		ELECTROCUTION          = true,
 	}
-	for _, status_name in ipairs( toxic_statuses ) do
-		local effect = GameGetGameEffect( entity_id, status_name )
-		while effect ~= 0 do
-			if ComponentGetValue2( effect, "disable_movement" ) then
-				local ctrl_comp = EntityGetFirstComponentIncludingDisabled( entity_id, "ControlsComponent" )
-				ComponentSetValue2( ctrl_comp, "enabled", true )
-			end
-			local effect_entity = ComponentGetEntity( effect )
-			if not EntityHasTag( effect_entity, "player_unit" )
-				and not EntityHasTag( effect_entity, "polymorphed_player" ) then
-				EntityKill( effect_entity )
-			else
-				EntityRemoveComponent( effect_entity, effect )
-			end
-			print( status_name, effect_entity, effect )
-			effect = GameGetGameEffect( entity_id, status_name )
-		end
+	for _, child_id in ipairs( EntityGetAllChildren( entity_id ) or {} ) do
+		if EntityHasTag( child_id, "spell_lab_shugged_non_toxic_status" ) then goto continue end
+
+		local effect_comp = EntityGetFirstComponentIncludingDisabled( child_id, "GameEffectComponent" )
+		if not effect_comp then goto continue end
+
+		local game_effect_id = ComponentGetValue2( effect_comp, "effect" )
+		if not toxic_game_effects[ game_effect_id ] then goto continue end
+
+		ComponentSetValue2( effect_comp, "frames", 0 )
+		::continue::
 	end
 end
 

@@ -8,46 +8,7 @@ do
 	end
 end
 local edit_panel_state = access_edit_panel_state( held_wand )
-if InputIsKeyJustDown( Key_BACKSPACE ) then
-	local current_actions = {}
-	for s, a, u in state_str_iter_actions( edit_panel_state.get() ) do
-		if s then
-			if a == "" then
-				current_actions[ #current_actions ] = { true }
-			end
-			table.insert( current_actions, { false } )
-		else
-			table.insert( current_actions, { s, a, u } )
-		end
-	end
-	edit_panel_state.set( table_to_state_str( current_actions ), wrap_key( "operation_delete_action" ) )
-end
-if InputIsKeyJustDown( Key_DELETE ) then
-	local current_actions = {}
-	local delete_next_action
-	for s, a, u in state_str_iter_actions( edit_panel_state.get() ) do
-		if s then
-			if a == "" then
-				delete_next_action = true
-			end
-			table.insert( current_actions, { false } )
-		else
-			if not delete_next_action then
-				table.insert( current_actions, { s, a, u } )
-			else
-				table.insert( current_actions, { true } )
-				delete_next_action = false
-			end
-		end
-	end
-	edit_panel_state.set( table_to_state_str( current_actions ), wrap_key( "operation_delete_action" ) )
-end
-if ctrl and InputIsKeyJustDown( Key_z ) then
-	edit_panel_state.undo()
-end
-if ctrl and InputIsKeyJustDown( Key_y ) then
-	edit_panel_state.redo()
-end
+
 local common_actions = {}
 local permanent_actions = {}
 for s, a, u in state_str_iter_actions( edit_panel_state.get() ) do
@@ -85,6 +46,9 @@ else
 		offset_reached_end = true
 	end
 end
+
+local create_real_sprite = mod_setting_get( "gif_mode" )
+
 local permanent_rows_num = math.ceil( #permanent_actions / actions_per_row )
 if not_showing_all and panel_row_offset > 0 then
 	GuiLayoutBeginVertical( gui, 0, screen_height * 0.96 - ( rows_num + permanent_rows_num + 1 ) * ( 20 + 2 ) + 2, true )
@@ -104,44 +68,56 @@ GuiLayoutBeginVertical( gui, 0, screen_height * 0.96 - ( rows_num + permanent_ro
 				GuiLayoutBeginHorizontal( gui, horizontal_centered_x( #permanent_actions % actions_per_row ), 0, true )
 			end
 		end
-		do_action_button( permanent_action, 0, 0, false, function( left_click, right_click )
-			if ctrl and shift then
-				local max_uses = nil
-				do
-					local this_action_data = action_data[ permanent_action ]
-					if this_action_data.max_uses ~= nil then
-						if not world_state_unlimited_spells or this_action_data.never_unlimited then
-							max_uses = this_action_data.max_uses
+		if not create_real_sprite then
+			do_action_button( permanent_action, 0, 0, false, function( left_click, right_click )
+				if ctrl and shift then
+					local max_uses = nil
+					do
+						local this_action_data = action_data[ permanent_action ]
+						if this_action_data.max_uses ~= nil then
+							if not world_state_unlimited_spells or this_action_data.never_unlimited then
+								max_uses = this_action_data.max_uses
+							end
 						end
 					end
-				end
 
-				local current_actions = { { true, permanent_action, max_uses } }
-				local is_first = true
-				for s, a, u in state_str_iter_actions( edit_panel_state.get() ) do
-					if is_first then
-						if not a or a == "" then
-							-- just leave that slot to the demoted action
+					local current_actions = { { true, permanent_action, max_uses } }
+					local is_first = true
+					for s, a, u in state_str_iter_actions( edit_panel_state.get() ) do
+						if is_first then
+							if not a or a == "" then
+								-- just leave that slot to the demoted action
+							else
+								table.insert( current_actions, { s, a, u } )
+							end
+							is_first = false
 						else
 							table.insert( current_actions, { s, a, u } )
 						end
-						is_first = false
-					else
-						table.insert( current_actions, { s, a, u } )
 					end
+					if not fit_into_capacity( current_actions, 1, EntityGetWandCapacity( held_wand ) ) then
+						GamePrint( text_get_translated( "demotion_no_space" ) )
+						return
+					end
+					local current_permanent_actions = {}
+					for pa in state_str_iter_permanent_actions( edit_panel_state.get_permanent() ) do
+						table.insert( current_permanent_actions, pa )
+					end
+					table.remove( current_permanent_actions, j )
+					edit_panel_state.set_both( table_to_state_str( current_actions ), permanent_table_to_state_str( current_permanent_actions ), wrap_key( "operation_demote_permanent_action" ) )
 				end
-				if not fit_into_capacity( current_actions, 1, EntityGetWandCapacity( held_wand ) ) then
-					GamePrint( text_get_translated( "demotion_no_space" ) )
-					return
-				end
-				local current_permanent_actions = {}
-				for pa in state_str_iter_permanent_actions( edit_panel_state.get_permanent() ) do
-					table.insert( current_permanent_actions, pa )
-				end
-				table.remove( current_permanent_actions, j )
-				edit_panel_state.set_both( table_to_state_str( current_actions ), permanent_table_to_state_str( current_permanent_actions ), wrap_key( "operation_demote_permanent_action" ) )
+			end, nil, nil, nil, show_permanent_icon )
+		else
+			GuiOptionsAddForNextWidget( gui, GUI_OPTION.NonInteractive )
+			GuiImageButton( gui, next_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/transparent_20x20.png" )
+			local _,_,_,x,y = previous_data( gui )
+			local this_action_data = action_data[ permanent_action ]
+			if this_action_data then
+				local world_x, world_y = get_world_position( x, y )
+				GameCreateSpriteForXFrames( this_action_data.sprite, world_x, world_y, false, 0, 0, 2, true )
+				GameCreateSpriteForXFrames( "data/ui_gfx/inventory/icon_gun_permanent_actions.png", world_x - 2, world_y - 2, false, 0, 0, 2, true )
 			end
-		end, nil, nil, nil, show_permanent_icon )
+		end
 		if j % actions_per_row == 0 or j == #permanent_actions then
 			GuiLayoutEnd( gui )
 		end
@@ -164,208 +140,219 @@ GuiLayoutBeginVertical( gui, 0, screen_height * 0.96 - rows_num * ( 20 + 2 ) + 2
 		end
 		if uses_remaining == "" then uses_remaining = nil end
 		local note = wrap_key( "spell_box_commmon_tips" )
-		do_action_button( action_id, 0, 0, selected, function( left_click, right_click )
-			if ctrl and shift then
-				if action_id and action_id ~= "" then
-					local current_actions = {}
-					for s, a, u in state_str_iter_actions( edit_panel_state.get() ) do
-						table.insert( current_actions, { s, a, u } )
-					end
-					if current_actions[ i ] then
-						current_actions[ i ] = { false }
-						edit_panel_state.set_both( table_to_state_str( current_actions ), edit_panel_state.get_permanent() .. action_id .. ",", wrap_key( "operation_promote_permanent_action" ) )
-					end
-				end
-			elseif ctrl and alt then
-				if left_click then
-					local current_actions = {}
-					local index = 1
-					local last_selected_index = 1
-					for s, a, u in state_str_iter_actions( edit_panel_state.get() ) do
-						if s and index < i then
-							last_selected_index = index
+		if not create_real_sprite then
+			do_action_button( action_id, 0, 0, selected, function( left_click, right_click )
+				if ctrl and shift then
+					if action_id and action_id ~= "" then
+						local current_actions = {}
+						for s, a, u in state_str_iter_actions( edit_panel_state.get() ) do
+							table.insert( current_actions, { s, a, u } )
 						end
-						index = index + 1
-						table.insert( current_actions, { s, a, u } )
-					end
-					for j = last_selected_index, i, 1 do
-						if current_actions[ j ] then
-							current_actions[ j ][1] = true
-						else
-							current_actions[ j ] = { true }
+						if current_actions[ i ] then
+							current_actions[ i ] = { false }
+							edit_panel_state.set_both( table_to_state_str( current_actions ), edit_panel_state.get_permanent() .. action_id .. ",", wrap_key( "operation_promote_permanent_action" ) )
 						end
 					end
-					edit_panel_state.set( table_to_state_str( current_actions ), wrap_key( "operation_select_action" ) )
-				elseif right_click then	
-					local current_actions = {}
-					local index = 1
-					local next_selected_index = -1
-					for s, a, u in state_str_iter_actions( edit_panel_state.get() ) do
-						if s and index > i and next_selected_index == -1 then
-							next_selected_index = index
-						end
-						index = index + 1
-						table.insert( current_actions, { s, a, u } )
-					end
-					if next_selected_index ~= -1 then
-						for j = i, next_selected_index, 1 do
-							if current_actions[ j ] then
-								current_actions[ j ][1] = true
-							else
-								current_actions[ j ] = { true }
-							end
-						end
-					elseif not edit_panel_state.get_autocap_enabled() then
-						for j = i, EntityGetWandCapacity( held_wand ) do
-							if current_actions[ j ] then
-								current_actions[ j ][1] = true
-							else
-								current_actions[ j ] = { true }
-							end
-						end
-					end
-					edit_panel_state.set( table_to_state_str( current_actions ), wrap_key( "operation_select_action" ) )
-				end
-			elseif alt and shift then
-				local current_actions = {}
-				local selected_indexes = {}
-				local index = 1
-				for s, a, u in state_str_iter_actions( edit_panel_state.get() ) do
-					table.insert( current_actions, { false, a, u } )
-					if s then
-						table.insert( selected_indexes, index )
-					end
-					index = index + 1
-				end
-				if current_actions[ i ] and current_actions[ i ][1] then
-					return
-				end
-				local first = selected_indexes[1]
-				if not first then return end
-				local offset = i - first
-				if not edit_panel_state.get_autocap_enabled() then
-					for j, index in ipairs( selected_indexes ) do
-						local the_other = index + offset
-						if the_other > capacity then
-							return
-						end
-					end
-				end
-				local selected_actions = {}
-				for j, index in ipairs( selected_indexes ) do
-					selected_actions[ j ] = { true, current_actions[ index ][2], current_actions[ index ][3] }
-				end
-				for j, index in ipairs( selected_indexes ) do
-					current_actions[ index + offset ] = selected_actions[ j ]
-				end
-				edit_panel_state.set( table_to_state_str( current_actions ), wrap_key( "operation_duplicate_action" ) )
-			elseif ctrl then
-				local current_actions = {}
-				for s, a, u in state_str_iter_actions( edit_panel_state.get() ) do
-					table.insert( current_actions, { s, a, u } )
-				end
-				if current_actions[ i ] then
-					current_actions[ i ][1] = not current_actions[ i ][1]
-				else
-					current_actions[ i ] = { true }
-				end
-				edit_panel_state.set( table_to_state_str( current_actions ), wrap_key( "operation_select_action" ) )
-			elseif shift then
-				local current_actions = {}
-				for s, a, u in state_str_iter_actions( edit_panel_state.get() ) do
-					table.insert( current_actions, { s, a, u } )
-				end
-				if left_click then
-					if current_actions[ i ] then
-						local a = current_actions[ i ][2]
-						if a and a ~= "" then
-							new_action_history_entry( a )
-						end
-					end
-					current_actions[ i ] = { true }
-					edit_panel_state.set( table_to_state_str( current_actions ), wrap_key( "operation_clear_action_slot" ) )
-				elseif right_click then
-					if current_actions[ i ] then
-						local a = current_actions[ i ][2]
-						if a and a ~= "" then
-							new_action_history_entry( a )
-						end
-					end
-					table.remove( current_actions, i )
-					edit_panel_state.set( table_to_state_str( current_actions ), wrap_key( "operation_delete_action_slot" ) )
-				end
-			elseif alt then
-				local current_actions = {}
-				local indexes_to_swap = {}
-				local index = 1
-				for s, a, u in state_str_iter_actions( edit_panel_state.get() ) do
-					table.insert( current_actions, { s, a, u } )
-					if s then
-						table.insert( indexes_to_swap, index )
-					end
-					index = index + 1
-				end
-				local first = indexes_to_swap[1]
-				if not first then return end
-				local offset = i - first
-				if selected then
-					local temp = {}
-					for j, index in ipairs( indexes_to_swap ) do
-						temp[ j ] = current_actions[ index ]
-					end
-					local size = #indexes_to_swap
-					for j = 1, size - offset do
-						current_actions[ indexes_to_swap[ j + offset ] ] = temp[ j ]
-					end
+				elseif ctrl and alt then
 					if left_click then
-						for j = 1, offset do
-							current_actions[ indexes_to_swap[ j ] ] = temp[ size - offset + j ]
+						local current_actions = {}
+						local index = 1
+						local last_selected_index = 1
+						for s, a, u in state_str_iter_actions( edit_panel_state.get() ) do
+							if s and index < i then
+								last_selected_index = index
+							end
+							index = index + 1
+							table.insert( current_actions, { s, a, u } )
 						end
+						for j = last_selected_index, i, 1 do
+							if current_actions[ j ] then
+								current_actions[ j ][1] = true
+							else
+								current_actions[ j ] = { true }
+							end
+						end
+						edit_panel_state.set( table_to_state_str( current_actions ), wrap_key( "operation_select_action" ) )
+					elseif right_click then	
+						local current_actions = {}
+						local index = 1
+						local next_selected_index = -1
+						for s, a, u in state_str_iter_actions( edit_panel_state.get() ) do
+							if s and index > i and next_selected_index == -1 then
+								next_selected_index = index
+							end
+							index = index + 1
+							table.insert( current_actions, { s, a, u } )
+						end
+						if next_selected_index ~= -1 then
+							for j = i, next_selected_index, 1 do
+								if current_actions[ j ] then
+									current_actions[ j ][1] = true
+								else
+									current_actions[ j ] = { true }
+								end
+							end
+						elseif not edit_panel_state.get_autocap_enabled() then
+							for j = i, EntityGetWandCapacity( held_wand ) do
+								if current_actions[ j ] then
+									current_actions[ j ][1] = true
+								else
+									current_actions[ j ] = { true }
+								end
+							end
+						end
+						edit_panel_state.set( table_to_state_str( current_actions ), wrap_key( "operation_select_action" ) )
 					end
-				else
+				elseif alt and shift then
+					local current_actions = {}
+					local selected_indexes = {}
+					local index = 1
+					for s, a, u in state_str_iter_actions( edit_panel_state.get() ) do
+						table.insert( current_actions, { false, a, u } )
+						if s then
+							table.insert( selected_indexes, index )
+						end
+						index = index + 1
+					end
+					if current_actions[ i ] and current_actions[ i ][1] then
+						return
+					end
+					local first = selected_indexes[1]
+					if not first then return end
+					local offset = i - first
 					if not edit_panel_state.get_autocap_enabled() then
-						for j, index in ipairs( indexes_to_swap ) do
+						for j, index in ipairs( selected_indexes ) do
 							local the_other = index + offset
 							if the_other > capacity then
 								return
 							end
 						end
 					end
+					local selected_actions = {}
+					for j, index in ipairs( selected_indexes ) do
+						selected_actions[ j ] = { true, current_actions[ index ][2], current_actions[ index ][3] }
+					end
+					for j, index in ipairs( selected_indexes ) do
+						current_actions[ index + offset ] = selected_actions[ j ]
+					end
+					edit_panel_state.set( table_to_state_str( current_actions ), wrap_key( "operation_duplicate_action" ) )
+				elseif ctrl then
+					local current_actions = {}
+					for s, a, u in state_str_iter_actions( edit_panel_state.get() ) do
+						table.insert( current_actions, { s, a, u } )
+					end
+					if current_actions[ i ] then
+						current_actions[ i ][1] = not current_actions[ i ][1]
+					else
+						current_actions[ i ] = { true }
+					end
+					edit_panel_state.set( table_to_state_str( current_actions ), wrap_key( "operation_select_action" ) )
+				elseif shift then
+					local current_actions = {}
+					for s, a, u in state_str_iter_actions( edit_panel_state.get() ) do
+						table.insert( current_actions, { s, a, u } )
+					end
 					if left_click then
-						for j, index in ipairs( indexes_to_swap ) do
-							local the_other = index + offset
-							local temp = current_actions[ the_other ]
-							current_actions[ the_other ] = current_actions[ index ]
-							current_actions[ index ] = temp
+						if current_actions[ i ] then
+							local a = current_actions[ i ][2]
+							if a and a ~= "" then
+								new_action_history_entry( a )
+							end
 						end
+						current_actions[ i ] = { true }
+						edit_panel_state.set( table_to_state_str( current_actions ), wrap_key( "operation_clear_action_slot" ) )
 					elseif right_click then
+						if current_actions[ i ] then
+							local a = current_actions[ i ][2]
+							if a and a ~= "" then
+								new_action_history_entry( a )
+							end
+						end
+						table.remove( current_actions, i )
+						edit_panel_state.set( table_to_state_str( current_actions ), wrap_key( "operation_delete_action_slot" ) )
+					end
+				elseif alt then
+					local current_actions = {}
+					local indexes_to_swap = {}
+					local index = 1
+					for s, a, u in state_str_iter_actions( edit_panel_state.get() ) do
+						table.insert( current_actions, { s, a, u } )
+						if s then
+							table.insert( indexes_to_swap, index )
+						end
+						index = index + 1
+					end
+					local first = indexes_to_swap[1]
+					if not first then return end
+					local offset = i - first
+					if selected then
+						local temp = {}
 						for j, index in ipairs( indexes_to_swap ) do
-							local the_other = index + offset
-							current_actions[ the_other ] = current_actions[ index ]
-							current_actions[ index ] = { false }
+							temp[ j ] = current_actions[ index ]
+						end
+						local size = #indexes_to_swap
+						for j = 1, size - offset do
+							current_actions[ indexes_to_swap[ j + offset ] ] = temp[ j ]
+						end
+						if left_click then
+							for j = 1, offset do
+								current_actions[ indexes_to_swap[ j ] ] = temp[ size - offset + j ]
+							end
+						end
+					else
+						if not edit_panel_state.get_autocap_enabled() then
+							for j, index in ipairs( indexes_to_swap ) do
+								local the_other = index + offset
+								if the_other > capacity then
+									return
+								end
+							end
+						end
+						if left_click then
+							for j, index in ipairs( indexes_to_swap ) do
+								local the_other = index + offset
+								local temp = current_actions[ the_other ]
+								current_actions[ the_other ] = current_actions[ index ]
+								current_actions[ index ] = temp
+							end
+						elseif right_click then
+							for j, index in ipairs( indexes_to_swap ) do
+								local the_other = index + offset
+								current_actions[ the_other ] = current_actions[ index ]
+								current_actions[ index ] = { false }
+							end
 						end
 					end
-				end
-				edit_panel_state.set( table_to_state_str( current_actions ), wrap_key( "operation_swap_actions" ) )
-			else
-				local current_actions = {}
-				for s, a, u in state_str_iter_actions( edit_panel_state.get() ) do
-					table.insert( current_actions, { false, a, u } )
-				end
-				local s
-				if left_click then
-					s = true
+					edit_panel_state.set( table_to_state_str( current_actions ), wrap_key( "operation_swap_actions" ) )
 				else
-					s = false
+					local current_actions = {}
+					for s, a, u in state_str_iter_actions( edit_panel_state.get() ) do
+						table.insert( current_actions, { false, a, u } )
+					end
+					local s
+					if left_click then
+						s = true
+					else
+						s = false
+					end
+					if current_actions[ i ] then
+						current_actions[ i ][1] = s
+					else
+						current_actions[ i ] = { s }
+					end
+					edit_panel_state.set( table_to_state_str( current_actions ), wrap_key( "operation_select_action" ) )
 				end
-				if current_actions[ i ] then
-					current_actions[ i ][1] = s
-				else
-					current_actions[ i ] = { s }
-				end
-				edit_panel_state.set( table_to_state_str( current_actions ), wrap_key( "operation_select_action" ) )
+			end, nil, uses_remaining, note, show_uses_remaining )
+		else
+			GuiOptionsAddForNextWidget( gui, GUI_OPTION.NonInteractive )
+			GuiImageButton( gui, next_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/transparent_20x20.png" )
+			local _,_,_,x,y = previous_data( gui )
+			local this_action_data = action_data[ action_id ]
+			if this_action_data then
+				local world_x, world_y = get_world_position( x, y )
+				GameCreateSpriteForXFrames( this_action_data.sprite, world_x, world_y, false, 0, 0, 2, true )
 			end
-		end, nil, uses_remaining, note, show_uses_remaining )
+		end
 		if i == capacity and not edit_panel_state.get_autocap_enabled() then
 			GuiLayoutEnd( gui )
 			break

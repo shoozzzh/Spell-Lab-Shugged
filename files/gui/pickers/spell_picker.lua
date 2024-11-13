@@ -30,34 +30,26 @@ local CHARACTERS_ACTION_ID = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWX
 
 local fzy = dofile_once( "mods/spell_lab_shugged/files/lib/fzy_lua.lua" )
 
-local current_action_search_needle = ""
+local current_action_search_needle = dofile( "mods/spell_lab_shugged/files/gui/editable_text.lua" )
 local current_action_search_result = {}
-local current_action_search_input_anchor = 1
-
-local keyboard = {
-	{ "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P" },
-	{ "A", "S", "D", "F", "G", "H", "J", "K", "L" },
-	{ "Z", "X", "C", "V", "B", "N", "M", "_" },
-}
-
 local action_search_haystacks = {}
 for i, a in pairs( actions ) do
 	action_search_haystacks[ i ] = a.id
 end
-
 local last_action_search_needle = ""
-function search_actions()
-	if current_action_search_needle == last_action_search_needle then return end
-	last_action_search_needle = current_action_search_needle
+current_action_search_needle.on_changed = function()
+	local search_needle_text = current_action_search_needle.text
+	if search_needle_text == last_action_search_needle then return end
+	last_action_search_needle = search_needle_text
 
-	if current_action_search_needle == "" then
+	if search_needle_text == "" then
 		current_action_search_result = {}
 		return
 	end
 
 	-- TODO: replace for-loop with stream api
 	local all_needles_search_result = {}
-	for needle in string.gmatch( current_action_search_needle, "[^ ]+" ) do
+	for needle in string.gmatch( search_needle_text, "[^ ]+" ) do
 		all_needles_search_result[ #all_needles_search_result + 1 ] = fzy.filter( needle, action_search_haystacks, false )
 	end
 
@@ -73,21 +65,11 @@ function search_actions()
 	end
 end
 
-local function insert_character( str, char, index )
-	return string.sub( str, 1, index - 1 ) .. char .. string.sub( str, index, -1 )
-end
-
-function search_needle_insert_character( char )
-	current_action_search_needle = insert_character( current_action_search_needle, char, current_action_search_input_anchor )
-	current_action_search_input_anchor = current_action_search_input_anchor + 1
-	search_actions()
-end
-
-function show_keyboard_key( character, x, y, key_width, clicked_func )
+local function show_keyboard_key( character, x, y, key_width, clicked_func )
 	key_width = key_width - 1 -- gap between keys
 	x = x + 0.5
 	clicked_func = clicked_func or function()
-		search_needle_insert_character( character )
+		current_action_search_needle:insert_character( character )
 	end
 
 	GuiOptionsAddForNextWidget( gui, GUI_OPTION.Layout_NoLayouting )
@@ -105,6 +87,7 @@ function show_keyboard_key( character, x, y, key_width, clicked_func )
 		GuiButton( gui, next_id(), x + key_width / 2 - text_width / 2, y, button_text )
 		local left_click,right_click = previous_data( gui )
 		if left_click or right_click then
+			interacting = true
 			clicked_func( left_click, right_click )
 		end
 	GuiAnimateEnd( gui )
@@ -131,8 +114,91 @@ function show_keyboard_key( character, x, y, key_width, clicked_func )
 	GuiButton( gui, next_id(), x + key_width / 2 - character_width / 2, y, character )
 end
 
+local spell_search_focused = false
+
+local character_keys = {
+	{ Key_a, "A" },
+	{ Key_b, "B" },
+	{ Key_c, "C" },
+	{ Key_d, "D" },
+	{ Key_e, "E" },
+	{ Key_f, "F" },
+	{ Key_g, "G" },
+	{ Key_h, "H" },
+	{ Key_i, "I" },
+	{ Key_j, "J" },
+	{ Key_k, "K" },
+	{ Key_l, "L" },
+	{ Key_m, "M" },
+	{ Key_n, "N" },
+	{ Key_o, "O" },
+	{ Key_p, "P" },
+	{ Key_q, "Q" },
+	{ Key_r, "R" },
+	{ Key_s, "S" },
+	{ Key_t, "T" },
+	{ Key_u, "U" },
+	{ Key_v, "V" },
+	{ Key_w, "W" },
+	{ Key_x, "X" },
+	{ Key_y, "Y" },
+	{ Key_z, "Z" },
+	{ Key_1, "1" },
+	{ Key_2, "2" },
+	{ Key_3, "3" },
+	{ Key_4, "4" },
+	{ Key_5, "5" },
+	{ Key_6, "6" },
+	{ Key_7, "7" },
+	{ Key_8, "8" },
+	{ Key_9, "9" },
+	{ Key_0, "0" },
+	{ Key_SPACE, " " },
+	{ Key_MINUS, "_" },
+}
+
+local Focus_SpellSearch = {
+	id = "spell_search",
+	on_focused = function() spell_search_focused = true end,
+	on_unfocused = function() spell_search_focused = false end,
+	on_input = function( keyboard_input )
+		if keyboard_input[ Key_BACKSPACE ] then
+			current_action_search_needle:left_delete()
+		end
+		if keyboard_input[ Key_LEFT ] then
+			if not shift then
+				current_action_search_needle:input_anchor_move_left()
+			else
+				current_action_search_needle:input_anchor_move_to_last_word()
+			end
+		end
+		if keyboard_input[ Key_RIGHT ] then
+			if not shift then
+				current_action_search_needle:input_anchor_move_right()
+			else
+				current_action_search_needle:input_anchor_move_to_next_word()
+			end
+		end
+		for _, p in ipairs( character_keys ) do
+			if keyboard_input[ p[1] ] then
+				current_action_search_needle:insert_character( p[2] )
+				print( "inserted", p[2] )
+			end
+		end
+	end,
+}
+
 local picker = {}
+
+local keyboard = {
+	{ "Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P" },
+	{ "A", "S", "D", "F", "G", "H", "J", "K", "L" },
+	{ "Z", "X", "C", "V", "B", "N", "M", "_" },
+}
+
 picker.menu = function()
+	local interacting = false
+
 	local show_locked_spells = mod_setting_get( "show_locked_spells" )
 	local actions_data_to_show
 
@@ -240,6 +306,7 @@ picker.menu = function()
 
 		do_scroll_table( first_scroll_id + filter_type, nil, height, actions_data_to_show, function( action )
 			do_action_button( action.id, 0, 0, false, function( left_click, right_click )
+				interacting = true
 				local is_unlocked_action = action.spawn_requires_flag and HasFlagPersistent( action.spawn_requires_flag ) 
 				if ctrl and shift then
 					if is_unlocked_action then
@@ -276,8 +343,14 @@ picker.menu = function()
 				local do_replace = mod_setting_get( "replace_mode" )
 				if shift then do_replace = not do_replace end
 				local uses_remaining = nil
-				if not world_state_unlimited_spells or action.never_unlimited then
-					uses_remaining = action.max_uses
+				if action.max_uses then
+					if not world_state_unlimited_spells or action.never_unlimited then
+						if not mod_setting_get( "zero_uses" ) then
+							uses_remaining = action.max_uses
+						else
+							uses_remaining = 0
+						end
+					end
 				end
 				set_action( access_edit_panel_state( held_wand ), action.id, uses_remaining, do_replace, EntityGetWandCapacity( held_wand ), right_click )
 				if filter_type ~= FILTER_TYPE_RECENT then
@@ -294,59 +367,41 @@ picker.menu = function()
 				local med_key_width = 0.75 * key_width
 				GuiOptionsAddForNextWidget( gui, GUI_OPTION.NonInteractive )
 				local input_bar_width = 174 - 2 * big_key_width - 2 * med_key_width - 2.5
-				if current_action_search_needle ~= "" then
-					local needle_display
-					if current_action_search_input_anchor > #current_action_search_needle then
-						needle_display = current_action_search_needle
-					else
-						needle_display = insert_character( current_action_search_needle, "'", current_action_search_input_anchor )
-					end
-					GuiTextInput( gui, next_id(), 0, 0, needle_display, input_bar_width, -1, CHARACTERS_ACTION_ID )
-				else
+				if not spell_search_focused then
 					GuiOptionsAddForNextWidget( gui, GUI_OPTION.DrawSemiTransparent )
+				end
+				if spell_search_focused or current_action_search_needle.text ~= "" then
+					GuiTextInput( gui, next_id(), 0, 0, current_action_search_needle:display(), input_bar_width, -1, CHARACTERS_ACTION_ID )
+				else
 					GuiTextInput( gui, next_id(), 0, 0, text_get_translated( "spell_picker_searchbox" ), input_bar_width, -1, CHARACTERS_ACTION_ID )
 				end
 				local _,_,_,x,y,width,height,_,_,_,_ = previous_data( gui )
+				do
+					local mx, my = get_mouse_pos_on_screen()
+					if -2 <= mx - x and mx - x <= width + 2 and -2 <= my - y and my - y <= height + 2 then
+						interacting = true
+					end
+				end
 				show_keyboard_key( " ", x + width, y, big_key_width )
 				show_keyboard_key( "<", x + width + big_key_width, y, med_key_width, function( left_click, right_click )
 					if left_click then
-						if current_action_search_input_anchor > 1 then
-							current_action_search_input_anchor = current_action_search_input_anchor - 1
-						end
+						current_action_search_needle:input_anchor_move_left()
 					elseif right_click then
-						local str_left = string.sub( current_action_search_needle, 1, current_action_search_input_anchor - 1 )
-						local last_word_idx, _, _ = string.find( str_left, "[^ ]* *$" )
-						if last_word_idx then
-							current_action_search_input_anchor = last_word_idx
-						end
+						current_action_search_needle:input_anchor_move_to_last_word()
 					end
 				end )
 				show_keyboard_key( ">", x + width + med_key_width + big_key_width, y, med_key_width, function( left_click, right_click )
 					if left_click then
-						if current_action_search_input_anchor <= #current_action_search_needle then
-							current_action_search_input_anchor = current_action_search_input_anchor + 1
-						end
+						current_action_search_needle:input_anchor_move_right()
 					elseif right_click then
-						local str_right = string.sub( current_action_search_needle, current_action_search_input_anchor, -1 )
-						local _, next_word_idx, _ = string.find( str_right, "^ *[^ ]*" )
-						if next_word_idx then
-							current_action_search_input_anchor = current_action_search_input_anchor + next_word_idx
-						end
+						current_action_search_needle:input_anchor_move_to_next_word()
 					end
 				end )
 				show_keyboard_key( "<-", x + width + 2 * med_key_width + big_key_width, y, big_key_width, function( left_click, right_click )
 					if left_click then
-						if current_action_search_input_anchor >= 2 then
-							current_action_search_needle =
-								string.sub( current_action_search_needle, 1, current_action_search_input_anchor - 2 )
-								.. string.sub( current_action_search_needle, current_action_search_input_anchor, -1 )
-							current_action_search_input_anchor = current_action_search_input_anchor - 1
-							search_actions()
-						end
+						current_action_search_needle:left_delete()
 					elseif right_click then
-						current_action_search_needle = ""
-						current_action_search_input_anchor = 1
-						search_actions()
+						current_action_search_needle:clear()
 					end
 				end )
 
@@ -401,12 +456,24 @@ picker.menu = function()
 			show_filter( FILTER_TYPE_IN_INV, wrap_key( "action_in_inv" ) )
 		GuiLayoutEnd( gui )
 	GuiLayoutEnd( gui )
+
+	if spell_search_focused and filter_type ~= FILTER_TYPE_SEARCH then
+		change_keyboard_focus( Focus_PlayerControls )
+	elseif InputIsMouseButtonJustDown( Mouse_left ) then
+		if interacting then
+			change_keyboard_focus( Focus_SpellSearch )
+		else
+			if change_keyboard_focus( Focus_PlayerControls ) then
+				block_upcoming_wand_shooting()
+			end
+		end
+	end
 end
 
 picker.buttons = function()
-	local buttons_num = 1
+	local buttons_num = 2
 	if held_wand and mod_setting_get( "show_wand_edit_panel" ) then
-		buttons_num = buttons_num + 6
+		buttons_num = buttons_num + 7
 	end
 	GuiLayoutBeginHorizontal( gui, horizontal_centered_x(buttons_num,4), percent_to_ui_scale_y(2), true )
 		if held_wand and mod_setting_get( "show_wand_edit_panel" ) then
@@ -415,6 +482,9 @@ picker.buttons = function()
 		do_flag_toggle_image_button( "mods/spell_lab_shugged/files/gui/buttons/show_locked_spells.png", "show_locked_spells", nil, nil, wrap_key( "relock_tips" ) )
 		if held_wand and mod_setting_get( "show_wand_edit_panel" ) then
 			do_flag_toggle_image_button( "mods/spell_lab_shugged/files/gui/buttons/spell_replacement.png", "replace_mode", "spell_replacement", nil, wrap_key( "spell_replacement_tips" ) )
+		end
+		do_flag_toggle_image_button( "mods/spell_lab_shugged/files/gui/buttons/spell_replacement.png", "zero_uses" )
+		if held_wand and mod_setting_get( "show_wand_edit_panel" ) then
 			show_edit_panel_toggle_options()
 		end
 	GuiLayoutEnd( gui )
