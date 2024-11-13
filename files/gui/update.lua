@@ -701,7 +701,7 @@ if initialized == false then
 			GuiTooltip( gui, text_get_translated( "redo" ) .. " " .. GameTextGetTranslatedOrNot( operation_to_redo ),
 				GameTextGet( wrap_key( "current_history" ), edit_panel_state.get_current_history_index() ) )
 		else cant_redo() end
-		do_flag_toggle_image_button( "mods/spell_lab_shugged/files/gui/buttons/automatic_capacity.png", "gif_mode" )
+		do_flag_toggle_image_button( "mods/spell_lab_shugged/files/gui/buttons/camera.png", "gif_mode" )
 	end
 
 	function do_gui()
@@ -1044,7 +1044,6 @@ if initialized == false then
 						local _,right_click = GuiImageButton( gui, next_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/heart.png" )
 						if right_click then
 							sound_button_clicked()
-							EntityRemoveFromParent( hp_fixer )
 							EntityKill( hp_fixer )
 						end
 						local _,_,_,x,y = previous_data( gui )
@@ -1134,7 +1133,7 @@ if initialized == false then
 				if mod_setting_get( "show_toggle_options" ) then
 					GuiLayoutBeginHorizontal( gui, horizontal_centered_x(8,4), percent_to_ui_scale_y(2), true )
 						do_flag_toggle_image_button( "mods/spell_lab_shugged/files/gui/buttons/disable_projectiles.png", "disable_casting" )
-						do_flag_toggle_image_button( "mods/spell_lab_shugged/files/gui/buttons/disable_toxic_statuses.png", "disable_toxic_statuses" )
+						do_flag_toggle_image_button( "mods/spell_lab_shugged/files/gui/buttons/disable_toxic_statuses.png", "disable_toxic_statuses", nil, nil, wrap_key( "disable_toxic_statuses_description" ) )
 						do_flag_toggle_image_button( "mods/spell_lab_shugged/files/gui/buttons/invincible.png", "invincible", "$status_protection_all" )
 						do_flag_toggle_image_button( "mods/spell_lab_shugged/files/gui/buttons/disable_polymorphing.png", "no_polymorphing", "$status_protection_polymorph" )
 						do_flag_toggle_image_button( "mods/spell_lab_shugged/files/gui/buttons/no_recoil.png", "no_recoil" )

@@ -10,6 +10,10 @@ if not hp_comp or not max_hp_comp then
 	max_hp = ComponentGetValue2( damage_model, "max_hp" )
 	EntityAddComponent2( entity_id, "VariableStorageComponent", { name = "hp", value_float = hp } )
 	EntityAddComponent2( entity_id, "VariableStorageComponent", { name = "max_hp", value_float = max_hp } )
+	local wait_for_kill_flag_on_death = ComponentGetValue2( damage_model, "wait_for_kill_flag_on_death" )
+	EntityAddComponent2( entity_id, "VariableStorageComponent",
+		{ name = "wait_for_kill_flag_on_death", value_bool = wait_for_kill_flag_on_death } )
+	ComponentSetValue2( damage_model, "wait_for_kill_flag_on_death", true )
 	return
 end
 local hp = ComponentGetValue2( hp_comp, "value_float" )

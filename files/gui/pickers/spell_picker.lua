@@ -483,10 +483,10 @@ picker.buttons = function()
 		if held_wand and mod_setting_get( "show_wand_edit_panel" ) then
 			do_flag_toggle_image_button( "mods/spell_lab_shugged/files/gui/buttons/spell_replacement.png", "replace_mode", "spell_replacement", nil, wrap_key( "spell_replacement_tips" ) )
 		end
-		do_flag_toggle_image_button( "mods/spell_lab_shugged/files/gui/buttons/spell_replacement.png", "zero_uses" )
 		if held_wand and mod_setting_get( "show_wand_edit_panel" ) then
 			show_edit_panel_toggle_options()
 		end
+		do_flag_toggle_image_button( "mods/spell_lab_shugged/files/gui/buttons/zero_uses.png", "zero_uses" )
 	GuiLayoutEnd( gui )
 end
 

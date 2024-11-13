@@ -75,6 +75,14 @@ if ModDoesFileExist( neutralized_effect_path ) and neutralized_effect then
 	ModTextFileSetContent( neutralized_effect_path, neutralized_effect )
 end
 
+local glue_lua_path = "data/scripts/projectiles/glue_init.lua"
+local glue_lua = ModTextFileGetContent( glue_lua_path )
+if ModDoesFileExist( glue_lua_path ) and glue_lua then
+	ModTextFileSetContent( glue_lua_path, glue_lua:gsub( "if target2 ~= target then",
+		[[if EntityHasTag( target2, "player_unit" ) and ModSettingGet( "spell_lab_shugged.disable_toxic_statuses" ) then return end
+		if target2 ~= target then]] ) )
+end
+
 function OnModPostInit()
 	local nxml = dofile_once( "mods/spell_lab_shugged/files/lib/nxml.lua" )
 	dofile_once( "mods/spell_lab_shugged/files/scripts/toxic_effect_entities.lua" )
