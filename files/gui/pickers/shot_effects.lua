@@ -173,7 +173,7 @@ picker.menu = function()
 		count_table[ id ] = ( count_table[ id ] or 0 ) + 1
 	end
 	GuiLayoutBeginVertical( gui, 640 * 0.05, 360 * 0.16, true )
-		do_scroll_table( next_id(), nil, nil, shot_effect_data, function( shot_effect )
+		do_scroll_table( next_id(), nil, nil, true, nil, shot_effect_data, function( shot_effect )
 			local count = count_table[ shot_effect.id ] or 0
 			local max_count = shot_effect.max_count
 			local unsafe_count_allowed = mod_setting_get( "shot_effect_unsafe_count_allowed" ) and not shot_effect.no_unsafe

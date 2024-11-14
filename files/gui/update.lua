@@ -161,11 +161,9 @@ if initialized == false then
 		return cached_mouse_x, cached_mouse_y
 	end
 
-	function scroll_box_no_wand_switching()
-		local _,_,_,x,y,width,height,_,_,_,_ = previous_data( gui )
-		local mx, my = get_mouse_pos_on_screen()
-		-- extra 2 pixels for the margins
-		if -2 <= mx - x and mx - x <= width + 2 and -2 <= my - y and my - y <= height + 2 then
+	function scroll_box_no_wand_switching( hovered )
+		if hovered then
+			local mx, my = get_mouse_pos_on_screen()
 			GuiIdPushString( gui, "NO_MORE_WAND_SWITCHING" )
 			GuiAnimateBegin( gui )
 			GuiAnimateAlphaFadeIn( gui, 1, 0, 0, true )
@@ -257,17 +255,25 @@ if initialized == false then
 
 	SCROLL_TABLE_WIDTH = 174
 
-	function do_scroll_table( scroll_id, width, height, cell_list, cell_gui_func, row_size, height_limit )
+	function do_scroll_table( scroll_id, width, height, height_autofit, hover_callback, cell_list, cell_gui_func, row_size )
 		row_size = row_size or 8
-		height_limit = height_limit or 160
 		width = width or SCROLL_TABLE_WIDTH
-		if not height then
+		if height_autofit then
 			local num_rows = math.max( 1, math.ceil( #cell_list / row_size ) )
-			height = math.min( num_rows * 20, height_limit )
+			height = math.min( num_rows * 20, height or 160 )
 		end
 
 		GuiBeginScrollContainer( gui, scroll_id, 0, 0, width, math.max( height, 20 ) )
-			scroll_box_no_wand_switching()
+			do
+				local _,_,_,x,y,width,height,_,_,_,_ = previous_data( gui )
+				local mx, my = get_mouse_pos_on_screen()
+				-- extra 2 pixels for the margins
+				local hovered = -2 <= mx - x and mx - x <= width + 2 and -2 <= my - y and my - y <= height + 2
+				if hover_callback then
+					hover_callback( hovered )
+				end
+				scroll_box_no_wand_switching( hovered )
+			end
 			GuiLayoutBeginVertical( gui, 0, 0 )
 				local index = 1
 				local cell = cell_list[ index ]
@@ -295,7 +301,8 @@ if initialized == false then
 		if not ModSettingGet( mod_settings_key ) then
 			GuiOptionsAddForNextWidget( gui, GUI_OPTION.DrawSemiTransparent )
 		end
-		if GuiImageButton( gui, next_id(), 0, 0, "", filepath ) then
+		local left_click, right_click = GuiImageButton( gui, next_id(), 0, 0, "", filepath )
+		if left_click then
 			sound_button_clicked()
 			local new = not ModSettingGet( mod_settings_key )
 			ModSettingSet( mod_settings_key, new )
@@ -310,6 +317,7 @@ if initialized == false then
 		else
 			GuiTooltip( gui, text_get_translated( "enable" ) .. option_text, description or "" )
 		end
+		return left_click, right_click
 	end
 
 	function do_action_image( id, action_id, x, y, alpha, scale_x, scale_y, rotation )
@@ -701,7 +709,6 @@ if initialized == false then
 			GuiTooltip( gui, text_get_translated( "redo" ) .. " " .. GameTextGetTranslatedOrNot( operation_to_redo ),
 				GameTextGet( wrap_key( "current_history" ), edit_panel_state.get_current_history_index() ) )
 		else cant_redo() end
-		do_flag_toggle_image_button( "mods/spell_lab_shugged/files/gui/buttons/camera.png", "gif_mode" )
 	end
 
 	function do_gui()
@@ -876,7 +883,14 @@ if initialized == false then
 					do_picker_button( "mods/spell_lab_shugged/files/gui/buttons/shot_effects.png", PICKERS.ShotEffects, "shot_effects" )
 					do_flag_toggle_image_button( "mods/spell_lab_shugged/files/gui/buttons/show_toggles.png", "show_toggle_options", "toggle_options" )
 					do_flag_toggle_image_button( "mods/spell_lab_shugged/files/gui/buttons/damage_info.png", "damage_info" )
-					do_flag_toggle_image_button( "mods/spell_lab_shugged/files/gui/buttons/show_wand_edit_panel.png", "show_wand_edit_panel", "wand_edit_panel" )
+					do
+						local gif_mode = mod_setting_get( "gif_mode" )
+						local description = wrap_key( gif_mode and "gif_mode_disable" or "gif_mode_enable" )
+						local left_click, right_click = do_flag_toggle_image_button( "mods/spell_lab_shugged/files/gui/buttons/show_wand_edit_panel.png", "show_wand_edit_panel", "wand_edit_panel", nil, description )
+						if right_click then
+							mod_setting_set( "gif_mode", not gif_mode )
+						end
+					end
 				GuiLayoutEnd( gui )
 
 				GuiLayoutBeginHorizontal( gui, horizontal_centered_x(9,4), percent_to_ui_scale_y(2), true )
@@ -1040,7 +1054,7 @@ if initialized == false then
 						local hp_comp = get_variable_storage_component( hp_fixer, "hp" )
 						local max_hp_comp = get_variable_storage_component( hp_fixer, "max_hp" )
 						local hp_fixed_to = ComponentGetValue2( hp_comp, "value_float" )
-						local max_hp_fixed_to = ComponentGetValue2( hp_comp, "value_float" )
+						local max_hp_fixed_to = ComponentGetValue2( max_hp_comp, "value_float" )
 						local _,right_click = GuiImageButton( gui, next_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/heart.png" )
 						if right_click then
 							sound_button_clicked()

@@ -274,42 +274,6 @@ function get_action_metadata( this_action_data )
 	return metadata
 end
 
-local FORMAT = {
-	Floor = 0,
-	Round = 1,
-	Ceiling = 2
-}
-
-local function format_value( value, decimals, show_sign, format )
-	local text = ""
-	if value ~= nil then
-		if show_sign and value > 0 then
-			text = "+"
-		end
-		local rounder = math.floor
-		local value_offset = 0
-		if format == FORMAT.Ceiling then
-			rounder = math.ceil
-		elseif format == FORMAT.Round then
-			value_offset = 0.5
-		end
-		local power = math.pow( 10, decimals )
-		text = text .. tostring( rounder( value * power + value_offset ) / power )
-	else
-		return "missing"
-	end
-	return text
-end
-
-local function format_range( min, max )
-	if not min or not max then return nil end
-	if min ~= max then
-		return min .. " - " .. max
-	else
-		return tostring( min )
-	end
-end
-
 if player then EntityRemoveTag( player, "player_unit" ) end
 
 local action_metadata = {}
@@ -350,11 +314,11 @@ local metadata_to_show = {
 		{ "draw_actions"            , "$inventory_actionspercast", 0, function(value) return format_value( value, 0 ) end },
 		{ "max_uses"                , wrap_key( "max_uses" ), nil, function(value) return format_value( value, 0 ) end },
 		{ "mana"                    , "$inventory_manadrain", nil, function(value) return format_value( value, 0 ) end },
-		{ "fire_rate_wait"          , "$inventory_castdelay", 0, function(value) return format_value( value / 60, 3, true, FORMAT.Round ) .. " s (" .. GameTextGet( wrap_key( "frames" ), format_value( value, 0 ) ) .. ")" end },
+		{ "fire_rate_wait"          , "$inventory_castdelay", 0, function(value) return format_time( value, 3 ) end },
 		{ "speed_multiplier"        , "$inventory_mod_speed", 1, function(value) return "x " .. format_value( value, 2 ) end },
 		{ "lifetime_add"            , wrap_key( "lifetime_add" ), 0, function(value) return format_value( value, 0, true ) end },
 		{ "lifetime_cap"            , wrap_key( "lifetime_cap" ), nil, function(value) return format_range( value[1], value[2] ) end },
-		{ "reload_time"             , "$inventory_rechargetime", 0, function(value) return format_value( value / 60, 3, true, FORMAT.Round ) .. " s (" .. GameTextGet( wrap_key( "frames" ), format_value( value, 0 ) ) .. ")" end },
+		{ "reload_time"             , "$inventory_rechargetime", 0, function(value) return format_time( value, 3 ) end },
 		{ "spread_degrees"          , "$inventory_spread", 0, function(value) return GameTextGet( wrap_key( "degrees" ), format_value( value, 3, true, FORMAT.Round ) ) end },
 		{ "damage_critical_chance"  , "$inventory_mod_critchance", 0, function(value) return format_value( value, 0, true ) .. "%" end },
 		{ "explosion_radius"        , "$inventory_explosion_radius", 0, function(value) return format_value( value, 0, true, FORMAT.Ceiling ) end },

@@ -19,7 +19,7 @@ local picker = {}
 local selected_spell_group_index = 0
 picker.menu = function()
 	GuiLayoutBeginVertical( gui, 640 * 0.05, 360 * 0.16, true )
-		do_scroll_table( next_id(), nil, nil, saved_spell_groups, function( saved_spell_group )
+		do_scroll_table( next_id(), nil, nil, true, nil, saved_spell_groups, function( saved_spell_group, index )
 			for _, p in ipairs( saved_spell_group ) do
 				do_action_button( p[1], 0, 0, selected_spell_group_index == index, function()
 					if selected_spell_group_index ~= index then
@@ -42,7 +42,7 @@ end
 picker.buttons = function()
 	local buttons_num = 1
 	if held_wand and mod_setting_get( "show_wand_edit_panel" ) then
-		buttons_num = buttons_num + 8
+		buttons_num = buttons_num + 7
 	end
 	GuiLayoutBeginHorizontal( gui, horizontal_centered_x(buttons_num,4), percent_to_ui_scale_y(2), true )
 		if held_wand and mod_setting_get( "show_wand_edit_panel" ) then
@@ -75,8 +75,7 @@ picker.buttons = function()
 		GuiTooltip( gui, wrap_key( "spell_group_box_delete" ), "" )
 
 		if held_wand and mod_setting_get( "show_wand_edit_panel" ) then
-			GuiImageButton( gui, next_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/load_into_wand.png" )
-			local left_click, right_click = previous_data( gui )
+			local left_click, right_click = GuiImageButton( gui, next_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/load_into_wand.png" )
 			if left_click or right_click then
 				local saved_spell_group = saved_spell_groups[ selected_spell_group_index ]
 				local do_replace = mod_setting_get( "replace_mode" )

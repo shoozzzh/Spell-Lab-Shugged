@@ -7,7 +7,7 @@ mod_settings_version = 1
 local function load_mod_settings()
 	local cur_lang = GameTextGetTranslatedOrNot( "$current_language" )
 	local text
-	if cur_lang == "简体中文" then
+	if cur_lang == "简体中文" or cur_lang == "喵体中文" or cur_lang == "汪体中文" or cur_lang == "完全汉化" then
 		text = {
 			wand_edit_panel_max_num_rows = "法杖编辑面板最大行数",
 			wand_edit_panel_max_num_rows_description = "法杖编辑面板最多可以同时显示的行数，默认为 5",
@@ -35,6 +35,7 @@ local function load_mod_settings()
 			action_button_click_sound = "法术按钮点击音效",
 			include_spells_in_non_inv_wand = "背包/附近页面显示附近法杖中法术",
 			include_spells_in_non_inv_wand_description = "开启时，法术选取菜单的背包/附近页面将显示附近法杖中法术",
+			show_screen_keyboard = "法术搜索页面显示软键盘",
 		}
 	else
 		text = {
@@ -64,6 +65,7 @@ local function load_mod_settings()
 			action_button_click_sound = "Spell Button Click sound",
 			include_spells_in_non_inv_wand = "Include Spells In Nearby Wands",
 			include_spells_in_non_inv_wand_description = "Should spells in nearby wands be shown in Inv/Nearby page of the spell picker?",
+			show_screen_keyboard = "Show Screen Keyboard In Spell Search Page",
 		}
 	end
 	mod_settings = {
@@ -148,6 +150,12 @@ local function load_mod_settings()
 			id                 = "include_spells_in_non_inv_wand",
 			ui_name            = text.include_spells_in_non_inv_wand,
 			ui_description     = text.include_spells_in_non_inv_wand_description,
+			value_default      = false,
+			scope              = MOD_SETTING_SCOPE_RUNTIME,
+		},
+		{
+			id                 = "show_screen_keyboard",
+			ui_name            = text.show_screen_keyboard,
 			value_default      = false,
 			scope              = MOD_SETTING_SCOPE_RUNTIME,
 		},

@@ -64,6 +64,23 @@ function editable_text:left_delete()
 	end
 end
 
+function editable_text:right_delete()
+	if self.input_anchor <= #self.text then
+		self.text =
+			string.sub( self.text, 1, self.input_anchor - 1 )
+			.. string.sub( self.text, self.input_anchor + 1, -1 )
+		self:try_on_changed()
+	end
+end
+
+function editable_text:input_anchor_move_to_beginning()
+	self.input_anchor = #self.text + 1
+end
+
+function editable_text:input_anchor_move_to_end()
+	self.input_anchor = 1
+end
+
 function editable_text:clear()
 	self.text = ""
 	self.input_anchor = 1
