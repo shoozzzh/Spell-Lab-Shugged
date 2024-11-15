@@ -1,0 +1,18 @@
+extra_modifiers_supported = {
+	"critical_hit_boost",
+	"critical_plus_small",
+	"powerful_shot",
+	"projectile_homing_shooter",
+	"food_clock",
+	"damage_plus_small",
+	"extra_knockback",
+	"lower_spread",
+	"laser_aim",
+	"low_recoil",
+	"bounce",
+	"projectile_homing_shooter_wizard",
+	"projectile_alcohol_trail",
+	"duplicate_projectile",
+	"fast_projectiles",
+	"slow_firing",
+}

@@ -280,19 +280,15 @@ local action_metadata = {}
 for _, action in pairs( actions ) do
 	action_metadata[ action.id ] = get_action_metadata( action )
 end
+
+dofile_once( "mods/spell_lab_shugged/files/gui/extra_modifiers_supported.lua" )
 local extra_modifier_metadata = {}
-local extra_modifier_blacklist = { "damage_projectile_boost" }
-for id, action in pairs( extra_modifiers ) do
-	for _, bad_extra_modifier_id in ipairs( extra_modifier_blacklist ) do
-		if id == bad_extra_modifier_id then
-			goto continue
-		end
-	end
+for _, id in pairs( extra_modifiers_supported ) do
 	do
 		local fake_action = {
 			id = "FAKE_ACTION_" .. string.upper( id ),
 			mana = 0,
-			action = action,
+			action = extra_modifiers[ id ],
 		}
 		local metadata = get_action_metadata( fake_action ).c
 		for k, v in pairs( metadata ) do
