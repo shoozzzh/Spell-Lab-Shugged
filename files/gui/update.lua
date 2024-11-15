@@ -858,12 +858,14 @@ if initialized == false then
 								GlobalsSetValue( "spell_lab_shugged_checkpoint", "0" )
 							end
 						elseif right_click then
-							sound_button_clicked()
-							EntityLoad( "mods/spell_lab_shugged/files/biome_impl/wand_lab/wand_lab.xml", 14600, -6000 )
+							if GlobalsGetValue( "spell_lab_shugged_checkpoint", "0" ) ~= "0" then
+								sound_button_clicked()
+								EntityLoad( "mods/spell_lab_shugged/files/biome_impl/wand_lab/wand_lab.xml", 14600, -6000 )
+							end
 						end
 					end
 					if GlobalsGetValue( "spell_lab_shugged_checkpoint", "0" ) == "0" then
-						GuiTooltip( gui, wrap_key( "enter_spell_lab" ), wrap_key( "reload_spell_lab" ) )
+						GuiTooltip( gui, wrap_key( "enter_spell_lab" ), "" )
 					else
 						GuiTooltip( gui, wrap_key( "leave_spell_lab" ), wrap_key( "reload_spell_lab" ) )
 					end
