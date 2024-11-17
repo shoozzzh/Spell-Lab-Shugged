@@ -46,7 +46,7 @@ local WANDS = {}
 
 function WANDS.wand_clear_actions( wand )
 	local actions = {}
-	local children = EntityGetAllChildren( wand ) or {}
+	local children = EntityGetAllChildren( wand, "card_action" ) or {}
 	for i,v in ipairs( children ) do
 		local item = EntityGetFirstComponentIncludingDisabled( v, "ItemComponent" )
 		local item_action = EntityGetFirstComponentIncludingDisabled( v, "ItemActionComponent" )
@@ -60,7 +60,7 @@ end
 
 function WANDS.wand_get_actions( wand )
 	local actions = {}
-	local children = EntityGetAllChildren( wand ) or {}
+	local children = EntityGetAllChildren( wand, "card_action" ) or {}
 	for i,v in ipairs( children ) do
 		local item = EntityGetFirstComponentIncludingDisabled( v, "ItemComponent" )
 		local item_action = EntityGetFirstComponentIncludingDisabled( v, "ItemActionComponent" )
@@ -81,7 +81,7 @@ end
 function WANDS.wand_get_actions_absolute( wand )
 	local actions = {}
 	local permanent_actions = {}
-	local children = EntityGetAllChildren( wand ) or {}
+	local children = EntityGetAllChildren( wand, "card_action" ) or {}
 	local slot_0_taken = false
 	local offset = 0
 	for i,v in ipairs( children ) do
@@ -119,7 +119,7 @@ end
 
 function WANDS.wand_get_actions_all( wand )
 	local actions = {}
-	for i, a in ipairs( EntityGetAllChildren( wand--[[, "card_action"]] ) or {} ) do
+	for i, a in ipairs( EntityGetAllChildren( wand, "card_action" ) or {} ) do
 		local item_comp = EntityGetFirstComponentIncludingDisabled( a, "ItemComponent" )
 		local ia_comp   = EntityGetFirstComponentIncludingDisabled( a, "ItemActionComponent" )
 		if not item_comp or not ia_comp then goto continue end
@@ -144,7 +144,7 @@ end
 
 function WANDS.wand_get_actions_permanent( wand )
 	local permanent_actions = {}
-	for i,v in ipairs( EntityGetAllChildren( wand ) or {} ) do
+	for i,v in ipairs( EntityGetAllChildren( wand, "card_action" ) or {} ) do
 		local item        = EntityGetFirstComponentIncludingDisabled( v, "ItemComponent" )
 		local item_action = EntityGetFirstComponentIncludingDisabled( v, "ItemActionComponent" )
 		if not item or not item_action then goto continue end
@@ -170,7 +170,7 @@ end
 
 function WANDS.wand_get_num_actions_permanent( wand )
 	local num_permanent_actions = 0
-	for i, v in ipairs( EntityGetAllChildren( wand ) or {} ) do
+	for i, v in ipairs( EntityGetAllChildren( wand, "card_action" ) or {} ) do
 		local item        = EntityGetFirstComponentIncludingDisabled( v, "ItemComponent" )
 		local item_action = EntityGetFirstComponentIncludingDisabled( v, "ItemActionComponent" )
 		if not item or not item_action then goto continue end
@@ -202,7 +202,7 @@ end
 function WANDS.wand_shuffle_actions( wand )
 	local actions = {}
 	local actions_data = {}
-	local children = EntityGetAllChildren( wand ) or {}
+	local children = EntityGetAllChildren( wand, "card_action" ) or {}
 	for i,v in ipairs( children ) do
 		local item = EntityGetFirstComponentIncludingDisabled( v, "ItemComponent" )
 		local item_action = EntityGetFirstComponentIncludingDisabled( v, "ItemActionComponent" )
@@ -572,7 +572,7 @@ end
 function WANDS.wand_explode_actions_out_of_bound( wand )
 	local deck_capacity = WANDS.wand_get_stat( wand, "deck_capacity" )
 	local vx = 0
-	for _, a in ipairs( EntityGetAllChildren( wand ) or {} ) do
+	for _, a in ipairs( EntityGetAllChildren( wand, "card_action" ) or {} ) do
 		local item        = EntityGetFirstComponentIncludingDisabled( a, "ItemComponent" )
 		local item_action = EntityGetFirstComponentIncludingDisabled( a, "ItemActionComponent" )
 		if item and item_action then
@@ -587,7 +587,7 @@ function WANDS.wand_explode_actions_out_of_bound( wand )
 end
 
 function WANDS.wand_check_actions_out_of_bound( wand, deck_capacity )
-	for _, a in ipairs( EntityGetAllChildren( wand ) or {} ) do
+	for _, a in ipairs( EntityGetAllChildren( wand, "card_action" ) or {} ) do
 		local item        = EntityGetFirstComponentIncludingDisabled( a, "ItemComponent" )
 		local item_action = EntityGetFirstComponentIncludingDisabled( a, "ItemActionComponent" )
 		if item and item_action then
@@ -604,7 +604,7 @@ end
 function WANDS.wand_explode_random_action( wand, include_permanent_actions, include_frozen_actions, ox, oy )
 	local x, y = EntityGetTransform( wand )
 	local actions = {}
-	local children = EntityGetAllChildren( wand ) or {}
+	local children = EntityGetAllChildren( wand, "card_action" ) or {}
 	for i,action in ipairs( children ) do
 		local item_action = EntityGetFirstComponentIncludingDisabled( action, "ItemActionComponent" )
 		if item_action ~= nil then
@@ -634,7 +634,7 @@ end
 function WANDS.wand_remove_first_action( wand, include_permanent_actions, include_frozen_actions )
 	local x, y = EntityGetTransform( wand )
 	local actions = {}
-	local children = EntityGetAllChildren( wand ) or {}
+	local children = EntityGetAllChildren( wand, "card_action" ) or {}
 	for _,action in pairs( children ) do
 		local item_action = EntityGetFirstComponentIncludingDisabled( action, "ItemActionComponent" )
 		if item_action ~= nil then
@@ -660,7 +660,7 @@ function WANDS.wand_lock( wand, lock_spells, lock_wand )
 	if lock_spells == nil then lock_spells = true end
 	if lock_wand == nil then lock_wand = true end
 	if lock_spells then
-		local children = EntityGetAllChildren( wand ) or {}
+		local children = EntityGetAllChildren( wand, "card_action" ) or {}
 		for i,action in ipairs( children ) do
 			local item = EntityGetFirstComponentIncludingDisabled( action, "ItemComponent" )
 			if item ~= nil then
@@ -687,7 +687,7 @@ function WANDS.wand_attach_action( wand, action, permanent, locked )
 end
 
 function WANDS.wand_is_always_cast_valid( wand )
-	local children = EntityGetAllChildren( wand ) or {}
+	local children = EntityGetAllChildren( wand, "card_action" ) or {}
 	for i,v in ipairs( children ) do
 		local items = EntityGetComponentIncludingDisabled( v, "ItemComponent" )
 		local has_a_valid_spell = false
@@ -706,7 +706,7 @@ end
 
 function WANDS.force_always_cast( wand, amount )
 	if amount == nil then amount = 1 end
-	local children = EntityGetAllChildren( wand ) or {}
+	local children = EntityGetAllChildren( wand, "card_action" ) or {}
 	local always_cast_count = 0
 	for _,child in pairs( children ) do
 		local item_component = EntityGetFirstComponentIncludingDisabled( child, "ItemComponent" )
