@@ -56,11 +56,22 @@ local LISTENED_KEYS = {
 	Key_DOWN,
 	Key_UP,
 }
+local frames_keys_held = {}
+for _, key in ipairs( LISTENED_KEYS ) do
+	frames_keys_held[ key ] = 0
+end
+
 function listen_keyboard()
 	local result = {}
 	for _, key in ipairs( LISTENED_KEYS ) do
-		if InputIsKeyJustDown( key ) then
+		local current_frames_held = frames_keys_held[ key ]
+		if InputIsKeyJustDown( key ) or current_frames_held > 30 then
 			result[ key ] = true
+		end
+		if InputIsKeyDown( key ) then
+			frames_keys_held[ key ] = current_frames_held + 1
+		else
+			frames_keys_held[ key ] = 0
 		end
 	end
 	return result
