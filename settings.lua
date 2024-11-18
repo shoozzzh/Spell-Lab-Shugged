@@ -36,6 +36,13 @@ local function load_mod_settings()
 			include_spells_in_non_inv_wand = "背包/附近页面显示附近法杖中法术",
 			include_spells_in_non_inv_wand_description = "开启时，法术选取菜单的背包/附近页面将显示附近法杖中法术",
 			show_screen_keyboard = "法术搜索页面显示软键盘",
+			creative_mode_flight_speed = "超级飞行速度",
+			creative_mode_flight_speed_normal = "正常",
+			creative_mode_flight_speed_normal_description = "默认：200",
+			creative_mode_flight_speed_faster = "加速",
+			creative_mode_flight_speed_faster_description = "默认：450",
+			creative_mode_flight_speed_no_clip = "穿墙",
+			creative_mode_flight_speed_no_clip_description = "默认：300",
 		}
 	else
 		text = {
@@ -52,7 +59,7 @@ local function load_mod_settings()
 			no_weather_description = "Should we disable all kinds of rain or snow?",
 			show_icon_unlocked = "Mark Out Unlocked Spells",
 			show_icon_unlocked_description = "Should we mark out unlocked spells with a small icon in the top right corner?",
-			dummy_target_show_full_damage_number = "Show Full Damage Number in dummy target",
+			dummy_target_show_full_damage_number = "Show Full Damage Number For Dummy Targets",
 			dummy_target_show_full_damage_number_description = "Should dummy targets always has full-length damage numbers shown?",
 			wand_listener_type = "Wand Listening",
 			wand_listener_type_description = "From which wand(s) should be listened to track any external options?\nValue doesn't change the way you edit wand, but changes how many histories will be created",
@@ -66,6 +73,13 @@ local function load_mod_settings()
 			include_spells_in_non_inv_wand = "Include Spells In Nearby Wands",
 			include_spells_in_non_inv_wand_description = "Should spells in nearby wands be shown in Inv/Nearby page of the spell picker?",
 			show_screen_keyboard = "Show Screen Keyboard In Spell Search Page",
+			creative_mode_flight_speed = "SuperFlight Speed",
+			creative_mode_flight_speed_normal = "Normal",
+			creative_mode_flight_speed_normal_description = "200 by default",
+			creative_mode_flight_speed_faster = "Faster",
+			creative_mode_flight_speed_faster_description = "450 by default",
+			creative_mode_flight_speed_no_clip = "No Clip",
+			creative_mode_flight_speed_no_clip_description = "300 by default",
 		}
 	end
 	mod_settings = {
@@ -159,6 +173,40 @@ local function load_mod_settings()
 			value_default      = false,
 			scope              = MOD_SETTING_SCOPE_RUNTIME,
 		},
+		{
+			category_id = "creative_mode_flight_speed",
+			ui_name = text.creative_mode_flight_speed,
+			foldable = true,
+			settings = {
+				{
+					id                 = "creative_mode_flight_speed_normal",
+					ui_name            = text.creative_mode_flight_speed_normal,
+					ui_description     = text.creative_mode_flight_speed_normal_description,
+					allowed_characters = "0123456789",
+					text_max_length    = 6,
+					value_default      = "200",
+					scope              = MOD_SETTING_SCOPE_RUNTIME,
+				},
+				{
+					id                 = "creative_mode_flight_speed_faster",
+					ui_name            = text.creative_mode_flight_speed_faster,
+					ui_description     = text.creative_mode_flight_speed_faster_description,
+					allowed_characters = "0123456789",
+					text_max_length    = 6,
+					value_default      = "450",
+					scope              = MOD_SETTING_SCOPE_RUNTIME,
+				},
+				{
+					id                 = "creative_mode_flight_speed_no_clip",
+					ui_name            = text.creative_mode_flight_speed_no_clip,
+					ui_description     = text.creative_mode_flight_speed_no_clip_description,
+					allowed_characters = "0123456789",
+					text_max_length    = 6,
+					value_default      = "300",
+					scope              = MOD_SETTING_SCOPE_RUNTIME,
+				},
+			}
+		}
 	}
 end
 load_mod_settings()

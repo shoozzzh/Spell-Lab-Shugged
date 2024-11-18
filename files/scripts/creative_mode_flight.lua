@@ -8,15 +8,15 @@ local lerp_speed = 0.60
 local cp_comp = EntityGetFirstComponent( entity_id, "CharacterPlatformingComponent" )
 local cd_comp = EntityGetFirstComponent( entity_id, "CharacterDataComponent" )
 
-local speed = 200
+local speed = tonumber( ModSettingGet( "spell_lab_shugged.creative_mode_flight_speed_normal" ) ) or 200
 
 local ctrl = InputIsKeyDown( Key_LCTRL ) or InputIsKeyDown( Key_RCTRL )
 local shift = InputIsKeyDown( Key_LSHIFT ) or InputIsKeyDown( Key_RSHIFT )
 if ctrl then
-	speed = speed * 2.25
+	speed = tonumber( ModSettingGet( "spell_lab_shugged.creative_mode_flight_speed_faster" ) ) or 450
 end
 if shift then
-	local dist = 300 / 60
+	local dist = ( tonumber( ModSettingGet( "spell_lab_shugged.creative_mode_flight_speed_no_clip" ) ) or 300 ) / 60
 	component_read( EntityGetFirstComponent( entity_id, "ControlsComponent" ),
 		{ mButtonDownDown = false, mButtonDownUp = false, mButtonDownLeft = false, mButtonDownRight = false }, function( controls_comp )
 		local x, y = EntityGetTransform( entity_id )

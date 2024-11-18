@@ -403,17 +403,45 @@ picker.menu = function()
 				end
 				GuiOptionsAddForNextWidget( gui, GUI_OPTION.NonInteractive )
 				if spell_search_focused or current_action_search_needle.text ~= "" then
-					GuiTextInput( gui, next_id(), 0, 0, current_action_search_needle:display(), input_bar_width, -1, CHARACTERS_ACTION_ID )
+					GuiTextInput( gui, next_id(), 0, 0, current_action_search_needle.text, input_bar_width, -1, CHARACTERS_ACTION_ID )
 				else
 					GuiZSetForNextWidget( gui, -1 )
 					GuiTextInput( gui, next_id(), 0, 0, text_get_translated( "spell_picker_searchbox" ), input_bar_width, -1, CHARACTERS_ACTION_ID )
 					GuiTextInput( gui, next_id(), 0, 0, "", input_bar_width, -1, CHARACTERS_ACTION_ID )
 				end
 				local _,_,_,x,y,width,height,_,_,_,_ = previous_data( gui )
+				if spell_search_focused or current_action_search_needle.text ~= "" then
+					local left_text = current_action_search_needle.text:sub( 1, current_action_search_needle.input_anchor - 1 )
+					local input_anchor_offset = GuiGetTextDimensions( gui, left_text )
+					GuiZSetForNextWidget( gui, -1 )
+					GuiOptionsAddForNextWidget( gui, GUI_OPTION.Layout_NoLayouting )
+					GuiImageButton( gui, next_id(), x + 1 + input_anchor_offset, y + 2, "", "mods/spell_lab_shugged/files/gui/input_anchor.png" )
+				end
 				if InputIsMouseButtonJustDown( Mouse_left ) then
 					local mx, my = get_mouse_pos_on_screen()
 					if -2 <= mx - x and mx - x <= width + 2 and -2 <= my - y and my - y <= height + 2 then
 						change_keyboard_focus( Focus_SpellSearch )
+						local width_mouse_pos = mx - x
+						local last_substring, substring
+						for i = 0, #current_action_search_needle.text do
+							substring = string.sub( current_action_search_needle.text, 1, i )
+							if GuiGetTextDimensions( gui, substring ) >= width_mouse_pos then
+								break
+							end
+							last_substring = substring
+							substring = nil
+						end
+						if last_substring and not substring then
+							current_action_search_needle.input_anchor = #last_substring + 1
+						elseif not last_substring and substring then
+							current_action_search_needle.input_anchor = #substring + 1
+						elseif last_substring and substring then
+							if width_mouse_pos - GuiGetTextDimensions( gui, last_substring ) <= GuiGetTextDimensions( gui, substring ) - width_mouse_pos then
+								current_action_search_needle.input_anchor = #last_substring + 1
+							else
+								current_action_search_needle.input_anchor = #substring + 1
+							end
+						end
 					end
 				end
 				if mod_setting_get( "show_screen_keyboard" ) then

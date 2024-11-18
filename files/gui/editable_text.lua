@@ -18,14 +18,6 @@ function editable_text:insert_character( char )
 	self:try_on_changed()
 end
 
-function editable_text:display()
-	if self.input_anchor > #self.text then
-		return self.text
-	else
-		return insert_character( self.text, "'", self.input_anchor )
-	end
-end
-
 function editable_text:input_anchor_move_left()
 	if self.input_anchor > 1 then
 		self.input_anchor = self.input_anchor - 1
@@ -74,11 +66,11 @@ function editable_text:right_delete()
 end
 
 function editable_text:input_anchor_move_to_beginning()
-	self.input_anchor = #self.text + 1
+	self.input_anchor = 1
 end
 
 function editable_text:input_anchor_move_to_end()
-	self.input_anchor = 1
+	self.input_anchor = #self.text + 1
 end
 
 function editable_text:clear()
