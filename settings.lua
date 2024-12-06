@@ -9,12 +9,12 @@ local function load_mod_settings( cur_lang )
 	if cur_lang == "简体中文" or cur_lang == "喵体中文" or cur_lang == "汪体中文" or cur_lang == "完全汉化" then
 		text = {
 			wand_edit_panel = "法杖编辑面板",
-			wand_edit_panel_max_num_rows = "法杖编辑面板最大行数",
+			wand_edit_panel_max_num_rows = "最大行数",
 			wand_edit_panel_max_num_rows_description = "法杖编辑面板最多可以同时显示的行数，默认为 5",
-			wand_edit_panel_max_actions_per_row = "法杖编辑面板单行格数限制",
+			wand_edit_panel_max_actions_per_row = "单行格数限制",
 			wand_edit_panel_max_actions_per_row_description =
 				"限制法杖编辑面板单行最多可以显示的格数\n单行最多能容纳的格数自动由虚拟分辨率计算得出，然后应用此限制\n0 = 不进行限制",
-			wand_edit_panel_history_limit = "法杖编辑面板历史记录最大条数",
+			wand_edit_panel_history_limit = "历史记录最大条数",
 			wand_edit_panel_history_limit_description = "法杖编辑面板保留最近操作的数量，默认为 30",
 			wand_listener_type = "法杖监听",
 			wand_listener_type_description = "法杖编辑面板应该从哪些法杖监听外部操作？\n该设置不影响编辑，但会影响历史记录的产生数量",
@@ -53,12 +53,12 @@ local function load_mod_settings( cur_lang )
 	else
 		text = {
 			wand_edit_panel = "Wand Edit Panel",
-			wand_edit_panel_max_num_rows = "Wand Edit Panel Max Rows",
+			wand_edit_panel_max_num_rows = "Max Rows",
 			wand_edit_panel_max_num_rows_description = "How many rows should the wand edit panel show at most at the same time?\n5 by default",
-			wand_edit_panel_max_actions_per_row = "Wand Edit Panel Max Slots In One Row Limit",
+			wand_edit_panel_max_actions_per_row = "Max Slots In One Row Limit",
 			wand_edit_panel_max_actions_per_row_description =
 				"How many slots should one row of the wand edit panel contain at most?\nNote: That is calculated with your virtual resolution magic numbers\n0 = No extra limit to it",
-			wand_edit_panel_history_limit = "Wand Edit Panel Max Histories",
+			wand_edit_panel_history_limit = "Max Histories",
 			wand_edit_panel_history_limit_description = "How many recent operations should the wand edit panel remember?\n30 by default",
 			wand_listener_type = "Wand Listening",
 			wand_listener_type_description = "From which wand(s) should be listened to track any external options?\nValue doesn't change the way you edit wand, but changes how many histories will be created",
