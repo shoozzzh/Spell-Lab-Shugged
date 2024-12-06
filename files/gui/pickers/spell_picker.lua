@@ -513,6 +513,12 @@ picker.menu = function()
 		end
 		GuiLayoutEnd( gui )
 		GuiLayoutBeginVertical( gui, 640 * 0.34 - 20 + 10, 0, true )
+			if mod_setting_get( "special_filter_button_align_to" ) == "bottom" then
+				for i = 0, 4 do
+					GuiOptionsAddForNextWidget( gui, GUI_OPTION.NonInteractive )
+					GuiImageButton( gui, next_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/transparent_20x20.png" )
+				end
+			end
 			show_filter( FILTER_TYPE_SEARCH, wrap_key( "action_search" ) )
 			show_filter( FILTER_TYPE_RECENT, wrap_key( "action_recent" ), function( left_click, right_click )
 				if right_click then

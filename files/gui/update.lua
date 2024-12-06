@@ -182,23 +182,20 @@ if initialized == false then
 	function force_refresh_held_wands()
 		if not player then return end
 		local inv2_comp = EntityGetFirstComponent( player, "Inventory2Component" )
-		if inv2_comp then
-			ComponentSetValue2( inv2_comp, "mForceRefresh", true )
-			ComponentSetValue2( inv2_comp, "mActualActiveItem", 0 )
-			ComponentSetValue2( inv2_comp, "mDontLogNextItemEquip", true )
-		end
+		if not inv2_comp then return end
+		ComponentSetValue2( inv2_comp, "mForceRefresh", true )
+		ComponentSetValue2( inv2_comp, "mActualActiveItem", 0 )
+		ComponentSetValue2( inv2_comp, "mDontLogNextItemEquip", true )
 	end
 
 	function clear_held_wand_wait()
-		local did = false
-		local ab_comp = EntityGetFirstComponentIncludingDisabled( v, "AbilityComponent" )
-		if ab_comp then
-			did = true
-			ComponentSetValue2( ab_comp, "mReloadFramesLeft", 0 )
-			ComponentSetValue2( ab_comp, "mNextFrameUsable", now )
-			ComponentSetValue2( ab_comp, "mReloadNextFrameUsable", now )
-		end
-		return did
+		if not held_wand then return false end
+		local ab_comp = EntityGetFirstComponentIncludingDisabled( held_wand, "AbilityComponent" )
+		if not ab_comp then return false end
+		ComponentSetValue2( ab_comp, "mReloadFramesLeft", 0 )
+		ComponentSetValue2( ab_comp, "mNextFrameUsable", now )
+		ComponentSetValue2( ab_comp, "mReloadNextFrameUsable", now )
+		return true
 	end
 
 	function block_upcoming_wand_shooting()
@@ -354,6 +351,7 @@ if initialized == false then
 		end
 		local this_action_metadata = action_metadata[ action_id ]
 
+		GuiZSetForNextWidget( gui, 0 )
 		GuiImageButton( gui, next_id(), 2, 2, "", image_sprite )
 		local left_click,right_click,hover = previous_data( gui )
 
@@ -459,10 +457,12 @@ if initialized == false then
 		if not this_action_data or not this_action_data.spawn_requires_flag then return end
 		if HasFlagPersistent( this_action_data.spawn_requires_flag ) then
 			if mod_setting_get( "show_icon_unlocked" ) then
+				GuiZSetForNextWidget( gui, -1 )
 				GuiOptionsAddForNextWidget( gui, GUI_OPTION.Layout_NoLayouting )
 				GuiImage( gui, next_id(), x+14, y-2, "mods/spell_lab_shugged/files/gui/unlocked.png", 0.3, 1.0, 0 )
 			end
 		else
+			GuiZSetForNextWidget( gui, -1 )
 			GuiOptionsAddForNextWidget( gui, GUI_OPTION.Layout_NoLayouting )
 			GuiImage( gui, next_id(), x+14, y-2, "mods/spell_lab_shugged/files/gui/locked.png", 1.0, 1.0, 0 )
 		end
@@ -470,6 +470,7 @@ if initialized == false then
 
 	function show_uses_remaining( x, y, _, uses_remaining )
 		if not uses_remaining then return end
+		GuiZSetForNextWidget( gui, -1 )
 		GuiOptionsAddForNextWidget( gui, GUI_OPTION.Layout_NoLayouting )
 		GuiText( gui, x-2, y-2, tostring( uses_remaining ), 1, "data/fonts/font_pixel_noshadow.xml", true )
 	end
