@@ -376,10 +376,17 @@ picker.menu = function()
 		end )
 
 		if filter_type == FILTER_TYPE_SEARCH then
-			local keyboard_height = 50
-			if not mod_setting_get( "show_screen_keyboard" ) then
-				keyboard_height = 10
+			GuiOptionsAddForNextWidget( gui, GUI_OPTION.NonInteractive )
+			GuiZSetForNextWidget( gui, 1 )
+			GuiTextInput( gui, next_id(), 3, 10, "", input_bar_width, -1, CHARACTERS_ACTION_ID )
+			local _,_,_,_,_,_,text_input_height,_,_,_,_ = previous_data( gui )
+			GuiLayoutAddVerticalSpacing( gui, -( text_input_height + 10 ) )
+
+			local keyboard_height = text_input_height
+			if mod_setting_get( "show_screen_keyboard" ) then
+				keyboard_height = 10 --[[ incorrectly assumed height of text input ]]+ 40
 			end
+
 			GuiBeginScrollContainer( gui, next_id(), 0, 8, SCROLL_TABLE_WIDTH, keyboard_height )
 				if InputIsMouseButtonJustDown( Mouse_left ) then
 					local _,_,_,x,y,width,height,_,_,_,_ = previous_data( gui )
@@ -413,9 +420,12 @@ picker.menu = function()
 				if spell_search_focused or current_action_search_needle.text ~= "" then
 					local left_text = current_action_search_needle.text:sub( 1, current_action_search_needle.input_anchor - 1 )
 					local input_anchor_offset = GuiGetTextDimensions( gui, left_text )
+					GuiLayoutBeginLayer( gui )
 					GuiZSetForNextWidget( gui, -1 )
-					GuiOptionsAddForNextWidget( gui, GUI_OPTION.Layout_NoLayouting )
-					GuiImageButton( gui, next_id(), x + 1 + input_anchor_offset, y + 2, "", "mods/spell_lab_shugged/files/gui/input_anchor.png" )
+					local image_height = 10
+					local scale = text_input_height / image_height
+					GuiImage( gui, next_id(), x + 1 + input_anchor_offset, y + 2 * ( text_input_height - 2 ) / ( image_height - 2 ), "mods/spell_lab_shugged/files/gui/input_anchor.png", 1, scale, 0 )
+					GuiLayoutEndLayer( gui )
 				end
 				if InputIsMouseButtonJustDown( Mouse_left ) then
 					local mx, my = get_mouse_pos_on_screen()

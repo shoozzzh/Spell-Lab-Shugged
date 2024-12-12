@@ -1,9 +1,9 @@
 local function get_all_wands_in_inventory()
 	if not player then return {} end
 	local children = EntityGetAllChildren( player ) or {}
-	for key,child in pairs( children ) do
+	for _, child in pairs( children ) do
 		if EntityGetName( child ) == "inventory_quick" then
-			return EntityGetAllChildren( child, "wand" )
+			return EntityGetAllChildren( child, "wand" ) or {}
 		end
 	end
 end
