@@ -15,25 +15,31 @@ function read_state_table_from_wand( wand_id )
 	local actions, permanent_actions = WANDS.wand_get_actions_absolute( wand_id )
 	local _actions = {}
 	for i = 0, maxn( actions ) do
+		local _a = { false }
+
 		local a = actions[ i ]
-		if a then
-			local uses_remaining
+		do
+			if not a then goto skip end
 			local this_action_data = action_data[ a.action_id ]
-			if this_action_data.max_uses and this_action_data.max_uses ~= -1  then -- don't give it a -1 pls
+			if not this_action_data then goto skip end
+			
+			_a[2] = a.action_id
+			
+			if this_action_data.max_uses and this_action_data.max_uses ~= -1  then -- don't give it a -1 plz
 				if world_state_unlimited_spells and not this_action_data.never_unlimited then -- Should be unlimited, but being limited
-					uses_remaining = nil
+					_a[3] = nil
 				elseif a.uses_remaining == -1 then -- Should be limited, but being unlimited
-					uses_remaining = this_action_data.max_uses
+					_a[3] = this_action_data.max_uses
 				else -- just normal case
-					uses_remaining = a.uses_remaining
+					_a[3] = a.uses_remaining
 				end
 			else
-				uses_remaining = nil
+				_a[3] = nil
 			end
-			_actions[ i + 1 ] = { false, a.action_id, uses_remaining }
-		else
-			_actions[ i + 1 ] = { false }
 		end
+		::skip::
+
+		_actions[ i + 1 ] = _a
 	end
 	local _permanent_actions = {}
 	for i, a in ipairs( permanent_actions ) do
