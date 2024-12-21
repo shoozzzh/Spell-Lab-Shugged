@@ -23,6 +23,10 @@ function parse_entity_xml( filepath )
 			end
 
 			for k, v in pairs( child.attr ) do
+				if k == "_remove_from_base" and v == "1" then
+					child_to_edit.attr.removed = "1"
+					goto skip
+				end
 				child_to_edit.attr[k] = v
 			end
 			for object in child:each_child() do
@@ -35,10 +39,11 @@ function parse_entity_xml( filepath )
 					table.insert( child_to_edit.children, object )
 				end
 			end
+			::skip::
 			child_to_edit.attr.edited = true
 		end
 		for child in basefile_content:each_child() do
-			if child.name ~= "Entity" or include_children == "1" then
+			if not child.attr.removed and ( child.name ~= "Entity" or include_children == "1" ) then
 				child.attr.edited = nil
 				table.insert( children_to_add, child )
 			end
