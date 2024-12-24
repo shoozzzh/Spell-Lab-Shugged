@@ -203,6 +203,8 @@ local keyboard = {
 	{ "Z", "X", "C", "V", "B", "N", "M", "_" },
 }
 
+local filter_switch_blocked = false
+
 picker.menu = function()
 	local show_locked_spells = mod_setting_get( "show_locked_spells" )
 	local actions_data_to_show
@@ -277,9 +279,10 @@ picker.menu = function()
 			unsorted[""] = nil
 			action_ids_to_show = {}
 			for k, _ in pairs( unsorted ) do
-				action_ids_to_show[ #action_ids_to_show + 1 ] = k
+				if action_id_to_idx[ k ] then
+					action_ids_to_show[ #action_ids_to_show + 1 ] = k
+				end
 			end
-
 
 			table.sort( action_ids_to_show, function( a, b ) return action_id_to_idx[ a ] < action_id_to_idx[ b ] end )
 		end
@@ -320,8 +323,9 @@ picker.menu = function()
 			height_autofit = false
 		end
 
-		do_scroll_table( first_scroll_id + filter_type, nil, height, height_autofit,
-			function( hovered ) interacting = interacting or hovered end, actions_data_to_show, function( action )
+		local scroll_table = { do_scroll_table( first_scroll_id + filter_type, nil,
+			height, height_autofit, function( hovered ) interacting = interacting or hovered end,
+			actions_data_to_show, function( action )
 			do_action_button( action.id, 0, 0, false, function( left_click, right_click )
 				local is_unlocked_action = action.spawn_requires_flag and HasFlagPersistent( action.spawn_requires_flag ) 
 				if ctrl and shift then
@@ -331,7 +335,8 @@ picker.menu = function()
 					return
 				end
 
-				if not mod_setting_get( "quick_spell_picker" ) or not mod_setting_get( "show_wand_edit_panel" ) or not held_wand then
+				if not mod_setting_get( "quick_spell_picker" )
+					or not mod_setting_get( "show_wand_edit_panel" ) or not held_wand then
 					if not player then return end
 					local x, y = EntityGetTransform( player )
 					local action_entity = CreateItemActionEntity( action.id, x, y )
@@ -373,7 +378,24 @@ picker.menu = function()
 					new_action_history_entry( action.id )
 				end
 			end, do_verbose_tooltip, action.max_uses, nil, show_locked_state, false, true )
-		end )
+		end ) }
+		do
+			local content_height = 20 * math.ceil( #actions_data_to_show / 8 )
+			if content_height > scroll_table[4] and InputIsMouseButtonJustDown( Mouse_left ) then
+				local scrollbar_x = scroll_table[1] + 6 + scroll_table[3]
+				local scrollbar_y = scroll_table[2] + 2
+				local scrollbar_width = 8
+				local scrollbar_height = scroll_table[4] + 4
+				local mx, my = get_mouse_pos_on_screen()
+				if scrollbar_x < mx and mx < scrollbar_x + scrollbar_width
+					and scrollbar_y < my and my < scrollbar_y + scrollbar_height then
+					filter_switch_blocked = true
+				end
+			end
+			if filter_switch_blocked and not InputIsMouseButtonDown( Mouse_left ) then
+				filter_switch_blocked = false
+			end
+		end
 
 		if filter_type == FILTER_TYPE_SEARCH then
 			GuiOptionsAddForNextWidget( gui, GUI_OPTION.NonInteractive )
@@ -514,7 +536,7 @@ picker.menu = function()
 			clicked_func( left_click, right_click )
 		end
 		GuiTooltip( gui, tooltip_text, "" )
-		if hover then filter_type = i end
+		if hover and not filter_switch_blocked then filter_type = i end
 	end
 	GuiLayoutBeginHorizontal( gui, 0, 360 * 0.16, true, 0, 0 )
 		GuiLayoutBeginVertical( gui, 640 * 0.01, 0, true )

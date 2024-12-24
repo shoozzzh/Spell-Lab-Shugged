@@ -225,7 +225,7 @@ function get_action_metadata( this_action_data )
 		action_env.add_projectile_trigger_timer = add_projectile_trigger_timer_injected
 		setfenv( action_action, action_env )
 
-		action_action()
+		pcall( action_action )
 
 		draw_actions = _draw_actions
 		c.draw_actions = draws

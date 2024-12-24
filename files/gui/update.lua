@@ -223,6 +223,17 @@ if initialized == false then
 		if a.id and a.id ~= "" then
 			action_id_to_idx[ a.id ] = i
 		end
+		if a.max_uses ~= nil then
+			local hell_no = type( a.max_uses )
+			if hell_no == "string" then
+				a.max_uses = tonumber( a.max_uses ) or 0
+			elseif hell_no ~= "number" then
+				a.max_uses = 0
+			end
+			if a.max_uses < 0 then
+				a.max_uses = nil
+			end
+		end
 	end
 
 	function word_wrap( str, wrap_size )
@@ -259,10 +270,13 @@ if initialized == false then
 			local num_rows = math.max( 1, math.ceil( #cell_list / row_size ) )
 			height = math.min( num_rows * 20, height or 160 )
 		end
+		height = math.max( height, 20 )
+		local _x, _y
 
-		GuiBeginScrollContainer( gui, scroll_id, 0, 0, width, math.max( height, 20 ) )
+		GuiBeginScrollContainer( gui, scroll_id, 0, 0, width, height )
 			do
 				local _,_,_,x,y,width,height,_,_,_,_ = previous_data( gui )
+				_x, _y = x, y
 				local mx, my = get_mouse_pos_on_screen()
 				-- extra 2 pixels for the margins
 				local hovered = -2 <= mx - x and mx - x <= width + 2 and -2 <= my - y and my - y <= height + 2
@@ -291,6 +305,7 @@ if initialized == false then
 				end
 			GuiLayoutEnd( gui )
 		GuiEndScrollContainer( gui )
+		return _x, _y, width, height
 	end
 
 	function do_flag_toggle_image_button( filepath, flag, option_text, click_callback, description )
