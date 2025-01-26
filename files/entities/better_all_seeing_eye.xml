@@ -2,6 +2,7 @@
 	<InheritTransformComponent only_position="1" />
 	<_Transform scale.x="12" scale.y="12" />
 	<LightComponent
+		update_properties="1"
 		r="255"
 		g="255"
 		b="255"
@@ -15,4 +16,8 @@
 		smooth_filtering="1"
 		fog_of_war_hole="1">
 	</SpriteComponent>
+	<LuaComponent
+		script_source_file="mods/spell_lab_shugged/files/entities/better_all_seeing_eye.lua"
+		execute_every_n_frame="1">
+	</LuaComponent>
 </Entity>

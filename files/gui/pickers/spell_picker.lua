@@ -116,44 +116,44 @@ end
 local spell_search_focused = false
 
 local character_keys = {
-	{ Key_a, "A" },
-	{ Key_b, "B" },
-	{ Key_c, "C" },
-	{ Key_d, "D" },
-	{ Key_e, "E" },
-	{ Key_f, "F" },
-	{ Key_g, "G" },
-	{ Key_h, "H" },
-	{ Key_i, "I" },
-	{ Key_j, "J" },
-	{ Key_k, "K" },
-	{ Key_l, "L" },
-	{ Key_m, "M" },
-	{ Key_n, "N" },
-	{ Key_o, "O" },
-	{ Key_p, "P" },
-	{ Key_q, "Q" },
-	{ Key_r, "R" },
-	{ Key_s, "S" },
-	{ Key_t, "T" },
-	{ Key_u, "U" },
-	{ Key_v, "V" },
-	{ Key_w, "W" },
-	{ Key_x, "X" },
-	{ Key_y, "Y" },
-	{ Key_z, "Z" },
-	{ Key_1, "1" },
-	{ Key_2, "2" },
-	{ Key_3, "3" },
-	{ Key_4, "4" },
-	{ Key_5, "5" },
-	{ Key_6, "6" },
-	{ Key_7, "7" },
-	{ Key_8, "8" },
-	{ Key_9, "9" },
-	{ Key_0, "0" },
-	{ Key_SPACE, " " },
-	{ Key_MINUS, "_" },
+	{ "Key_a", "A" },
+	{ "Key_b", "B" },
+	{ "Key_c", "C" },
+	{ "Key_d", "D" },
+	{ "Key_e", "E" },
+	{ "Key_f", "F" },
+	{ "Key_g", "G" },
+	{ "Key_h", "H" },
+	{ "Key_i", "I" },
+	{ "Key_j", "J" },
+	{ "Key_k", "K" },
+	{ "Key_l", "L" },
+	{ "Key_m", "M" },
+	{ "Key_n", "N" },
+	{ "Key_o", "O" },
+	{ "Key_p", "P" },
+	{ "Key_q", "Q" },
+	{ "Key_r", "R" },
+	{ "Key_s", "S" },
+	{ "Key_t", "T" },
+	{ "Key_u", "U" },
+	{ "Key_v", "V" },
+	{ "Key_w", "W" },
+	{ "Key_x", "X" },
+	{ "Key_y", "Y" },
+	{ "Key_z", "Z" },
+	{ "Key_1", "1" },
+	{ "Key_2", "2" },
+	{ "Key_3", "3" },
+	{ "Key_4", "4" },
+	{ "Key_5", "5" },
+	{ "Key_6", "6" },
+	{ "Key_7", "7" },
+	{ "Key_8", "8" },
+	{ "Key_9", "9" },
+	{ "Key_0", "0" },
+	{ "Key_SPACE", " " },
+	{ "Key_MINUS", "_" },
 }
 
 local Focus_SpellSearch = {
@@ -161,27 +161,27 @@ local Focus_SpellSearch = {
 	on_focused = function() spell_search_focused = true end,
 	on_unfocused = function() spell_search_focused = false end,
 	on_input = function( keyboard_input )
-		if keyboard_input[ Key_BACKSPACE ] then
+		if keyboard_input.Key_BACKSPACE then
 			current_action_search_needle:left_delete()
 		end
-		if keyboard_input[ Key_DELETE ] then
+		if keyboard_input.Key_DELETE then
 			current_action_search_needle:right_delete()
 		end
-		if keyboard_input[ Key_HOME ] then
+		if keyboard_input.Key_HOME then
 			current_action_search_needle:input_anchor_move_to_beginning()
 		end
-		if keyboard_input[ Key_END ] then
+		if keyboard_input.Key_END then
 			current_action_search_needle:input_anchor_move_to_end()
 		end
-		if keyboard_input[ Key_LEFT ] then
-			if not alt then
+		if keyboard_input.Key_LEFT then
+			if not keyboard_input.Key_ALT then
 				current_action_search_needle:input_anchor_move_left()
 			else
 				current_action_search_needle:input_anchor_move_to_last_word()
 			end
 		end
-		if keyboard_input[ Key_RIGHT ] then
-			if not alt then
+		if keyboard_input.Key_RIGHT then
+			if not keyboard_input.Key_ALT then
 				current_action_search_needle:input_anchor_move_right()
 			else
 				current_action_search_needle:input_anchor_move_to_next_word()

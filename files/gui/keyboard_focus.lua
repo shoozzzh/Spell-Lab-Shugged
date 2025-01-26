@@ -10,7 +10,7 @@ Focus_PlayerControls = {
 	on_input = function( keyboard_input )
 		if not held_wand or not mod_setting_get( "show_wand_edit_panel" ) then return end
 		local edit_panel_state = access_edit_panel_state( held_wand )
-		if keyboard_input[ Key_BACKSPACE ] then
+		if keyboard_input.Key_BACKSPACE then
 			local current_actions = {}
 			local did = false
 			for s, a, u in state_str_iter_actions( edit_panel_state.get() ) do
@@ -28,7 +28,7 @@ Focus_PlayerControls = {
 				edit_panel_state.set( table_to_state_str( current_actions ), wrap_key( "operation_delete_action" ) )
 			end
 		end
-		if keyboard_input[ Key_DELETE ] then
+		if keyboard_input.Key_DELETE then
 			local current_actions = {}
 			local delete_next_action
 			local did = false
@@ -52,10 +52,10 @@ Focus_PlayerControls = {
 				edit_panel_state.set( table_to_state_str( current_actions ), wrap_key( "operation_delete_action" ) )
 			end
 		end
-		if ctrl and keyboard_input[ Key_z ] then
+		if ctrl and keyboard_input.Key_z then
 			edit_panel_state.undo()
 		end
-		if ctrl and keyboard_input[ Key_y ] then
+		if ctrl and keyboard_input.Key_y then
 			edit_panel_state.redo()
 		end
 	end,

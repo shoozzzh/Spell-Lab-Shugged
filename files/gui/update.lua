@@ -12,6 +12,7 @@ if initialized == false then
 	dofile_once( "mods/spell_lab_shugged/files/gui/get_player.lua" )
 	WANDS = dofile_once( "mods/spell_lab_shugged/files/lib/wands.lua")
 	dofile_once( "data/scripts/debug/keycodes.lua" )
+	KEYCODES_RAW, KEYCODES_BY_TYPE = unpack( dofile_once( "mods/spell_lab_shugged/files/lib/keycodes_wrapped.lua" ) )
 	smallfolk = dofile_once( "mods/spell_lab_shugged/files/lib/smallfolk.lua" )
 
 	player = get_player()
@@ -754,7 +755,7 @@ if initialized == false then
 
 		dofile( "mods/spell_lab_shugged/files/gui/wand_listener.lua" )
 
-		update_keyboard_input( listen_keyboard() )
+		update_keyboard_input( listen_keyboard_just_down() )
 
 		if selecting_mortal_to_transform then
 			if shift then

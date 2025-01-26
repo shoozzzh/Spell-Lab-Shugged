@@ -76,6 +76,7 @@ if ModSettingGet( mod_setting_prefix .. "disable_toxic_statuses" ) then
 		FROZEN                 = true,
 		ELECTROCUTION          = true,
 	}
+	local frozen = nil
 	for _, child_id in ipairs( EntityGetAllChildren( entity_id ) or {} ) do
 		if EntityHasTag( child_id, "spell_lab_shugged_non_toxic_status" ) then goto continue end
 
@@ -85,7 +86,10 @@ if ModSettingGet( mod_setting_prefix .. "disable_toxic_statuses" ) then
 		local game_effect_id = ComponentGetValue2( effect_comp, "effect" )
 		if not toxic_game_effects[ game_effect_id ] then goto continue end
 
-		ComponentSetValue2( effect_comp, "frames", 0 )
+		ComponentSetValue2( effect_comp, "disable_movement", false )
+		if ComponentGetValue2( effect_comp, "frames" ) > 1 then
+			ComponentSetValue2( effect_comp, "frames", 1 )
+		end
 		::continue::
 	end
 end
