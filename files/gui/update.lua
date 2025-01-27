@@ -46,7 +46,7 @@ if initialized == false then
 		return GameTextGet( wrap_key( key ), ... )
 	end
 
-	local version = "Shugged v1.7.7"
+	local version = "Shugged v1.8.0"
 
 	function maxn( t )
 		local result = table.maxn( t )
