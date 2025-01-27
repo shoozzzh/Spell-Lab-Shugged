@@ -1,23 +1,28 @@
 local shortcut_check = {}
 
-function shortcut_check.check_input( keyboard_input, shortcut, left_click, right_click )
+local cache = {}
+
+local xor = function( a, b ) return ( a and not b ) or ( not a and b ) end
+
+function shortcut_check.check_input( keyboard_input, shortcut, left_click, right_click, dont_cache )
 	if #shortcut == 0 then return false end
-	if left_click == nil and right_click == nil then
+	local inverted_shortcut = cache[ shortcut ]
+	if inverted_shortcut == nil then
+		inverted_shortcut = {}
 		for _, keyname in ipairs( shortcut ) do
-			if not keyboard_input[ keyname ] then return false end
+			inverted_shortcut[ keyname ] = true
 		end
-	else
-		for _, keyname in ipairs( shortcut ) do
-			local passed
-			if keyname == "Mouse_left" then
-				passed = left_click
-			elseif keyname == "Mouse_right" then
-				passed = right_click
-			else
-				passed = keyboard_input[ keyname ]
-			end
-			if not passed then return false end
+		if not dont_cache then
+			cache[ shortcut ] = inverted_shortcut
 		end
+	end
+
+	for keyname, status in pairs( keyboard_input ) do
+		if xor( status, inverted_shortcut[ keyname ] ) then return false end
+	end
+	if left_click ~= nil or right_click ~= nil then
+		if xor( left_click, inverted_shortcut.Mouse_left ) then return false end
+		if xor( right_click, inverted_shortcut.Mouse_right ) then return false end
 	end
 	return true
 end

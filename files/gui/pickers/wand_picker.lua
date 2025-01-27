@@ -91,7 +91,7 @@ picker.menu = function()
 								local deck_capacity = wand_data.stats.capacity + WANDS.wand_get_num_actions_permanent( wand )
 								if not WANDS.wand_check_actions_out_of_bound( held_wand, deck_capacity ) then
 									if not shift then
-										GamePrint( text_get_translated( "wand_picker_exploding_actions" ) )
+										GamePrint( text_get( "wand_picker_exploding_actions", shortcut_texts.confirm ) )
 										do_update = false
 									end
 								end
@@ -104,7 +104,7 @@ picker.menu = function()
 							end
 						end
 					end
-					if GuiButton( gui, 8, 0, GameTextGet( wrap_key( "wand_picker_precise_mode" ), text_get_translated( precise_mode and "disable" or "enable" ) ), next_id() ) then
+					if GuiButton( gui, 8, 0, text_get( "wand_picker_precise_mode", text_get_translated( precise_mode and "disable" or "enable" ) ), next_id() ) then
 						mod_setting_set( "wand_picker_precise_mode", not precise_mode )
 					end
 					if precise_mode then

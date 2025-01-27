@@ -60,6 +60,7 @@ if not_showing_all and panel_row_offset > 0 then
 	GuiLayoutEnd( gui )
 end
 GuiLayoutBeginVertical( gui, 0, screen_height * 0.96 - ( rows_num + permanent_rows_num ) * ( 20 + 2 ) + 2, true )
+	local permanent_note = text_get( "spell_box_permanent_tips", shortcut_texts.always_cast )
 	for j, permanent_action in ipairs( permanent_actions ) do
 		if j % actions_per_row == 1 % actions_per_row then
 			if #permanent_actions - j + 1 >= actions_per_row then
@@ -106,7 +107,7 @@ GuiLayoutBeginVertical( gui, 0, screen_height * 0.96 - ( rows_num + permanent_ro
 					table.remove( current_permanent_actions, j )
 					edit_panel_state.set_both( table_to_state_str( current_actions ), permanent_table_to_state_str( current_permanent_actions ), wrap_key( "operation_demote_permanent_action" ) )
 				end
-			end, nil, nil, nil, show_permanent_icon )
+			end, nil, nil, permanent_note, show_permanent_icon )
 		else
 			GuiOptionsAddForNextWidget( gui, GUI_OPTION.NonInteractive )
 			GuiImageButton( gui, next_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/transparent_20x20.png" )
@@ -124,6 +125,9 @@ GuiLayoutBeginVertical( gui, 0, screen_height * 0.96 - ( rows_num + permanent_ro
 	end
 GuiLayoutEnd( gui )
 GuiLayoutBeginVertical( gui, 0, screen_height * 0.96 - rows_num * ( 20 + 2 ) + 2, true )
+	local note_not_selected = text_get( "spell_box_commmon_tips", shortcut_texts.select )
+	local note_selected = text_get( "spell_box_commmon_tips_selected", shortcut_texts.deselect )
+
 	local total_count = rows_num * actions_per_row
 	local panel_offset = panel_row_offset * actions_per_row
 	for i = 1 + panel_offset, total_count + panel_offset do
@@ -139,7 +143,7 @@ GuiLayoutBeginVertical( gui, 0, screen_height * 0.96 - rows_num * ( 20 + 2 ) + 2
 			selected, action_id, uses_remaining = unpack( common_actions[ i ] )
 		end
 		if uses_remaining == "" then uses_remaining = nil end
-		local note = wrap_key( "spell_box_commmon_tips" )
+		local note = selected and note_selected or note_not_selected
 		if not create_real_sprite then
 			do_action_button( action_id, 0, 0, selected, function( left_click, right_click )
 				if shortcut_check.check( shortcuts.always_cast, left_click, right_click ) then
@@ -154,24 +158,24 @@ GuiLayoutBeginVertical( gui, 0, screen_height * 0.96 - rows_num * ( 20 + 2 ) + 2
 						end
 					end
 				elseif shortcut_check.check( shortcuts.expand_selection_left, left_click, right_click ) then
-						local current_actions = {}
-						local index = 1
-						local last_selected_index = 1
-						for s, a, u in state_str_iter_actions( edit_panel_state.get() ) do
-							if s and index < i then
-								last_selected_index = index
-							end
-							index = index + 1
-							table.insert( current_actions, { s, a, u } )
+					local current_actions = {}
+					local index = 1
+					local last_selected_index = 1
+					for s, a, u in state_str_iter_actions( edit_panel_state.get() ) do
+						if s and index < i then
+							last_selected_index = index
 						end
-						for j = last_selected_index, i, 1 do
-							if current_actions[ j ] then
-								current_actions[ j ][1] = true
-							else
-								current_actions[ j ] = { true }
-							end
+						index = index + 1
+						table.insert( current_actions, { s, a, u } )
+					end
+					for j = last_selected_index, i, 1 do
+						if current_actions[ j ] then
+							current_actions[ j ][1] = true
+						else
+							current_actions[ j ] = { true }
 						end
-						edit_panel_state.set( table_to_state_str( current_actions ), wrap_key( "operation_select" ) )
+					end
+					edit_panel_state.set( table_to_state_str( current_actions ), wrap_key( "operation_select" ) )
 				elseif shortcut_check.check( shortcuts.expand_selection_right, left_click, right_click ) then	
 					local current_actions = {}
 					local index = 1
@@ -317,40 +321,34 @@ GuiLayoutBeginVertical( gui, 0, screen_height * 0.96 - rows_num * ( 20 + 2 ) + 2
 				elseif shortcut_check.check( shortcuts.override, left_click, right_click ) then
 					local current_actions = {}
 					local indexes_to_swap = {}
+					local first_index
 					local index = 1
 					for s, a, u in state_str_iter_actions( edit_panel_state.get() ) do
 						table.insert( current_actions, { s, a, u } )
 						if s then
+							first_index = first_index or index
 							table.insert( indexes_to_swap, index )
 						end
 						index = index + 1
 					end
-					local first = indexes_to_swap[1]
+					local first = selected_actions[1]
 					if not first then return end
 					local offset = i - first
-					if selected then
-						local temp = {}
-						for j, index in ipairs( indexes_to_swap ) do
-							temp[ j ] = current_actions[ index ]
-						end
-						local size = #indexes_to_swap
-						for j = 1, size - offset do
-							current_actions[ indexes_to_swap[ j + offset ] ] = temp[ j ]
-						end
-					else
-						if not edit_panel_state.get_autocap_enabled() then
-							for j, index in ipairs( indexes_to_swap ) do
-								local the_other = index + offset
-								if the_other > capacity then
-									return
-								end
-							end
-						end
+					if not edit_panel_state.get_autocap_enabled() then
 						for j, index in ipairs( indexes_to_swap ) do
 							local the_other = index + offset
-							current_actions[ the_other ] = current_actions[ index ]
-							current_actions[ index ] = { false }
+							if the_other > capacity then
+								return
+							end
 						end
+					end
+					local selected_actions = {}
+					for j, index in ipairs( indexes_to_swap ) do
+						selected_actions[ j ] = current_actions[ index ]
+					end
+					for j, index in ipairs( indexes_to_swap ) do
+						current_actions[ index + offset ] = selected_actions[ j ]
+						current_actions[ index ] = { false }
 					end
 					edit_panel_state.set( table_to_state_str( current_actions ), wrap_key( "operation_override_actions" ) )
 				elseif shortcut_check.check( shortcuts.select, left_click, right_click ) then
@@ -358,23 +356,21 @@ GuiLayoutBeginVertical( gui, 0, screen_height * 0.96 - rows_num * ( 20 + 2 ) + 2
 					for s, a, u in state_str_iter_actions( edit_panel_state.get() ) do
 						table.insert( current_actions, { false, a, u } )
 					end
-					local s = true
 					if current_actions[ i ] then
-						current_actions[ i ][1] = s
+						current_actions[ i ][1] = true
 					else
-						current_actions[ i ] = { s }
+						current_actions[ i ] = { true }
 					end
 					edit_panel_state.set( table_to_state_str( current_actions ), wrap_key( "operation_select" ) )
 				elseif shortcut_check.check( shortcuts.deselect, left_click, right_click ) then
 					local current_actions = {}
 					for s, a, u in state_str_iter_actions( edit_panel_state.get() ) do
-						table.insert( current_actions, { false, a, u } )
+						table.insert( current_actions, { s, a, u } )
 					end
-					local s = false
 					if current_actions[ i ] then
-						current_actions[ i ][1] = s
+						current_actions[ i ][1] = false
 					else
-						current_actions[ i ] = { s }
+						current_actions[ i ] = { false }
 					end
 					edit_panel_state.set( table_to_state_str( current_actions ), wrap_key( "operation_deselect" ) )
 				end

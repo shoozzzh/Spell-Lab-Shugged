@@ -86,7 +86,10 @@ picker.buttons = function()
 				end
 			end
 			GuiTooltip( gui, wrap_key( "spell_group_box_load" ), "" )
-			do_flag_toggle_image_button( "mods/spell_lab_shugged/files/gui/buttons/spell_replacement.png", "replace_mode", "spell_replacement", nil, wrap_key( "spell_replacement_tips" ) )
+			do_flag_toggle_image_button( "mods/spell_lab_shugged/files/gui/buttons/spell_replacement.png",
+				"replace_mode", "spell_replacement", nil,
+				text_get( "spell_replacement_tips", shortcut_texts.replace_switch_temp )
+			)
 			show_edit_panel_toggle_options()
 		end
 	GuiLayoutEnd( gui )

@@ -42,6 +42,9 @@ if initialized == false then
 	function text_get_translated( key )
 		return GameTextGetTranslatedOrNot( wrap_key( key ) )
 	end
+	function text_get( key, ... )
+		return GameTextGet( wrap_key( key ), ... )
+	end
 
 	local version = "Shugged v1.7.7"
 
@@ -753,15 +756,30 @@ if initialized == false then
 		clear_action_history = { "Key_SHIFT", "Mouse_right" },
 		transform_mortal_into_dummy = { "Key_SHIFT" },
 	}
+
+	dofile_once( "mods/spell_lab_shugged/files/lib/shortcut_tostring.lua" )
+
+	shortcut_texts = {}
+
+	local edit_panel_shortcut_tips
+
 	function reload_shortcuts()
 		for name, _ in pairs( shortcuts ) do
 			local value = mod_setting_get( "shortcut_" .. name )
 			if value ~= nil then value = smallfolk.loads( value ) end
 			if value ~= nil then shortcuts[ name ] = value end
 		end
+		edit_panel_shortcut_tips = text_get_translated( "shortcut_tips" )
+
+		for name, v in pairs( shortcuts ) do
+			shortcut_texts[ name ] = shortcut_tostring( v )
+		end
+		for name, v in pairs( shortcuts ) do
+			edit_panel_shortcut_tips = edit_panel_shortcut_tips:gsub( "{" .. name .. "}", shortcut_texts[ name ] )
+		end
 	end
 
-	dofile_once( "mods/spell_lab_shugged/files/lib/shortcut_tostring.lua" )
+	reload_shortcuts()
 
 	function do_gui()
 		shift = InputIsKeyDown( Key_LSHIFT ) or InputIsKeyDown( Key_RSHIFT )
@@ -793,7 +811,7 @@ if initialized == false then
 
 		update_keyboard_input( listen_keyboard_just_down() )
 
-		if GameGetFrameNum() % 30 == 0 then
+		if GameGetFrameNum() % 60 == 0 then
 			reload_shortcuts()
 		end
 
@@ -867,7 +885,8 @@ if initialized == false then
 
 				GuiLayoutBeginHorizontal( gui, horizontal_centered_x(9,4), percent_to_ui_scale_y(2), true )
 					GuiImageButton( gui, next_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/shortcut_tips.png" )
-					GuiTooltip( gui, wrap_key( "shortcut_tips_title" ), wrap_key( "shortcut_tips" ) )
+
+					GuiTooltip( gui, wrap_key( "shortcut_tips_title" ), edit_panel_shortcut_tips )
 
 					if GuiImageButton( gui, next_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/clear_projectiles.png" ) then
 						sound_button_clicked()
@@ -1076,7 +1095,9 @@ if initialized == false then
 						sound_button_clicked()
 						selecting_mortal_to_transform = not selecting_mortal_to_transform
 					end
-					GuiTooltip( gui, wrap_key( "transform_mortal_into_target_dummy" ), wrap_key( "transform_mortal_into_target_dummy_description" ) )
+					GuiTooltip( gui, wrap_key( "transform_mortal_into_target_dummy" ),
+						text_get( "transform_mortal_into_target_dummy_description", shortcut_texts.transform_mortal_into_dummy )
+					)
 
 					GuiImageButton( gui, next_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/spawn_convenient_wand.png" )
 					do

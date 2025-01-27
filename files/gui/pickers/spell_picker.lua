@@ -552,7 +552,7 @@ picker.menu = function()
 				end
 			end
 			show_filter( FILTER_TYPE_SEARCH, wrap_key( "action_search" ) )
-			show_filter( FILTER_TYPE_RECENT, wrap_key( "action_recent" ), function( left_click, right_click )
+			show_filter( FILTER_TYPE_RECENT, text_get( "action_recent", shortcut_texts.clear_action_history ), function( left_click, right_click )
 				if shortcut_check.check( shortcuts.clear_action_history, left_click, right_click ) then
 					clear_action_history()
 				end
@@ -581,10 +581,10 @@ picker.buttons = function()
 		if held_wand and mod_setting_get( "show_wand_edit_panel" ) then
 			do_flag_toggle_image_button( "mods/spell_lab_shugged/files/gui/buttons/quick_spell_picker.png", "quick_spell_picker" )
 		end
-		do_flag_toggle_image_button( "mods/spell_lab_shugged/files/gui/buttons/show_locked_spells.png", "show_locked_spells", nil, nil, wrap_key( "relock_tips" ) )
+		do_flag_toggle_image_button( "mods/spell_lab_shugged/files/gui/buttons/show_locked_spells.png", "show_locked_spells", nil, nil, text_get( "relock_tips", shortcut_texts.relock ) )
 		do_flag_toggle_image_button( "mods/spell_lab_shugged/files/gui/buttons/zero_uses.png", "zero_uses" )
 		if held_wand and mod_setting_get( "show_wand_edit_panel" ) then
-			do_flag_toggle_image_button( "mods/spell_lab_shugged/files/gui/buttons/spell_replacement.png", "replace_mode", "spell_replacement", nil, wrap_key( "spell_replacement_tips" ) )
+			do_flag_toggle_image_button( "mods/spell_lab_shugged/files/gui/buttons/spell_replacement.png", "replace_mode", "spell_replacement", nil, text_get( "spell_replacement_tips", shortcut_texts.replace_switch_temp ) )
 			show_edit_panel_toggle_options()
 		end
 	GuiLayoutEnd( gui )

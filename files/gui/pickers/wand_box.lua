@@ -213,12 +213,10 @@ picker.menu = function()
 									current_page[ index ] = temp
 								end
 							end
-						else
-							if wand_box_selected_indexes[ wand_index ] then
-								wand_box_selected_indexes = {}
-							else
-								wand_box_selected_indexes = { [ wand_index ] = true }
-							end
+						elseif shortcut_check.check( shortcuts.select, left_click, right_click ) then
+							wand_box_selected_indexes = { [ wand_index ] = true }
+						elseif shortcut_check.check( shortcuts.deselect, left_click, right_click ) then
+							wand_box_selected_indexes[ wand_index ] = false
 						end
 					end
 					::skip::
@@ -228,7 +226,7 @@ picker.menu = function()
 							GuiLayoutBeginHorizontal( gui, 0, 0 )
 								GuiText( gui, 0, 0, GameTextGet(
 									wrap_key( "wand_box_hold_something_to_show_wand_stats" ),
-									shortcut_tostring( shortcuts.show_wand_stats )
+									shortcut_texts.show_wand_stats
 								) )
 							GuiLayoutEnd( gui )
 						else
@@ -302,7 +300,7 @@ picker.buttons = function()
 			if not wand_box_delete_wand_confirming then
 				GuiTooltip( gui, wrap_key( "wand_box_delete" ), "" )
 			else
-				GuiTooltip( gui, wrap_key( "wand_box_delete" ), GameTextGet( wrap_key( "deletion_confirm_button" ), tostring( #selected_indexes ) ) )
+				GuiTooltip( gui, wrap_key( "wand_box_delete" ), text_get( "deletion_confirm_button", shortcut_texts.confirm ) )
 			end
 		else
 			GuiOptionsAddForNextWidget( gui, GUI_OPTION.DrawSemiTransparent )
@@ -412,7 +410,7 @@ picker.buttons = function()
 		if not wand_box_remove_page_confirming then
 			GuiTooltip( gui, GameTextGet( wrap_key( "wand_box_delete_page" ), wand_box_current_page_index ), "" )
 		else
-			GuiTooltip( gui, GameTextGet( wrap_key( "wand_box_delete_page" ), wand_box_current_page_index ), wrap_key( "deletion_confirm_button" ) )
+			GuiTooltip( gui, GameTextGet( wrap_key( "wand_box_delete_page" ), wand_box_current_page_index ), text_get( "deletion_confirm_button", shortcut_texts.confirm ) )
 		end
 	GuiLayoutEnd( gui )
 end
