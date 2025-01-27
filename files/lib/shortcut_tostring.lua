@@ -49,22 +49,14 @@ local named_keys = {
 	Key_CTRL = "Ctrl",
 	Key_SHIFT = "Shift",
 	Key_ALT = "Alt",
+	JOY_BUTTON_0 = "$input_xboxbutton_a",
+	JOY_BUTTON_1 = "$input_xboxbutton_b",
+	JOY_BUTTON_2 = "$input_xboxbutton_x",
+	JOY_BUTTON_3 = "$input_xboxbutton_y",
 }
 
 local custom_keys_i18n = {
 	["简体中文"] = {
-		Mouse_left = "左键",
-		Mouse_right = "右键",
-	},
-	["喵体中文"] = {
-		Mouse_left = "左键",
-		Mouse_right = "右键",
-	},
-	["汪体中文"] = {
-		Mouse_left = "左键",
-		Mouse_right = "右键",
-	},
-	["完全汉化"] = {
 		Mouse_left = "左键",
 		Mouse_right = "右键",
 	},
@@ -73,6 +65,13 @@ local custom_keys_i18n = {
 		Mouse_right = "Right-click",
 	},
 }
+
+do
+	local other_zh_cn_languages = { "喵体中文", "汪体中文", "完全汉化" }
+	for _, v in ipairs( other_zh_cn_languages ) do
+		custom_keys_i18n[ v ] = custom_keys_i18n["简体中文"]
+	end
+end
 
 local function keyname_to_text( keyname, lang )
 	local result = named_keys[ keyname ]
@@ -98,7 +97,12 @@ local function keyname_to_text( keyname, lang )
 
 		return name
 	elseif keyname:find "^JOY_BUTTON_" then
-		return GameTextGet( "$input_xboxbutton_" .. keyname:sub(12):lower() )
+		local result = GameTextGet( "$input_xboxbutton_" .. keyname:sub(12):lower() )
+		if keyname:find "%d%d_DOWN$" then
+			result = result .. " DOWN"
+		elseif keyname:find "%d%d_MOVED$" then
+			result = result .. " MOVED"
+		end
 	end
 	return GameTextGet( "$menuoptions_configurecontrols_keyname_unknown" )
 end

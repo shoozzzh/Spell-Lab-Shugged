@@ -328,7 +328,7 @@ picker.menu = function()
 			actions_data_to_show, function( action )
 			do_action_button( action.id, 0, 0, false, function( left_click, right_click )
 				local is_unlocked_action = action.spawn_requires_flag and HasFlagPersistent( action.spawn_requires_flag ) 
-				if ctrl and shift then
+				if shortcut_check.check( shortcuts.relock, left_click, right_click ) then
 					if is_unlocked_action then
 						RemoveFlagPersistent( action.spawn_requires_flag )
 					end
@@ -553,10 +553,8 @@ picker.menu = function()
 			end
 			show_filter( FILTER_TYPE_SEARCH, wrap_key( "action_search" ) )
 			show_filter( FILTER_TYPE_RECENT, wrap_key( "action_recent" ), function( left_click, right_click )
-				if right_click then
-					if shift then
-						clear_action_history()
-					end
+				if shortcut_check.check( shortcuts.clear_action_history, left_click, right_click ) then
+					clear_action_history()
 				end
 			end )
 			show_filter( FILTER_TYPE_IN_INV, wrap_key( "action_in_inv" ) )

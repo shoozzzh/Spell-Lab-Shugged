@@ -152,33 +152,31 @@ picker.menu = function()
 					local left_click,right_click,_,x,y,_,_,_,_ = previous_data( gui )
 					if left_click or right_click then
 						wand_box_delete_wand_confirming = false
-						if ctrl and alt then
-							if left_click then
-								local to = 1
-								for i = wand_index, 1, -1 do
-									if wand_box_selected_indexes[ i ] then
-										to = i
-										break
-									end
-								end
-								for i = to, wand_index do
-									wand_box_selected_indexes[ i ] = true
-								end
-							elseif right_click then
-								local to = #current_page
-								for i = wand_index, #current_page do
-									if wand_box_selected_indexes[ i ] then
-										to = i
-										break
-									end
-								end
-								for i = wand_index, to do
-									wand_box_selected_indexes[ i ] = true
+						if shortcut_check.check( shortcuts.expand_selection_left, left_click, right_click ) then
+							local to = 1
+							for i = wand_index, 1, -1 do
+								if wand_box_selected_indexes[ i ] then
+									to = i
+									break
 								end
 							end
-						elseif ctrl then
+							for i = to, wand_index do
+								wand_box_selected_indexes[ i ] = true
+							end
+						elseif shortcut_check.check( shortcuts.expand_selection_right, left_click, right_click ) then
+							local to = #current_page
+							for i = wand_index, #current_page do
+								if wand_box_selected_indexes[ i ] then
+									to = i
+									break
+								end
+							end
+							for i = wand_index, to do
+								wand_box_selected_indexes[ i ] = true
+							end
+						elseif shortcut_check.check( shortcuts.multi_select, left_click, right_click ) then
 							wand_box_selected_indexes[ wand_index ] = not wand_box_selected_indexes[ wand_index ]
-						elseif alt then
+						elseif shortcut_check.check( shortcuts.swap, left_click, right_click ) then
 							local indexes_to_swap = {}
 							for i = 1, #current_page do
 								if wand_box_selected_indexes[ i ] then
@@ -225,10 +223,13 @@ picker.menu = function()
 					end
 					::skip::
 					do_custom_tooltip( function()
-						if not ctrl then
+						if not shortcut_check.check( shortcuts.show_wand_stats, left_click, right_click ) then
 							do_simple_action_list( saved_wand.all_actions )
 							GuiLayoutBeginHorizontal( gui, 0, 0 )
-								GuiText( gui, 0, 0, wrap_key( "wand_box_hold_ctrl_to_show_wand_stats" ) )
+								GuiText( gui, 0, 0, GameTextGet(
+									wrap_key( "wand_box_hold_something_to_show_wand_stats" ),
+									shortcut_tostring( shortcuts.show_wand_stats )
+								) )
 							GuiLayoutEnd( gui )
 						else
 							do_wand_stats( gui, saved_wand.stats )
@@ -286,7 +287,7 @@ picker.buttons = function()
 				if not wand_box_delete_wand_confirming then
 					wand_box_delete_wand_confirming = true
 				else
-					if shift then
+					if shortcut_check.check( shortcuts.confirm ) then
 						for i = #current_page, 1, -1 do
 							if wand_box_selected_indexes[ i ] then
 								table.remove( current_page, i )
@@ -393,7 +394,7 @@ picker.buttons = function()
 			if not wand_box_remove_page_confirming then
 				wand_box_remove_page_confirming = true
 			else
-				if shift then
+				if shortcut_check.check( shortcuts.confirm ) then
 					if mod_setting_get( "wand_box_page_max_index" ) ~= 1 then
 						if wand_box_current_page_index == mod_setting_get( "wand_box_page_max_index" ) then
 							wand_box_current_page_index =  wand_box_current_page_index - 1

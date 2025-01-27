@@ -42,7 +42,7 @@ function center_text( text )
 	return GuiGetTextDimensions( not_a_gui, text, 1, 0, "mods/spell_lab_shugged/files/font/font_small_numbers.xml", true ) / 2
 end
 
-local chinese_languages = {
+local zh_cn_languages = {
 	["简体中文"] = true,
 	["喵体中文"] = true,
 	["汪体中文"] = true,
@@ -50,7 +50,7 @@ local chinese_languages = {
 }
 
 function separator( text )
-	return ( chinese_languages[ GameTextGetTranslatedOrNot( "$current_language" ) ]
+	return ( zh_cn_languages[ GameTextGetTranslatedOrNot( "$current_language" ) ]
 	and ten_thousands_separator or thousands_separator )( text )
 end
 

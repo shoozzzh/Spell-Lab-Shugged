@@ -50,11 +50,22 @@ function mod_setting_shortcut( mod_id, gui, in_main_menu, im_id, setting )
 	else
 		local str
 		do
-			local shortcut = ModSettingGetNextValue( mod_setting_get_id( mod_id, setting ) )
-			if shortcut == nil or shortcut == "" or shortcut == "{}" then
+			local value = ModSettingGetNextValue( mod_setting_get_id( mod_id, setting ) )
+			if type( value ) ~= "string" then value = setting.value_default or "{}" end
+			local shortcut
+			do
+				local status, _ = pcall( function()
+					shortcut = smallfolk.loads( value )
+				end )
+				if not status then
+					shortcut = {}
+				end
+			end
+
+			if #shortcut == 0 then
 				str = "$menuoptions_configurecontrols_action_unbound"
 			else
-				str = shortcut_tostring( smallfolk.loads( shortcut ), GameTextGet( "$current_language" ) )
+				str = shortcut_tostring( shortcut, GameTextGet( "$current_language" ) )
 			end
 		end
 

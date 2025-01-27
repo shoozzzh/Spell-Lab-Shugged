@@ -79,7 +79,7 @@ picker.buttons = function()
 			if left_click or right_click then
 				local saved_spell_group = saved_spell_groups[ selected_spell_group_index ]
 				local do_replace = mod_setting_get( "replace_mode" )
-				if shift then do_replace = not do_replace end
+				if shortcut_check.check( shortcuts.replace_switch_temp ) then do_replace = not do_replace end
 				if saved_spell_group and held_wand then
 					sound_button_clicked()
 					set_action_group( access_edit_panel_state( held_wand ), saved_spell_group, do_replace, EntityGetWandCapacity( held_wand ), right_click )

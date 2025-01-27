@@ -45,9 +45,7 @@ function listen_keyboard_just_down()
 		local code = tri[1]
 
 		local current_frames_held = frames_keys_held[ name ]
-		if tri[3]( code ) or current_frames_held > 30 then
-			listen_result_just_down[ name ] = true
-		end
+		listen_result_just_down[ name ] = tri[3]( code ) or current_frames_held > 30
 		if tri[2]( code ) then
 			frames_keys_held[ name ] = current_frames_held + 1
 		else

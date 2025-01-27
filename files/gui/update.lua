@@ -14,6 +14,7 @@ if initialized == false then
 	dofile_once( "data/scripts/debug/keycodes.lua" )
 	KEYCODES_RAW, KEYCODES_BY_TYPE = unpack( dofile_once( "mods/spell_lab_shugged/files/lib/keycodes_wrapped.lua" ) )
 	smallfolk = dofile_once( "mods/spell_lab_shugged/files/lib/smallfolk.lua" )
+	shortcut_check = dofile_once( "mods/spell_lab_shugged/files/lib/shortcut_check.lua" )
 
 	player = get_player()
 
@@ -728,8 +729,41 @@ if initialized == false then
 		else cant_redo() end
 	end
 
+	shortcuts = {
+		select = { "Mouse_left" },
+		deselect = { "Mouse_right" },
+		multi_select = { "Key_CTRL", "Mouse_left" },
+		expand_selection_left = { "Key_CTRL", "Key_ALT", "Mouse_left" },
+		expand_selection_right = { "Key_CTRL", "Key_ALT", "Mouse_right" },
+		swap = { "Key_ALT", "Mouse_left" },
+		override = { "Key_ALT", "Mouse_right" },
+		duplicate = { "Key_ALT", "Key_SHIFT", "Mouse_left" },
+		delete_action = { "Key_SHIFT", "Mouse_left" },
+		delete_slot = { "Key_SHIFT", "Mouse_right" },
+		always_cast = { "Key_CTRL", "Key_SHIFT", "Mouse_left" },
+		left_delete = { "Key_BACKSPACE" },
+		right_delete = { "Key_DELETE" },
+		undo = { "Key_CTRL", "Key_z" },
+		redo = { "Key_CTRL", "Key_y" },
+		relock = { "Key_CTRL", "Key_SHIFT", "Mouse_left" },
+		show_wand_stats = { "Key_CTRL" },
+		replace_switch_temp = { "Key_SHIFT" },
+		replace_switch = {},
+		confirm = { "Key_SHIFT" },
+		clear_action_history = { "Key_SHIFT", "Mouse_right" },
+		transform_mortal_into_dummy = { "Key_SHIFT" },
+	}
+	function reload_shortcuts()
+		for name, _ in pairs( shortcuts ) do
+			local value = mod_setting_get( "shortcut_" .. name )
+			if value ~= nil then value = smallfolk.loads( value ) end
+			if value ~= nil then shortcuts[ name ] = value end
+		end
+	end
+
+	dofile_once( "mods/spell_lab_shugged/files/lib/shortcut_tostring.lua" )
+
 	function do_gui()
-		ctrl = InputIsKeyDown( Key_LCTRL ) or InputIsKeyDown( Key_RCTRL )
 		shift = InputIsKeyDown( Key_LSHIFT ) or InputIsKeyDown( Key_RSHIFT )
 		alt = InputIsKeyDown( Key_LALT ) or InputIsKeyDown( Key_RALT )
 
@@ -753,96 +787,14 @@ if initialized == false then
 		player = get_player()
 		held_wand = get_held_wand()
 
+		keyboard_input_holding = listen_keyboard_down()
+
 		dofile( "mods/spell_lab_shugged/files/gui/wand_listener.lua" )
 
 		update_keyboard_input( listen_keyboard_just_down() )
 
-		if selecting_mortal_to_transform then
-			if shift then
-				local error_msg = nil
-				local mx, my = DEBUG_GetMouseWorld()
-				local mortal_id = EntityGetClosestWithTag( mx, my, "mortal" )
-				local mortal_x, mortal_y = EntityGetTransform( mortal_id )
-				if not is_valid_entity( mortal_id ) or ( mx - mortal_x ) ^ 2 + ( my - mortal_y ) ^ 2 > 1600 then
-					mortal_id = EntityGetClosestWithTag( mx, my, "enemy" )
-					mortal_x, mortal_y = EntityGetTransform( mortal_id )
-					if not is_valid_entity( mortal_id ) or ( mx - mortal_x ) ^ 2 + ( my - mortal_y ) ^ 2 > 1600 then
-						error_msg = text_get_translated( "transform_mortal_failed_no_mortal_found" )
-					end
-				end
-				if EntityHasTag( mortal_id, "player_unit" ) or EntityHasTag( mortal_id, "polymorphed_player" ) then
-					error_msg = text_get_translated( "transform_mortal_failed_cant_transform_player" )
-				end
-				if EntityHasTag( mortal_id, "spell_lab_shugged_target_dummy" ) then
-					error_msg = text_get_translated(  "transform_mortal_failed_already_transformed" )
-				end
-				if not error_msg then
-					-- GameDropAllItems( mortal_id )
-					local comp_names_to_disable = {
-						"AnimalAIComponent",
-						"PhysicsAIComponent",
-						"FishAIComponent",
-						"AdvancedFishAIComponent",
-						"BossDragonComponent",
-						"WormComponent",
-						"WormAIComponent",
-						"BossHealthBarComponent",
-						"CameraBoundComponent",
-					}
-					for _, comp_name in ipairs( comp_names_to_disable ) do
-						for _, c in ipairs( EntityGetComponent( mortal_id, comp_name ) or {} ) do
-							EntitySetComponentIsEnabled( mortal_id, c, false )
-						end
-					end
-					for _, ctrl_comp in ipairs( EntityGetComponentIncludingDisabled( mortal_id, "ControlsComponent" ) or {} ) do
-						ComponentSetValue2( ctrl_comp, "enabled", false )
-					end
-					local cp_comp = EntityGetFirstComponentIncludingDisabled( mortal_id, "CharacterPlatformingComponent" )
-					if cp_comp then
-						for _, field_name in ipairs( {
-							"velocity_min_x",
-							"velocity_min_y",
-							"velocity_max_x",
-							"velocity_max_y",
-							"pixel_gravity",
-							"run_velocity",
-							"fly_velocity_x",
-							"fly_speed_up",
-							"fly_speed_down",
-						} ) do
-							ComponentSetValue2( cp_comp, field_name, 0 )
-						end
-					end
-					local cd_comp = EntityGetFirstComponentIncludingDisabled( mortal_id, "CharacterDataComponent" )
-					if cd_comp then
-						ComponentSetValue2( cd_comp, "mVelocity", 0, 0 )
-					end
-					for _, pbody_id in ipairs( PhysicsBodyIDGetFromEntity( mortal_id ) ) do
-						PhysicsBodyIDSetGravityScale( pbody_id, 0 )
-						local x, y, a = PhysicsBodyIDGetTransform( pbody_id )
-						PhysicsBodyIDSetTransform( pbody_id, x, y, a, 0, 0 )
-					end
-					local dm_comp = EntityGetFirstComponentIncludingDisabled( mortal_id, "DamageModelComponent" )
-					if dm_comp then
-						ComponentSetValue2( dm_comp, "wait_for_kill_flag_on_death", true )
-					end
-					dm_comp = EntityGetFirstComponent( mortal_id, "DamageModelComponent" )
-					if dm_comp then
-						ComponentSetValue2( dm_comp, "wait_for_kill_flag_on_death", true )
-					end
-					EntityAddComponent2( mortal_id, "LuaComponent", {
-						_tags="enabled_in_world",
-						script_source_file = "mods/spell_lab_shugged/files/scripts/transformed_mortal_update.lua",
-						execute_every_n_frame = 1,
-					} )
-					EntityLoadToEntity( "mods/spell_lab_shugged/files/entities/dummy_target/base_dummy_target.xml", mortal_id )
-					EntityAddTag( mortal_id, "spell_lab_shugged_target_dummy" )
-					GamePrint( GameTextGet( wrap_key( "transform_mortal_succeeded" ), GameTextGetTranslatedOrNot( EntityGetName( mortal_id ) ) ) )
-				else
-					GamePrint( error_msg )
-				end
-				selecting_mortal_to_transform = false
-			end
+		if GameGetFrameNum() % 30 == 0 then
+			reload_shortcuts()
 		end
 
 		if is_panel_open and not GameIsInventoryOpen() and player and not GameHasFlagRun( "gkbrkn_config_menu_open" ) then
