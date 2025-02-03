@@ -85,7 +85,7 @@ function mod_setting_shortcut( mod_id, gui, in_main_menu, im_id, setting )
 		end
 	end
 
-	if changed then ModSettingSetNextValue( mod_id .. ".shortcut_changed", true, false ) end
+	if changed then ModSettingSet( mod_id .. ".shortcut_changed", true, false ) end
 
 	mod_setting_tooltip( mod_id, gui, in_main_menu, setting )
 

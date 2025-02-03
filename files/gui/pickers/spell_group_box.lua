@@ -42,6 +42,7 @@ picker.menu = function()
 				if selected_spell_group_index ~= index then
 					saved_spell_groups[ selected_spell_group_index ], saved_spell_groups[ index ] =
 						saved_spell_groups[ index ], saved_spell_groups[ selected_spell_group_index ]
+					selected_spell_group_index = index
 				end
 			end
 			do_custom_tooltip( function()

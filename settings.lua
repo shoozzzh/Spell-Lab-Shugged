@@ -49,7 +49,8 @@ local function load_mod_settings( cur_lang )
 			shortcut = "快捷键设置",
 			shortcut_click_to_save = "（点击以保存）",
 			shortcut_click_here = " +（请点击）",
-			shortcut_general = "法杖编辑面板 & 法杖仓库",
+			shortcut_general = "法杖编辑面板、法杖仓库 & 法术组合仓库",
+			shortcut_multi_selectable = "法杖编辑面板 & 法杖仓库",
 			shortcut_select = "选择",
 			shortcut_deselect = "取消选择",
 			shortcut_multi_select = "选择多个",
@@ -124,7 +125,8 @@ local function load_mod_settings( cur_lang )
 			shortcut = "Shortcuts Setting",
 			shortcut_click_to_save = " (click to save)",
 			shortcut_click_here = " + (click here)",
-			shortcut_general = "Wand Edit Panel & Wand Box",
+			shortcut_general = "Wand Edit Panel, Wand Box & Spell Group Box",
+			shortcut_multi_selectable = "Wand Edit Panel & Wand Box",
 			shortcut_select = "Select",
 			shortcut_deselect = "Deselect",
 			shortcut_multi_select = "Multiple selection",
@@ -307,7 +309,8 @@ local function load_mod_settings( cur_lang )
 					scope                    = MOD_SETTING_SCOPE_RUNTIME,
 				},
 			},
-		},{
+		},
+		{
 			category_id = "shortcut",
 			ui_name = text.shortcut,
 			foldable = true,
@@ -336,6 +339,22 @@ local function load_mod_settings( cur_lang )
 							click_required = true,
 						},
 						{
+							id             = "shortcut_swap",
+							ui_name        = text.shortcut_swap,
+							value_default  = '{"Key_ALT","Mouse_left"}',
+							scope          = MOD_SETTING_SCOPE_RUNTIME,
+							ui_fn          = mod_setting_shortcut,
+							click_required = true,
+						},
+					}
+				},
+				{
+					category_id = "shortcut_multi_selectable",
+					ui_name = text.shortcut_multi_selectable,
+					foldable = true,
+					_folded = true,
+					settings = {
+						{
 							id             = "shortcut_multi_select",
 							ui_name        = text.shortcut_multi_select,
 							value_default  = '{"Key_CTRL","Mouse_left"}',
@@ -355,14 +374,6 @@ local function load_mod_settings( cur_lang )
 							id             = "shortcut_expand_selection_right",
 							ui_name        = text.shortcut_expand_selection_right,
 							value_default  = '{"Key_CTRL","Key_ALT","Mouse_right"}',
-							scope          = MOD_SETTING_SCOPE_RUNTIME,
-							ui_fn          = mod_setting_shortcut,
-							click_required = true,
-						},
-						{
-							id             = "shortcut_swap",
-							ui_name        = text.shortcut_swap,
-							value_default  = '{"Key_ALT","Mouse_left"}',
 							scope          = MOD_SETTING_SCOPE_RUNTIME,
 							ui_fn          = mod_setting_shortcut,
 							click_required = true,
