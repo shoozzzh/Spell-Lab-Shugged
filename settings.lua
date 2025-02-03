@@ -378,14 +378,6 @@ local function load_mod_settings( cur_lang )
 							ui_fn          = mod_setting_shortcut,
 							click_required = true,
 						},
-						{
-							id             = "shortcut_override",
-							ui_name        = text.shortcut_override,
-							value_default  = '{"Key_ALT","Mouse_right"}',
-							scope          = MOD_SETTING_SCOPE_RUNTIME,
-							ui_fn          = mod_setting_shortcut,
-							click_required = true,
-						},
 					},
 				},
 				{
@@ -394,6 +386,14 @@ local function load_mod_settings( cur_lang )
 					foldable = true,
 					_folded = true,
 					settings = {
+						{
+							id             = "shortcut_override",
+							ui_name        = text.shortcut_override,
+							value_default  = '{"Key_ALT","Mouse_right"}',
+							scope          = MOD_SETTING_SCOPE_RUNTIME,
+							ui_fn          = mod_setting_shortcut,
+							click_required = true,
+						},
 						{
 							id             = "shortcut_duplicate",
 							ui_name        = text.shortcut_duplicate,
