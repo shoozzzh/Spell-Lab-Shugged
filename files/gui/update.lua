@@ -55,7 +55,7 @@ if initialized == false then
 		return GameTextGet( wrap_key( key ), ... )
 	end
 
-	local version = "Shugged v1.8.0"
+	local version = "Shugged v1.8.1"
 
 	function maxn( t )
 		local result = table.maxn( t )
@@ -828,7 +828,7 @@ if initialized == false then
 		for name, v in pairs( shortcuts ) do
 			shortcut_texts[ name ] = shortcut_tostring( v, last_cur_lang )
 		end
-		
+
 		edit_panel_shortcut_tips = text_get_translated( "shortcut_tips" )
 		for name, v in pairs( shortcuts ) do
 			edit_panel_shortcut_tips = edit_panel_shortcut_tips:gsub( "{" .. name .. "}", shortcut_texts[ name ] )
