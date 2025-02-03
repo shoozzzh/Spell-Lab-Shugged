@@ -31,6 +31,15 @@ if initialized == false then
 		return ModSettingSet( mod_settings_prefix .. key, value )
 	end
 
+	do
+		local function c( h )
+			return ( h + 1 ) / 256
+		end
+		function color( r, g, b, a )
+			return c( r ), c( g ), c( b ), c( a )
+		end
+	end
+
 	local transl_key_prefix = "$spell_lab_shugged_"
 
 	function wrap_key( key )
@@ -57,6 +66,21 @@ if initialized == false then
 	function next_id()
 		id_offset = id_offset + 1
 		return id_offset
+	end
+
+	gui_z = 0
+
+	do
+		local old_GuiZSet = GuiZSet
+		function GuiZSet( gui, z )
+			gui_z = gui_z + z
+			old_GuiZSet( gui, gui_z )
+		end
+
+		local old_GuiZSetForNextWidget = GuiZSetForNextWidget
+		function GuiZSetForNextWidget( gui, z )
+			old_GuiZSetForNextWidget( gui, gui_z + z )
+		end
 	end
 
 	function previous_data( gui )
@@ -357,7 +381,7 @@ if initialized == false then
 		GuiImage( gui, next_id(), -20, 0, "mods/spell_lab_shugged/files/gui/buttons/spell_box"..spell_box_suffix..".png", 1.0, 1.0, 0 )
 	end
 
-	function do_action_button( action_id, x, y, selected, click_callback, tooltip_func, uses_remaining, note, extra_gui, empty_slot_show_tooltip, no_title )
+	function do_action_button( action_id, x, y, selected, tooltip_func, uses_remaining, note, extra_gui, empty_slot_show_tooltip, no_title )
 		if x == nil then x = 0 end
 		if y == nil then y = 0 end
 		local image_sprite = "mods/spell_lab_shugged/files/gui/buttons/empty_spell.png"
@@ -412,10 +436,8 @@ if initialized == false then
 		end
 		if left_click or right_click then
 			sound_action_button_clicked()
-			if click_callback then
-				click_callback( left_click, right_click )
-			end
 		end
+		return left_click, right_click
 	end
 
 	function do_fake_action_button( action_type, action_sprite, name, id, desc, type, semi_transparent, uses_remaining, properties )
@@ -488,11 +510,14 @@ if initialized == false then
 		end
 	end
 
-	function show_uses_remaining( x, y, _, uses_remaining )
-		if not uses_remaining then return end
+	function show_uses_remaining( x, y, _, uses_remaining, scale )
+		if not uses_remaining or tonumber( uses_remaining ) < 0 then return end
+		scale = scale or 1
+		local offset = -2 * scale
+		x, y = x + offset, y + offset
 		GuiZSetForNextWidget( gui, -1 )
 		GuiOptionsAddForNextWidget( gui, GUI_OPTION.Layout_NoLayouting )
-		GuiText( gui, x-2, y-2, tostring( uses_remaining ), 1, "data/fonts/font_pixel_noshadow.xml", true )
+		GuiText( gui, x, y, tostring( uses_remaining ), scale, "data/fonts/font_pixel_noshadow.xml", true )
 	end
 
 	function do_property_list( lines )
@@ -562,52 +587,78 @@ if initialized == false then
 		end
 	end
 
+	function show_tooltip( content_fn, x, y )
+		GuiLayoutBeginLayer( gui )
+			GuiLayoutBeginVertical( gui, x, y, true )
+				GuiBeginAutoBox( gui )
+					content_fn()
+					GuiZSetForNextWidget( gui, 1 )
+				GuiEndAutoBoxNinePiece( gui )
+			GuiLayoutEnd( gui )
+		GuiLayoutEndLayer( gui )
+	end
+
 	function do_custom_tooltip( callback, z, x_offset, y_offset )
-		if z == nil then z = -12 end
-		local left_click,right_click,hover,x,y,width,height,draw_x,draw_y,draw_width,draw_height = previous_data( gui )
 		if x_offset == nil then x_offset = 0 end
 		if y_offset == nil then y_offset = 0 end
+		if z == nil then z = -1024 end
+		if not callback then return end
+		local left_click,right_click,hover,x,y,width,height,draw_x,draw_y,draw_width,draw_height = previous_data( gui )
 		if hover then
 			GuiZSet( gui, z )
-			GuiLayoutBeginLayer( gui )
-				GuiLayoutBeginVertical( gui, ( x + x_offset + width ), ( y + y_offset ), true )
-					GuiBeginAutoBox( gui )
-						if callback ~= nil then callback() end
-						GuiZSetForNextWidget( gui, z + 1 )
-					GuiEndAutoBoxNinePiece( gui )
-				GuiLayoutEnd( gui )
-			GuiLayoutEndLayer( gui )
-			GuiZSet( gui, 0 )
+				show_tooltip( callback, x + x_offset + width, y + y_offset )
+			GuiZSet( gui, -z )
 		end
 	end
 
-	local function show_simple_action_image( action_id )
+	function do_custom_tooltip_animated( callback, z, x_offset, y_offset )
+		if x_offset == nil then x_offset = 0 end
+		if y_offset == nil then y_offset = 0 end
+		if z == nil then z = -1024 end
+		local left_click,right_click,hover,x,y,width,height,draw_x,draw_y,draw_width,draw_height = previous_data( gui )
+		if hover then
+			GuiIdPushString( gui, "ANIMATED_TOOLTIP" )
+			GuiAnimateBegin( gui )
+			GuiAnimateAlphaFadeIn( gui, id_offset, 0.08, 0.1, false )
+			GuiAnimateScaleIn( gui, id_offset + 1, 0.08, false )
+			GuiIdPop( gui )
+			GuiZSet( gui, z )
+				show_tooltip( callback, x + x_offset + width, y + y_offset )
+			GuiZSet( gui, -z )
+			GuiAnimateEnd( gui )
+		end
+	end
+
+	local function show_simple_action_image( action_id, uses_remaining )
 		if action_id and action_id ~= "" then
 			local this_action_data = action_data[ action_id ]
 			local sprite = ( this_action_data and this_action_data.sprite ) and this_action_data.sprite or "data/ui_gfx/gun_actions/_unidentified.png"
-			GuiZSetForNextWidget( gui, -14 )
+			GuiZSetForNextWidget( gui, -1 )
 			GuiImage( gui, next_id(), 0, 0, sprite, 1.0, 0.5, 0 )
-			GuiZSetForNextWidget( gui, -13 )
 			GuiImage( gui, next_id(), -11, -1, "mods/spell_lab_shugged/files/gui/buttons/spell_box.png", 1.0, 0.5, 0 )
 		else
-			GuiZSetForNextWidget( gui, -13 )
 			GuiImage( gui, next_id(), -1, -1, "mods/spell_lab_shugged/files/gui/buttons/spell_box.png", 1.0, 0.5, 0 )
 		end
+		GuiZSet( gui, -1 )
+		local _,_,_,x,y = previous_data( gui )
+		show_uses_remaining( x, y, nil, uses_remaining, 0.5 )
+		GuiZSet( gui, 1 )
 	end
+
 	function do_simple_action_list( all_actions )
 		local common_actions = {}
 		local permanent_actions = {}
-		local max_x = -1
+		local max_x = 0
 		for _, a in ipairs( all_actions ) do
 			if a.permanent then
 				table.insert( permanent_actions, a.action_id )
 			else
 				if a.x ~= 0 then
-					common_actions[ a.x ] = a.action_id
-					max_x = math.max( max_x, a.x )
+					common_actions[ a.x + 1 ] = { a.action_id, a.uses_remaining }
+					max_x = math.max( max_x, a.x + 1 )
 				else
+					common_actions[ max_x + 1 ] = { a.action_id, a.uses_remaining }
 					max_x = max_x + 1
-					common_actions[ max_x ] = a.action_id
 				end
 			end
 		end
@@ -615,26 +666,24 @@ if initialized == false then
 		do_simple_common_action_list( common_actions, max_x )
 	end
 	function do_simple_permanent_action_list( permanent_actions )
-		if #permanent_actions > 0 then
-			GuiLayoutBeginHorizontal( gui, 0, 0 )
-			for _,permanent_action in pairs( permanent_actions ) do
-				show_simple_action_image( permanent_action )
-			end
-			GuiLayoutEnd( gui )
-			GuiLayoutAddVerticalSpacing( gui, 1 )
+		if #permanent_actions == 0 then return end
+		GuiLayoutBeginHorizontal( gui, 0, 0 )
+		for _,permanent_action in pairs( permanent_actions ) do
+			show_simple_action_image( permanent_action )
 		end
+		GuiLayoutEnd( gui )
+		GuiLayoutAddVerticalSpacing( gui, 1 )
 	end
 	function do_simple_common_action_list( common_actions, max_x )
+		if max_x <= 0 then return end
 		local actions_per_row = 26
-		if max_x > -1 then
-			for i = 0, max_x do
-				if i % actions_per_row == 0 then
-					GuiLayoutBeginHorizontal( gui, 0, 0 )
-				end
-				show_simple_action_image( common_actions[ i ] )
-				if i % actions_per_row == actions_per_row - 1 or i == max_x then
-					GuiLayoutEnd( gui )
-				end
+		for i = 1, max_x do
+			if i % actions_per_row == 1 then
+				GuiLayoutBeginHorizontal( gui, 0, 0 )
+			end
+			show_simple_action_image( unpack( common_actions[ i ] or {} ) )
+			if i % actions_per_row == 0 or i == max_x then
+				GuiLayoutEnd( gui )
 			end
 		end
 	end
@@ -771,9 +820,16 @@ if initialized == false then
 		end
 		edit_panel_shortcut_tips = text_get_translated( "shortcut_tips" )
 
+		reload_shortcut_texts()
+	end
+
+	last_cur_lang = GameTextGet( "$current_language" )
+
+	function reload_shortcut_texts()
 		for name, v in pairs( shortcuts ) do
-			shortcut_texts[ name ] = shortcut_tostring( v )
+			shortcut_texts[ name ] = shortcut_tostring( v, last_cur_lang )
 		end
+
 		for name, v in pairs( shortcuts ) do
 			edit_panel_shortcut_tips = edit_panel_shortcut_tips:gsub( "{" .. name .. "}", shortcut_texts[ name ] )
 		end
@@ -789,6 +845,7 @@ if initialized == false then
 
 		now = GameGetFrameNum()
 		id_offset = 0
+		gui_z = 0
 		GuiStartFrame( gui )
 		screen_width, screen_height = GuiGetScreenDimensions( gui )
 		GuiIdPushString( gui, "spell_lab_shugged" )
@@ -812,7 +869,16 @@ if initialized == false then
 		update_keyboard_input( listen_keyboard_just_down() )
 
 		if GameGetFrameNum() % 60 == 0 then
-			reload_shortcuts()
+			if mod_setting_get( "shortcut_changed" ) then
+				mod_setting_set( "shortcut_changed", false )
+				reload_shortcuts()
+			end
+
+			local cur_lang = GameTextGet( "$current_language" )
+			if cur_lang ~= last_cur_lang then
+				last_cur_lang = cur_lang
+				reload_shortcut_texts()
+			end
 		end
 
 		if is_panel_open and not GameIsInventoryOpen() and player and not GameHasFlagRun( "gkbrkn_config_menu_open" ) then
@@ -1087,7 +1153,26 @@ if initialized == false then
 							EntityLoad( "mods/spell_lab_shugged/files/entities/dummy_target/dummy_target_final.xml", x, y )
 						end
 					end
-					GuiTooltip( gui, wrap_key( "spawn_target_dummy" ), wrap_key( "spawn_target_dummy_description" ) )
+					-- GuiTooltip( gui, wrap_key( "spawn_target_dummy" ), wrap_key( "spawn_target_dummy_description" ) )
+					do_custom_tooltip_animated(
+						function()
+							GuiText( gui, 0, 0, wrap_key( "spawn_target_dummy" ) )
+							GuiText( gui, 0, 0, wrap_key( "spawn_target_dummy_description" ) )
+							GuiLayoutAddVerticalSpacing( gui, 6 )
+							GuiText( gui, 0, 0, wrap_key( "target_dummy_numbers_are" ) )
+							GuiColorSetForNextWidget( gui, color(0,207,40,255) )
+							GuiText( gui, 0, 0, wrap_key( "target_dummy_last_frame_damage" ) )
+							GuiColorSetForNextWidget( gui, color(208,208,248,255) )
+							GuiText( gui, 0, 0, wrap_key( "target_dummy_average_dps" ) )
+							GuiColorSetForNextWidget( gui, color(255,85,0,255) )
+							GuiText( gui, 0, 0, wrap_key( "target_dummy_total_damage" ) )
+							GuiColorSetForNextWidget( gui, color(208,208,248,255) )
+							GuiText( gui, 0, 0, wrap_key( "target_dummy_dps" ) )
+							GuiColorSetForNextWidget( gui, color(126,126,126,255) )
+							GuiText( gui, 0, 0, wrap_key( "target_dummy_highest_dps" ) )
+						end, nil, 10, 0
+					)
+
 					if not selecting_mortal_to_transform then
 						GuiOptionsAddForNextWidget( gui, GUI_OPTION.DrawSemiTransparent )
 					end
@@ -1216,7 +1301,11 @@ if initialized == false then
 			if x < mx and mx < x + width and y < my and my < y + height then
 				local text = wrap_key( ( is_panel_open and "hide" or "show" ) .. "_spell_lab" )
 				local text_width = GuiGetTextDimensions( gui, text )
-				GuiZSetForNextWidget( gui, -100 )
+				GuiIdPushString( gui, "ANIMATED_TOOLTIP_MAIN_BUTTON" )
+				GuiAnimateBegin( gui )
+				GuiAnimateAlphaFadeIn( gui, id_offset, 0.08, 0.1, false )
+				GuiAnimateScaleIn( gui, id_offset + 1, 0.08, false )
+				GuiIdPop( gui )
 				GuiLayoutBeginLayer( gui )
 					GuiLayoutBeginVertical( gui, ( x + width - text_width - 24 ), ( y + 10 ), true )
 						GuiBeginAutoBox( gui )
@@ -1229,6 +1318,7 @@ if initialized == false then
 						GuiEndAutoBoxNinePiece( gui )
 					GuiLayoutEnd( gui )
 				GuiLayoutEndLayer( gui )
+				GuiAnimateEnd( gui )
 			end
 		end
 

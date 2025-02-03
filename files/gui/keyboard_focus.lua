@@ -5,7 +5,7 @@ Focus_PlayerControls = {
 		unfreeze_controls()
 	end,
 	on_unfocused = function()
-		freeze_controls( player )
+		freeze_controls()
 	end,
 	on_input = function( keyboard_input )
 		if not held_wand or not mod_setting_get( "show_wand_edit_panel" ) then return end

@@ -326,7 +326,8 @@ picker.menu = function()
 		local scroll_table = { do_scroll_table( first_scroll_id + filter_type, nil,
 			height, height_autofit, function( hovered ) interacting = interacting or hovered end,
 			actions_data_to_show, function( action )
-			do_action_button( action.id, 0, 0, false, function( left_click, right_click )
+			local left_click, right_click = do_action_button( action.id, 0, 0, false, do_verbose_tooltip, action.max_uses, nil, show_locked_state, false, true )
+			if left_click or right_click then
 				local is_unlocked_action = action.spawn_requires_flag and HasFlagPersistent( action.spawn_requires_flag ) 
 				if shortcut_check.check( shortcuts.relock, left_click, right_click ) then
 					if is_unlocked_action then
@@ -377,7 +378,7 @@ picker.menu = function()
 				if filter_type ~= FILTER_TYPE_RECENT then
 					new_action_history_entry( action.id )
 				end
-			end, do_verbose_tooltip, action.max_uses, nil, show_locked_state, false, true )
+			end
 		end ) }
 		do
 			local content_height = 20 * math.ceil( #actions_data_to_show / 8 )

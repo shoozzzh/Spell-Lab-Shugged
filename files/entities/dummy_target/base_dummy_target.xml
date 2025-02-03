@@ -11,6 +11,7 @@
 	<VariableStorageComponent name="spell_lab_shugged_current_dps" />
 	<VariableStorageComponent name="spell_lab_shugged_highest_dps" />
 	<VariableStorageComponent name="spell_lab_shugged_total_damage" />
+	<VariableStorageComponent name="spell_lab_shugged_last_frame_damage" />
 	
 	<VariableStorageComponent name="gkbrkn_always_show_damage_numbers" />
 	<VariableStorageComponent name="gkbrkn_no_health_bar" />

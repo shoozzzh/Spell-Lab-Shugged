@@ -146,9 +146,15 @@ picker.menu = function()
 				for x_index = 1, 10 do
 					local saved_wand = current_page[ wand_index ]
 					if wand_index > #current_page or saved_wand == nil then break end
-					local spell_box_suffix = ""
-					if wand_box_selected_indexes[ wand_index ] then spell_box_suffix = spell_box_suffix .. "_active" end
-					GuiImageButton( gui, next_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/spell_box"..spell_box_suffix..".png" )
+					do
+						local spell_box
+						if wand_box_selected_indexes[ wand_index ] then
+							spell_box = "mods/spell_lab_shugged/files/gui/buttons/spell_box_active.png"
+						else
+							spell_box = "mods/spell_lab_shugged/files/gui/buttons/spell_box.png"
+						end
+						GuiImageButton( gui, next_id(), 0, 0, "", spell_box )
+					end
 					local left_click,right_click,_,x,y,_,_,_,_ = previous_data( gui )
 					if left_click or right_click then
 						wand_box_delete_wand_confirming = false
@@ -224,6 +230,7 @@ picker.menu = function()
 						if not shortcut_check.check( shortcuts.show_wand_stats, left_click, right_click ) then
 							do_simple_action_list( saved_wand.all_actions )
 							GuiLayoutBeginHorizontal( gui, 0, 0 )
+								GuiColorSetForNextWidget( gui, 0.5, 0.5, 0.5, 1.0 )
 								GuiText( gui, 0, 0, GameTextGet(
 									wrap_key( "wand_box_hold_something_to_show_wand_stats" ),
 									shortcut_texts.show_wand_stats

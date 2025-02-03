@@ -70,7 +70,8 @@ GuiLayoutBeginVertical( gui, 0, screen_height * 0.96 - ( rows_num + permanent_ro
 			end
 		end
 		if not create_real_sprite then
-			do_action_button( permanent_action, 0, 0, false, function( left_click, right_click )
+			local left_click, right_click = do_action_button( permanent_action, 0, 0, false, nil, nil, permanent_note, show_permanent_icon )
+			if left_click or right_click then
 				if shortcut_check.check( shortcuts.always_cast, left_click, right_click ) then
 					local max_uses = nil
 					do
@@ -107,7 +108,7 @@ GuiLayoutBeginVertical( gui, 0, screen_height * 0.96 - ( rows_num + permanent_ro
 					table.remove( current_permanent_actions, j )
 					edit_panel_state.set_both( table_to_state_str( current_actions ), permanent_table_to_state_str( current_permanent_actions ), wrap_key( "operation_demote_permanent_action" ) )
 				end
-			end, nil, nil, permanent_note, show_permanent_icon )
+			end
 		else
 			GuiOptionsAddForNextWidget( gui, GUI_OPTION.NonInteractive )
 			GuiImageButton( gui, next_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/transparent_20x20.png" )
@@ -145,7 +146,8 @@ GuiLayoutBeginVertical( gui, 0, screen_height * 0.96 - rows_num * ( 20 + 2 ) + 2
 		if uses_remaining == "" then uses_remaining = nil end
 		local note = selected and note_selected or note_not_selected
 		if not create_real_sprite then
-			do_action_button( action_id, 0, 0, selected, function( left_click, right_click )
+			local left_click, right_click = do_action_button( action_id, 0, 0, selected, nil, uses_remaining, note, show_uses_remaining )
+			if left_click or right_click then
 				if shortcut_check.check( shortcuts.always_cast, left_click, right_click ) then
 					if action_id and action_id ~= "" then
 						local current_actions = {}
@@ -374,7 +376,7 @@ GuiLayoutBeginVertical( gui, 0, screen_height * 0.96 - rows_num * ( 20 + 2 ) + 2
 					end
 					edit_panel_state.set( table_to_state_str( current_actions ), wrap_key( "operation_deselect" ) )
 				end
-			end, nil, uses_remaining, note, show_uses_remaining )
+			end
 		else
 			GuiOptionsAddForNextWidget( gui, GUI_OPTION.NonInteractive )
 			GuiImageButton( gui, next_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/transparent_20x20.png" )

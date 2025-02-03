@@ -31,11 +31,27 @@
 	></SpriteComponent>
 	<SpriteComponent 
 		_tags="enabled_in_world,spell_lab_shugged_average_dps"
+		image_file="mods/spell_lab_shugged/files/font/font_small_numbers.xml"
+		emissive="1"
+		is_text_sprite="1"
+		offset_x="7.5"
+		offset_y="62"
+		update_transform="1"
+		update_transform_rotation="0"
+		text="0.00"
+		has_special_scale="1"
+		special_scale_x="0.6667"
+		special_scale_y="0.6667"
+		z_index="-9000"
+		never_ragdollify_on_death="1"
+	></SpriteComponent>
+	<SpriteComponent 
+		_tags="enabled_in_world,spell_lab_shugged_last_frame_damage"
 		image_file="mods/spell_lab_shugged/files/font/font_small_numbers_true_damage.xml"
 		emissive="1"
 		is_text_sprite="1"
 		offset_x="7.5"
-		offset_y="64"
+		offset_y="72"
 		update_transform="1"
 		update_transform_rotation="0"
 		text="0.00"

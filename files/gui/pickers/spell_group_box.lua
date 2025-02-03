@@ -20,22 +20,72 @@ local selected_spell_group_index = 0
 picker.menu = function()
 	GuiLayoutBeginVertical( gui, 640 * 0.05, 360 * 0.16, true )
 		do_scroll_table( next_id(), nil, nil, true, nil, saved_spell_groups, function( saved_spell_group, index )
-			for _, p in ipairs( saved_spell_group ) do
-				do_action_button( p[1], 0, 0, selected_spell_group_index == index, function()
-					if selected_spell_group_index ~= index then
-						selected_spell_group_index = index
-					else
-						selected_spell_group_index = 0
-					end
-				end, function()
-					local common_actions = {}
-					for i, pair in ipairs( saved_spell_group ) do
-						common_actions[ i - 1 ] = pair[ 1 ]
-					end
-					do_simple_common_action_list( common_actions, #saved_spell_group - 1 )
-				end, p[2], text_get_translated( "spell_group_select" ), nil, true )
+			local spell_box
+			if selected_spell_group_index == index then
+				spell_box = "mods/spell_lab_shugged/files/gui/buttons/spell_box_active.png"
+			else
+				spell_box = "mods/spell_lab_shugged/files/gui/buttons/transparent_20x20.png"
 			end
-		end, 1 )
+			GuiImageButton( gui, next_id(), 0, 0, "", spell_box )
+			local left_click,right_click,_,x,y,_,_,_,_ = previous_data( gui )
+			if shortcut_check.check( shortcuts.select, left_click, right_click ) then
+				if selected_spell_group_index ~= index then
+					selected_spell_group_index = index
+				else
+					selected_spell_group_index = 0
+				end
+			elseif shortcut_check.check( shortcuts.deselect, left_click, right_click ) then
+				if selected_spell_group_index == index then
+					selected_spell_group_index = 0
+				end
+			elseif shortcut_check.check( shortcuts.swap, left_click, right_click ) then
+				if selected_spell_group_index ~= index then
+					saved_spell_groups[ selected_spell_group_index ], saved_spell_groups[ index ] =
+						saved_spell_groups[ index ], saved_spell_groups[ selected_spell_group_index ]
+				end
+			end
+			do_custom_tooltip( function()
+				do_simple_common_action_list( saved_spell_group, #saved_spell_group )
+				GuiColorSetForNextWidget( gui, 0.5, 0.5, 0.5, 1.0 )
+				GuiText( gui, 0, 0, text_get_translated( "spell_group_select" ) )
+			end, nil, 10, 0 )
+
+			GuiLayoutBeginLayer( gui )
+			local i = 1
+			while i <= 4 and i <= #saved_spell_group do
+				local action_id = saved_spell_group[ i ][1]
+
+				local this_action_data = action_data[ action_id ]
+				local action_sprite = ( this_action_data and this_action_data.sprite )
+					and this_action_data.sprite or "data/ui_gfx/gun_actions/_unidentified.png"
+
+				local spell_box = { "mods/spell_lab_shugged/files/gui/buttons/spell_box", "", ".png" }
+				if this_action_data then spell_box[2] = "_" .. this_action_data.type or "" end
+
+				local x_offset, y_offset
+				if i == 1 then x_offset, y_offset = 1, 1
+				elseif i == 2 then x_offset, y_offset = 10, 1
+				elseif i == 3 then x_offset, y_offset = 1, 10
+				elseif i == 4 then x_offset, y_offset = 10, 10
+					if i < #saved_spell_group then
+						action_sprite = "mods/spell_lab_shugged/files/gui/buttons/more_spells.png"
+						spell_box[2] = ""
+					end
+				end
+				x_offset, y_offset = x_offset + 0.5, y_offset + 0.5
+
+				if this_action_data then
+					GuiZSetForNextWidget( gui, -2 )
+					GuiImage( gui, next_id(), x + x_offset, y + y_offset, action_sprite, 1.0, 0.5, 0 )
+				end
+				GuiZSetForNextWidget( gui, -1 )
+				GuiImage( gui, next_id(), x + x_offset - 1, y + y_offset - 1, table.concat( spell_box ), 1.0, 0.5, 0 )
+
+				x_offset, y_offset = x_offset + 3, y_offset + 3
+				i = i + 1
+			end
+			GuiLayoutEndLayer( gui )
+		end, 8 )
 	GuiLayoutEnd( gui )
 end
 

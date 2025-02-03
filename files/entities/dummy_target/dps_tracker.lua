@@ -54,6 +54,13 @@ function damage_received( damage, message, entity_thats_responsible, is_fatal )
 	local average_dps = total_damage / ( now - first_hit_frame + 1 ) * 60
 	set_text( entity_id, "spell_lab_shugged_average_dps", average_dps )
 
+	local this_frame_damage_comp = get_variable_storage_component( entity_id, "spell_lab_shugged_last_frame_damage" )
+	local this_frame_damage = GameGetFrameNum() == last_hit_frame
+		and ComponentGetValue2( this_frame_damage_comp, "value_float" ) or 0
+	this_frame_damage = this_frame_damage + damage
+	ComponentSetValue2( this_frame_damage_comp, "value_float", this_frame_damage )
+	set_text( entity_id, "spell_lab_shugged_last_frame_damage", this_frame_damage )
+
 	local child_id = EntityGetAllChildren( entity_id, "spell_lab_shugged_dummy_target_child" )
 	if EntityGetIsAlive( child_id ) then
 		EntitySetComponentsWithTagEnabled( child_id, "invincible", true )
