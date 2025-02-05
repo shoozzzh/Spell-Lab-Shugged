@@ -18,11 +18,14 @@ pickers_data[""] = {
 		end
 	end,
 	menu = function() end,
+	name = "NONE",
 }
 
-for _, filename in pairs( PICKERS ) do
+for name, filename in pairs( PICKERS ) do
 	if #filename > 0 then
-		pickers_data[ filename ] = dofile_once( "mods/spell_lab_shugged/files/gui/pickers/" .. filename .. ".lua" )
+		local data = dofile_once( "mods/spell_lab_shugged/files/gui/pickers/" .. filename .. ".lua" )
+		data.name = name
+		pickers_data[ filename ] = data
 	end
 end
 
@@ -42,10 +45,11 @@ function change_picker( picker )
 end
 
 function do_active_picker_menu()
-	active_picker_data.menu()
+	do_content_wrapped( active_picker_data.menu, active_picker_data.name .. "_menu" )
 end
+
 function do_active_picker_buttons()
-	active_picker_data.buttons()
+	do_content_wrapped( active_picker_data.buttons, active_picker_data.name .. "buttons" )
 end
 
 function do_picker_button( filepath, picker, option_text, click_callback )

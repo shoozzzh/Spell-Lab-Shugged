@@ -104,6 +104,9 @@ function get_action_metadata( this_action_data )
 		local _draw_actions = draw_actions
 		draw_actions = function( how_many ) draws = draws + how_many end
 
+		local _EntityLoad = EntityLoad
+		EntityLoad = function() end
+
 		reset_modifiers( c )
 		ConfigGunShotEffects_Init( shot_effects )
 
@@ -261,6 +264,8 @@ function get_action_metadata( this_action_data )
 			end )
 		end
 		metadata.c = c
+
+		EntityLoad = _EntityLoad
 	c = _c
 	shot_effects = _shot_effects
 	reflecting = false

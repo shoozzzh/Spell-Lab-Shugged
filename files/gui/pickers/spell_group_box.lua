@@ -20,14 +20,8 @@ local selected_spell_group_index = 0
 picker.menu = function()
 	GuiLayoutBeginVertical( gui, 640 * 0.05, 360 * 0.16, true )
 		do_scroll_table( next_id(), nil, nil, true, nil, saved_spell_groups, function( saved_spell_group, index )
-			local spell_box
-			if selected_spell_group_index == index then
-				spell_box = "mods/spell_lab_shugged/files/gui/buttons/spell_box_active.png"
-			else
-				spell_box = "mods/spell_lab_shugged/files/gui/buttons/transparent_20x20.png"
-			end
-			GuiImageButton( gui, next_id(), 0, 0, "", spell_box )
-			local left_click,right_click,_,x,y,_,_,_,_ = previous_data( gui )
+			GuiImageButton( gui, next_id(), 2, 2, "", "mods/spell_lab_shugged/files/gui/buttons/transparent_16x16.png" )
+			local left_click,right_click,_,x,y,_,_,_,_,_,_ = previous_data( gui )
 			if shortcut_check.check( shortcuts.select, left_click, right_click ) then
 				if selected_spell_group_index ~= index then
 					selected_spell_group_index = index
@@ -49,7 +43,15 @@ picker.menu = function()
 				do_simple_common_action_list( saved_spell_group, #saved_spell_group )
 				GuiColorSetForNextWidget( gui, 0.5, 0.5, 0.5, 1.0 )
 				GuiText( gui, 0, 0, text_get_translated( "spell_group_select" ) )
-			end, nil, 10, 0 )
+			end, 3, -0.5 )
+
+			local spell_box
+			if selected_spell_group_index == index then
+				spell_box = "mods/spell_lab_shugged/files/gui/buttons/spell_box_active.png"
+			else
+				spell_box = "mods/spell_lab_shugged/files/gui/buttons/transparent_20x20.png"
+			end
+			GuiImage( gui, next_id(), -20, 0, spell_box, 1, 1, 0 )
 
 			GuiLayoutBeginLayer( gui )
 			local i = 1
@@ -73,7 +75,7 @@ picker.menu = function()
 						spell_box[2] = ""
 					end
 				end
-				x_offset, y_offset = x_offset + 0.5, y_offset + 0.5
+				x_offset, y_offset = x_offset - 1.5, y_offset - 1.5
 
 				if this_action_data then
 					GuiZSetForNextWidget( gui, -2 )
@@ -82,7 +84,6 @@ picker.menu = function()
 				GuiZSetForNextWidget( gui, -1 )
 				GuiImage( gui, next_id(), x + x_offset - 1, y + y_offset - 1, table.concat( spell_box ), 1.0, 0.5, 0 )
 
-				x_offset, y_offset = x_offset + 3, y_offset + 3
 				i = i + 1
 			end
 			GuiLayoutEndLayer( gui )
