@@ -218,7 +218,7 @@ function do_gui()
 
 	world_state = GameGetWorldStateEntity()
 	if EntityGetIsAlive( world_state ) then
-		local comp_worldstate = EntityGetFirstComponent( world_state, "WorldStateComponent" )
+		local comp_worldstate = EntityGetFirstComponentIncludingDisabled( world_state, "WorldStateComponent" )
 		world_state_unlimited_spells = ComponentGetValue2( comp_worldstate, "perk_infinite_spells" )
 	end
 
@@ -288,7 +288,7 @@ function do_gui()
 	if is_panel_open and not GameIsInventoryOpen() and player and not GameHasFlagRun( "gkbrkn_config_menu_open" ) then
 		GuiLayoutBeginVertical( gui, 0, 360 * 0.02, true )
 			GuiLayoutBeginHorizontal( gui, horizontal_centered_x(9,4), percent_to_ui_scale_y(2), true )
-				if GlobalsGetValue( "spell_lab_shugged_checkpoint", "0" ) == "0" then
+				if GlobalsGetValue( "spell_lab_shugged_checkpoint_x", "0" ) == "0" then
 					GuiOptionsAddForNextWidget( gui, GUI_OPTION.DrawSemiTransparent )
 				end
 				GuiImageButton( gui, next_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/spell_lab_shugged.png" )
@@ -322,7 +322,7 @@ function do_gui()
 						end
 					end
 				end
-				if GlobalsGetValue( "spell_lab_shugged_checkpoint", "0" ) == "0" then
+				if GlobalsGetValue( "spell_lab_shugged_checkpoint_x", "0" ) == "0" then
 					GuiTooltip( gui, wrap_key( "enter_spell_lab" ), "" )
 				else
 					GuiTooltip( gui, wrap_key( "leave_spell_lab" ), wrap_key( "reload_spell_lab" ) )
