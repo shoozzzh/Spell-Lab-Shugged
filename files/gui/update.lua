@@ -172,6 +172,8 @@ dofile_once( "mods/spell_lab_shugged/files/lib/shortcut_tostring.lua" )
 
 shortcut_texts = {}
 
+shortcut_used_keys = nil
+
 local edit_panel_shortcut_tips
 
 function reload_shortcuts()
@@ -179,6 +181,17 @@ function reload_shortcuts()
 		local value = mod_setting_get( "shortcut_" .. name )
 		if value ~= nil then value = smallfolk.loads( value ) end
 		if value ~= nil then shortcuts[ name ] = value end
+	end
+
+	if not mod_setting_get( "shortcut_strict" ) then
+		shortcut_used_keys = {}
+		for _, shortcut in pairs( shortcuts ) do
+			for _, key in ipairs( shortcut ) do
+				shortcut_used_keys[ key ] = true
+			end
+		end
+	else
+		shortcut_used_keys = nil
 	end
 
 	reload_shortcut_texts()

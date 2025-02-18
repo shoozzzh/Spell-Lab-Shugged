@@ -47,6 +47,8 @@ local function load_mod_settings( cur_lang )
 			all_seeing_eye_lighting = "照明",
 			all_seeing_eye_fog_of_war_removing = "移除战争迷雾",
 			shortcut = "快捷键设置",
+			shortcut_strict = "严格检测",
+			shortcut_strict_description = "没有包含在任何快捷键中的键是否应该影响快捷键检测？",
 			shortcut_click_to_save = "（点击以保存）",
 			shortcut_click_here = " +（请点击）",
 			shortcut_general = "法杖编辑面板、法杖仓库 & 法术组合仓库",
@@ -123,6 +125,8 @@ local function load_mod_settings( cur_lang )
 			all_seeing_eye_lighting = "Lighting",
 			all_seeing_eye_fog_of_war_removing = "Fog of War Removing",
 			shortcut = "Shortcuts Setting",
+			shortcut_strict = "Strict Detection",
+			shortcut_strict_description = "Should keys that not used in any shortcut be considered in shortcut detection?",
 			shortcut_click_to_save = " (click to save)",
 			shortcut_click_here = " + (click here)",
 			shortcut_general = "Wand Edit Panel, Wand Box & Spell Group Box",
@@ -316,6 +320,16 @@ local function load_mod_settings( cur_lang )
 			foldable = true,
 			_folded = true,
 			settings = {
+				{
+					id             = "shortcut_strict",
+					ui_name        = text.shortcut_strict,
+					ui_description = text.shortcut_strict_description,
+					value_default  = false,
+					scope          = MOD_SETTING_SCOPE_RUNTIME,
+					change_fn      = function( mod_id, gui, in_main_menu, setting, old_value, new_value )
+						ModSettingSet( mod_id .. ".shortcut_changed", true, false )
+					end,
+				},
 				{
 					category_id = "shortcut_general",
 					ui_name = text.shortcut_general,

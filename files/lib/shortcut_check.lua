@@ -18,7 +18,9 @@ function shortcut_check.check_input( keyboard_input, shortcut, left_click, right
 	end
 
 	for keyname, status in pairs( keyboard_input ) do
-		if xor( status, inverted_shortcut[ keyname ] ) then return false end
+		if shortcut_used_keys == nil or shortcut_used_keys[ keyname ] then
+			if xor( status, inverted_shortcut[ keyname ] ) then return false end
+		end
 	end
 	if left_click ~= nil or right_click ~= nil then
 		if xor( left_click, inverted_shortcut.Mouse_left ) then return false end
