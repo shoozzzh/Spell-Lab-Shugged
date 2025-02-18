@@ -21,7 +21,7 @@ gui = gui or GuiCreate()
 GuiStartFrame( gui )
 screen_width, screen_height = GuiGetScreenDimensions( gui )
 
-local version = "Shugged v1.8.1"
+local version = "Shugged v1.8.2"
 
 type_text = {
 	[ACTION_TYPE_MODIFIER]          = "$inventory_actiontype_modifier",
