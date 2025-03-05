@@ -18,7 +18,7 @@ pickers_data[""] = {
 		end
 	end,
 	menu = function() end,
-	name = "NONE",
+	name = "None",
 }
 
 for name, filename in pairs( PICKERS ) do
@@ -49,7 +49,7 @@ function do_active_picker_menu()
 end
 
 function do_active_picker_buttons()
-	do_content_wrapped( active_picker_data.buttons, active_picker_data.name .. "buttons" )
+	do_content_wrapped( active_picker_data.buttons, active_picker_data.name .. "_buttons" )
 end
 
 function do_picker_button( filepath, picker, option_text, click_callback )

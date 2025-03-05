@@ -307,9 +307,9 @@ picker.menu = function()
 	
 	local interacting = false
 	GuiLayoutBeginVertical( gui, 640 * 0.05, 360 * 0.16, true )
-		local first_scroll_id = next_id()
-		for i = 0 + 1, 10 do
-			next_id()
+		local scroll_ids = {}
+		for i = 0, 10 do
+			scroll_ids[ i ] = next_id()
 		end
 
 		local height = nil
@@ -323,7 +323,7 @@ picker.menu = function()
 			height_autofit = false
 		end
 
-		local scroll_table = { do_scroll_table( first_scroll_id + filter_type, nil,
+		local scroll_table = { do_scroll_table( scroll_ids[ filter_type ], nil,
 			height, height_autofit, function( hovered ) interacting = interacting or hovered end,
 			actions_data_to_show, function( action )
 			local left_click, right_click = do_action_button( action.id, 0, 0, false, do_verbose_tooltip, action.max_uses, nil, show_locked_state, false, true )

@@ -329,7 +329,7 @@ function do_gui()
 							GlobalsSetValue( "spell_lab_shugged_checkpoint_y", "0" )
 						end
 					elseif right_click then
-						if GlobalsGetValue( "spell_lab_shugged_checkpoint", "0" ) ~= "0" then
+						if GlobalsGetValue( "spell_lab_shugged_checkpoint_x", "0" ) ~= "0" then
 							sound_button_clicked()
 							EntityLoad( "mods/spell_lab_shugged/files/biome_impl/wand_lab/wand_lab.xml", 14600, -6000 )
 						end
@@ -687,7 +687,7 @@ function do_gui()
 		do_active_picker_menu()
 
 		if mod_setting_get( "show_wand_edit_panel" ) then
-			dofile( "mods/spell_lab_shugged/files/gui/edit_panel_shown.lua" )
+			do_content_wrapped(	function() dofile( "mods/spell_lab_shugged/files/gui/edit_panel_shown.lua" ) end, "edit_panel" )
 		end
 	else
 		change_keyboard_focus( Focus_PlayerControls )
