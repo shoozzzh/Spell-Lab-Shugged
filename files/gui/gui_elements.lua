@@ -104,7 +104,6 @@ function do_action_button( action_id, x, y, selected, tooltip_func, uses_remaini
 	end
 	local this_action_metadata = action_metadata[ action_id ]
 
-	GuiZSetForNextWidget( gui, 0 )
 	GuiImageButton( gui, next_id(), 2, 2, "", image_sprite )
 	local left_click,right_click,hover = previous_data( gui )
 
@@ -178,14 +177,13 @@ function do_fake_action_button( action_type, action_sprite, name, id, desc, type
 		GuiLayoutEnd( gui )
 	end, 2, -2 )
 	
-	GuiLayoutBeginLayer( gui )
-		local sprite_width, sprite_height = GuiGetImageDimensions( gui, action_sprite )
-		GuiOptionsAddForNextWidget( gui, GUI_OPTION.NonInteractive )
-		if semi_transparent then
-			GuiOptionsAddForNextWidget( gui, GUI_OPTION.DrawSemiTransparent )
-		end
-		GuiImageButton( gui, next_id(), x1 - 2 + ( 20 - sprite_width ) / 2, y1 - 2 + ( 20 - sprite_height ) / 2, "", action_sprite, 1 )
-	GuiLayoutEndLayer( gui )
+	local sprite_width, sprite_height = GuiGetImageDimensions( gui, action_sprite )
+	GuiOptionsAddForNextWidget( gui, GUI_OPTION.Layout_NoLayouting )
+	GuiOptionsAddForNextWidget( gui, GUI_OPTION.NonInteractive )
+	if semi_transparent then
+		GuiOptionsAddForNextWidget( gui, GUI_OPTION.DrawSemiTransparent )
+	end
+	GuiImageButton( gui, next_id(), x1 - 2 + ( 20 - sprite_width ) / 2, y1 - 2 + ( 20 - sprite_height ) / 2, "", action_sprite, 1 )
 
 	GuiZSetForNextWidget( gui, 1 )
 	if semi_transparent then
@@ -366,10 +364,12 @@ function do_custom_tooltip( callback, x_offset, y_offset, animated )
 
 	local tooltip_width, tooltip_height = autobox_size( callback )
 
+	GuiIdPushString( gui, "TOOLTIP" )
+
 	if animated then
 		GuiAnimateBegin( gui )
-		GuiAnimateAlphaFadeIn( gui, 2 * peek_next_id() + 1024 * 1024, 0.08, 0.1, false )
-		GuiAnimateScaleIn( gui, 2 * peek_next_id() + 1024 * 1024 + 1, 0.08, false )
+		GuiAnimateAlphaFadeIn( gui, 2 * peek_next_id(), 0.08, 0.1, false )
+		GuiAnimateScaleIn( gui, 2 * peek_next_id() + 1, 0.08, false )
 	end
 
 	GuiZSet( gui, -1024 )
@@ -397,6 +397,8 @@ function do_custom_tooltip( callback, x_offset, y_offset, animated )
 	if animated then
 		GuiAnimateEnd( gui )
 	end
+
+	GuiIdPop( gui )
 end
 
 local function show_simple_action_image( action_id, uses_remaining )

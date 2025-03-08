@@ -1,9 +1,10 @@
 local function get_all_wands_in_inventory()
-	if not player then return {} end
-	local children = EntityGetAllChildren( player ) or {}
+	if not player then return end
+	local children = EntityGetAllChildren( player )
+	if not children then return end
 	for _, child in pairs( children ) do
 		if EntityGetName( child ) == "inventory_quick" then
-			return EntityGetAllChildren( child, "wand" ) or {}
+			return EntityGetAllChildren( child, "wand" )
 		end
 	end
 end
@@ -17,17 +18,14 @@ elseif wand_listener_type == "HAND" then
 elseif wand_listener_type == "PANEL" then
 	if mod_setting_get( "show_wand_edit_panel" ) then
 		wands_to_listen = { held_wand }
-	else
-		wands_to_listen = {}
 	end
 else
 	GamePrint( "Something is very wrong!" )
 	GamePrintImportant( "Something is very wrong!" )
 	print( "Something is very wrong!" )
-	wands_to_listen = {}
 end
 
-for _, wand_id in ipairs( wands_to_listen ) do
+for _, wand_id in ipairs( wands_to_listen or {} ) do
 	local edit_panel_state = access_edit_panel_state( wand_id )
 	if edit_panel_state.get_force_compact_enabled() then goto continue end
 	local current_state = edit_panel_state.get()

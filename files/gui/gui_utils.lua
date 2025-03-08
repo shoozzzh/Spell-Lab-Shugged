@@ -114,16 +114,17 @@ function do_content_wrapped( content_fn, push_this_string )
 		return id_offset
 	end
 	local next_id = function()
-		id_offset = id_offset + 64
+		id_offset = id_offset + ID_GAP
 		return id_offset
 	end
 
 	local e = getfenv( content_fn )
+	e.id_offset = id_offset
 	e.peek_next_id = peek_next_id
 	e.next_id = next_id
 	setfenv( content_fn, e )
 
-	-- GuiIdPushString( gui, push_this_string )
+	GuiIdPushString( gui, push_this_string )
 	content_fn()
-	-- GuiIdPop( gui )
+	GuiIdPop( gui )
 end

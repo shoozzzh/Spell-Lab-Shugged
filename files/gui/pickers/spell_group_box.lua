@@ -53,7 +53,6 @@ picker.menu = function()
 			end
 			GuiImage( gui, next_id(), -20, 0, spell_box, 1, 1, 0 )
 
-			GuiLayoutBeginLayer( gui )
 			local i = 1
 			while i <= 4 and i <= #saved_spell_group do
 				local action_id = saved_spell_group[ i ][1]
@@ -78,15 +77,16 @@ picker.menu = function()
 				x_offset, y_offset = x_offset - 1.5, y_offset - 1.5
 
 				if this_action_data then
+					GuiOptionsAddForNextWidget( gui, GUI_OPTION.Layout_NoLayouting )
 					GuiZSetForNextWidget( gui, -2 )
 					GuiImage( gui, next_id(), x + x_offset, y + y_offset, action_sprite, 1.0, 0.5, 0 )
 				end
+				GuiOptionsAddForNextWidget( gui, GUI_OPTION.Layout_NoLayouting )
 				GuiZSetForNextWidget( gui, -1 )
 				GuiImage( gui, next_id(), x + x_offset - 1, y + y_offset - 1, table.concat( spell_box ), 1.0, 0.5, 0 )
 
 				i = i + 1
 			end
-			GuiLayoutEndLayer( gui )
 		end, 8 )
 	GuiLayoutEnd( gui )
 end
