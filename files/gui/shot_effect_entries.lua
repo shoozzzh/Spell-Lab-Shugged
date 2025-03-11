@@ -8,6 +8,10 @@ shot_effect_entries = {
 		extra_modifier = "critical_plus_small",
 	},
 	{
+		related_perk = "PROJECTILE_HOMING",
+		game_effect = "PROJECTILE_HOMING",
+	},
+	{
 		related_perk = "PROJECTILE_HOMING_SHOOTER",
 		extra_modifier = { "powerful_shot", "projectile_homing_shooter" },
 	},
