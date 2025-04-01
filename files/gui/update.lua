@@ -374,21 +374,26 @@ function do_gui()
 
 				if GuiImageButton( gui, next_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/clear_projectiles.png" ) then
 					sound_button_clicked()
-					for k,v in pairs( EntityGetWithTag( "projectile" ) or {} ) do
-						local projectile = EntityGetFirstComponent( v, "ProjectileComponent" )
-						if projectile ~= nil then
-							ComponentSetValue2( projectile, "on_death_explode", false )
-							ComponentSetValue2( projectile, "on_lifetime_out_explode", false )
+
+					local function silent_kill( proj_id )
+						for _, proj_comp in ipairs( EntityGetComponentIncludingDisabled( proj_id, "ProjectileComponent" ) or {} ) do
+							ComponentSetValue2( proj_comp, "on_death_explode", false )
+							ComponentSetValue2( proj_comp, "on_lifetime_out_explode", false )
 						end
-						EntityKill(v)
+						for _, expl_comp in ipairs( EntityGetComponentIncludingDisabled( proj_id, "ExplosionComponent" ) or {} ) do
+							ComponentSetValue2( expl_comp, "trigger", "ON_CREATE" )
+						end
+						for _, litn_comp in ipairs( EntityGetComponentIncludingDisabled( proj_id, "LightningComponent" ) or {} ) do
+							EntitySetComponentIsEnabled( proj_id, litn_comp, false )
+						end
+						EntityKill( proj_id )
 					end
-					for k,v in pairs( EntityGetWithTag( "player_projectile" ) or {} ) do
-						local projectile = EntityGetFirstComponent( v, "ProjectileComponent" )
-						if projectile ~= nil then
-							ComponentSetValue2( projectile, "on_death_explode", false )
-							ComponentSetValue2( projectile, "on_lifetime_out_explode", false )
-						end
-						EntityKill(v)
+
+					for _, proj_id in ipairs( EntityGetWithTag( "projectile" ) or {} ) do
+						silent_kill( proj_id )
+					end
+					for _, proj_id in ipairs( EntityGetWithTag( "player_projectile" ) or {} ) do
+						silent_kill( proj_id )
 					end
 				end
 				GuiTooltip( gui, wrap_key( "clear_projectiles" ), "" )
