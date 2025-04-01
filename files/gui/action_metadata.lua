@@ -312,7 +312,7 @@ if player then EntityAddTag( player, "player_unit" ) end
 
 local metadata_to_show = {
 	c = {
-		{ "draw_actions"            , "$inventory_actionspercast", 0, function(value) return format_value( value, 0 ) end },
+		{ "draw_actions"            , wrap_key( "draws" ), 0, function(value) return format_value( value, 0 ) end },
 		{ "max_uses"                , wrap_key( "max_uses" ), nil, function(value) return format_value( value, 0 ) end },
 		{ "mana"                    , "$inventory_manadrain", nil, function(value) return format_value( value, 0 ) end },
 		{ "fire_rate_wait"          , "$inventory_castdelay", 0, function(value) return format_time( value, 3 ) end },

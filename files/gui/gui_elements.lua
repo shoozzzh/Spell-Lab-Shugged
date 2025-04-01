@@ -250,25 +250,8 @@ function do_property_list( lines )
 end
 
 	function do_verbose_tooltip( this_action_data, this_action_metadata )
-		local num_lines = 1 -- wait
-		local other_offset = 0
-
 		local c_lines = c_metadata_to_lines( this_action_metadata.c )
-		num_lines = num_lines + #c_lines
-
 		local projectiles_lines, num_proj_lines = proj_metadata_to_lines( this_action_metadata.projectiles )
-		num_lines = num_lines + num_proj_lines
-
-		GuiColorSetForNextWidget( gui, 0, 0, 0, 0 )
-		GuiText( gui, 0, 0, " " )
-		local _,_,_,_,y,_,text_height,_,_,_,_ = previous_data( gui )
-		GuiLayoutAddVerticalSpacing( gui, -text_height )
-		local _, screen_height = GuiGetScreenDimensions( gui )
-		local tooltip_height = ( num_lines + 4 ) * ( text_height ) + 5
-		local tooltip_bottom = y + tooltip_height + 36 -- extra space
-		if tooltip_bottom > screen_height then
-			GuiLayoutAddVerticalSpacing( gui, screen_height - tooltip_bottom )
-		end
 
 		local title = GameTextGetTranslatedOrNot( this_action_data.name )
 		if this_action_data.max_uses then
@@ -384,6 +367,10 @@ function do_custom_tooltip( callback, x_offset, y_offset, animated )
 		x_offset = -x_offset
 	else
 		x_offset = x_offset + width
+	end
+
+	if y + y_offset + tooltip_height > screen_height then
+		y_offset = y_offset - ( y + y_offset + tooltip_height - screen_height )
 	end
 
 	show_tooltip( callback, x + x_offset, y + y_offset )
