@@ -97,8 +97,18 @@ if old_version_data then
 end
 local t = { ["spell_lab"] = "spell_lab_saved_wands", ["EcsGui"] = "WandsConn_saved_wands" }
 for name, key in pairs( t ) do
-	local flag = "spell_lab_shugged_migrated_wand_box_data_from_" .. string.lower( name )
-	if HasFlagPersistent( flag ) then ModSettingSet( flag, true ) end
+	local flag = "spell_lab_shugged.migrated_wand_box_data_from_" .. string.lower( name )
+	do -- for old version stuff
+		if HasFlagPersistent( flag ) then
+			RemoveFlagPersistent( flag )
+			ModSettingSet( flag, true )
+		end
+		local old_setting_key = "spell_lab_shugged_migrated_wand_box_data_from_" .. string.lower( name )
+		if ModSettingGet( old_setting_key ) then
+			ModSettingRemove( old_setting_key )
+			ModSettingSet( flag, true )
+		end
+	end
 	if ModSettingGet( flag ) then goto continue end
 	local spell_lab_wands_data = ModSettingGet( key )
 	if not spell_lab_wands_data then goto continue end
