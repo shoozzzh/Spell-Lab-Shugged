@@ -203,8 +203,6 @@ local keyboard = {
 	{ "Z", "X", "C", "V", "B", "N", "M", "_" },
 }
 
-local filter_switch_blocked = false
-
 picker.menu = function()
 	local show_locked_spells = mod_setting_get( "show_locked_spells" )
 	local actions_data_to_show
@@ -380,23 +378,6 @@ picker.menu = function()
 				end
 			end
 		end ) }
-		do
-			local content_height = 20 * math.ceil( #actions_data_to_show / 8 )
-			if content_height > scroll_table[4] and InputIsMouseButtonJustDown( Mouse_left ) then
-				local scrollbar_x = scroll_table[1] + 6 + scroll_table[3]
-				local scrollbar_y = scroll_table[2] + 2
-				local scrollbar_width = 8
-				local scrollbar_height = scroll_table[4] + 4
-				local mx, my = get_mouse_pos_on_screen()
-				if scrollbar_x < mx and mx < scrollbar_x + scrollbar_width
-					and scrollbar_y < my and my < scrollbar_y + scrollbar_height then
-					filter_switch_blocked = true
-				end
-			end
-			if filter_switch_blocked and not InputIsMouseButtonDown( Mouse_left ) then
-				filter_switch_blocked = false
-			end
-		end
 
 		if filter_type == FILTER_TYPE_SEARCH then
 			GuiOptionsAddForNextWidget( gui, GUI_OPTION.NonInteractive )
@@ -532,13 +513,24 @@ picker.menu = function()
 	local function show_filter( i, tooltip_text, clicked_func )
 		if filter_type ~= i then GuiOptionsAddForNextWidget( gui, GUI_OPTION.DrawSemiTransparent ) end
 		GuiImageButton( gui, next_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/type_filter_"..i..".png" )
-		local _,right_click,hover,_,_,_ = previous_data( gui )
+		local left_click,right_click,hover,_,_,_ = previous_data( gui )
 		if clicked_func then
 			clicked_func( left_click, right_click )
 		end
 		GuiTooltip( gui, tooltip_text, "" )
-		if hover and not filter_switch_blocked then filter_type = i end
+		if hover then filter_type = i end
 	end
+
+	local function show_filter_button( i, tooltip_text, clicked_func )
+		if GuiImageButton( gui, next_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/type_filter_"..i..".png" ) then
+			filter_type = i
+			sound_button_clicked()
+		end
+		local left_click,right_click,hover,x,y,_ = previous_data( gui )
+		if clicked_func then clicked_func( left_click, right_click ) end
+		GuiTooltip( gui, tooltip_text, "" )
+	end
+
 	GuiLayoutBeginHorizontal( gui, 0, 360 * 0.16, true, 0, 0 )
 		GuiLayoutBeginVertical( gui, 640 * 0.01, 0, true )
 		for i = 0, 7 do
@@ -552,13 +544,14 @@ picker.menu = function()
 					GuiImageButton( gui, next_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/transparent_20x20.png" )
 				end
 			end
-			show_filter( FILTER_TYPE_SEARCH, wrap_key( "action_search" ) )
-			show_filter( FILTER_TYPE_RECENT, text_get( "action_recent", shortcut_texts.clear_action_history ), function( left_click, right_click )
+			show_filter_button( FILTER_TYPE_SEARCH, wrap_key( "action_search" ) )
+			show_filter_button( FILTER_TYPE_RECENT, text_get( "action_recent", shortcut_texts.clear_action_history ), function( left_click, right_click )
 				if shortcut_check.check( shortcuts.clear_action_history, left_click, right_click ) then
 					clear_action_history()
+					sound_button_clicked()
 				end
 			end )
-			show_filter( FILTER_TYPE_IN_INV, wrap_key( "action_in_inv" ) )
+			show_filter_button( FILTER_TYPE_IN_INV, wrap_key( "action_in_inv" ) )
 		GuiLayoutEnd( gui )
 	GuiLayoutEnd( gui )
 

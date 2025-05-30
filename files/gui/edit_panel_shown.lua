@@ -323,17 +323,15 @@ GuiLayoutBeginVertical( gui, 0, screen_height * 0.96 - rows_num * ( 20 + 2 ) + 2
 				elseif shortcut_check.check( shortcuts.override, left_click, right_click ) then
 					local current_actions = {}
 					local indexes_to_swap = {}
-					local first_index
 					local index = 1
 					for s, a, u in state_str_iter_actions( edit_panel_state.get() ) do
 						table.insert( current_actions, { s, a, u } )
 						if s then
-							first_index = first_index or index
 							table.insert( indexes_to_swap, index )
 						end
 						index = index + 1
 					end
-					local first = selected_actions[1]
+					local first = indexes_to_swap[1]
 					if not first then return end
 					local offset = i - first
 					if not edit_panel_state.get_autocap_enabled() then
