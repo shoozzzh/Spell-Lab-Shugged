@@ -94,7 +94,7 @@ end
 picker.buttons = function()
 	local buttons_num = 1
 	if held_wand and mod_setting_get( "show_wand_edit_panel" ) then
-		buttons_num = buttons_num + 7
+		buttons_num = buttons_num + 3
 	end
 	GuiLayoutBeginHorizontal( gui, horizontal_centered_x(buttons_num,4), percent_to_ui_scale_y(2), true )
 		if held_wand and mod_setting_get( "show_wand_edit_panel" ) then
@@ -142,7 +142,6 @@ picker.buttons = function()
 				"replace_mode", "spell_replacement", nil,
 				text_get( "spell_replacement_tips", shortcut_texts.replace_switch_temp )
 			)
-			show_edit_panel_toggle_options()
 		end
 	GuiLayoutEnd( gui )
 end

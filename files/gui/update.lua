@@ -78,69 +78,74 @@ dofile_once( "mods/spell_lab_shugged/files/gui/keyboard_listener.lua" )
 dofile_once( "mods/spell_lab_shugged/files/gui/keyboard_focus.lua" )
 
 function show_edit_panel_toggle_options()
-	local edit_panel_state = access_edit_panel_state( held_wand )
-	local force_compact_enabled = edit_panel_state.get_force_compact_enabled()
-	if not force_compact_enabled then
-		GuiOptionsAddForNextWidget( gui, GUI_OPTION.DrawSemiTransparent )
-	end
-	if GuiImageButton( gui, next_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/force_compact.png" ) then
-		sound_button_clicked()
-		edit_panel_state.set_force_compact_enabled( not force_compact_enabled )
-		edit_panel_state.force_sync()
-	end
-	GuiTooltip( gui, text_get_translated( force_compact_enabled and "disable" or "enable" ) .. text_get_translated( "wand_force_compact" ), text_get_translated( "wand_force_compact_description" ) .. "\n" .. text_get_translated( "inventory_get_ignored" )  )
-	local autocap_enabled = edit_panel_state.get_autocap_enabled()
-	if not autocap_enabled then
-		GuiOptionsAddForNextWidget( gui, GUI_OPTION.DrawSemiTransparent )
-	end
-	if GuiImageButton( gui, next_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/automatic_capacity.png" ) then
-		sound_button_clicked()
-		edit_panel_state.set_autocap_enabled( not autocap_enabled )
-		if autocap_enabled and edit_panel_state.get_force_compact_enabled() then
-			local new_capacity = 0
-			for _ in state_str_iter_permanent_actions( edit_panel_state.get_permanent() ) do
-				new_capacity = new_capacity + 1
-			end
-			local temp = 0
-			for _, a, _ in state_str_iter_actions( edit_panel_state.get() ) do
-				temp = temp + 1
-				if a and a ~= "" then
-					new_capacity = new_capacity + temp
-					temp = 0
+	GuiLayoutBeginHorizontal( gui, 0, 0, true )
+		local edit_panel_state = access_edit_panel_state( held_wand )
+		local force_compact_enabled = edit_panel_state.get_force_compact_enabled()
+		if not force_compact_enabled then
+			GuiOptionsAddForNextWidget( gui, GUI_OPTION.DrawSemiTransparent )
+		end
+		if GuiImageButton( gui, next_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/force_compact.png" ) then
+			sound_button_clicked()
+			edit_panel_state.set_force_compact_enabled( not force_compact_enabled )
+			edit_panel_state.force_sync()
+		end
+		GuiTooltip( gui, text_get_translated( force_compact_enabled and "disable" or "enable" ) .. text_get_translated( "wand_force_compact" ), text_get_translated( "wand_force_compact_description" ) .. "\n" .. text_get_translated( "inventory_get_ignored" )  )
+		local autocap_enabled = edit_panel_state.get_autocap_enabled()
+		if not autocap_enabled then
+			GuiOptionsAddForNextWidget( gui, GUI_OPTION.DrawSemiTransparent )
+		end
+		if GuiImageButton( gui, next_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/automatic_capacity.png" ) then
+			sound_button_clicked()
+			edit_panel_state.set_autocap_enabled( not autocap_enabled )
+			if autocap_enabled and edit_panel_state.get_force_compact_enabled() then
+				local new_capacity = 0
+				for _ in state_str_iter_permanent_actions( edit_panel_state.get_permanent() ) do
+					new_capacity = new_capacity + 1
 				end
+				local temp = 0
+				for _, a, _ in state_str_iter_actions( edit_panel_state.get() ) do
+					temp = temp + 1
+					if a and a ~= "" then
+						new_capacity = new_capacity + temp
+						temp = 0
+					end
+				end
+				WANDS.wand_set_stat( held_wand, "deck_capacity", new_capacity )
 			end
-			WANDS.wand_set_stat( held_wand, "deck_capacity", new_capacity )
 		end
-	end
-	GuiTooltip( gui, text_get_translated( autocap_enabled and "disable" or "enable" ) .. text_get_translated( "automatic_capacity" ), wrap_key( "automatic_capacity_description" ) )
-	local function cant_undo()
-		GuiOptionsAddForNextWidget( gui, GUI_OPTION.DrawSemiTransparent )
-		GuiImageButton( gui, next_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/undo.png" )
-		GuiTooltip( gui, text_get_translated( "cant_undo" ), "" )
-	end
-	local function cant_redo()
-		GuiOptionsAddForNextWidget( gui, GUI_OPTION.DrawSemiTransparent )
-		GuiImageButton( gui, next_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/redo.png" )
-		GuiTooltip( gui, text_get_translated( "cant_redo" ), "" )
-	end
-	local operation_to_undo = edit_panel_state.peek_undo()
-	local operation_to_redo = edit_panel_state.peek_redo()
-	if operation_to_undo then
-		if GuiImageButton( gui, next_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/undo.png" ) then
-			sound_button_clicked()
-			edit_panel_state.undo()
+		GuiTooltip( gui, text_get_translated( autocap_enabled and "disable" or "enable" ) .. text_get_translated( "automatic_capacity" ), wrap_key( "automatic_capacity_description" ) )
+	GuiLayoutEnd( gui )
+
+	GuiLayoutBeginHorizontal( gui, 0, 0, true )
+		local function cant_undo()
+			GuiOptionsAddForNextWidget( gui, GUI_OPTION.DrawSemiTransparent )
+			GuiImageButton( gui, next_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/undo.png" )
+			GuiTooltip( gui, text_get_translated( "cant_undo" ), "" )
 		end
-		GuiTooltip( gui, text_get_translated( "undo" ) .. " " .. GameTextGetTranslatedOrNot( operation_to_undo ),
-			GameTextGet( wrap_key( "current_history" ), edit_panel_state.get_current_history_index() ) )
-	else cant_undo() end
-	if operation_to_redo then
-		if GuiImageButton( gui, next_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/redo.png" ) then
-			sound_button_clicked()
-			edit_panel_state.redo()
+		local function cant_redo()
+			GuiOptionsAddForNextWidget( gui, GUI_OPTION.DrawSemiTransparent )
+			GuiImageButton( gui, next_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/redo.png" )
+			GuiTooltip( gui, text_get_translated( "cant_redo" ), "" )
 		end
-		GuiTooltip( gui, text_get_translated( "redo" ) .. " " .. GameTextGetTranslatedOrNot( operation_to_redo ),
-			GameTextGet( wrap_key( "current_history" ), edit_panel_state.get_current_history_index() ) )
-	else cant_redo() end
+		local operation_to_undo = edit_panel_state.peek_undo()
+		local operation_to_redo = edit_panel_state.peek_redo()
+		if operation_to_undo then
+			if GuiImageButton( gui, next_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/undo.png" ) then
+				sound_button_clicked()
+				edit_panel_state.undo()
+			end
+			GuiTooltip( gui, text_get_translated( "undo" ) .. " " .. GameTextGetTranslatedOrNot( operation_to_undo ),
+				GameTextGet( wrap_key( "current_history" ), edit_panel_state.get_current_history_index() ) )
+		else cant_undo() end
+		if operation_to_redo then
+			if GuiImageButton( gui, next_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/redo.png" ) then
+				sound_button_clicked()
+				edit_panel_state.redo()
+			end
+			GuiTooltip( gui, text_get_translated( "redo" ) .. " " .. GameTextGetTranslatedOrNot( operation_to_redo ),
+				GameTextGet( wrap_key( "current_history" ), edit_panel_state.get_current_history_index() ) )
+		else cant_redo() end
+	GuiLayoutEnd( gui )
 end
 
 shortcuts = {
@@ -366,6 +371,17 @@ function do_gui()
 					end
 				end
 			GuiLayoutEnd( gui )
+			GuiLayoutBeginLayer( gui )
+				if mod_setting_get( "show_wand_edit_panel" ) then
+					GuiBeginAutoBox( gui )
+						local x, y = horizontal_centered_x(-9,4) + 5, 360 * 0.02 + percent_to_ui_scale_y(2)
+						GuiLayoutBeginVertical( gui, x, y, true )
+							show_edit_panel_toggle_options()
+						GuiLayoutEnd( gui )
+					GuiZSetForNextWidget( gui, 1 )
+					GuiEndAutoBoxNinePiece( gui, 2 )
+				end
+			GuiLayoutEndLayer( gui )
 
 			GuiLayoutBeginHorizontal( gui, horizontal_centered_x(9,4), percent_to_ui_scale_y(2), true )
 				GuiImageButton( gui, next_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/shortcut_tips.png" )

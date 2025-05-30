@@ -521,16 +521,6 @@ picker.menu = function()
 		if hover then filter_type = i end
 	end
 
-	local function show_filter_button( i, tooltip_text, clicked_func )
-		if GuiImageButton( gui, next_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/type_filter_"..i..".png" ) then
-			filter_type = i
-			sound_button_clicked()
-		end
-		local left_click,right_click,hover,x,y,_ = previous_data( gui )
-		if clicked_func then clicked_func( left_click, right_click ) end
-		GuiTooltip( gui, tooltip_text, "" )
-	end
-
 	GuiLayoutBeginHorizontal( gui, 0, 360 * 0.16, true, 0, 0 )
 		GuiLayoutBeginVertical( gui, 640 * 0.01, 0, true )
 		for i = 0, 7 do
@@ -544,14 +534,6 @@ picker.menu = function()
 					GuiImageButton( gui, next_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/transparent_20x20.png" )
 				end
 			end
-			show_filter_button( FILTER_TYPE_SEARCH, wrap_key( "action_search" ) )
-			show_filter_button( FILTER_TYPE_RECENT, text_get( "action_recent", shortcut_texts.clear_action_history ), function( left_click, right_click )
-				if shortcut_check.check( shortcuts.clear_action_history, left_click, right_click ) then
-					clear_action_history()
-					sound_button_clicked()
-				end
-			end )
-			show_filter_button( FILTER_TYPE_IN_INV, wrap_key( "action_in_inv" ) )
 		GuiLayoutEnd( gui )
 	GuiLayoutEnd( gui )
 
@@ -566,10 +548,20 @@ picker.menu = function()
 	end
 end
 
+local function show_filter_button( i, tooltip_text, clicked_func )
+	if GuiImageButton( gui, next_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/type_filter_"..i..".png" ) then
+		filter_type = i
+		sound_button_clicked()
+	end
+	local left_click,right_click,hover,x,y,_ = previous_data( gui )
+	if clicked_func then clicked_func( left_click, right_click ) end
+	GuiTooltip( gui, tooltip_text, "" )
+end
+
 picker.buttons = function()
-	local buttons_num = 2
+	local buttons_num = 5
 	if held_wand and mod_setting_get( "show_wand_edit_panel" ) then
-		buttons_num = buttons_num + 6
+		buttons_num = buttons_num + 2
 	end
 	GuiLayoutBeginHorizontal( gui, horizontal_centered_x(buttons_num,4), percent_to_ui_scale_y(2), true )
 		if held_wand and mod_setting_get( "show_wand_edit_panel" ) then
@@ -579,8 +571,15 @@ picker.buttons = function()
 		do_flag_toggle_image_button( "mods/spell_lab_shugged/files/gui/buttons/zero_uses.png", "zero_uses" )
 		if held_wand and mod_setting_get( "show_wand_edit_panel" ) then
 			do_flag_toggle_image_button( "mods/spell_lab_shugged/files/gui/buttons/spell_replacement.png", "replace_mode", "spell_replacement", nil, text_get( "spell_replacement_tips", shortcut_texts.replace_switch_temp ) )
-			show_edit_panel_toggle_options()
 		end
+		show_filter_button( FILTER_TYPE_SEARCH, wrap_key( "action_search" ) )
+		show_filter_button( FILTER_TYPE_RECENT, text_get( "action_recent", shortcut_texts.clear_action_history ), function( left_click, right_click )
+			if shortcut_check.check( shortcuts.clear_action_history, left_click, right_click ) then
+				clear_action_history()
+				sound_button_clicked()
+			end
+		end )
+		show_filter_button( FILTER_TYPE_IN_INV, wrap_key( "action_in_inv" ) )
 	GuiLayoutEnd( gui )
 end
 

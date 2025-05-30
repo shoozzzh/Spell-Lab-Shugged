@@ -10,13 +10,7 @@ PICKERS = {
 local pickers_data = {}
 
 pickers_data[""] = {
-	buttons = function()
-		if mod_setting_get( "show_wand_edit_panel" ) and held_wand then
-			GuiLayoutBeginHorizontal( gui, horizontal_centered_x(4,4), percent_to_ui_scale_y(2), true )
-				show_edit_panel_toggle_options()
-			GuiLayoutEnd( gui )
-		end
-	end,
+	buttons = function() end,
 	menu = function() end,
 	name = "None",
 }
