@@ -21,7 +21,7 @@ gui = gui or GuiCreate()
 GuiStartFrame( gui )
 screen_width, screen_height = GuiGetScreenDimensions( gui )
 
-local version = "Shugged v1.8.5"
+local version = "Shugged v1.8.6"
 
 type_text = {
 	[ACTION_TYPE_MODIFIER]          = "$inventory_actiontype_modifier",
@@ -371,7 +371,7 @@ function do_gui()
 					end
 				end
 			GuiLayoutEnd( gui )
-			
+
 			if mod_setting_get( "show_wand_edit_panel" ) and held_wand then
 				GuiLayoutBeginLayer( gui )
 					GuiBeginAutoBox( gui )
