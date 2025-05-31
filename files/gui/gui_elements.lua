@@ -249,40 +249,40 @@ function do_property_list( lines )
 	end
 end
 
-	function do_verbose_tooltip( this_action_data, this_action_metadata )
-		local c_lines = c_metadata_to_lines( this_action_metadata.c )
-		local projectiles_lines, num_proj_lines = proj_metadata_to_lines( this_action_metadata.projectiles )
-
-		local title = GameTextGetTranslatedOrNot( this_action_data.name )
-		if this_action_data.max_uses then
-			title = title .. ( "(" .. tostring( this_action_data.max_uses ) .. ")" )
-		end
-		GuiText( gui, 0, 0, title )
-
-		GuiColorSetForNextWidget( gui, 0.5, 0.5, 0.5, 1.0 )
-		GuiText( gui, 0, 0, this_action_data.id )
-		GuiColorSetForNextWidget( gui, 0.5, 0.5, 1.0, 1.0 )
-		GuiText( gui, 0, 0, GameTextGetTranslatedOrNot( type_text[ this_action_data.type ] ) )
-		GuiColorSetForNextWidget( gui, 0.811, 0.811, 0.811, 1.0 )
-		GuiText( gui, 0, 0, word_wrap( GameTextGetTranslatedOrNot( this_action_data.description ) ) )
-		if not this_action_metadata then return end
-		GuiLayoutAddVerticalSpacing( gui, 5 )
-		if this_action_metadata.projectiles then
-			GuiText( gui, 0, 0, wrap_key( "spell_data" ) )
-		end
-
-		do_property_list( c_lines )
-
-		local only_one_proj = #projectiles_lines == 1
-		for proj_index, proj_lines in ipairs( projectiles_lines ) do
-			if only_one_proj then
-				GuiText( gui, 0, 0, wrap_key( "projectile_data" ) )
-			else
-				GuiText( gui, 0, 0, GameTextGet( wrap_key( "projectile_nth_data" ), tostring( proj_index ) ) )
-			end
-			do_property_list( proj_lines )
-		end
+function do_verbose_tooltip( this_action_data, this_action_metadata )
+	local c_lines = c_metadata_to_lines( this_action_metadata.c )
+	local projectiles_lines, num_proj_lines = proj_metadata_to_lines( this_action_metadata.projectiles )
+	
+	local title = GameTextGetTranslatedOrNot( this_action_data.name )
+	if this_action_data.max_uses then
+		title = title .. ( "(" .. tostring( this_action_data.max_uses ) .. ")" )
 	end
+	GuiText( gui, 0, 0, title )
+	
+	GuiColorSetForNextWidget( gui, 0.5, 0.5, 0.5, 1.0 )
+	GuiText( gui, 0, 0, this_action_data.id )
+	GuiColorSetForNextWidget( gui, 0.5, 0.5, 1.0, 1.0 )
+	GuiText( gui, 0, 0, GameTextGetTranslatedOrNot( type_text[ this_action_data.type ] ) )
+	GuiColorSetForNextWidget( gui, 0.811, 0.811, 0.811, 1.0 )
+	GuiText( gui, 0, 0, word_wrap( GameTextGetTranslatedOrNot( this_action_data.description ) ) )
+	if not this_action_metadata then return end
+	GuiLayoutAddVerticalSpacing( gui, 5 )
+	if this_action_metadata.projectiles then
+		GuiText( gui, 0, 0, wrap_key( "spell_data" ) )
+	end
+	
+	do_property_list( c_lines )
+	
+	local only_one_proj = #projectiles_lines == 1
+	for proj_index, proj_lines in ipairs( projectiles_lines ) do
+		if only_one_proj then
+			GuiText( gui, 0, 0, wrap_key( "projectile_data" ) )
+		else
+			GuiText( gui, 0, 0, GameTextGet( wrap_key( "projectile_nth_data" ), tostring( proj_index ) ) )
+		end
+		do_property_list( proj_lines )
+	end
+end
 
 function show_tooltip( content_fn, x, y )
 	GuiLayoutBeginLayer( gui )
