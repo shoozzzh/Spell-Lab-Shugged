@@ -371,8 +371,9 @@ function do_gui()
 					end
 				end
 			GuiLayoutEnd( gui )
-			GuiLayoutBeginLayer( gui )
-				if mod_setting_get( "show_wand_edit_panel" ) then
+			
+			if mod_setting_get( "show_wand_edit_panel" ) and held_wand then
+				GuiLayoutBeginLayer( gui )
 					GuiBeginAutoBox( gui )
 						local x, y = horizontal_centered_x(-9,4) + 5, 360 * 0.02 + percent_to_ui_scale_y(2)
 						GuiLayoutBeginVertical( gui, x, y, true )
@@ -380,8 +381,8 @@ function do_gui()
 						GuiLayoutEnd( gui )
 					GuiZSetForNextWidget( gui, 1 )
 					GuiEndAutoBoxNinePiece( gui, 2 )
-				end
-			GuiLayoutEndLayer( gui )
+				GuiLayoutEndLayer( gui )
+			end
 
 			GuiLayoutBeginHorizontal( gui, horizontal_centered_x(9,4), percent_to_ui_scale_y(2), true )
 				GuiImageButton( gui, next_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/shortcut_tips.png" )
