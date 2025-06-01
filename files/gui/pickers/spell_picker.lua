@@ -304,6 +304,57 @@ picker.menu = function()
 	end
 	
 	local interacting = false
+
+	do
+		local x, y = 640 * 0.05 + 1, 360 * 0.16 - 16
+		local tab_width, tab_height = GuiGetImageDimensions( gui, "mods/spell_lab_shugged/files/gui/buttons/tab.png" )
+		for i, tab in ipairs( { "types", "search", "recent", "in_inv" } ) do
+			GuiOptionsAddForNextWidget( gui, GUI_OPTION.NoSound )
+			if GuiImageButton( gui, next_id(), x, y, "", "mods/spell_lab_shugged/files/gui/buttons/tab_transparent.png" ) then
+				if i == 1 then filter_type = 0 else filter_type = i + 6 end
+				sound_button_clicked()
+			end
+			local left_click,right_click,hover = previous_data( gui )
+
+			if i == 3 then
+				GuiTooltip( gui, text_get( "spell_picker_tab_recent_tips", shortcut_texts.clear_action_history ) )
+				if shortcut_check.check( shortcuts.clear_action_history, left_click, right_click ) then
+					clear_action_history()
+					sound_button_clicked()
+				end
+			end
+
+			local selected = i + 6 == filter_type or ( i == 1 and filter_type <= 7 )
+			if selected then
+				GuiZSetForNextWidget( gui, -3 )
+				GuiImage( gui, next_id(), x, y - 1, "mods/spell_lab_shugged/files/gui/buttons/tab_selected.png", 1, 1, 0 )
+			elseif hover then
+				GuiZSetForNextWidget( gui, -2.5 )
+				GuiImage( gui, next_id(), x, y, "mods/spell_lab_shugged/files/gui/buttons/tab_hovered.png", 1, 1, 0 )
+			else
+				GuiZSetForNextWidget( gui, -2 )
+				GuiImage( gui, next_id(), x, y, "mods/spell_lab_shugged/files/gui/buttons/tab.png", 1, 1, 0 )
+			end
+
+			local y_offset = 1.5
+			if not selected then
+				GuiColorSetForNextWidget( gui, 0.42, 0.42, 0.416, 1.0 )
+				y_offset = 2
+			end
+			GuiZSetForNextWidget( gui, -4 )
+			local scale = 1
+			local width, height = GuiGetTextDimensions( gui, text_get_translated( "spell_picker_tab_" .. tab ) )
+			local max_width = tab_width - 4
+			if width > max_width then
+				scale = max_width / width
+				width = max_width
+			end
+			GuiText( gui, x + tab_width / 2 - width / 2, y + y_offset + tab_height / 2 - height / 2, wrap_key( "spell_picker_tab_" .. tab ), scale, "", true )
+
+			x = x + tab_width - 1
+		end
+	end
+
 	GuiLayoutBeginVertical( gui, 640 * 0.05, 360 * 0.16, true )
 		local scroll_ids = {}
 		for i = 0, 10 do
@@ -521,21 +572,15 @@ picker.menu = function()
 		if hover then filter_type = i end
 	end
 
-	GuiLayoutBeginHorizontal( gui, 0, 360 * 0.16, true, 0, 0 )
-		GuiLayoutBeginVertical( gui, 640 * 0.01, 0, true )
-		for i = 0, 7 do
-			show_filter( i, type_text[i] )
-		end
-		GuiLayoutEnd( gui )
-		GuiLayoutBeginVertical( gui, 640 * 0.34 - 20 + 10, 0, true )
-			if mod_setting_get( "special_filter_button_align_to" ) == "bottom" then
-				for i = 0, 4 do
-					GuiOptionsAddForNextWidget( gui, GUI_OPTION.NonInteractive )
-					GuiImageButton( gui, next_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/transparent_20x20.png" )
-				end
+	if filter_type <= 7 then
+		GuiLayoutBeginHorizontal( gui, 0, 360 * 0.16, true, 0, 0 )
+			GuiLayoutBeginVertical( gui, 640 * 0.01, 0, true )
+			for i = 0, 7 do
+				show_filter( i, type_text[i] )
 			end
+			GuiLayoutEnd( gui )
 		GuiLayoutEnd( gui )
-	GuiLayoutEnd( gui )
+	end
 
 	if spell_search_focused and filter_type ~= FILTER_TYPE_SEARCH then
 		change_keyboard_focus( Focus_PlayerControls )
@@ -548,18 +593,8 @@ picker.menu = function()
 	end
 end
 
-local function show_filter_button( i, tooltip_text, clicked_func )
-	if GuiImageButton( gui, next_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/type_filter_"..i..".png" ) then
-		filter_type = i
-		sound_button_clicked()
-	end
-	local left_click,right_click,hover,x,y,_ = previous_data( gui )
-	if clicked_func then clicked_func( left_click, right_click ) end
-	GuiTooltip( gui, tooltip_text, "" )
-end
-
 picker.buttons = function()
-	local buttons_num = 5
+	local buttons_num = 2
 	if held_wand and mod_setting_get( "show_wand_edit_panel" ) then
 		buttons_num = buttons_num + 2
 	end
@@ -572,14 +607,6 @@ picker.buttons = function()
 		if held_wand and mod_setting_get( "show_wand_edit_panel" ) then
 			do_flag_toggle_image_button( "mods/spell_lab_shugged/files/gui/buttons/spell_replacement.png", "replace_mode", "spell_replacement", nil, text_get( "spell_replacement_tips", shortcut_texts.replace_switch_temp ) )
 		end
-		show_filter_button( FILTER_TYPE_SEARCH, wrap_key( "action_search" ) )
-		show_filter_button( FILTER_TYPE_RECENT, text_get( "action_recent", shortcut_texts.clear_action_history ), function( left_click, right_click )
-			if shortcut_check.check( shortcuts.clear_action_history, left_click, right_click ) then
-				clear_action_history()
-				sound_button_clicked()
-			end
-		end )
-		show_filter_button( FILTER_TYPE_IN_INV, wrap_key( "action_in_inv" ) )
 	GuiLayoutEnd( gui )
 end
 

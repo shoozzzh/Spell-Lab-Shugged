@@ -374,13 +374,10 @@ function do_gui()
 
 			if mod_setting_get( "show_wand_edit_panel" ) and held_wand then
 				GuiLayoutBeginLayer( gui )
-					GuiBeginAutoBox( gui )
-						local x, y = horizontal_centered_x(-9,4) + 5, 360 * 0.02 + percent_to_ui_scale_y(2)
-						GuiLayoutBeginVertical( gui, x, y, true )
-							show_edit_panel_toggle_options()
-						GuiLayoutEnd( gui )
-					GuiZSetForNextWidget( gui, 1 )
-					GuiEndAutoBoxNinePiece( gui, 2 )
+					local x, y = horizontal_centered_x(-9,4) + 5, 360 * 0.02 + percent_to_ui_scale_y(2)
+					GuiLayoutBeginVertical( gui, x, y, true )
+						show_edit_panel_toggle_options()
+					GuiLayoutEnd( gui )
 				GuiLayoutEndLayer( gui )
 			end
 
