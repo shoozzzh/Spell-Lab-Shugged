@@ -8,12 +8,10 @@ picker.menu = function()
 					for _, stat in ipairs( wand_stats ) do
 						GuiLayoutBeginHorizontal( gui, 0, 0 )
 							local width = GuiGetTextDimensions( gui, stat.label )
-							GuiColorSetForNextWidget( gui, 0.811, 0.811, 0.811, 1.0 )
 							GuiText( gui, 60 - width, 0, stat.label )
 							local _, _, _, x, y, width = previous_data( gui )
 							GuiOptionsAddForNextWidget( gui, GUI_OPTION.Layout_NoLayouting )
-							GuiColorSetForNextWidget( gui, 1.0, 0.75, 0.5, 1.0 )
-							GuiText( gui, x + width + 10, y, stat.text_callback( stat.current ) )
+							GuiColoredText( gui, 1.0, 0.75, 0.5, 1.0, x + width + 10, y, stat.text_callback( stat.current ) )
 							if not precise_mode then
 								stat.current = stat.value_callback( GuiSlider( gui, next_id(), 70, 0, " ", stat.current, stat.min, stat.max, stat.default, 1.0, stat.formatter, 140 ) )
 							else

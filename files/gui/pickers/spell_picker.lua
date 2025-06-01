@@ -94,18 +94,16 @@ local function show_keyboard_key( character, x, y, key_width, clicked_func )
 	local character_width,_ = GuiGetTextDimensions( gui, character )
 	GuiOptionsAddForNextWidget( gui, GUI_OPTION.Layout_NoLayouting )
 	if hover then
-		GuiColorSetForNextWidget( gui, 1, 1, 0.5, 1 )
+		GuiColoredText( gui, 1, 1, 0.5, 1, x - bracket_width / 3, y, "[" )
 	else
-		GuiColorSetForNextWidget( gui, 1, 1, 1, 0.3 )
+		GuiColoredText( gui, 1, 1, 1, 0.3, x - bracket_width / 3, y, "[" )
 	end
-	GuiText( gui, x - bracket_width / 3, y, "[" )
 	GuiOptionsAddForNextWidget( gui, GUI_OPTION.Layout_NoLayouting )
 	if hover then
-		GuiColorSetForNextWidget( gui, 1, 1, 0.5, 1 )
+		GuiColoredText( gui, 1, 1, 0.5, 1, x + key_width - bracket_width * 2 / 3, y, "]" )
 	else
-		GuiColorSetForNextWidget( gui, 1, 1, 1, 0.3 )
+		GuiColoredText( gui, 1, 1, 1, 0.3, x + key_width - bracket_width * 2 / 3, y, "]" )
 	end
-	GuiText( gui, x + key_width - bracket_width * 2 / 3, y, "]" )
 	GuiOptionsAddForNextWidget( gui, GUI_OPTION.Layout_NoLayouting )
 	if hover then
 		GuiColorSetForNextWidget( gui, 1, 1, 0.5, 1 )
@@ -338,7 +336,6 @@ picker.menu = function()
 
 			local y_offset = 1.5
 			if not selected then
-				GuiColorSetForNextWidget( gui, 0.42, 0.42, 0.416, 1.0 )
 				y_offset = 2
 			end
 			GuiZSetForNextWidget( gui, -4 )
@@ -349,8 +346,12 @@ picker.menu = function()
 				scale = max_width / width
 				width = max_width
 			end
-			GuiText( gui, x + tab_width / 2 - width / 2, y + y_offset + tab_height / 2 - height / 2, wrap_key( "spell_picker_tab_" .. tab ), scale, "", true )
-
+			local args = { x + tab_width / 2 - width / 2, y + y_offset + tab_height / 2 - height / 2, wrap_key( "spell_picker_tab_" .. tab ), scale, "", true }
+			if selected then
+				GuiText( gui, unpack( args ) )
+			else
+				GuiColoredText( gui, 0.42, 0.42, 0.42, 1.0, unpack( args ) )
+			end
 			x = x + tab_width - 1
 		end
 	end

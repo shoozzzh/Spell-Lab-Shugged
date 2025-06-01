@@ -129,8 +129,7 @@ function do_action_button( action_id, x, y, selected, tooltip_func, uses_remaini
 					tooltip_func( this_action_data, this_action_metadata )
 				end
 				if note then
-					GuiColorSetForNextWidget( gui, 0.5, 0.5, 0.5, 1.0 )
-					GuiText( gui, 0, 0, note )
+					GuiColoredText( gui, 0.5, 0.5, 0.5, 1.0, 0, 0, note )
 				end
 			GuiLayoutEnd( gui )
 		end, 2, -2 ) -- make it looks as if it belongs to the spell box
@@ -161,14 +160,11 @@ function do_fake_action_button( action_type, action_sprite, name, id, desc, type
 		GuiLayoutBeginVertical( gui, 0, 0, true )
 			GuiText( gui, 0, 0, name )
 			if id then
-				GuiColorSetForNextWidget( gui, 0.5, 0.5, 0.5, 1.0 )
-				GuiText( gui, 0, 0, id )
+				GuiColoredText( gui, 0.5, 0.5, 0.5, 1.0, 0, 0, id )
 			end
 			if type then
-				GuiColorSetForNextWidget( gui, 0.5, 0.5, 1.0, 1.0 )
-				GuiText( gui, 0, 0, type )
+				GuiColoredText( gui, 0.5, 0.5, 1.0, 1.0, 0, 0, type )
 			end
-			GuiColorSetForNextWidget( gui, 0.811, 0.811, 0.811, 1.0 )
 			GuiText( gui, 0, 0, desc )
 			if properties and #properties > 0 then
 				GuiLayoutAddVerticalSpacing( gui, 5 )
@@ -239,11 +235,9 @@ function do_property_list( lines )
 		local name = p[1]
 		local value = p[2]
 		GuiLayoutBeginHorizontal( gui, 0, 0 )
-			GuiColorSetForNextWidget( gui, 0.811, 0.811, 0.811, 1.0 )
-			GuiText( gui, 0, 0, name )
-			GuiColorSetForNextWidget( gui, 1.0, 0.75, 0.5, 1.0 )
+			GuiColoredText( gui, 0.811, 0.811, 0.811, 1.0, 0, 0, name )
 			local _,_,_,_,_,width,_,_,_,_,_ = previous_data( gui )
-			GuiText( gui, 72 - width, 0, tostring( value ) )
+			GuiColoredText( gui, 1.0, 0.75, 0.5, 1.0, 72 - width, 0, tostring( value ) )
 		GuiLayoutEnd( gui )
 		GuiLayoutAddVerticalSpacing( gui, -2 )
 	end
@@ -259,11 +253,8 @@ function do_verbose_tooltip( this_action_data, this_action_metadata )
 	end
 	GuiText( gui, 0, 0, title )
 	
-	GuiColorSetForNextWidget( gui, 0.5, 0.5, 0.5, 1.0 )
-	GuiText( gui, 0, 0, this_action_data.id )
-	GuiColorSetForNextWidget( gui, 0.5, 0.5, 1.0, 1.0 )
-	GuiText( gui, 0, 0, GameTextGetTranslatedOrNot( type_text[ this_action_data.type ] ) )
-	GuiColorSetForNextWidget( gui, 0.811, 0.811, 0.811, 1.0 )
+	GuiColoredText( gui, 0.5, 0.5, 0.5, 1.0, 0, 0, this_action_data.id )
+	GuiColoredText( gui, 0.5, 0.5, 1.0, 1.0, 0, 0, GameTextGetTranslatedOrNot( type_text[ this_action_data.type ] ) )
 	GuiText( gui, 0, 0, word_wrap( GameTextGetTranslatedOrNot( this_action_data.description ) ) )
 	if not this_action_metadata then return end
 	GuiLayoutAddVerticalSpacing( gui, 5 )
@@ -460,11 +451,9 @@ function do_wand_stats( gui, stats )
 	for _, v in ipairs( wand_stats ) do
 		if stats[ v.stat ] then
 			GuiLayoutBeginHorizontal( gui, 0, 0 )
-				GuiColorSetForNextWidget( gui, 0.811, 0.811, 0.811, 1.0 )
 				GuiText( gui, 0, 0, v.label )
-				GuiColorSetForNextWidget( gui, 1.0, 0.75, 0.5, 1.0 )
 				local left_click,right_click,hover,x,y,width,height,draw_x,draw_y,draw_width,draw_height = previous_data( gui )
-				GuiText( gui, 72 - width, 0, v.text_callback( stats[ v.stat ] ) )
+				GuiColoredText( gui, 1.0, 0.75, 0.5, 1.0, 72 - width, 0, v.text_callback( stats[ v.stat ] ) )
 			GuiLayoutEnd( gui )
 			GuiLayoutAddVerticalSpacing( gui, -4 )
 		end

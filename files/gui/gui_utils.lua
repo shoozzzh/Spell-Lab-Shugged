@@ -15,6 +15,18 @@ function reset_z()
 	gui_z = 0
 end
 
+do
+	GuiText_Old = GuiText
+	function GuiText( gui, ... )
+		GuiColorSetForNextWidget( gui, 0.812, 0.812, 0.812, 1 )
+		GuiText_Old( gui, ... )
+	end
+	function GuiColoredText( gui, red, green, blue, alpha, ... )
+		GuiColorSetForNextWidget( gui, red, green, blue, alpha )
+		GuiText_Old( gui, ... )
+	end
+end
+
 local cache_frame
 local cached_mouse_x, cached_mouse_y
 function get_mouse_pos_on_screen()
