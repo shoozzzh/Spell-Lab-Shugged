@@ -41,7 +41,7 @@ picker.menu = function()
 			end
 			do_custom_tooltip( function()
 				do_simple_common_action_list( saved_spell_group, #saved_spell_group )
-				GuiColoredText( gui, 0.5, 0.5, 0.5, 1.0, 0, 0, text_get_translated( "spell_group_select" ) )
+				GuiDimText( gui, 0, 0, text_get_translated( "spell_group_select" ) )
 			end, 3, -0.5 )
 
 			local spell_box

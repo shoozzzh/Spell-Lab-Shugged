@@ -304,10 +304,9 @@ picker.menu = function()
 	local interacting = false
 
 	do
-		local x, y = 640 * 0.05 + 1, 360 * 0.16 - 16
+		local x, y = 640 * 0.05 + 2, 360 * 0.16 - 16
 		local tab_width, tab_height = GuiGetImageDimensions( gui, "mods/spell_lab_shugged/files/gui/buttons/tab.png" )
 		for i, tab in ipairs( { "types", "search", "recent", "in_inv" } ) do
-			GuiOptionsAddForNextWidget( gui, GUI_OPTION.NoSound )
 			if GuiImageButton( gui, next_id(), x, y, "", "mods/spell_lab_shugged/files/gui/buttons/tab_transparent.png" ) then
 				if i == 1 then filter_type = 0 else filter_type = i + 6 end
 				sound_button_clicked()
@@ -348,7 +347,7 @@ picker.menu = function()
 			end
 			local args = { x + tab_width / 2 - width / 2, y + y_offset + tab_height / 2 - height / 2, wrap_key( "spell_picker_tab_" .. tab ), scale, "", true }
 			if selected then
-				GuiText( gui, unpack( args ) )
+				GuiSoftText( gui, unpack( args ) )
 			else
 				GuiColoredText( gui, 0.42, 0.42, 0.42, 1.0, unpack( args ) )
 			end

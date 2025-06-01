@@ -15,16 +15,17 @@ function reset_z()
 	gui_z = 0
 end
 
-do
-	GuiText_Old = GuiText
-	function GuiText( gui, ... )
-		GuiColorSetForNextWidget( gui, 0.812, 0.812, 0.812, 1 )
-		GuiText_Old( gui, ... )
-	end
-	function GuiColoredText( gui, red, green, blue, alpha, ... )
-		GuiColorSetForNextWidget( gui, red, green, blue, alpha )
-		GuiText_Old( gui, ... )
-	end
+function GuiColoredText( gui, red, green, blue, alpha, ... )
+	GuiColorSetForNextWidget( gui, red, green, blue, alpha )
+	GuiText( gui, ... )
+end
+function GuiSoftText( gui, ... )
+	GuiColorSetForNextWidget( gui, color(207,207,207,255) )
+	GuiText( gui, ... )
+end
+function GuiDimText( gui, ... )
+	GuiColorSetForNextWidget( gui, 0.5, 0.5, 0.5, 1.0 )
+	GuiText( gui, ... )
 end
 
 local cache_frame

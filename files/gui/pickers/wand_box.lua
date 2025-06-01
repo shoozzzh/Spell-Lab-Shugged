@@ -240,7 +240,7 @@ picker.menu = function()
 						if not shortcut_check.check( shortcuts.show_wand_stats, left_click, right_click ) then
 							do_simple_action_list( saved_wand.all_actions )
 							GuiLayoutBeginHorizontal( gui, 0, 0 )
-								GuiColoredText( gui, 0.5, 0.5, 0.5, 1.0, 0, 0, GameTextGet(
+								GuiDimText( gui, 0, 0, GameTextGet(
 									wrap_key( "wand_box_hold_something_to_show_wand_stats" ),
 									shortcut_texts.show_wand_stats
 								) )

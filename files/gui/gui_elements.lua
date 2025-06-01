@@ -129,7 +129,7 @@ function do_action_button( action_id, x, y, selected, tooltip_func, uses_remaini
 					tooltip_func( this_action_data, this_action_metadata )
 				end
 				if note then
-					GuiColoredText( gui, 0.5, 0.5, 0.5, 1.0, 0, 0, note )
+					GuiDimText( gui, 0, 0, note )
 				end
 			GuiLayoutEnd( gui )
 		end, 2, -2 ) -- make it looks as if it belongs to the spell box
@@ -160,7 +160,7 @@ function do_fake_action_button( action_type, action_sprite, name, id, desc, type
 		GuiLayoutBeginVertical( gui, 0, 0, true )
 			GuiText( gui, 0, 0, name )
 			if id then
-				GuiColoredText( gui, 0.5, 0.5, 0.5, 1.0, 0, 0, id )
+				GuiDimText( gui, 0, 0, id )
 			end
 			if type then
 				GuiColoredText( gui, 0.5, 0.5, 1.0, 1.0, 0, 0, type )
@@ -253,7 +253,7 @@ function do_verbose_tooltip( this_action_data, this_action_metadata )
 	end
 	GuiText( gui, 0, 0, title )
 	
-	GuiColoredText( gui, 0.5, 0.5, 0.5, 1.0, 0, 0, this_action_data.id )
+	GuiDimText( gui, 0, 0, this_action_data.id )
 	GuiColoredText( gui, 0.5, 0.5, 1.0, 1.0, 0, 0, GameTextGetTranslatedOrNot( type_text[ this_action_data.type ] ) )
 	GuiText( gui, 0, 0, word_wrap( GameTextGetTranslatedOrNot( this_action_data.description ) ) )
 	if not this_action_metadata then return end
