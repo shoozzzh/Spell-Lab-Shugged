@@ -4,6 +4,7 @@ function _draw_actions_for_shot( ... )
 		local entity_id = GetUpdatedEntityID()
 		if not EntityHasTag( entity_id, "player_unit" ) then goto nevermind end
 		if not ModSettingGet( "spell_lab_shugged.disable_casting" ) then goto nevermind end
+		GamePrint( "$spell_lab_shugged_cast_is_blocked" )
 		return
 	end
 

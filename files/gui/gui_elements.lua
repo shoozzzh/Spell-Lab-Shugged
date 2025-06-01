@@ -243,6 +243,11 @@ function do_property_list( lines )
 	end
 end
 
+function do_least_tooltip( this_action_data, this_action_metadata )
+	GuiDimText( gui, 0, 0, this_action_data.id )
+	GuiColoredText( gui, 0.5, 0.5, 1.0, 1.0, 0, 0, GameTextGetTranslatedOrNot( type_text[ this_action_data.type ] ) )
+end
+
 function do_verbose_tooltip( this_action_data, this_action_metadata )
 	local c_lines = c_metadata_to_lines( this_action_metadata.c )
 	local projectiles_lines, num_proj_lines = proj_metadata_to_lines( this_action_metadata.projectiles )
