@@ -49,7 +49,7 @@ end
 
 local create_real_sprite = mod_setting_get( "gif_mode" )
 
-local function do_permanent_shortcuts( edit_panel_state, left_click, right_click, j, capacity )
+local function do_permanent_shortcuts( edit_panel_state, left_click, right_click, j, permanent_action, capacity )
 	if shortcut_check.check( shortcuts.always_cast, left_click, right_click ) then
 		local max_uses = nil
 		do
@@ -83,9 +83,11 @@ local function do_permanent_shortcuts( edit_panel_state, left_click, right_click
 		for pa in state_str_iter_permanent_actions( edit_panel_state.get_permanent() ) do
 			table.insert( current_permanent_actions, pa )
 		end
+		table.remove( current_permanent_actions, j )
+		edit_panel_state.set_both( table_to_state_str( current_actions ), permanent_table_to_state_str( current_permanent_actions ), wrap_key( "operation_demote_permanent_action" ) )
 	end
 end
-local function do_shortcuts( edit_panel_state, left_click, right_click, i, capacity )
+local function do_shortcuts( edit_panel_state, left_click, right_click, i, action_id, capacity )
 	if shortcut_check.check( shortcuts.always_cast, left_click, right_click ) then
 		if action_id and action_id ~= "" then
 			local current_actions = {}
@@ -333,7 +335,7 @@ GuiLayoutBeginVertical( gui, 0, screen_height * 0.96 - ( rows_num + permanent_ro
 		if not create_real_sprite then
 			local left_click, right_click = do_action_button( permanent_action, 0, 0, false, do_least_tooltip, nil, permanent_note, show_permanent_icon )
 			if left_click or right_click then
-				do_permanent_shortcuts( edit_panel_state, left_click, right_click, j, capacity )
+				do_permanent_shortcuts( edit_panel_state, left_click, right_click, j, permanent_action, capacity )
 			end
 		else
 			GuiOptionsAddForNextWidget( gui, GUI_OPTION.NonInteractive )
@@ -374,7 +376,7 @@ GuiLayoutBeginVertical( gui, 0, screen_height * 0.96 - rows_num * ( 20 + 2 ) + 2
 		if not create_real_sprite then
 			local left_click, right_click = do_action_button( action_id, 0, 0, selected, do_least_tooltip, uses_remaining, note, show_uses_remaining )
 			if left_click or right_click then
-				do_shortcuts( edit_panel_state, left_click, right_click, i, capacity )
+				do_shortcuts( edit_panel_state, left_click, right_click, i, action_id, capacity )
 			end
 		else
 			GuiOptionsAddForNextWidget( gui, GUI_OPTION.NonInteractive )
