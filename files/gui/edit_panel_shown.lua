@@ -400,7 +400,7 @@ GuiLayoutBeginVertical( gui, 0, screen_height * 0.96 - rows_num * ( 20 + 2 ) + 2
 GuiLayoutEnd( gui )
 
 if not_showing_all and not offset_reached_end then
-	if GuiImageButton( gui, next_id(), horizontal_centered_x(1), screen_height * 0.96, "", "mods/spell_lab_shugged/files/gui/buttons/pagedown.png" ) then
+	if GuiImageButton( gui, next_id(), horizontal_centered_x(1), screen_height * 0.96 + 2, "", "mods/spell_lab_shugged/files/gui/buttons/pagedown.png" ) then
 		edit_panel_state.set_offset( panel_row_offset + 1 )
 	end
 end
