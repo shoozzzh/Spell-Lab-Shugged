@@ -24,6 +24,12 @@ local function load_mod_settings( cur_lang )
 				{ "PANEL", "手持法杖（仅法杖编辑面板显示时）" },
 			},
 			spell_picker = "法术选取菜单",
+			filter_buttons_trigger = "法术类别切换方式",
+			filter_buttons_trigger_description = "法术类别按钮应该如何触发？",
+			filter_buttons_trigger_values = {
+				{ "HOVER", "悬浮" },
+				{ "CLICK", "点击" },
+			},
 			action_history_limit = "法术使用记录最大条数",
 			action_history_limit_description = "法术选取菜单保留的法术使用记录条数，默认为 96",
 			show_icon_unlocked = "标记已解锁法术",
@@ -97,6 +103,12 @@ local function load_mod_settings( cur_lang )
 				{ "PANEL", "Held Wand(Only when the wand edit panel is shown)" },
 			},
 			spell_picker = "Spell Picker",
+			filter_buttons_trigger = "Switch between types",
+			filter_buttons_trigger_description = "How to trigger the spell type buttons?",
+			filter_buttons_trigger_values = {
+				{ "HOVER", "Hover" },
+				{ "CLICK", "Click" },
+			},
 			action_history_limit = "Recently Used Spells Limit",
 			action_history_limit_description = "How many recently used spells should the spell picker menu remember?\n96 by default",
 			show_icon_unlocked = "Mark Out Unlocked Spells",
@@ -203,6 +215,14 @@ local function load_mod_settings( cur_lang )
 			foldable = true,
 			_folded = true,
 			settings = {
+				{
+					id                 = "filter_buttons_trigger",
+					ui_name            = text.filter_buttons_trigger,
+					ui_description     = text.filter_buttons_trigger_description,
+					value_default      = text.filter_buttons_trigger_values[1][1],
+					values             = text.filter_buttons_trigger_values,
+					scope              = MOD_SETTING_SCOPE_RUNTIME,
+				},
 				{
 					id                 = "show_icon_unlocked",
 					ui_name            = text.show_icon_unlocked,

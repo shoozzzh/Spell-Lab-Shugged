@@ -300,6 +300,32 @@ picker.menu = function()
 			::continue::
 		end
 	end
+
+	local function show_filter( i, tooltip_text )
+		if filter_type ~= i then GuiOptionsAddForNextWidget( gui, GUI_OPTION.DrawSemiTransparent ) end
+		GuiImageButton( gui, next_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/type_filter_"..i..".png" )
+		local left_click,right_click,hover,_,_,_ = previous_data( gui )
+		GuiTooltip( gui, tooltip_text, "" )
+		if filter_type ~= i then
+			if hover and mod_setting_get( "filter_buttons_trigger" ) == "HOVER" then
+				filter_type = i
+			end
+			if left_click and mod_setting_get( "filter_buttons_trigger" ) == "CLICK" then
+				filter_type = i
+				sound_button_clicked()
+			end
+		end
+	end
+
+	if filter_type <= 7 then
+		GuiLayoutBeginHorizontal( gui, 0, 360 * 0.16, true, 0, 0 )
+			GuiLayoutBeginVertical( gui, 640 * 0.01, 0, true )
+			for i = 0, 7 do
+				show_filter( i, type_text[i] )
+			end
+			GuiLayoutEnd( gui )
+		GuiLayoutEnd( gui )
+	end
 	
 	local interacting = false
 
@@ -345,7 +371,7 @@ picker.menu = function()
 				scale = max_width / width
 				width = max_width
 			end
-			local args = { x + tab_width / 2 - width / 2, y + y_offset + tab_height / 2 - height / 2, wrap_key( "spell_picker_tab_" .. tab ), scale, "", true }
+			local args = { x + tab_width / 2 - width / 2, y + y_offset + tab_height / 2 - height / 2, wrap_key( "spell_picker_tab_" .. tab ), scale, "data/fonts/font_pixel.xml", true }
 			if selected then
 				GuiSoftText( gui, unpack( args ) )
 			else
@@ -560,27 +586,6 @@ picker.menu = function()
 			GuiEndScrollContainer( gui )
 		end
 	GuiLayoutEnd( gui )
-
-	local function show_filter( i, tooltip_text, clicked_func )
-		if filter_type ~= i then GuiOptionsAddForNextWidget( gui, GUI_OPTION.DrawSemiTransparent ) end
-		GuiImageButton( gui, next_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/type_filter_"..i..".png" )
-		local left_click,right_click,hover,_,_,_ = previous_data( gui )
-		if clicked_func then
-			clicked_func( left_click, right_click )
-		end
-		GuiTooltip( gui, tooltip_text, "" )
-		if hover then filter_type = i end
-	end
-
-	if filter_type <= 7 then
-		GuiLayoutBeginHorizontal( gui, 0, 360 * 0.16, true, 0, 0 )
-			GuiLayoutBeginVertical( gui, 640 * 0.01, 0, true )
-			for i = 0, 7 do
-				show_filter( i, type_text[i] )
-			end
-			GuiLayoutEnd( gui )
-		GuiLayoutEnd( gui )
-	end
 
 	if spell_search_focused and filter_type ~= FILTER_TYPE_SEARCH then
 		change_keyboard_focus( Focus_PlayerControls )
