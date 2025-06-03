@@ -2,10 +2,12 @@ shot_effect_entries = {
 	{
 		related_status = "BLOODY",
 		extra_modifier = "critical_hit_boost",
+		desc = wrap_key( "shot_effect_desc_bloody" ),
 	},
 	{
 		related_perk = "RISKY_CRITICAL",
 		extra_modifier = "critical_plus_small",
+		desc = wrap_key( "shot_effect_desc_risky_critical" ),
 	},
 	{
 		related_perk = "PROJECTILE_HOMING",
@@ -18,6 +20,7 @@ shot_effect_entries = {
 	{
 		related_perk = "FOOD_CLOCK",
 		extra_modifier = "food_clock",
+		desc = wrap_key( "shot_effect_desc_food_clock" ),
 	},
 	{
 		related_custom_effect = "data/entities/misc/effect_damage_plus_small.xml",
@@ -40,6 +43,7 @@ shot_effect_entries = {
 	{
 		related_perk = "LASER_AIM",
 		extra_modifier = "laser_aim",
+		desc = wrap_key( "shot_effect_desc_laser_aim" ),
 	},
 	{
 		related_perk = "LOW_RECOIL",
@@ -59,6 +63,7 @@ shot_effect_entries = {
 	{
 		related_custom_effect = "data/entities/misc/effect_homing_shooter.xml",
 		extra_modifier = "projectile_homing_shooter_wizard",
+		desc = wrap_key( "shot_effect_desc_homing_shooter_wizard" ),
 	},
 	{
 		id = "essence_alcohol",
@@ -72,6 +77,7 @@ shot_effect_entries = {
 		related_perk = "DUPLICATE_PROJECTILE",
 		extra_modifier = "duplicate_projectile",
 		equivalent_action_type = ACTION_TYPE_UTILITY,
+		desc = wrap_key( "shot_effect_desc_duplicate_projectile" ),
 	},
 	{
 		related_perk = "FAST_PROJECTILES",
@@ -80,11 +86,13 @@ shot_effect_entries = {
 	{
 		related_perk = "PERSONAL_LASER",
 		extra_modifier = "slow_firing",
+		desc = wrap_key( "shot_effect_desc_personal_laser" ),
 	},
 	{
 		related_perk = "GLASS_CANNON",
 		game_effect = "DAMAGE_MULTIPLIER",
 		max_count = 2,
+		desc = wrap_key( "shot_effect_desc_glass_cannon" ),
 	},
 	{
 		related_perk = "LOW_HP_DAMAGE_BOOST",
@@ -104,6 +112,7 @@ shot_effect_entries = {
 		metadata = {
 			{ "friendly_fire", true },
 		},
+		desc = wrap_key( "shot_effect_desc_twitchy" ),
 	},
 	{
 		related_custom_effect = "data/entities/misc/neutralized.xml",

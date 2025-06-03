@@ -134,94 +134,6 @@ function get_action_metadata( this_action_data )
 				end,
 			}
 		)
---[[				do
-			local recoil = { shot_effects.recoil_knockback, __class = "spell_lab_shugged_recoil" }
-			setmetatable( recoil, {
-				__add = function( a, b )
-					if a.__class == "spell_lab_shugged_recoil" then
-						a[1] = a[1] + b
-						return a
-					else
-						b[1] = b[1] + a
-						return b
-					end
-				end,
-				__sub = function( a, b )
-					if a.__class == "spell_lab_shugged_recoil" then
-						a[1] = a[1] - b
-						return a
-					else
-						b[1] = b[1] - a
-						return b
-					end
-				end,
-				__mul = function( a, b )
-					if a.__class == "spell_lab_shugged_recoil" then
-						a[1] = a[1] * b
-						return a
-					else
-						b[1] = b[1] * a
-						return b
-					end
-				end,
-				__div = function( a, b )
-					if a.__class == "spell_lab_shugged_recoil" then
-						a[1] = a[1] / b
-						return a
-					else
-						b[1] = a / b[1]
-						return b
-					end
-				end,
-				__mod = function( a, b )
-					if a.__class == "spell_lab_shugged_recoil" then
-						a[1] = a[1] % b
-						return a
-					else
-						b[1] = a % b[1]
-						return b
-					end
-				end,
-				__pow = function( a, b )
-					if a.__class == "spell_lab_shugged_recoil" then
-						a[1] = a[1] ^ b
-						return a
-					else
-						b[1] = a ^ b[1]
-						return b
-					end
-				end,
-				__unm = function( a )
-					a[1] = -a[1]
-					return a
-				end,
-				__eq = function( a, b )
-					if a.__class == "spell_lab_shugged_recoil" then
-						return a[1] == b
-					else
-						return a == b[1]
-					end
-				end,
-				__lt = function( a, b )
-					if a.__class == "spell_lab_shugged_recoil" then
-						return a[1] < b
-					else
-						return a < b[1]
-					end
-				end,
-				__le = function( a, b )
-					if a.__class == "spell_lab_shugged_recoil" then
-						return a[1] <= b
-					else
-						return a <= b[1]
-					end
-				end,
-				__tostring = function( a )
-					return tostring( a[1] )
-				end
-			} )
-			shot_effects.recoil_knockback = recoil
-		end]]
 
 		local action_action = this_action_data.action
 		local action_env = getfenv( action_action )
@@ -331,6 +243,7 @@ local metadata_to_show = {
 		{ "damage_fire_add"         , "$inventory_mod_damage_fire", 0, function(value) return format_value( value * 25, 2, true, FORMAT.Ceiling ) end },
 		{ "friendly_fire"           , wrap_key( "friendly_fire" ), nil, function(value) return wrap_key( value and "enable2" or "disable2" ) end },
 		{ "gravity"                 , wrap_key( "gravity" ), 0, function(value) return format_value( value, 0, true ) end },
+		{ "bounces"                 , "$inventory_mod_bounces", 0, function(value) return format_value( value, 0, true ) end },
 		{ "spell_lab_shugged_recoil", wrap_key( "recoil" ), nil, function(value)
 			if value.type == TYPE_ADJUSTMENT.Set then
 				return GameTextGet( wrap_key( "value_set_to" ), format_value( value.value, 0 ) )
@@ -388,7 +301,8 @@ local metadata_to_show = {
 		{ wrap_key( "projectile_explosion_damage" ), function( data ) if data.explosion_damage ~= nil then return format_value( data.explosion_damage * 25, 2, false, FORMAT.Round ) end end },
 		{ wrap_key( "projectile_explosion_dont_damage_shooter" ), function( data ) if data.explosion_dont_damage_shooter and data.explosion_dont_damage_shooter ~= "0" then return "$menu_yes" end end },
 		{ wrap_key( "projectile_timer_time" ), function( data ) if data.timer_time ~= nil then return GameTextGet( wrap_key( "frames" ), format_value( data.timer_time, 0 ) ) end end },
-		{ wrap_key( "projectile_die_on_low_velocity" ), function( data ) if data.die_on_low_velocity == "1" then return data.die_on_low_velocity_limit or "50" end end }
+		{ wrap_key( "projectile_die_on_low_velocity" ), function( data ) if data.die_on_low_velocity == "1" then return data.die_on_low_velocity_limit or "50" end end },
+		{ "$inventory_mod_bounces", function( data ) if data.bounces_left ~= "0" then return data.bounces_left end end },
 	}
 }
 
