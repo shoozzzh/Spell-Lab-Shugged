@@ -92,7 +92,7 @@ function center_text( text )
 	return GuiGetTextDimensions( not_a_gui, text, 1, 0, "mods/spell_lab_shugged/files/font/font_small_numbers.xml", true ) / 2
 end
 
-local zh_cn_languages = {
+zh_cn_languages = {
 	["简体中文"] = true,
 	["喵体中文"] = true,
 	["汪体中文"] = true,

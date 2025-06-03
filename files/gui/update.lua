@@ -475,7 +475,7 @@ function do_gui()
 				if GuiImageButton( gui, next_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/clear_wand.png" ) then
 					if held_wand then
 						sound_button_clicked()
-						access_edit_panel_state( held_wand ).set( "", wrap_key( "operation_clear_held_wand" ) )
+						WANDS.wand_clear_actions( held_wand )
 					end
 				end
 				GuiTooltip( gui, wrap_key( "clear_held_wand" ), "" )
@@ -492,7 +492,73 @@ function do_gui()
 					GuiImageButton( gui, next_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/edit_wands_everywhere.png" )
 				end
 				do
+					local a = #EntityGetWithTag( "spell_lab_shugged_effect_edit_wands_everywhere" )
+					local b = #EntityGetWithTag( "spell_lab_shugged_effect_no_wand_editing" )
+					local c = GameGetGameEffectCount( player, "EDIT_WANDS_EVERYWHERE" ) - a
+					local d = GameGetGameEffectCount( player, "NO_WAND_EDITING" ) - b
+					local level = a + c - b - d
+					local tooltip = {}
+
+					if num_effects_positive > 0 then
+						tooltip[ #tooltip + 1 ] = GameTextGet( wrap_key( "edit_wands_num" ), text_get( "edit_wands_perk_positive" ), a, c )
+					end
+					if num_effects_negative > 0 then
+						tooltip[ #tooltip + 1 ] = GameTextGet( wrap_key( "edit_wands_num" ), text_get( "edit_wands_perk_negative" ), b, d )
+					end
+
+					local expr = {}
+					local function add_num_to_expr( num )
+						if #expr > 0 then
+							expr[ #expr + 1 ] = " + "
+						end
+						if num > 0 then
+							expr[ #expr + 1 ] = tostring( num )
+						elseif num == 0 then
+							expr[ #expr + 1 ] = "0"
+						elseif num < 0 then
+							expr[ #expr + 1 ] = "("
+							expr[ #expr + 1 ] = tostring( num )
+							expr[ #expr + 1 ] = ")"
+						end
+					end
+
+					if a ~= 0 or c ~= 0 then
+						add_num_to_expr( a )
+						add_num_to_expr( c )
+					end
+					if b ~= 0 or d ~= 0 then
+						add_num_to_expr( -b )
+						add_num_to_expr( -d )
+					end
+
+					if #expr > 0 then
+						expr[ #expr + 1 ] = " = "
+					end
+					expr[ #expr + 1 ] = tostring( level )
+
+					if level > 0 then
+						expr[ #expr + 1 ] = " > 0"
+					elseif level < 0 then
+						expr[ #expr + 1 ] = " < 0"
+					end
+
+					table.insert( tooltip, GameTextGet( wrap_key( "edit_wands_level" ), table.concat( expr ) ) )
+
+					if level > 0 then
+						table.insert( tooltip, wrap_key( "edit_wands_everywhere" ) )
+					elseif level == 0 then
+						table.insert( tooltip, wrap_key( "edit_wands_workshop" ) )
+					else
+						table.insert( tooltip, wrap_key( "edit_wands_unable" ) )
+					end
+
+					local title = {
+						GameTextGet( wrap_key( "edit_wands_gain" ), text_get( "edit_wands_perk_positive" ) ),
+						GameTextGet( wrap_key( "edit_wands_lose" ), text_get( "edit_wands_perk_positive" ) ),
+					}
+
 					local left_click,right_click = previous_data( gui )
+
 					if left_click then
 						sound_button_clicked()
 						local effect_to_remove = EntityGetWithTag( "spell_lab_shugged_effect_no_wand_editing" )[1]
@@ -526,21 +592,8 @@ function do_gui()
 							EntityAddTag( effect_id, "spell_lab_shugged_effect_no_wand_editing" )
 						end
 					end
-				end
-				do
-					local a = #EntityGetWithTag( "spell_lab_shugged_effect_edit_wands_everywhere" )
-					local b = #EntityGetWithTag( "spell_lab_shugged_effect_no_wand_editing" )
-					local c = GameGetGameEffectCount( player, "EDIT_WANDS_EVERYWHERE" ) - a
-					local d = GameGetGameEffectCount( player, "NO_WAND_EDITING" ) - b
-					local t = { GameTextGet( wrap_key( "edit_wands_everywhere_lose" ), GameTextGetTranslatedOrNot( "$perk_edit_wands_everywhere" ) ) }
-					if num_effects_positive > 0 then
-						table.insert( t, GameTextGet( wrap_key( "edit_wands_everywhere_num" ), c, a, GameTextGetTranslatedOrNot( "$perk_edit_wands_everywhere" ) ) )
-					end
-					if num_effects_negative > 0 then
-						table.insert( t, GameTextGet( wrap_key( "edit_wands_everywhere_num" ), d, b, GameTextGetTranslatedOrNot( "$perk_no_wand_editing" ) ) )
-					end
 					
-					GuiTooltip( gui, GameTextGet( wrap_key( "edit_wands_everywhere_gain" ), GameTextGetTranslatedOrNot( "$perk_edit_wands_everywhere" ) ), table.concat( t, "\n" ) )
+					GuiTooltip( gui, table.concat( title, "\n" ), table.concat( tooltip, "\n" ) )
 				end
 				local hp_fixer = EntityGetWithName( "spell_lab_shugged_hp_fixer" )
 				if hp_fixer ~= 0 then

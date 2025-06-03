@@ -372,6 +372,9 @@ picker.menu = function()
 				width = max_width
 			end
 			local args = { x + tab_width / 2 - width / 2, y + y_offset + tab_height / 2 - height / 2, wrap_key( "spell_picker_tab_" .. tab ), scale, "data/fonts/font_pixel.xml", true }
+			if zh_cn_languages[ text_get_translated( "$current_language" ) ] then
+				args[5] = ""
+			end
 			if selected then
 				GuiSoftText( gui, unpack( args ) )
 			else
