@@ -49,8 +49,8 @@ end
 
 local create_real_sprite = mod_setting_get( "gif_mode" )
 
-local function do_permanent_shortcuts( edit_panel_state, left_click, right_click, j, permanent_action, capacity )
-	if shortcut_check.check( shortcuts.always_cast, left_click, right_click ) then
+local permanent_action_button_shortcuts = {
+	[ shortcuts.always_cast ] = function()
 		local max_uses = nil
 		do
 			local this_action_data = action_data[ permanent_action ]
@@ -85,10 +85,10 @@ local function do_permanent_shortcuts( edit_panel_state, left_click, right_click
 		end
 		table.remove( current_permanent_actions, j )
 		edit_panel_state.set_both( table_to_state_str( current_actions ), permanent_table_to_state_str( current_permanent_actions ), wrap_key( "operation_demote_permanent_action" ) )
-	end
-end
-local function do_shortcuts( edit_panel_state, left_click, right_click, i, action_id, capacity )
-	if shortcut_check.check( shortcuts.always_cast, left_click, right_click ) then
+	end,
+}
+local action_button_shortcuts = {
+	[ shortcuts.always_cast ] = function()
 		if action_id and action_id ~= "" then
 			local current_actions = {}
 			for s, a, u in state_str_iter_actions( edit_panel_state.get() ) do
@@ -99,7 +99,8 @@ local function do_shortcuts( edit_panel_state, left_click, right_click, i, actio
 				edit_panel_state.set_both( table_to_state_str( current_actions ), edit_panel_state.get_permanent() .. action_id .. ",", wrap_key( "operation_promote_permanent_action" ) )
 			end
 		end
-	elseif shortcut_check.check( shortcuts.expand_selection_left, left_click, right_click ) then
+	end,
+	[ shortcuts.expand_selection_left ] = function()
 		local current_actions = {}
 		local index = 1
 		local last_selected_index = 1
@@ -118,7 +119,8 @@ local function do_shortcuts( edit_panel_state, left_click, right_click, i, actio
 			end
 		end
 		edit_panel_state.set( table_to_state_str( current_actions ), wrap_key( "operation_select" ) )
-	elseif shortcut_check.check( shortcuts.expand_selection_right, left_click, right_click ) then	
+	end,
+	[ shortcuts.expand_selection_right ] = function()
 		local current_actions = {}
 		local index = 1
 		local next_selected_index = -1
@@ -147,7 +149,8 @@ local function do_shortcuts( edit_panel_state, left_click, right_click, i, actio
 			end
 		end
 		edit_panel_state.set( table_to_state_str( current_actions ), wrap_key( "operation_select" ) )
-	elseif shortcut_check.check( shortcuts.duplicate, left_click, right_click ) then
+	end,
+	[ shortcuts.duplicate ] = function()
 		local current_actions = {}
 		local selected_indexes = {}
 		local index = 1
@@ -180,7 +183,8 @@ local function do_shortcuts( edit_panel_state, left_click, right_click, i, actio
 			current_actions[ index + offset ] = selected_actions[ j ]
 		end
 		edit_panel_state.set( table_to_state_str( current_actions ), wrap_key( "operation_duplicate_action" ) )
-	elseif shortcut_check.check( shortcuts.multi_select, left_click, right_click ) then
+	end,
+	[ shortcuts.multi_select ] = function()
 		local current_actions = {}
 		for s, a, u in state_str_iter_actions( edit_panel_state.get() ) do
 			table.insert( current_actions, { s, a, u } )
@@ -191,7 +195,8 @@ local function do_shortcuts( edit_panel_state, left_click, right_click, i, actio
 			current_actions[ i ] = { true }
 		end
 		edit_panel_state.set( table_to_state_str( current_actions ), wrap_key( "operation_select" ) )
-	elseif shortcut_check.check( shortcuts.delete_action, left_click, right_click ) then
+	end,
+	[ shortcuts.delete_action ] = function()
 		local current_actions = {}
 		for s, a, u in state_str_iter_actions( edit_panel_state.get() ) do
 			table.insert( current_actions, { s, a, u } )
@@ -204,7 +209,8 @@ local function do_shortcuts( edit_panel_state, left_click, right_click, i, actio
 		end
 		current_actions[ i ] = { true }
 		edit_panel_state.set( table_to_state_str( current_actions ), wrap_key( "operation_clear_action_slot" ) )
-	elseif shortcut_check.check( shortcuts.delete_slot, left_click, right_click ) then
+	end,
+	[ shortcuts.delete_slot ] = function()
 		local current_actions = {}
 		for s, a, u in state_str_iter_actions( edit_panel_state.get() ) do
 			table.insert( current_actions, { s, a, u } )
@@ -217,7 +223,8 @@ local function do_shortcuts( edit_panel_state, left_click, right_click, i, actio
 		end
 		table.remove( current_actions, i )
 		edit_panel_state.set( table_to_state_str( current_actions ), wrap_key( "operation_delete_action_slot" ) )
-	elseif shortcut_check.check( shortcuts.swap, left_click, right_click ) then
+	end,
+	[ shortcuts.swap ] = function()
 		local current_actions = {}
 		local indexes_to_swap = {}
 		local index = 1
@@ -260,7 +267,8 @@ local function do_shortcuts( edit_panel_state, left_click, right_click, i, actio
 			end
 		end
 		edit_panel_state.set( table_to_state_str( current_actions ), wrap_key( "operation_swap_actions" ) )
-	elseif shortcut_check.check( shortcuts.override, left_click, right_click ) then
+	end,
+	[ shortcuts.override ] = function()
 		local current_actions = {}
 		local indexes_to_swap = {}
 		local index = 1
@@ -291,7 +299,8 @@ local function do_shortcuts( edit_panel_state, left_click, right_click, i, actio
 			current_actions[ index ] = { false }
 		end
 		edit_panel_state.set( table_to_state_str( current_actions ), wrap_key( "operation_override_actions" ) )
-	elseif shortcut_check.check( shortcuts.select, left_click, right_click ) then
+	end,
+	[ shortcuts.select ] = function()
 		local current_actions = {}
 		for s, a, u in state_str_iter_actions( edit_panel_state.get() ) do
 			table.insert( current_actions, { false, a, u } )
@@ -302,7 +311,8 @@ local function do_shortcuts( edit_panel_state, left_click, right_click, i, actio
 			current_actions[ i ] = { true }
 		end
 		edit_panel_state.set( table_to_state_str( current_actions ), wrap_key( "operation_select" ) )
-	elseif shortcut_check.check( shortcuts.deselect, left_click, right_click ) then
+	end,
+	[ shortcuts.deselect ] = function()
 		local current_actions = {}
 		for s, a, u in state_str_iter_actions( edit_panel_state.get() ) do
 			table.insert( current_actions, { s, a, u } )
@@ -313,8 +323,8 @@ local function do_shortcuts( edit_panel_state, left_click, right_click, i, actio
 			current_actions[ i ] = { false }
 		end
 		edit_panel_state.set( table_to_state_str( current_actions ), wrap_key( "operation_deselect" ) )
-	end
-end
+	end,
+}
 
 local permanent_rows_num = math.ceil( #permanent_actions / actions_per_row )
 if not_showing_all and panel_row_offset > 0 then
@@ -334,9 +344,7 @@ GuiLayoutBeginVertical( gui, 0, screen_height * 0.96 - ( rows_num + permanent_ro
 		end
 		if not create_real_sprite then
 			local left_click, right_click = do_action_button( permanent_action, 0, 0, false, do_least_tooltip, nil, permanent_note, show_permanent_icon )
-			if left_click or right_click then
-				do_permanent_shortcuts( edit_panel_state, left_click, right_click, j, permanent_action, capacity )
-			end
+			detect_shortcuts( gui, permanent_action_button_shortcuts, shortcut_used_keys, left_click, right_click )
 		else
 			GuiOptionsAddForNextWidget( gui, GUI_OPTION.NonInteractive )
 			GuiImageButton( gui, next_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/transparent_20x20.png" )
@@ -375,9 +383,7 @@ GuiLayoutBeginVertical( gui, 0, screen_height * 0.96 - rows_num * ( 20 + 2 ) + 2
 		local note = selected and note_selected or note_not_selected
 		if not create_real_sprite then
 			local left_click, right_click = do_action_button( action_id, 0, 0, selected, do_least_tooltip, uses_remaining, note, show_uses_remaining )
-			if left_click or right_click then
-				do_shortcuts( edit_panel_state, left_click, right_click, i, action_id, capacity )
-			end
+			detect_shortcuts( action_button_shortcuts, shortcut_used_keys )
 		else
 			GuiOptionsAddForNextWidget( gui, GUI_OPTION.NonInteractive )
 			GuiImageButton( gui, next_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/transparent_20x20.png" )

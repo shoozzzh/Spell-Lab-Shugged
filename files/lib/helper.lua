@@ -217,3 +217,7 @@ function is_action_unlocked( action )
 	end
 	return false
 end
+
+function optional_call( f, ... )
+	if f then return f( ... ) end
+end

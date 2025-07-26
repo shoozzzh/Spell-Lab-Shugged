@@ -53,6 +53,8 @@ local named_keys = {
 	JOY_BUTTON_1 = "$input_xboxbutton_b",
 	JOY_BUTTON_2 = "$input_xboxbutton_x",
 	JOY_BUTTON_3 = "$input_xboxbutton_y",
+	Mouse_x1 = "$input_mousebutton4",
+	Mouse_x2 = "$input_mousebutton5",
 }
 
 local custom_keys_i18n = {
@@ -75,7 +77,7 @@ end
 
 local function keyname_to_text( keyname, lang )
 	local result = named_keys[ keyname ]
-	if result then return result end
+	if result then return GameTextGetTranslatedOrNot( result ) end
 
 	local i18n = custom_keys_i18n[ lang ] or custom_keys_i18n.DEFAULT
 	result = i18n[ keyname ]
@@ -102,7 +104,11 @@ local function keyname_to_text( keyname, lang )
 			result = result .. " DOWN"
 		elseif keyname:find "%d%d_MOVED$" then
 			result = result .. " MOVED"
+		else
+			result = ("(%s)"):format( result ) -- to ensure they look different from keyboard keys e.g. (A) not A
 		end
+
+		return result
 	end
 	return GameTextGet( "$menuoptions_configurecontrols_keyname_unknown" )
 end
@@ -134,7 +140,12 @@ function shortcut_tostring( shortcut, lang )
 	for k, v in pairs( shortcut ) do
 		copy[ k ] = v
 	end
+	local trigger_key = copy[ #copy ]
+	copy[ #copy ] = nil
+
 	shortcut_sort( copy )
+
+	copy[ #copy + 1 ] = trigger_key
 
 	local strs_to_concat = {}
 	for _, key in ipairs( copy ) do

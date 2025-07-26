@@ -154,44 +154,45 @@ local character_keys = {
 	{ "Key_MINUS", "_" },
 }
 
-local Focus_SpellSearch = {
-	id = "spell_search",
-	on_focused = function() spell_search_focused = true end,
-	on_unfocused = function() spell_search_focused = false end,
-	on_input = function( keyboard_input )
-		if keyboard_input.Key_BACKSPACE then
-			current_action_search_needle:left_delete()
-		end
-		if keyboard_input.Key_DELETE then
-			current_action_search_needle:right_delete()
-		end
-		if keyboard_input.Key_HOME then
-			current_action_search_needle:input_anchor_move_to_beginning()
-		end
-		if keyboard_input.Key_END then
-			current_action_search_needle:input_anchor_move_to_end()
-		end
-		if keyboard_input.Key_LEFT then
-			if not keyboard_input.Key_ALT then
+do
+	local alt_right = { "Key_LEFT", "Key_ALT" }
+	local alt_right = { "Key_RIGHT", "Key_ALT" }
+	keyboard_focus.focusables.spell_search = {
+		on_focused = function() spell_search_focused = true end,
+		on_unfocused = function() spell_search_focused = false end,
+		update = function()
+			if shortcut_detector.is_fired( "Key_BACKSPACE" ) then
+				current_action_search_needle:left_delete()
+			end
+			if shortcut_detector.is_fired( "Key_DELETE" ) then
+				current_action_search_needle:right_delete()
+			end
+			if shortcut_detector.is_fired( "Key_HOME" ) then
+				current_action_search_needle:input_anchor_move_to_beginning()
+			end
+			if shortcut_detector.is_fired( "Key_END" ) then
+				current_action_search_needle:input_anchor_move_to_end()
+			end
+			if shortcut_detector.is_fired( "Key_LEFT" ) then
 				current_action_search_needle:input_anchor_move_left()
-			else
+			end
+			if shortcut_detector.is_fired( alt_left ) then
 				current_action_search_needle:input_anchor_move_to_last_word()
 			end
-		end
-		if keyboard_input.Key_RIGHT then
-			if not keyboard_input.Key_ALT then
+			if shortcut_detector.is_fired( "Key_RIGHT" ) then
 				current_action_search_needle:input_anchor_move_right()
-			else
+			end
+			if shortcut_detector.is_fired( alt_right ) then
 				current_action_search_needle:input_anchor_move_to_next_word()
 			end
-		end
-		for _, p in ipairs( character_keys ) do
-			if keyboard_input[ p[1] ] then
-				current_action_search_needle:insert_character( p[2] )
+			for _, p in ipairs( character_keys ) do
+				if shortcut_detector.is_fired( p[1] ) then
+					current_action_search_needle:insert_character( p[2] )
+				end
 			end
-		end
-	end,
-}
+		end,
+	}
+end
 
 local picker = {}
 
@@ -341,7 +342,7 @@ picker.menu = function()
 
 			if i == 3 then
 				GuiTooltip( gui, text_get( "spell_picker_tab_recent_tips", shortcut_texts.clear_action_history ) )
-				if shortcut_check.check( shortcuts.clear_action_history, left_click, right_click ) then
+				if shortcut_detector.is_fired( shortcuts.clear_action_history, shortcut_used_keys, left_click, right_click ) then
 					clear_action_history()
 					sound_button_clicked()
 				end
@@ -407,7 +408,7 @@ picker.menu = function()
 			local left_click, right_click = do_action_button( action.id, 0, 0, false, do_verbose_tooltip, action.max_uses, nil, show_locked_state, false, true )
 			if left_click or right_click then
 				local is_unlocked_action = action.spawn_requires_flag and HasFlagPersistent( action.spawn_requires_flag ) 
-				if shortcut_check.check( shortcuts.relock, left_click, right_click ) then
+				if shortcut_detector.is_fired( shortcuts.relock, left_click, right_click ) then
 					if is_unlocked_action then
 						RemoveFlagPersistent( action.spawn_requires_flag )
 					end
@@ -472,12 +473,8 @@ picker.menu = function()
 			end
 
 			GuiBeginScrollContainer( gui, next_id(), 0, 8, SCROLL_TABLE_WIDTH, keyboard_height )
-				if InputIsMouseButtonJustDown( Mouse_left ) then
-					local _,_,_,x,y,width,height,_,_,_,_ = previous_data( gui )
-					local mx, my = get_mouse_pos_on_screen()
-					if -2 <= mx - x and mx - x <= width + 2 and -2 <= my - y and my - y <= height + 2 then
-						interacting = true
-					end
+				if InputIsMouseButtonJustDown( Mouse_left ) and previous_hovered(2) then
+					interacting = true
 				end
 				local row_height = 13
 				local key_width = 13
@@ -500,6 +497,7 @@ picker.menu = function()
 					GuiTextInput( gui, next_id(), 0, 0, text_get_translated( "spell_picker_searchbox" ), input_bar_width, -1, CHARACTERS_ACTION_ID )
 					GuiTextInput( gui, next_id(), 0, 0, "", input_bar_width, -1, CHARACTERS_ACTION_ID )
 				end
+				local hovered = previous_hovered(2)
 				local _,_,_,x,y,width,height,_,_,_,_ = previous_data( gui )
 				if spell_search_focused or current_action_search_needle.text ~= "" then
 					local left_text = current_action_search_needle.text:sub( 1, current_action_search_needle.input_anchor - 1 )
@@ -511,30 +509,27 @@ picker.menu = function()
 					GuiImage( gui, next_id(), x + 1 + input_anchor_offset, y + 2 * ( text_input_height - 2 ) / ( image_height - 2 ), "mods/spell_lab_shugged/files/gui/input_anchor.png", 1, scale, 0 )
 					GuiLayoutEndLayer( gui )
 				end
-				if InputIsMouseButtonJustDown( Mouse_left ) then
-					local mx, my = get_mouse_pos_on_screen()
-					if -2 <= mx - x and mx - x <= width + 2 and -2 <= my - y and my - y <= height + 2 then
-						change_keyboard_focus( Focus_SpellSearch )
-						local width_mouse_pos = mx - x
-						local last_substring, substring
-						for i = 0, #current_action_search_needle.text do
-							substring = string.sub( current_action_search_needle.text, 1, i )
-							if GuiGetTextDimensions( gui, substring ) >= width_mouse_pos then
-								break
-							end
-							last_substring = substring
-							substring = nil
+				if InputIsMouseButtonJustDown( Mouse_left ) and hovered then
+					keyboard_focus.change_to( "spell_search" )
+					local width_mouse_pos = mx - x
+					local last_substring, substring
+					for i = 0, #current_action_search_needle.text do
+						substring = string.sub( current_action_search_needle.text, 1, i )
+						if GuiGetTextDimensions( gui, substring ) >= width_mouse_pos then
+							break
 						end
-						if last_substring and not substring then
+						last_substring = substring
+						substring = nil
+					end
+					if last_substring and not substring then
+						current_action_search_needle.input_anchor = #last_substring + 1
+					elseif not last_substring and substring then
+						current_action_search_needle.input_anchor = #substring + 1
+					elseif last_substring and substring then
+						if width_mouse_pos - GuiGetTextDimensions( gui, last_substring ) <= GuiGetTextDimensions( gui, substring ) - width_mouse_pos then
 							current_action_search_needle.input_anchor = #last_substring + 1
-						elseif not last_substring and substring then
+						else
 							current_action_search_needle.input_anchor = #substring + 1
-						elseif last_substring and substring then
-							if width_mouse_pos - GuiGetTextDimensions( gui, last_substring ) <= GuiGetTextDimensions( gui, substring ) - width_mouse_pos then
-								current_action_search_needle.input_anchor = #last_substring + 1
-							else
-								current_action_search_needle.input_anchor = #substring + 1
-							end
 						end
 					end
 				end
@@ -591,10 +586,10 @@ picker.menu = function()
 	GuiLayoutEnd( gui )
 
 	if spell_search_focused and filter_type ~= FILTER_TYPE_SEARCH then
-		change_keyboard_focus( Focus_PlayerControls )
+		keyboard_focus.change_to( "player_controls" )
 	elseif InputIsMouseButtonJustDown( Mouse_left ) then
 		if not interacting then
-			if change_keyboard_focus( Focus_PlayerControls ) then
+			if keyboard_focus.change_to( "player_controls" ) then
 				block_upcoming_wand_shooting()
 			end
 		end

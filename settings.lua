@@ -5,12 +5,294 @@ dofile_once( "mods/spell_lab_shugged/files/lib/shortcut_setting.lua" )
 local mod_id = "spell_lab_shugged"
 
 mod_settings_version = 1
+mod_settings = {
+	{
+		category_id = "wand_edit_panel",
+		foldable = true,
+		_folded = true,
+		settings = {
+			{
+				id                 = "wand_edit_panel_max_rows",
+				allowed_characters = "0123456789",
+				text_max_length    = 3,
+				value_default      = "5",
+			},
+			{
+				id                 = "wand_edit_panel_max_actions_per_row",
+				allowed_characters = "0123456789",
+				text_max_length    = 3,
+				value_default      = "0",
+			},
+			{
+				id                 = "wand_edit_panel_history_limit",
+				allowed_characters = "0123456789",
+				text_max_length    = 3,
+				value_default      = "30",
+			},
+			{
+				id = "wand_listener_type",
+			},
+		},
+	},
+	{
+		category_id = "spell_picker",
+		foldable = true,
+		_folded = true,
+		settings = {
+			{
+				id = "filter_buttons_trigger",
+			},
+			{
+				id            = "show_icon_unlocked",
+				value_default = false,
+			},
+			{
+				id                 = "action_history_limit",
+				allowed_characters = "0123456789",
+				text_max_length    = 3,
+				value_default      = "96",
+			},
+			{
+				id            = "include_spells_in_non_inv_wand",
+				value_default = false,
+			},
+			{
+				id            = "show_screen_keyboard",
+				value_default = false,
+			},
+		},
+	},
+	{
+		category_id = "creative_mode_flight_speed",
+		foldable = true,
+		_folded = true,
+		settings = {
+			{
+				id                 = "creative_mode_flight_speed_normal",
+				allowed_characters = "0123456789",
+				text_max_length    = 6,
+				value_default      = "200",
+			},
+			{
+				id                 = "creative_mode_flight_speed_faster",
+				allowed_characters = "0123456789",
+				text_max_length    = 6,
+				value_default      = "450",
+			},
+			{
+				id                 = "creative_mode_flight_speed_no_clip",
+				allowed_characters = "0123456789",
+				text_max_length    = 6,
+				value_default      = "300",
+			},
+		},
+	},
+	{
+		category_id = "all_seeing_eye",
+		foldable = true,
+		_folded = true,
+		settings = {
+			{
+				id                       = "all_seeing_eye_lighting",
+				value_default            = 0,
+				value_min                = 0,
+				value_max                = 1,
+				value_display_multiplier = 100,
+				value_display_formatting = " $0%",
+			},
+			{
+				id                       = "all_seeing_eye_fog_of_war_removing",
+				value_default            = 1,
+				value_min                = 0,
+				value_max                = 1,
+				value_display_multiplier = 100,
+				value_display_formatting = " $0%",
+			},
+		},
+	},
+	{
+		category_id = "shortcut",
+		foldable = true,
+		_folded = true,
+		settings = {
+			{
+				id            = "shortcut_strict",
+				value_default = false,
+				change_fn     = function( mod_id, gui, in_main_menu, setting, old_value, new_value )
+					ModSettingSetNextValue( mod_id .. ".shortcut_changed", true, false )
+				end,
+			},
+			{
+				category_id = "shortcut_general",
+				foldable = true,
+				_folded = true,
+				settings = {
+					{
+						id            = "shortcut_select",
+						value_default = '{"Mouse_left"}',
+						ui_fn         = mod_setting_shortcut,
+					},
+					{
+						id            = "shortcut_deselect",
+						value_default = '{"Mouse_right"}',
+						ui_fn         = mod_setting_shortcut,
+					},
+					{
+						id            = "shortcut_swap",
+						value_default = '{"Key_ALT","Mouse_left"}',
+						ui_fn         = mod_setting_shortcut,
+					},
+				}
+			},
+			{
+				category_id = "shortcut_multi_selectable",
+				foldable = true,
+				_folded = true,
+				settings = {
+					{
+						id            = "shortcut_multi_select",
+						value_default = '{"Key_CTRL","Mouse_left"}',
+						ui_fn         = mod_setting_shortcut,
+					},
+					{
+						id            = "shortcut_expand_selection_left",
+						value_default = '{"Key_CTRL","Key_ALT","Mouse_left"}',
+						ui_fn         = mod_setting_shortcut,
+					},
+					{
+						id            = "shortcut_expand_selection_right",
+						value_default = '{"Key_CTRL","Key_ALT","Mouse_right"}',
+						ui_fn         = mod_setting_shortcut,
+					},
+				},
+			},
+			{
+				category_id = "shortcut_wand_edit_panel",
+				foldable = true,
+				_folded = true,
+				settings = {
+					{
+						id            = "shortcut_override",
+						value_default = '{"Key_ALT","Mouse_right"}',
+						ui_fn         = mod_setting_shortcut,
+					},
+					{
+						id            = "shortcut_duplicate",
+						value_default = '{"Key_ALT","Key_SHIFT","Mouse_left"}',
+						ui_fn         = mod_setting_shortcut,
+					},
+					{
+						id            = "shortcut_delete_action",
+						value_default = '{"Key_SHIFT","Mouse_left"}',
+						ui_fn         = mod_setting_shortcut,
+					},
+					{
+						id            = "shortcut_delete_slot",
+						value_default = '{"Key_SHIFT","Mouse_right"}',
+						ui_fn         = mod_setting_shortcut,
+					},
+					{
+						id            = "shortcut_always_cast",
+						value_default = '{"Key_CTRL","Key_SHIFT","Mouse_left"}',
+						ui_fn         = mod_setting_shortcut,
+					},
+					{
+						id            = "shortcut_left_delete",
+						value_default = '{"Key_BACKSPACE"}',
+						ui_fn         = mod_setting_shortcut,
+					},
+					{
+						id            = "shortcut_right_delete",
+						value_default = '{"Key_DELETE"}',
+						ui_fn         = mod_setting_shortcut,
+					},
+					{
+						id            = "shortcut_undo",
+						value_default = '{"Key_CTRL","Key_z"}',
+						ui_fn         = mod_setting_shortcut,
+					},
+					{
+						id            = "shortcut_redo",
+						value_default = '{"Key_CTRL","Key_y"}',
+						ui_fn         = mod_setting_shortcut,
+					},
+				},
+			},
+			{
+				category_id = "shortcut_spell_picker",
+				foldable = true,
+				_folded = true,
+				settings = {
+					{
+						id            = "shortcut_relock",
+						value_default = '{"Key_CTRL","Key_SHIFT","Mouse_left"}',
+						ui_fn         = mod_setting_shortcut,
+					},
+					{
+						id            = "shortcut_replace_switch_temp",
+						value_default = '{"Key_SHIFT"}',
+						ui_fn         = mod_setting_shortcut,
+						shortcut_type = Shortcut_Type.Sustained,
+					},
+					{
+						id            = "shortcut_clear_action_history",
+						value_default = '{"Key_SHIFT","Mouse_right"}',
+						ui_fn         = mod_setting_shortcut,
+					},
+				},
+			},
+			{
+				category_id = "shortcut_wand_box",
+				foldable    = true,
+				_folded     = true,
+				settings    = {
+					{
+						id            = "shortcut_show_wand_stats",
+						value_default = '{"Key_CTRL"}',
+						ui_fn         = mod_setting_shortcut,
+						shortcut_type = Shortcut_Type.Sustained,
+					},
+				},
+			},
+			{
+				id            = "shortcut_confirm",
+				value_default = '{"Key_SHIFT"}',
+				ui_fn         = mod_setting_shortcut,
+				shortcut_type = Shortcut_Type.Sustained,
+			},
+			{
+				id            = "shortcut_transform_mortal_into_dummy",
+				value_default = '{"Key_SHIFT"}',
+				ui_fn         = mod_setting_shortcut,
+			},
+		},
+	},
+	{
+		id            = "no_weather",
+		value_default = false,
+		scope         = MOD_SETTING_SCOPE_RUNTIME_RESTART,
+	},
+	{
+		id            = "dummy_target_show_full_damage_number",
+		value_default = false,
+	},
+	{
+		id            = "button_click_sound",
+		value_default = false,
+	},
+	{
+		id            = "action_button_click_sound",
+		value_default = false,
+	},
+}
+
 local function load_mod_settings( cur_lang )
+	local text
 	if cur_lang == "简体中文" or cur_lang == "喵体中文" or cur_lang == "汪体中文" or cur_lang == "完全汉化" then
 		text = {
 			wand_edit_panel = "法杖编辑面板",
-			wand_edit_panel_max_num_rows = "最大行数",
-			wand_edit_panel_max_num_rows_description = "法杖编辑面板最多可以同时显示的行数，默认为 5",
+			wand_edit_panel_max_rows = "最大行数",
+			wand_edit_panel_max_rows_description = "法杖编辑面板最多可以同时显示的行数，默认为 5",
 			wand_edit_panel_max_actions_per_row = "单行格数限制",
 			wand_edit_panel_max_actions_per_row_description =
 				"限制法杖编辑面板单行最多可以显示的格数\n单行最多能容纳的格数自动由虚拟分辨率计算得出，然后应用此限制\n0 = 不进行限制",
@@ -50,8 +332,6 @@ local function load_mod_settings( cur_lang )
 			shortcut = "快捷键设置",
 			shortcut_strict = "严格检测",
 			shortcut_strict_description = "没有包含在任何快捷键中的键是否应该影响快捷键检测？",
-			shortcut_click_to_save = "（点击以保存）",
-			shortcut_click_here = " +（请点击）",
 			shortcut_general = "法杖编辑面板、法杖仓库 & 法术组合仓库",
 			shortcut_multi_selectable = "法杖编辑面板 & 法杖仓库",
 			shortcut_select = "选择",
@@ -64,7 +344,7 @@ local function load_mod_settings( cur_lang )
 			shortcut_wand_edit_panel = "法杖编辑面板",
 			shortcut_duplicate = "复制选中法术至此处",
 			shortcut_delete_action = "删除法术",
-			shortcut_delete_slot = "删除法术及其槽位",
+			shortcut_delete_slot = "删除法术并将右侧法术左移",
 			shortcut_always_cast = "设置/取消始终施放",
 			shortcut_undo = "撤销",
 			shortcut_redo = "恢复",
@@ -78,6 +358,12 @@ local function load_mod_settings( cur_lang )
 			shortcut_show_wand_stats = "显示法杖信息",
 			shortcut_confirm = "确认（删除等）",
 			shortcut_transform_mortal_into_dummy = "转化生物为伤害测试假人",
+			joystick_alternatives = "手柄类比鼠标",
+			joystick_alternative_to_Mouse_left = "鼠标左键",
+			joystick_alternative_to_Mouse_right = "鼠标右键",
+			joystick_alternative_to_Mouse_middle = "鼠标中键",
+			joystick_alternative_to_Mouse_x1 = "鼠标 4",
+			joystick_alternative_to_Mouse_x2 = "鼠标 5",
 			no_weather = "禁用天气",
 			no_weather_description = "开启时，天气将锁定为晴朗状态",
 			dummy_target_show_full_damage_number = "伤害测试假人显示完整伤害数字",
@@ -88,8 +374,8 @@ local function load_mod_settings( cur_lang )
 	else
 		text = {
 			wand_edit_panel = "Wand Edit Panel",
-			wand_edit_panel_max_num_rows = "Max Rows",
-			wand_edit_panel_max_num_rows_description = "How many rows should the wand edit panel show at most at the same time?\n5 by default",
+			wand_edit_panel_max_rows = "Max Rows",
+			wand_edit_panel_max_rows_description = "How many rows should the wand edit panel show at most at the same time?\n5 by default",
 			wand_edit_panel_max_actions_per_row = "Max Slots In One Row Limit",
 			wand_edit_panel_max_actions_per_row_description =
 				"How many slots should one row of the wand edit panel contain at most?\nNote: That is calculated with your virtual resolution magic numbers\n0 = No extra limit to it",
@@ -129,8 +415,6 @@ local function load_mod_settings( cur_lang )
 			shortcut = "Shortcuts Setting",
 			shortcut_strict = "Strict Detection",
 			shortcut_strict_description = "Should keys that not used in any shortcut be considered in shortcut detection?",
-			shortcut_click_to_save = " (click to save)",
-			shortcut_click_here = " + (click here)",
 			shortcut_general = "Wand Edit Panel, Wand Box & Spell Group Box",
 			shortcut_multi_selectable = "Wand Edit Panel & Wand Box",
 			shortcut_select = "Select",
@@ -143,7 +427,7 @@ local function load_mod_settings( cur_lang )
 			shortcut_wand_edit_panel = "Wand Edit Panel",
 			shortcut_duplicate = "Duplicate spell(s)",
 			shortcut_delete_action = "Delete spell",
-			shortcut_delete_slot = "Delete slot",
+			shortcut_delete_slot = "Delete spell and shift following spells left",
 			shortcut_always_cast = "Promote/Demote always-cast",
 			shortcut_undo = "Undo",
 			shortcut_redo = "Redo",
@@ -157,6 +441,12 @@ local function load_mod_settings( cur_lang )
 			shortcut_show_wand_stats = "Show wand stats",
 			shortcut_confirm = "Confirm (deletions, etc.)",
 			shortcut_transform_mortal_into_dummy = "Target dummy transformation",
+			joystick_alternatives = "Joystick As Mouse",
+			joystick_alternative_to_Mouse_left = "Mouse left",
+			joystick_alternative_to_Mouse_right = "Mouse right",
+			joystick_alternative_to_Mouse_middle = "Mouse middle",
+			joystick_alternative_to_Mouse_x1 = "Mouse 4",
+			joystick_alternative_to_Mouse_x2 = "Mouse 5",
 			no_weather = "Disable Weather",
 			no_weather_description = "Should we disable all kinds of rain or snow?",
 			dummy_target_show_full_damage_number = "Show Full Damage Number For Dummy Targets",
@@ -165,408 +455,31 @@ local function load_mod_settings( cur_lang )
 			action_button_click_sound = "Spell Button Click sound",
 		}
 	end
-	mod_settings = {
-		{
-			category_id = "wand_edit_panel",
-			ui_name = text.wand_edit_panel,
-			foldable = true,
-			_folded = true,
-			settings = {
-				{
-					id                 = "wand_edit_panel_max_rows",
-					ui_name            = text.wand_edit_panel_max_num_rows,
-					ui_description     = text.wand_edit_panel_max_num_rows_description,
-					allowed_characters = "0123456789",
-					text_max_length    = 3,
-					value_default      = "5",
-					scope              = MOD_SETTING_SCOPE_RUNTIME,
-				},
-				{
-					id                 = "wand_edit_panel_max_actions_per_row",
-					ui_name            = text.wand_edit_panel_max_actions_per_row,
-					ui_description     = text.wand_edit_panel_max_actions_per_row_description,
-					allowed_characters = "0123456789",
-					text_max_length    = 3,
-					value_default      = "0",
-					scope              = MOD_SETTING_SCOPE_RUNTIME,
-				},
-				{
-					id                 = "wand_edit_panel_history_limit",
-					ui_name            = text.wand_edit_panel_history_limit,
-					ui_description     = text.wand_edit_panel_history_limit_description,
-					allowed_characters = "0123456789",
-					text_max_length    = 3,
-					value_default      = "30",
-					scope              = MOD_SETTING_SCOPE_RUNTIME,
-				},
-				{
-					id                 = "wand_listener_type",
-					ui_name            = text.wand_listener_type,
-					ui_description     = text.wand_listener_type_description,
-					value_default      = text.wand_listener_type_values[1][1],
-					values             = text.wand_listener_type_values,
-					scope              = MOD_SETTING_SCOPE_RUNTIME,
-				},
-			},
-		},
-		{
-			category_id = "spell_picker",
-			ui_name = text.spell_picker,
-			foldable = true,
-			_folded = true,
-			settings = {
-				{
-					id                 = "filter_buttons_trigger",
-					ui_name            = text.filter_buttons_trigger,
-					ui_description     = text.filter_buttons_trigger_description,
-					value_default      = text.filter_buttons_trigger_values[1][1],
-					values             = text.filter_buttons_trigger_values,
-					scope              = MOD_SETTING_SCOPE_RUNTIME,
-				},
-				{
-					id                 = "show_icon_unlocked",
-					ui_name            = text.show_icon_unlocked,
-					ui_description     = text.show_icon_unlocked_description,
-					value_default      = false,
-					scope              = MOD_SETTING_SCOPE_RUNTIME,
-				},
-				{
-					id                 = "action_history_limit",
-					ui_name            = text.action_history_limit,
-					ui_description     = text.action_history_limit_description,
-					allowed_characters = "0123456789",
-					text_max_length    = 3,
-					value_default      = "96",
-					scope              = MOD_SETTING_SCOPE_RUNTIME,
-				},
-				{
-					id                 = "include_spells_in_non_inv_wand",
-					ui_name            = text.include_spells_in_non_inv_wand,
-					ui_description     = text.include_spells_in_non_inv_wand_description,
-					value_default      = false,
-					scope              = MOD_SETTING_SCOPE_RUNTIME,
-				},
-				{
-					id                 = "show_screen_keyboard",
-					ui_name            = text.show_screen_keyboard,
-					value_default      = false,
-					scope              = MOD_SETTING_SCOPE_RUNTIME,
-				},
-			},
-		},
-		{
-			category_id = "creative_mode_flight_speed",
-			ui_name = text.creative_mode_flight_speed,
-			foldable = true,
-			_folded = true,
-			settings = {
-				{
-					id                 = "creative_mode_flight_speed_normal",
-					ui_name            = text.creative_mode_flight_speed_normal,
-					ui_description     = text.creative_mode_flight_speed_normal_description,
-					allowed_characters = "0123456789",
-					text_max_length    = 6,
-					value_default      = "200",
-					scope              = MOD_SETTING_SCOPE_RUNTIME,
-				},
-				{
-					id                 = "creative_mode_flight_speed_faster",
-					ui_name            = text.creative_mode_flight_speed_faster,
-					ui_description     = text.creative_mode_flight_speed_faster_description,
-					allowed_characters = "0123456789",
-					text_max_length    = 6,
-					value_default      = "450",
-					scope              = MOD_SETTING_SCOPE_RUNTIME,
-				},
-				{
-					id                 = "creative_mode_flight_speed_no_clip",
-					ui_name            = text.creative_mode_flight_speed_no_clip,
-					ui_description     = text.creative_mode_flight_speed_no_clip_description,
-					allowed_characters = "0123456789",
-					text_max_length    = 6,
-					value_default      = "300",
-					scope              = MOD_SETTING_SCOPE_RUNTIME,
-				},
-			},
-		},
-		{
-			category_id = "all_seeing_eye",
-			ui_name = text.all_seeing_eye,
-			foldable = true,
-			_folded = true,
-			settings = {
-				{
-					id                       = "all_seeing_eye_lighting",
-					ui_name                  = text.all_seeing_eye_lighting,
-					value_default            = 0,
-					value_min                = 0,
-					value_max                = 1,
-					value_display_multiplier = 100,
-					value_display_formatting = " $0%",
-					scope                    = MOD_SETTING_SCOPE_RUNTIME,
-				},
-				{
-					id                       = "all_seeing_eye_fog_of_war_removing",
-					ui_name                  = text.all_seeing_eye_fog_of_war_removing,
-					value_default            = 1,
-					value_min                = 0,
-					value_max                = 1,
-					value_display_multiplier = 100,
-					value_display_formatting = " $0%",
-					scope                    = MOD_SETTING_SCOPE_RUNTIME,
-				},
-			},
-		},
-		{
-			category_id = "shortcut",
-			ui_name = text.shortcut,
-			foldable = true,
-			_folded = true,
-			settings = {
-				{
-					id             = "shortcut_strict",
-					ui_name        = text.shortcut_strict,
-					ui_description = text.shortcut_strict_description,
-					value_default  = false,
-					scope          = MOD_SETTING_SCOPE_RUNTIME,
-					change_fn      = function( mod_id, gui, in_main_menu, setting, old_value, new_value )
-						ModSettingSet( mod_id .. ".shortcut_changed", true, false )
-					end,
-				},
-				{
-					category_id = "shortcut_general",
-					ui_name = text.shortcut_general,
-					foldable = true,
-					_folded = true,
-					settings = {
-						{
-							id             = "shortcut_select",
-							ui_name        = text.shortcut_select,
-							value_default  = '{"Mouse_left"}',
-							scope          = MOD_SETTING_SCOPE_RUNTIME,
-							ui_fn          = mod_setting_shortcut,
-							click_required = true,
-						},
-						{
-							id             = "shortcut_deselect",
-							ui_name        = text.shortcut_deselect,
-							value_default  = '{"Mouse_right"}',
-							scope          = MOD_SETTING_SCOPE_RUNTIME,
-							ui_fn          = mod_setting_shortcut,
-							click_required = true,
-						},
-						{
-							id             = "shortcut_swap",
-							ui_name        = text.shortcut_swap,
-							value_default  = '{"Key_ALT","Mouse_left"}',
-							scope          = MOD_SETTING_SCOPE_RUNTIME,
-							ui_fn          = mod_setting_shortcut,
-							click_required = true,
-						},
-					}
-				},
-				{
-					category_id = "shortcut_multi_selectable",
-					ui_name = text.shortcut_multi_selectable,
-					foldable = true,
-					_folded = true,
-					settings = {
-						{
-							id             = "shortcut_multi_select",
-							ui_name        = text.shortcut_multi_select,
-							value_default  = '{"Key_CTRL","Mouse_left"}',
-							scope          = MOD_SETTING_SCOPE_RUNTIME,
-							ui_fn          = mod_setting_shortcut,
-							click_required = true,
-						},
-						{
-							id             = "shortcut_expand_selection_left",
-							ui_name        = text.shortcut_expand_selection_left,
-							value_default  = '{"Key_CTRL","Key_ALT","Mouse_left"}',
-							scope          = MOD_SETTING_SCOPE_RUNTIME,
-							ui_fn          = mod_setting_shortcut,
-							click_required = true,
-						},
-						{
-							id             = "shortcut_expand_selection_right",
-							ui_name        = text.shortcut_expand_selection_right,
-							value_default  = '{"Key_CTRL","Key_ALT","Mouse_right"}',
-							scope          = MOD_SETTING_SCOPE_RUNTIME,
-							ui_fn          = mod_setting_shortcut,
-							click_required = true,
-						},
-					},
-				},
-				{
-					category_id = "shortcut_wand_edit_panel",
-					ui_name = text.shortcut_wand_edit_panel,
-					foldable = true,
-					_folded = true,
-					settings = {
-						{
-							id             = "shortcut_override",
-							ui_name        = text.shortcut_override,
-							value_default  = '{"Key_ALT","Mouse_right"}',
-							scope          = MOD_SETTING_SCOPE_RUNTIME,
-							ui_fn          = mod_setting_shortcut,
-							click_required = true,
-						},
-						{
-							id             = "shortcut_duplicate",
-							ui_name        = text.shortcut_duplicate,
-							value_default  = '{"Key_ALT","Key_SHIFT","Mouse_left"}',
-							scope          = MOD_SETTING_SCOPE_RUNTIME,
-							ui_fn          = mod_setting_shortcut,
-							click_required = true,
-						},
-						{
-							id             = "shortcut_delete_action",
-							ui_name        = text.shortcut_delete_action,
-							value_default  = '{"Key_SHIFT","Mouse_left"}',
-							scope          = MOD_SETTING_SCOPE_RUNTIME,
-							ui_fn          = mod_setting_shortcut,
-							click_required = true,
-						},
-						{
-							id             = "shortcut_delete_slot",
-							ui_name        = text.shortcut_delete_slot,
-							value_default  = '{"Key_SHIFT","Mouse_right"}',
-							scope          = MOD_SETTING_SCOPE_RUNTIME,
-							ui_fn          = mod_setting_shortcut,
-							click_required = true,
-						},
-						{
-							id             = "shortcut_always_cast",
-							ui_name        = text.shortcut_always_cast,
-							value_default  = '{"Key_CTRL","Key_SHIFT","Mouse_left"}',
-							scope          = MOD_SETTING_SCOPE_RUNTIME,
-							ui_fn          = mod_setting_shortcut,
-							click_required = true,
-						},
-						{
-							id            = "shortcut_left_delete",
-							ui_name       = text.shortcut_left_delete,
-							value_default = '{"Key_BACKSPACE"}',
-							scope         = MOD_SETTING_SCOPE_RUNTIME,
-							ui_fn         = mod_setting_shortcut,
-						},
-						{
-							id            = "shortcut_right_delete",
-							ui_name       = text.shortcut_right_delete,
-							value_default = '{"Key_DELETE"}',
-							scope         = MOD_SETTING_SCOPE_RUNTIME,
-							ui_fn         = mod_setting_shortcut,
-						},
-						{
-							id            = "shortcut_undo",
-							ui_name       = text.shortcut_undo,
-							value_default = '{"Key_CTRL","Key_z"}',
-							scope         = MOD_SETTING_SCOPE_RUNTIME,
-							ui_fn         = mod_setting_shortcut,
-						},
-						{
-							id            = "shortcut_redo",
-							ui_name       = text.shortcut_redo,
-							value_default = '{"Key_CTRL","Key_y"}',
-							scope         = MOD_SETTING_SCOPE_RUNTIME,
-							ui_fn         = mod_setting_shortcut,
-						},
-					},
-				},
-				{
-					category_id = "shortcut_spell_picker",
-					ui_name = text.shortcut_spell_picker,
-					foldable = true,
-					_folded = true,
-					settings = {
-						{
-							id             = "shortcut_relock",
-							ui_name        = text.shortcut_relock,
-							value_default  = '{"Key_CTRL","Key_SHIFT","Mouse_left"}',
-							scope          = MOD_SETTING_SCOPE_RUNTIME,
-							ui_fn          = mod_setting_shortcut,
-							click_required = true,
-						},
-						{
-							id             = "shortcut_replace_switch_temp",
-							ui_name        = text.shortcut_replace_switch_temp,
-							value_default  = '{"Key_SHIFT"}',
-							scope          = MOD_SETTING_SCOPE_RUNTIME,
-							ui_fn          = mod_setting_shortcut,
-						},
-						{
-							id             = "shortcut_clear_action_history",
-							ui_name        = text.shortcut_clear_action_history,
-							value_default  = '{"Key_SHIFT","Mouse_right"}',
-							scope          = MOD_SETTING_SCOPE_RUNTIME,
-							ui_fn          = mod_setting_shortcut,
-							click_required = true,
-						},
-					},
-				},
-				{
-					category_id = "shortcut_wand_box",
-					ui_name = text.shortcut_wand_box,
-					foldable = true,
-					_folded = true,
-					settings = {
-						{
-							id             = "shortcut_show_wand_stats",
-							ui_name        = text.shortcut_show_wand_stats,
-							value_default  = '{"Key_CTRL"}',
-							scope          = MOD_SETTING_SCOPE_RUNTIME,
-							ui_fn          = mod_setting_shortcut,
-						},
-					},
-				},
-				{
-					id             = "shortcut_confirm",
-					ui_name        = text.shortcut_confirm,
-					value_default  = '{"Key_SHIFT"}',
-					scope          = MOD_SETTING_SCOPE_RUNTIME,
-					ui_fn          = mod_setting_shortcut,
-				},
-				{
-					id             = "shortcut_transform_mortal_into_dummy",
-					ui_name        = text.shortcut_transform_mortal_into_dummy,
-					value_default  = '{"Key_SHIFT"}',
-					scope          = MOD_SETTING_SCOPE_RUNTIME,
-					ui_fn          = mod_setting_shortcut,
-				},
-			},
-		},
-		{
-			id                 = "no_weather",
-			ui_name            = text.no_weather,
-			ui_description     = text.no_weather_description,
-			value_default      = false,
-			scope              = MOD_SETTING_SCOPE_RUNTIME_RESTART,
-		},
-		{
-			id                 = "dummy_target_show_full_damage_number",
-			ui_name            = text.dummy_target_show_full_damage_number,
-			ui_description     = text.dummy_target_show_full_damage_number_description,
-			value_default      = false,
-			scope              = MOD_SETTING_SCOPE_RUNTIME,
-		},
-		{
-			id                 = "button_click_sound",
-			ui_name            = text.button_click_sound,
-			value_default      = false,
-			scope              = MOD_SETTING_SCOPE_RUNTIME,
-		},
-		{
-			id                 = "action_button_click_sound",
-			ui_name            = text.action_button_click_sound,
-			value_default      = false,
-			scope              = MOD_SETTING_SCOPE_RUNTIME,
-		},
-	}
+	local function recursive( setting )
+		if setting.id ~= nil then
+			setting.ui_name = text[ setting.id ]
+			setting.ui_description = text[ setting.id .. "_description" ]
+			if text[ setting.id .. "_values" ] ~= nil then
+				setting.values = text[ setting.id .. "_values" ]
+				setting.value_default = setting.values[1][1]
+			end
+			setting.scope = setting.scope or MOD_SETTING_SCOPE_RUNTIME
+		elseif setting.category_id ~= nil then
+			setting.ui_name = text[ setting.category_id ]
+			setting.ui_description = text[ setting.category_id .. "_description" ]
+			for _, s in ipairs( setting.settings ) do
+				recursive( s )
+			end
+		end
+	end
+	for _, s in ipairs( mod_settings ) do
+		recursive( s )
+	end
 end
+
 load_mod_settings()
 
 function ModSettingsUpdate( init_scope )
-	local old_version = mod_settings_get_version( mod_id ) -- This can be used to migrate some settings between mod versions.
 	mod_settings_update( mod_id, mod_settings, init_scope )
 end
 

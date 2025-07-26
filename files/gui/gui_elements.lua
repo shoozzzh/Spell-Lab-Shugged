@@ -1,3 +1,18 @@
+function GuiColoredText( gui, red, green, blue, alpha, ... )
+	GuiColorSetForNextWidget( gui, red, green, blue, alpha )
+	GuiText( gui, ... )
+end
+
+function GuiSoftText( gui, ... )
+	GuiColorSetForNextWidget( gui, color(207,207,207,255) )
+	GuiText( gui, ... )
+end
+
+function GuiDimText( gui, ... )
+	GuiColorSetForNextWidget( gui, 0.5, 0.5, 0.5, 1.0 )
+	GuiText( gui, ... )
+end
+
 SCROLL_TABLE_WIDTH = 174
 function do_scroll_table( scroll_id, width, height, height_autofit, hover_callback, cell_list, cell_gui_func, row_size )
 	row_size = row_size or 8
@@ -11,14 +26,9 @@ function do_scroll_table( scroll_id, width, height, height_autofit, hover_callba
 
 	GuiBeginScrollContainer( gui, scroll_id, 0, 0, width, height )
 		do
-			local _,_,_,x,y,width,height,_,_,_,_ = previous_data( gui )
-			_x, _y = x, y
-			local mx, my = get_mouse_pos_on_screen()
-			-- extra 2 pixels for the margins
-			local hovered = -2 <= mx - x and mx - x <= width + 2 and -2 <= my - y and my - y <= height + 2
-			if hover_callback then
-				hover_callback( hovered )
-			end
+			local _,_,_,_x,_y,_,_,_,_,_,_ = previous_data( gui )
+			local hovered = previous_hovered(2)
+			optional_call( hover_callback, hovered )
 			scroll_box_no_wand_switching( hovered )
 		end
 		GuiLayoutBeginVertical( gui, 0, 0 )
@@ -125,9 +135,7 @@ function do_action_button( action_id, x, y, selected, tooltip_func, uses_remaini
 					end
 					GuiText( gui, 0, 0, title )
 				end
-				if tooltip_func then
-					tooltip_func( this_action_data, this_action_metadata )
-				end
+				optional_call( tooltip_func, this_action_data, this_action_metadata )
 				if note then
 					GuiDimText( gui, 0, 0, note )
 				end
