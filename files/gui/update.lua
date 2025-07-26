@@ -51,7 +51,6 @@ action_metadata, extra_modifier_metadata, metadata_to_show =
 local is_panel_open = false
 
 dofile_once( "mods/spell_lab_shugged/files/gui/edit_panel_utils.lua" )
-dofile_once( "mods/spell_lab_shugged/files/gui/pickers.lua" )
 
 action_id_to_idx = {}
 
@@ -224,6 +223,8 @@ function reload_shortcut_texts()
 end
 
 reload_shortcuts()
+
+dofile_once( "mods/spell_lab_shugged/files/gui/pickers.lua" )
 
 function do_gui()
 	shift = InputIsKeyDown( Key_LSHIFT ) or InputIsKeyDown( Key_RSHIFT )
