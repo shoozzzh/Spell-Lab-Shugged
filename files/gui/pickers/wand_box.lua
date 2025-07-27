@@ -243,7 +243,7 @@ picker.menu = function()
 					if left_click or right_click then
 						wand_box_delete_wand_confirming = false
 					end
-					detect_shortcuts( gui, wand_button_shortcuts, shortcut_used_keys, left_click, right_click )
+					detect_shortcuts( gui, wand_button_shortcuts, shortcut_used_keys )
 					::skip::
 					do_custom_tooltip( function()
 						if not shortcut_detector.is_held( shortcuts.show_wand_stats, left_click, right_click ) then

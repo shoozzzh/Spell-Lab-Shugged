@@ -31,21 +31,22 @@ return function( keystroke_listener )
 		local inverted_shortcut = get_inverted( shortcut, dont_cache )
 
 		local trigger_key = shortcut[ #shortcut ]
-		if not keystroke_listener.just_down[ trigger_key ] then return end
+		if trigger_key == "Mouse_left" then
+			if xor( left_click, inverted_shortcut.Mouse_left ) then return false end
+		elseif trigger_key == "Mouse_right" then
+			if xor( right_click, inverted_shortcut.Mouse_right ) then return false end
+		else
+			if not keystroke_listener.just_down[ trigger_key ] then return false end
+		end
 
 		for _, key in pairs( detection_range ) do
 			if xor( keystroke_listener.down[ key ], inverted_shortcut[ key ] ) then return false end
 		end
 
-		if left_click ~= nil or right_click ~= nil then
-			if xor( left_click, inverted_shortcut.Mouse_left ) then return false end
-			if xor( right_click, inverted_shortcut.Mouse_right ) then return false end
-		end
-
 		return true
 	end
 
-	function shortcut_detector:is_held( shortcut, detection_range, dont_cache )
+	function shortcut_detector.is_held( shortcut, detection_range, dont_cache )
 		if #shortcut == 0 then return false end
 		
 		detection_range = detection_range or keystroke_listener.listened_keys

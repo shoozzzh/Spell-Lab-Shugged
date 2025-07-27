@@ -383,7 +383,7 @@ GuiLayoutBeginVertical( gui, 0, screen_height * 0.96 - rows_num * ( 20 + 2 ) + 2
 		local note = selected and note_selected or note_not_selected
 		if not create_real_sprite then
 			local left_click, right_click = do_action_button( action_id, 0, 0, selected, do_least_tooltip, uses_remaining, note, show_uses_remaining )
-			detect_shortcuts( action_button_shortcuts, shortcut_used_keys )
+			detect_shortcuts( gui, action_button_shortcuts, shortcut_used_keys, left_click, right_click )
 		else
 			GuiOptionsAddForNextWidget( gui, GUI_OPTION.NonInteractive )
 			GuiImageButton( gui, next_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/transparent_20x20.png" )
