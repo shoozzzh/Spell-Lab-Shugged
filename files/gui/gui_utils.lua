@@ -126,15 +126,17 @@ function do_content_wrapped( content_fn, push_this_string )
 end
 
 -- usage: detect_shortcuts( gui, { [{"Mouse_left"}] = xxx, [{"Mouse_right"}] = yyy, } )
-function detect_shortcuts( gui, shortcutz, detection_range, left_click, right_click )
-	local _left_click, _right_click, hover = previous_data( gui )
+function detect_shortcuts( gui, shortcutz, detection_range, left_click, right_click, hover, args )
+	local _left_click, _right_click, _hover = previous_data( gui )
 	if left_click == nil then left_click = _left_click end
 	if right_click == nil then right_click = _right_click end
+	if hover == nil then hover = _hover end
+
 	if not hover then return end
 
 	for shortcut, do_what in pairs( shortcutz ) do
 		if shortcut_detector.is_fired( shortcut, left_click, right_click, detection_range ) then
-			do_what()
+			do_what( unpack( args ) )
 			return
 		end
 	end

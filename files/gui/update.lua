@@ -199,6 +199,8 @@ function reload_shortcuts()
 				inverted[ key ] = true
 			end
 		end
+		inverted.Mouse_left = nil
+		inverted.Mouse_right = nil
 		for key, _ in pairs( inverted ) do
 			shortcut_used_keys[ #shortcut_used_keys + 1 ] = key
 		end

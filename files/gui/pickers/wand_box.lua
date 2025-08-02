@@ -147,7 +147,7 @@ for name, key in pairs( t ) do
 end
 
 local wand_button_shortcuts = {
-	[ shortcuts.expand_selection_left ] = function()
+	[ shortcuts.expand_selection_left ] = function( wand_index, current_page )
 		local to = 1
 		for i = wand_index, 1, -1 do
 			if wand_box_selected_indexes[ i ] then
@@ -159,7 +159,7 @@ local wand_button_shortcuts = {
 			wand_box_selected_indexes[ i ] = true
 		end
 	end,
-	[ shortcuts.expand_selection_right ] = function()
+	[ shortcuts.expand_selection_right ] = function( wand_index, current_page )
 		local to = #current_page
 		for i = wand_index, #current_page do
 			if wand_box_selected_indexes[ i ] then
@@ -171,10 +171,10 @@ local wand_button_shortcuts = {
 			wand_box_selected_indexes[ i ] = true
 		end
 	end,
-	[ shortcuts.multi_select ] = function()
+	[ shortcuts.multi_select ] = function( wand_index, current_page )
 		wand_box_selected_indexes[ wand_index ] = not wand_box_selected_indexes[ wand_index ]
 	end,
-	[ shortcuts.swap ] = function()
+	[ shortcuts.swap ] = function( wand_index, current_page )
 		local indexes_to_swap = {}
 		for i = 1, #current_page do
 			if wand_box_selected_indexes[ i ] then
@@ -212,10 +212,10 @@ local wand_button_shortcuts = {
 			end
 		end
 	end,
-	[ shortcuts.select ] = function()
+	[ shortcuts.select ] = function( wand_index, current_page )
 		wand_box_selected_indexes = { [ wand_index ] = true }
 	end,
-	[ shortcuts.deselect ] = function()
+	[ shortcuts.deselect ] = function( wand_index, current_page )
 		wand_box_selected_indexes[ wand_index ] = false
 	end,
 }
@@ -243,10 +243,11 @@ picker.menu = function()
 					if left_click or right_click then
 						wand_box_delete_wand_confirming = false
 					end
-					detect_shortcuts( gui, wand_button_shortcuts, shortcut_used_keys )
+					local args = { wand_index, current_page }
+					detect_shortcuts( gui, wand_button_shortcuts, shortcut_used_keys, nil, nil, nil, args )
 					::skip::
 					do_custom_tooltip( function()
-						if not shortcut_detector.is_held( shortcuts.show_wand_stats, left_click, right_click ) then
+						if not shortcut_detector.is_held( shortcuts.show_wand_stats, shortcut_used_keys ) then
 							do_simple_action_list( saved_wand.all_actions )
 							GuiLayoutBeginHorizontal( gui, 0, 0 )
 								GuiDimText( gui, 0, 0, GameTextGet(

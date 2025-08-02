@@ -103,7 +103,6 @@ function do_action_button( action_id, x, y, selected, tooltip_func, uses_remaini
 	if y == nil then y = 0 end
 	local image_sprite = "mods/spell_lab_shugged/files/gui/buttons/empty_spell.png"
 	local this_action_data =  action_data[action_id]
-	local left_click,right_click,hover
 	local spell_box_suffix = ""
 
 	GuiLayoutBeginHorizontal( gui, 0, 0 )
@@ -115,7 +114,7 @@ function do_action_button( action_id, x, y, selected, tooltip_func, uses_remaini
 	local this_action_metadata = action_metadata[ action_id ]
 
 	GuiImageButton( gui, next_id(), 2, 2, "", image_sprite )
-	local left_click,right_click,hover = previous_data( gui )
+	local left_click, right_click, hover = previous_data( gui )
 
 	if selected then
 		spell_box_suffix = spell_box_suffix .. "_active"
@@ -155,7 +154,7 @@ function do_action_button( action_id, x, y, selected, tooltip_func, uses_remaini
 	if left_click or right_click then
 		sound_action_button_clicked()
 	end
-	return left_click, right_click
+	return left_click, right_click, hover
 end
 
 function do_fake_action_button( action_type, action_sprite, name, id, desc, type, semi_transparent, uses_remaining, properties )

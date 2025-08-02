@@ -50,7 +50,7 @@ end
 local create_real_sprite = mod_setting_get( "gif_mode" )
 
 local permanent_action_button_shortcuts = {
-	[ shortcuts.always_cast ] = function()
+	[ shortcuts.always_cast ] = function( edit_panel_state, j, permanent_action, capacity )
 		local max_uses = nil
 		do
 			local this_action_data = action_data[ permanent_action ]
@@ -88,7 +88,7 @@ local permanent_action_button_shortcuts = {
 	end,
 }
 local action_button_shortcuts = {
-	[ shortcuts.always_cast ] = function()
+	[ shortcuts.always_cast ] = function( edit_panel_state, left_click, right_click, i, action_id, capacity )
 		if action_id and action_id ~= "" then
 			local current_actions = {}
 			for s, a, u in state_str_iter_actions( edit_panel_state.get() ) do
@@ -100,7 +100,7 @@ local action_button_shortcuts = {
 			end
 		end
 	end,
-	[ shortcuts.expand_selection_left ] = function()
+	[ shortcuts.expand_selection_left ] = function( edit_panel_state, left_click, right_click, i, action_id, capacity )
 		local current_actions = {}
 		local index = 1
 		local last_selected_index = 1
@@ -120,7 +120,7 @@ local action_button_shortcuts = {
 		end
 		edit_panel_state.set( table_to_state_str( current_actions ), wrap_key( "operation_select" ) )
 	end,
-	[ shortcuts.expand_selection_right ] = function()
+	[ shortcuts.expand_selection_right ] = function( edit_panel_state, left_click, right_click, i, action_id, capacity )
 		local current_actions = {}
 		local index = 1
 		local next_selected_index = -1
@@ -150,7 +150,7 @@ local action_button_shortcuts = {
 		end
 		edit_panel_state.set( table_to_state_str( current_actions ), wrap_key( "operation_select" ) )
 	end,
-	[ shortcuts.duplicate ] = function()
+	[ shortcuts.duplicate ] = function( edit_panel_state, i, action_id, capacity )
 		local current_actions = {}
 		local selected_indexes = {}
 		local index = 1
@@ -184,7 +184,7 @@ local action_button_shortcuts = {
 		end
 		edit_panel_state.set( table_to_state_str( current_actions ), wrap_key( "operation_duplicate_action" ) )
 	end,
-	[ shortcuts.multi_select ] = function()
+	[ shortcuts.multi_select ] = function( edit_panel_state, i, action_id, capacity )
 		local current_actions = {}
 		for s, a, u in state_str_iter_actions( edit_panel_state.get() ) do
 			table.insert( current_actions, { s, a, u } )
@@ -196,7 +196,7 @@ local action_button_shortcuts = {
 		end
 		edit_panel_state.set( table_to_state_str( current_actions ), wrap_key( "operation_select" ) )
 	end,
-	[ shortcuts.delete_action ] = function()
+	[ shortcuts.delete_action ] = function( edit_panel_state, i, action_id, capacity )
 		local current_actions = {}
 		for s, a, u in state_str_iter_actions( edit_panel_state.get() ) do
 			table.insert( current_actions, { s, a, u } )
@@ -210,7 +210,7 @@ local action_button_shortcuts = {
 		current_actions[ i ] = { true }
 		edit_panel_state.set( table_to_state_str( current_actions ), wrap_key( "operation_clear_action_slot" ) )
 	end,
-	[ shortcuts.delete_slot ] = function()
+	[ shortcuts.delete_slot ] = function( edit_panel_state, i, action_id, capacity )
 		local current_actions = {}
 		for s, a, u in state_str_iter_actions( edit_panel_state.get() ) do
 			table.insert( current_actions, { s, a, u } )
@@ -224,7 +224,7 @@ local action_button_shortcuts = {
 		table.remove( current_actions, i )
 		edit_panel_state.set( table_to_state_str( current_actions ), wrap_key( "operation_delete_action_slot" ) )
 	end,
-	[ shortcuts.swap ] = function()
+	[ shortcuts.swap ] = function( edit_panel_state, i, action_id, capacity )
 		local current_actions = {}
 		local indexes_to_swap = {}
 		local index = 1
@@ -268,7 +268,7 @@ local action_button_shortcuts = {
 		end
 		edit_panel_state.set( table_to_state_str( current_actions ), wrap_key( "operation_swap_actions" ) )
 	end,
-	[ shortcuts.override ] = function()
+	[ shortcuts.override ] = function( edit_panel_state, i, action_id, capacity )
 		local current_actions = {}
 		local indexes_to_swap = {}
 		local index = 1
@@ -300,7 +300,7 @@ local action_button_shortcuts = {
 		end
 		edit_panel_state.set( table_to_state_str( current_actions ), wrap_key( "operation_override_actions" ) )
 	end,
-	[ shortcuts.select ] = function()
+	[ shortcuts.select ] = function( edit_panel_state, i, action_id, capacity )
 		local current_actions = {}
 		for s, a, u in state_str_iter_actions( edit_panel_state.get() ) do
 			table.insert( current_actions, { false, a, u } )
@@ -312,7 +312,7 @@ local action_button_shortcuts = {
 		end
 		edit_panel_state.set( table_to_state_str( current_actions ), wrap_key( "operation_select" ) )
 	end,
-	[ shortcuts.deselect ] = function()
+	[ shortcuts.deselect ] = function( edit_panel_state, i, action_id, capacity )
 		local current_actions = {}
 		for s, a, u in state_str_iter_actions( edit_panel_state.get() ) do
 			table.insert( current_actions, { s, a, u } )
@@ -343,8 +343,9 @@ GuiLayoutBeginVertical( gui, 0, screen_height * 0.96 - ( rows_num + permanent_ro
 			end
 		end
 		if not create_real_sprite then
-			local left_click, right_click = do_action_button( permanent_action, 0, 0, false, do_least_tooltip, nil, permanent_note, show_permanent_icon )
-			detect_shortcuts( gui, permanent_action_button_shortcuts, shortcut_used_keys, left_click, right_click )
+			local left_click, right_click, hover = do_action_button( permanent_action, 0, 0, false, do_least_tooltip, nil, permanent_note, show_permanent_icon )
+			local args = { edit_panel_state, j, permanent_action, capacity }
+			detect_shortcuts( gui, permanent_action_button_shortcuts, shortcut_used_keys, left_click, right_click, hover, args )
 		else
 			GuiOptionsAddForNextWidget( gui, GUI_OPTION.NonInteractive )
 			GuiImageButton( gui, next_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/transparent_20x20.png" )
@@ -382,8 +383,9 @@ GuiLayoutBeginVertical( gui, 0, screen_height * 0.96 - rows_num * ( 20 + 2 ) + 2
 		if uses_remaining == "" then uses_remaining = nil end
 		local note = selected and note_selected or note_not_selected
 		if not create_real_sprite then
-			local left_click, right_click = do_action_button( action_id, 0, 0, selected, do_least_tooltip, uses_remaining, note, show_uses_remaining )
-			detect_shortcuts( gui, action_button_shortcuts, shortcut_used_keys, left_click, right_click )
+			local left_click, right_click, hover = do_action_button( action_id, 0, 0, selected, do_least_tooltip, uses_remaining, note, show_uses_remaining )
+			local args = { edit_panel_state, i, action_id, capacity }
+			detect_shortcuts( gui, action_button_shortcuts, shortcut_used_keys, left_click, right_click, hover, args )
 		else
 			GuiOptionsAddForNextWidget( gui, GUI_OPTION.NonInteractive )
 			GuiImageButton( gui, next_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/transparent_20x20.png" )
