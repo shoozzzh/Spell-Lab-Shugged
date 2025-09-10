@@ -124,9 +124,9 @@ for key, value in pairs( default_settings ) do
 	end
 end
 
-
+dofile_once( "mods/spell_lab_shugged/files/lib/controls_freezing_utils.lua" )
 function OnPlayerSpawned( player_id )
-	dofile_once( "mods/spell_lab_shugged/files/lib/controls_freezer.lua" ).unfreeze()
+	unfreeze_controls()
 	GlobalsSetValue( "mod_button_tr_width", "0" )
 	if not GameHasFlagRun( "spell_lab_shugged_init" ) then
 		EntityLoad( "mods/spell_lab_shugged/files/biome_impl/wand_lab/wand_lab.xml", 14600, -6000 )

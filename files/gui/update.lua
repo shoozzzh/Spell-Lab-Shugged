@@ -13,11 +13,9 @@ dofile_once( "mods/spell_lab_shugged/files/gui/gui_elements.lua")
 dofile_once( "mods/spell_lab_shugged/files/gui/get_player.lua" )
 WANDS = dofile_once( "mods/spell_lab_shugged/files/lib/wands.lua")
 dofile_once( "data/scripts/debug/keycodes.lua" )
+KEYCODES_RAW, KEYCODES_BY_TYPE = unpack( dofile_once( "mods/spell_lab_shugged/files/lib/keycodes_wrapped.lua" ) )
 smallfolk = dofile_once( "mods/spell_lab_shugged/files/lib/smallfolk.lua" )
-
-local keystroke_listener = dofile( "mods/spell_lab_shugged/files/gui/keystroke_listener.lua" )
-shortcut_detector = dofile_once( "mods/spell_lab_shugged/files/lib/shortcut_detector.lua" )( keystroke_listener )
-keyboard_focus = dofile_once( "mods/spell_lab_shugged/files/gui/keyboard_focus.lua" )
+shortcut_check = dofile_once( "mods/spell_lab_shugged/files/lib/shortcut_check.lua" )
 
 gui = gui or GuiCreate()
 GuiStartFrame( gui )
@@ -51,6 +49,7 @@ action_metadata, extra_modifier_metadata, metadata_to_show =
 local is_panel_open = false
 
 dofile_once( "mods/spell_lab_shugged/files/gui/edit_panel_utils.lua" )
+dofile_once( "mods/spell_lab_shugged/files/gui/pickers.lua" )
 
 action_id_to_idx = {}
 
@@ -74,6 +73,9 @@ end
 wand_stats = dofile( "mods/spell_lab_shugged/files/gui/wand_stats.lua" )
 
 dofile_once( "mods/spell_lab_shugged/files/gui/edit_panel_api.lua" )
+
+dofile_once( "mods/spell_lab_shugged/files/gui/keyboard_listener.lua" )
+dofile_once( "mods/spell_lab_shugged/files/gui/keyboard_focus.lua" )
 
 function show_edit_panel_toggle_options()
 	GuiLayoutBeginHorizontal( gui, 0, 0, true )
@@ -175,34 +177,23 @@ dofile_once( "mods/spell_lab_shugged/files/lib/shortcut_tostring.lua" )
 
 shortcut_texts = {}
 
+shortcut_used_keys = nil
+
 local edit_panel_shortcut_tips
 
 function reload_shortcuts()
 	for name, _ in pairs( shortcuts ) do
 		local value = mod_setting_get( "shortcut_" .. name )
-		local status
-		if value == nil then goto continue end
-		
-		status, value = pcall( smallfolk.loads, value )
-		if not status or ( value == nil ) then goto continue end
-
-		shortcuts[ name ] = value
-		::continue::
+		if value ~= nil then value = smallfolk.loads( value ) end
+		if value ~= nil then shortcuts[ name ] = value end
 	end
 
 	if not mod_setting_get( "shortcut_strict" ) then
 		shortcut_used_keys = {}
-
-		local inverted = {}
 		for _, shortcut in pairs( shortcuts ) do
 			for _, key in ipairs( shortcut ) do
-				inverted[ key ] = true
+				shortcut_used_keys[ key ] = true
 			end
-		end
-		inverted.Mouse_left = nil
-		inverted.Mouse_right = nil
-		for key, _ in pairs( inverted ) do
-			shortcut_used_keys[ #shortcut_used_keys + 1 ] = key
 		end
 	else
 		shortcut_used_keys = nil
@@ -225,8 +216,6 @@ function reload_shortcut_texts()
 end
 
 reload_shortcuts()
-
-dofile_once( "mods/spell_lab_shugged/files/gui/pickers.lua" )
 
 function do_gui()
 	shift = InputIsKeyDown( Key_LSHIFT ) or InputIsKeyDown( Key_RSHIFT )
@@ -253,10 +242,12 @@ function do_gui()
 
 	player = get_player()
 	held_wand = get_held_wand()
-	
+
+	keyboard_input_holding = listen_keyboard_down()
+
 	dofile( "mods/spell_lab_shugged/files/gui/wand_listener.lua" )
 
-	keyboard_focus.update()
+	update_keyboard_input( listen_keyboard_just_down() )
 
 	if GameGetFrameNum() % 60 == 0 then
 		if mod_setting_get( "shortcut_changed" ) then
@@ -282,8 +273,8 @@ function do_gui()
 	end
 	GlobalsSetValue( "mod_button_tr_current", tostring( current_button_reservation + 15 ) )
 	
-	-- GuiOptionsAddForNextWidget( gui, GUI_OPTION.NonInteractive )
-	-- GuiOptionsAddForNextWidget( gui, GUI_OPTION.AlwaysClickable )
+	GuiOptionsAddForNextWidget( gui, GUI_OPTION.NonInteractive )
+	GuiOptionsAddForNextWidget( gui, GUI_OPTION.AlwaysClickable )
 	if GuiImageButton( gui, next_id(), screen_width - 14 - current_button_reservation, 2, "", "mods/spell_lab_shugged/files/gui/wrench.png" ) then
 		sound_button_clicked()
 		is_panel_open = not is_panel_open
@@ -770,7 +761,7 @@ function do_gui()
 			do_content_wrapped(	function() dofile( "mods/spell_lab_shugged/files/gui/edit_panel_shown.lua" ) end, "edit_panel" )
 		end
 	else
-		keyboard_focus.change_to( "player_controls" )
+		change_keyboard_focus( Focus_PlayerControls )
 	end
 end
 

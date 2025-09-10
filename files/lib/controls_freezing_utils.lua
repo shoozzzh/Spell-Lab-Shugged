@@ -1,6 +1,4 @@
-local controls_freezer = {}
-
-function controls_freezer.freeze()
+function freeze_controls()
 	for _, player in ipairs( EntityGetWithTag( "player_unit" ) or {} ) do
 		local controls_disabler = EntityCreateNew()
 		EntityAddTag( controls_disabler, "spell_lab_shugged_controls_disabler" )
@@ -14,12 +12,9 @@ function controls_freezer.freeze()
 		} )
 	end
 end
-
-function controls_freezer.unfreeze()
+function unfreeze_controls()
 	for _, controls_disabler in ipairs( EntityGetWithTag( "spell_lab_shugged_controls_disabler" ) ) do
 		local effect_comp = EntityGetFirstComponentIncludingDisabled( controls_disabler, "GameEffectComponent" )
 		ComponentSetValue2( effect_comp, "frames", 1 )
 	end
 end
-
-return controls_freezer

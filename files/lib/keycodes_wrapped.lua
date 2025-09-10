@@ -13,12 +13,4 @@ for k, v in pairs( raw ) do
 	end
 end
 
-local excluded_keys = { "JOY_BUTTON_0", "JOY_BUTTON_1", "JOY_BUTTON_2", "JOY_BUTTON_3" }
-
-for _, t in ipairs( { raw, by_type.Mouse, by_type.Keyboard, by_type.Joystick } ) do
-	for _, key in ipairs( excluded_keys ) do
-		t[ key ] = nil
-	end
-end
-
 return { raw, by_type }

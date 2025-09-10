@@ -1,109 +1,55 @@
 local smallfolk = dofile_once( "mods/spell_lab_shugged/files/lib/smallfolk.lua" )
 dofile_once( "mods/spell_lab_shugged/files/lib/shortcut_tostring.lua" )
-local keystroke_listener = dofile_once( "mods/spell_lab_shugged/files/gui/keystroke_listener.lua" )
+dofile_once( "mods/spell_lab_shugged/files/gui/keyboard_listener.lua" )
+local KEYCODES_RAW = dofile_once( "mods/spell_lab_shugged/files/lib/keycodes_wrapped.lua" )[1]
 
-local shortcut_text = {
-	["简体中文"] = {
-		done = "[完成]",
-		clear = "[清空]",
-		cancel = "[取消]",
-	},
-	DEFAULT = {
-		done = "[Done]",
-		clear = "[Clear]",
-		cancel = "[Cancel]",
-	},
-}
-for _, lang in ipairs( { "喵体中文", "汪体中文", "完全汉化" } ) do
-	shortcut_text[ lang ] = shortcut_text["简体中文"]
-end
-
-Shortcut_Type = {
-	OneShot = 0,
-	Sustained = 1,
-}
-
-local current_key_detector = nil
-local shortcut_inputed = nil
-
-local function input_key_to_shortcut( key )
-	local new = true
-	for _, key_inputed in ipairs( shortcut_inputed ) do
-		if key == key_inputed then
-			new = false
-			break
-		end
-	end
-
-	if new then
-		shortcut_inputed[ #shortcut_inputed + 1 ] = key
-	end
-end
-
+local current_key_detector
 function mod_setting_shortcut( mod_id, gui, in_main_menu, im_id, setting )
-	GuiLayoutBeginHorizontal( gui, 0, 0, true, 2, 2 )
-	GuiButton( gui, 4 * im_id, mod_setting_group_x_offset, 0, setting.ui_name )
-	local ui_name_width = GuiGetTextDimensions( gui, setting.ui_name )
-	local _,_,_,x,y = GuiGetPreviousWidgetInfo( gui )
-	local cur_lang = GameTextGet( "$current_language" )
+    GuiLayoutBeginHorizontal( gui, 0, 0, true, 2, 2 )
+    GuiText( gui, mod_setting_group_x_offset, 0, setting.ui_name )
 
-	GuiIdPushString( gui, "spell_lab_shugged.shortcut_setting.extra_button" )
-
-	local changed = false
+    local changed = false
 	if current_key_detector == setting.id then
-		keystroke_listener:update()
-
-		for key, status in pairs( keystroke_listener.just_down ) do
-			if status then
-				input_key_to_shortcut( key )
+		local shortcut = {}
+		for k, v in pairs( listen_keyboard_down() ) do
+			if v then
+				shortcut[ #shortcut + 1 ] = k
 			end
 		end
 
 		local str
-		if #shortcut_inputed > 0 then
-			str = shortcut_tostring( shortcut_inputed, cur_lang )
+		if #shortcut > 0 then
+			str = shortcut_tostring( shortcut, GameTextGet( "$current_language" ) )
+			str = str .. ( setting.click_required and text.shortcut_click_here or text.shortcut_click_to_save )
 		else
 			str = "$menuoptions_configurecontrols_pressakey"
 		end
 
-		GuiOptionsAddForNextWidget( gui, GUI_OPTION.Layout_NoLayouting )
 		GuiColorSetForNextWidget( gui, 1, 1, 0.5, 1 )
-		local left_click, right_click = GuiButton( gui, im_id, x + 120, y, str )
+		local left_click, right_click =
+			GuiButton( gui, im_id, mod_setting_group_x_offset - GuiGetTextDimensions( gui, setting.ui_name ) + 120, 0, str )
 
-		if setting.shortcut_type ~= Shortcut_Type.Sustained then
-			if left_click then
-				input_key_to_shortcut( "Mouse_left" )
-			elseif right_click then
-				input_key_to_shortcut( "Mouse_right" )
+		if InputIsMouseButtonJustUp( KEYCODES_RAW.Mouse_left ) or InputIsMouseButtonJustDown( KEYCODES_RAW.Mouse_right ) then
+			current_key_detector = nil
+			if not setting.click_required then
+				ModSettingSetNextValue( mod_setting_get_id( mod_id, setting ), smallfolk.dumps( shortcut ), false )
+				changed = true
+			else
+				local click_given = false
+				if left_click then
+					shortcut[ #shortcut + 1 ] = "Mouse_left"
+					click_given = true
+				end
+				if right_click then
+					shortcut[ #shortcut + 1 ] = "Mouse_right"
+					click_given = true
+				end
+				if click_given then
+					ModSettingSetNextValue( mod_setting_get_id( mod_id, setting ), smallfolk.dumps( shortcut ), false )
+					changed = true
+				end
 			end
 		end
-
-		if left_click or right_click then
-			changed = true
-			ModSettingSetNextValue( mod_setting_get_id( mod_id, setting ), smallfolk.dumps( shortcut_inputed ), false )
-			current_key_detector = nil
-			shortcut_inputed = nil
-		end
-
-		mod_setting_tooltip( mod_id, gui, in_main_menu, setting )
-
-		GuiLayoutEnd( gui )
-
-		GuiLayoutBeginHorizontal( gui, mod_setting_group_x_offset + 120, 0, true, 2, 2 )
-		if GuiButton( gui, 4 * im_id + 1, 0, 0, ( shortcut_text[ cur_lang ] or shortcut_text.DEFAULT ).done ) then
-			changed = true
-			ModSettingSetNextValue( mod_setting_get_id( mod_id, setting ), smallfolk.dumps( shortcut_inputed ), false )
-			current_key_detector = nil
-			shortcut_inputed = nil
-		end
-		if GuiButton( gui, 4 * im_id + 2, 0, 0, ( shortcut_text[ cur_lang ] or shortcut_text.DEFAULT ).clear ) then
-			shortcut_inputed = {}
-		end
-		if GuiButton( gui, 4 * im_id + 3, 0, 0, ( shortcut_text[ cur_lang ] or shortcut_text.DEFAULT ).cancel ) then
-			current_key_detector = nil
-			shortcut_inputed = nil
-		end
-		GuiLayoutEnd( gui )
 	else
 		local str
 		do
@@ -126,23 +72,22 @@ function mod_setting_shortcut( mod_id, gui, in_main_menu, im_id, setting )
 			end
 		end
 
-		GuiOptionsAddForNextWidget( gui, GUI_OPTION.Layout_NoLayouting )
-		local left_click, right_click = GuiButton( gui, im_id, x + 120, y, str )
+		local left_click, right_click =
+			GuiButton( gui, im_id, mod_setting_group_x_offset - GuiGetTextDimensions( gui, setting.ui_name ) + 120, 0, str )
 
 		if left_click and not right_click then
 			current_key_detector = setting.id
-			shortcut_inputed = {}
+			ModSettingSetNextValue( mod_setting_get_id( mod_id, setting ), "{}", false )
+			changed = true
 		elseif not left_click and right_click then
-			ModSettingSetNextValue( mod_setting_get_id( mod_id, setting ), setting.value_default, false )
+			ModSettingSetNextValue( mod_setting_get_id( mod_id, setting ), "{}", false )
 			changed = true
 		end
-
-		mod_setting_tooltip( mod_id, gui, in_main_menu, setting )
-
-		GuiLayoutEnd( gui )
 	end
 
-	GuiIdPop( gui )
+	if changed then ModSettingSet( mod_id .. ".shortcut_changed", true, false ) end
 
-	if changed then ModSettingSetNextValue( mod_id .. ".shortcut_changed", true, false ) end
+	mod_setting_tooltip( mod_id, gui, in_main_menu, setting )
+
+    GuiLayoutEnd( gui )
 end

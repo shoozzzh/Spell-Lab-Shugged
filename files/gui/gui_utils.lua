@@ -15,6 +15,19 @@ function reset_z()
 	gui_z = 0
 end
 
+function GuiColoredText( gui, red, green, blue, alpha, ... )
+	GuiColorSetForNextWidget( gui, red, green, blue, alpha )
+	GuiText( gui, ... )
+end
+function GuiSoftText( gui, ... )
+	GuiColorSetForNextWidget( gui, color(207,207,207,255) )
+	GuiText( gui, ... )
+end
+function GuiDimText( gui, ... )
+	GuiColorSetForNextWidget( gui, 0.5, 0.5, 0.5, 1.0 )
+	GuiText( gui, ... )
+end
+
 local cache_frame
 local cached_mouse_x, cached_mouse_y
 function get_mouse_pos_on_screen()
@@ -54,7 +67,11 @@ function get_world_position( x, y )
 end
 
 function previous_data( gui )
-	return GuiGetPreviousWidgetInfo( gui )
+	local left_click,right_click,hover,x,y,width,height,draw_x,draw_y,draw_width,draw_height = GuiGetPreviousWidgetInfo( gui )
+	if left_click == 1 then left_click = true elseif left_click == 0 then left_click = false end
+	if right_click == 1 then right_click = true elseif right_click == 0 then right_click = false end
+	if hover == 1 then hover = true elseif hover == 0 then hover = false end
+	return left_click,right_click,hover,x,y,width,height,draw_x,draw_y,draw_width,draw_height
 end
 
 function sound_button_clicked()
@@ -123,21 +140,4 @@ function do_content_wrapped( content_fn, push_this_string )
 	GuiIdPushString( gui, push_this_string )
 	content_fn()
 	GuiIdPop( gui )
-end
-
--- usage: detect_shortcuts( gui, { [{"Mouse_left"}] = xxx, [{"Mouse_right"}] = yyy, } )
-function detect_shortcuts( gui, shortcutz, detection_range, left_click, right_click, hover, args )
-	local _left_click, _right_click, _hover = previous_data( gui )
-	if left_click == nil then left_click = _left_click end
-	if right_click == nil then right_click = _right_click end
-	if hover == nil then hover = _hover end
-
-	if not hover then return end
-
-	for shortcut, do_what in pairs( shortcutz ) do
-		if shortcut_detector.is_fired( shortcut, left_click, right_click, detection_range ) then
-			do_what( unpack( args ) )
-			return
-		end
-	end
 end

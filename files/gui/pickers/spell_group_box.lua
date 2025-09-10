@@ -15,36 +15,30 @@ local function serialize_saved_spell_groups()
 	end
 end
 
-local spell_group_button_shortcut = {
-	[ shortcuts.select ] = function()
-		if selected_spell_group_index ~= index then
-			selected_spell_group_index = index
-		else
-			selected_spell_group_index = 0
-		end
-	end,
-	[ shortcuts.deselect ] = function()
-		if selected_spell_group_index == index then
-			selected_spell_group_index = 0
-		end
-	end,
-	[ shortcuts.swap ] = function()
-		if selected_spell_group_index ~= index then
-			saved_spell_groups[ selected_spell_group_index ], saved_spell_groups[ index ] =
-				saved_spell_groups[ index ], saved_spell_groups[ selected_spell_group_index ]
-			selected_spell_group_index = index
-		end
-	end,
-}
-
 local picker = {}
 local selected_spell_group_index = 0
 picker.menu = function()
 	GuiLayoutBeginVertical( gui, 640 * 0.05, 360 * 0.16, true )
 		do_scroll_table( next_id(), nil, nil, true, nil, saved_spell_groups, function( saved_spell_group, index )
 			GuiImageButton( gui, next_id(), 2, 2, "", "mods/spell_lab_shugged/files/gui/buttons/transparent_16x16.png" )
-			detect_shortcuts( gui, spell_group_button_shortcut, shortcut_used_keys )
-			
+			local left_click,right_click,_,x,y,_,_,_,_,_,_ = previous_data( gui )
+			if shortcut_check.check( shortcuts.select, left_click, right_click ) then
+				if selected_spell_group_index ~= index then
+					selected_spell_group_index = index
+				else
+					selected_spell_group_index = 0
+				end
+			elseif shortcut_check.check( shortcuts.deselect, left_click, right_click ) then
+				if selected_spell_group_index == index then
+					selected_spell_group_index = 0
+				end
+			elseif shortcut_check.check( shortcuts.swap, left_click, right_click ) then
+				if selected_spell_group_index ~= index then
+					saved_spell_groups[ selected_spell_group_index ], saved_spell_groups[ index ] =
+						saved_spell_groups[ index ], saved_spell_groups[ selected_spell_group_index ]
+					selected_spell_group_index = index
+				end
+			end
 			do_custom_tooltip( function()
 				do_simple_common_action_list( saved_spell_group, #saved_spell_group )
 				GuiDimText( gui, 0, 0, text_get_translated( "spell_group_select" ) )
@@ -136,7 +130,7 @@ picker.buttons = function()
 			if left_click or right_click then
 				local saved_spell_group = saved_spell_groups[ selected_spell_group_index ]
 				local do_replace = mod_setting_get( "replace_mode" )
-				if shortcut_detector.is_held( shortcuts.replace_switch_temp, shortcut_used_keys ) then do_replace = not do_replace end
+				if shortcut_check.check( shortcuts.replace_switch_temp ) then do_replace = not do_replace end
 				if saved_spell_group and held_wand then
 					sound_button_clicked()
 					set_action_group( access_edit_panel_state( held_wand ), saved_spell_group, do_replace, EntityGetWandCapacity( held_wand ), right_click )

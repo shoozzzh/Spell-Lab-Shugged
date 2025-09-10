@@ -9,5 +9,4 @@
 	<LifetimeComponent lifetime="2"/>
   	<LuaComponent execute_on_added="1" remove_after_executed="1" script_source_file="mods/spell_lab_shugged/files/biome_impl/wand_lab/init.lua"/>
   	<LuaComponent execute_every_n_frame="1" remove_after_executed="1" script_source_file="mods/spell_lab_shugged/files/biome_impl/wand_lab/lab_entity_manager.lua"/>
-	<StreamingKeepAliveComponent/>
 </Entity>
