@@ -62,7 +62,6 @@ spell_lab_shugged_spawn_best_wand_description,Right-click to replace held wand w
 spell_lab_shugged_disable_casting,No Shooting,,,,,,,,禁止法杖射击,,,,,
 spell_lab_shugged_disable_toxic_statuses,No Toxic Statuses,,,,,,,,免疫部分负面效果,,,,,
 spell_lab_shugged_disable_toxic_statuses_description,"Immunity from (unstable) teleportisis, blindness, confusion, slower movement,\nfrozen, electrocution, drunk and glued",,,,,,,,免疫（不稳）传送、致盲、混乱、更慢移动、冻结、电击、醉酒、胶粘,,,,,
-spell_lab_shugged_force_2gcedge,Force 2GC + Edge,,,,,,,,双玻璃大炮 + 刀尖舔血,,,,,
 spell_lab_shugged_no_recoil,No recoil,,,,,,,,无后坐力,,,,,
 spell_lab_shugged_damage_info,Damage Info,,,,,,,,伤害数值显示,,,,,
 spell_lab_shugged_creative_mode_flight,Superflight,,,,,,,,超级飞行,,,,,
