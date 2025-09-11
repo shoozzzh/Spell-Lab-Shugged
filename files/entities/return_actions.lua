@@ -5,6 +5,12 @@ if not not_first_time then
 	return
 end
 
+local function stream_actions( wand_id )
+	return stream( EntityGetAllChildren( wand_id ) or {} )
+		.filter( function( e ) return EntityGetFirstComponentIncludingDisabled( e, "ItemComponent" ) ~= nil end )
+		.filter( function( e ) return EntityGetFirstComponentIncludingDisabled( e, "ItemActionComponent" ) ~= nil end )
+end
+
 local var_name_prefix = "spell_lab_shugged."
 local tag_dumping = "spell_lab_shugged.dumping_this_wand"
 local vfile_wand_id = "mods/spell_lab_shugged/vfiles/load_to_this_wand.txt"
@@ -29,7 +35,7 @@ else
 	return
 end
 
-stream( EntityGetAllChildren( entity_id ) or {} )
+stream_actions( entity_id )
 	.foreach( function( a )
 		EntityRemoveFromParent( a )
 		EntityAddChild( wand_id, a )

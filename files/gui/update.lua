@@ -318,7 +318,7 @@ function do_gui()
 				if GlobalsGetValue( "spell_lab_shugged_checkpoint_x", "0" ) == "0" then
 					GuiOptionsAddForNextWidget( gui, GUI_OPTION.DrawSemiTransparent )
 				end
-				GuiImageButton( gui, next_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/spell_lab_shugged.png" )
+				GuiImageButton( gui, next_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/spell_lab.png" )
 				do
 					local left_click, right_click = previous_data( gui )
 					if left_click then
