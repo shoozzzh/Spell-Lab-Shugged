@@ -402,10 +402,34 @@ picker.menu = function()
 			height_autofit = false
 		end
 
-		local scroll_table = { do_scroll_table( scroll_ids[ filter_type ], nil,
+		do_scroll_table( scroll_ids[ filter_type ], nil,
 			height, height_autofit, function( hovered ) interacting = interacting or hovered end,
 			actions_data_to_show, function( action )
-			local left_click, right_click = do_action_button( action.id, 0, 0, false, do_verbose_tooltip, action.max_uses, nil, show_locked_state, false, true )
+			local this_action_data     = action_data[ action_id ]
+			local this_action_metadata = action_metadata[ action_id ]
+
+			local action_type, sprite_file
+			if this_action_data then
+				action_type = this_action_data.type
+				sprite_file = this_action_data.sprite
+			else
+				action_type = nil
+				sprite_file = "mods/spell_lab_shugged/files/gui/buttons/missing_sprite.png"
+			end
+
+			local left_click, right_click = do_action_button( 0, 0, false, action_type, sprite_file )
+			local _,_,_,x,y,_,_,_,_,_,_ = previous_data( gui )
+			if this_action_data then
+				do_custom_tooltip( function()
+					GuiLayoutBeginVertical( gui, 0, 0 )
+						do_verbose_tooltip( this_action_data, this_action_metadata )
+						if note then
+							GuiDimText( gui, 0, 0, note )
+						end
+					GuiLayoutEnd( gui )
+				end, 2, -2 )
+			end
+			show_locked_state( x, y, this_action_data )
 			if left_click or right_click then
 				local is_unlocked_action = action.spawn_requires_flag and HasFlagPersistent( action.spawn_requires_flag ) 
 				if shortcut_detector.is_fired( shortcuts.relock, left_click, right_click ) then
@@ -458,7 +482,7 @@ picker.menu = function()
 					new_action_history_entry( action.id )
 				end
 			end
-		end ) }
+		end )
 
 		if filter_type == FILTER_TYPE_SEARCH then
 			GuiOptionsAddForNextWidget( gui, GUI_OPTION.NonInteractive )

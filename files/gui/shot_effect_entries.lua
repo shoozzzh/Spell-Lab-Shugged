@@ -50,7 +50,7 @@ shot_effect_entries = {
 		extra_modifier = "low_recoil",
 		metadata = {
 			{ "speed_multiplier", 0.8 },
-			{ wrap_key( "recoil" ), { TYPE_ADJUSTMENT.Add, -16 } },
+			{ wrap_key( "recoil" ), { Type_Adjustment.Add, -16 } },
 		},
 		properties = {
 			{ wrap_key( "recoil" ), "x 0.5" },

@@ -43,7 +43,7 @@ keyboard_focus.focusables.player_controls = {
 
 		if not held_wand or not mod_setting_get( "show_wand_edit_panel" ) then return end
 
-		local edit_panel_state = access_edit_panel_state( held_wand )
+--[[		local edit_panel_state = access_edit_panel_state( held_wand )
 		if shortcut_detector.is_fired( shortcuts.left_delete, shortcut_used_keys ) then
 			local current_actions = {}
 			local did = false
@@ -91,7 +91,7 @@ keyboard_focus.focusables.player_controls = {
 		end
 		if shortcut_detector.is_fired( shortcuts.redo, shortcut_used_keys ) then
 			edit_panel_state.redo()
-		end
+		end]]
 	end,
 }
 

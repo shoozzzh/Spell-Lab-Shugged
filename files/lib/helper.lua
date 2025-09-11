@@ -221,3 +221,42 @@ end
 function optional_call( f, ... )
 	if f then return f( ... ) end
 end
+
+function memoize( f )
+	return setmetatable( {}, {
+		__call = function( self, arg )
+			local cache = self[ arg ]
+			if cache ~= nil then return cache end
+			local result = f( arg )
+			self[ arg ] = result
+			return result
+		end,
+	} )
+end
+
+local function dofile_wrapped( filepath, environment )
+	local f = loadfile( filepath )
+	local e = environment or {}
+	setfenv( f, e )()
+	return e
+end
+
+function get_globals( filepath )
+	local g = _G
+	local captured_globals = {}
+	local mt = {
+		__index = g,
+		__newindex = function( e, k, v )
+			rawset( e, k, v )
+			captured_globals[ k ] = v
+		end,
+	}
+	return dofile_wrapped( filepath, setmetatable( {}, mt ) )
+end
+
+get_globals = memoize( get_globals )
+
+Type_Adjustment = {
+	Add = 1,
+	Set = 2,
+}
