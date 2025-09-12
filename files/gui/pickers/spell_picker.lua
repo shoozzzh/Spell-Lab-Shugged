@@ -404,9 +404,8 @@ picker.menu = function()
 
 		do_scroll_table( scroll_ids[ filter_type ], nil,
 			height, height_autofit, function( hovered ) interacting = interacting or hovered end,
-			actions_data_to_show, function( action )
-			local this_action_data     = action_data[ action_id ]
-			local this_action_metadata = action_metadata[ action_id ]
+			actions_data_to_show, function( this_action_data, _, x, y )
+			local this_action_metadata = action_metadata[ this_action_data.id ]
 
 			local action_type, sprite_file
 			if this_action_data then
@@ -417,17 +416,17 @@ picker.menu = function()
 				sprite_file = "mods/spell_lab_shugged/files/gui/buttons/missing_sprite.png"
 			end
 
-			local left_click, right_click = do_action_button( 0, 0, false, action_type, sprite_file )
+			local left_click, right_click, hover = do_action_button( 0, 0, false, action_type, sprite_file )
 			local _,_,_,x,y,_,_,_,_,_,_ = previous_data( gui )
-			if this_action_data then
-				do_custom_tooltip( function()
+			if this_action_data and hover then
+				force_do_custom_tooltip( function()
 					GuiLayoutBeginVertical( gui, 0, 0 )
 						do_verbose_tooltip( this_action_data, this_action_metadata )
 						if note then
 							GuiDimText( gui, 0, 0, note )
 						end
 					GuiLayoutEnd( gui )
-				end, 2, -2 )
+				end, 2, -2, false, x, y, 20 )
 			end
 			show_locked_state( x, y, this_action_data )
 			if left_click or right_click then

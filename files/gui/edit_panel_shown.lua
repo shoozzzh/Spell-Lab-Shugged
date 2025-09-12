@@ -78,10 +78,6 @@ do
 	for i, a in ipairs( permanent_actions ) do
 		row = row or {}
 
-		local args
-		if create_real_sprite then
-			args = { i, next_empty_slot }
-		end
 		row[ #row + 1 ] = { a, selection[ i ] }
 		
 		if #row == actions_per_row or i == -num_pa then
@@ -100,7 +96,7 @@ do
 	local offset_count = row_offset * actions_per_row
 
 	local row = nil
-	local first_i, last_i = offset_count, total_count + offset_count - 1
+	local first_i, last_i = offset_count + 1, total_count + offset_count
 	for i = first_i, last_i do
 		row = row or {}
 
@@ -108,7 +104,7 @@ do
 		row[ #row + 1 ] = { a, selection[ i ] }
 
 		if #row == actions_per_row or i == last_i then
-			do_horizontal_centered_button_list( gui, action_func, row, y_first_row + ( i - first_i ) * ( 20 + 2 ) )
+			do_horizontal_centered_button_list( gui, action_func, row, y_first_row + math.floor( ( i - first_i ) / actions_per_row ) * ( 20 + 2 ) )
 			row = nil
 		end
 		

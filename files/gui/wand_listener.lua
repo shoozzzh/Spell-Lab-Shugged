@@ -1,5 +1,7 @@
 local edit_panel_api = dofile_once( "mods/spell_lab_shugged/files/gui/edit_panel_api.lua" )
 
+local tag_dumping = "spell_lab_shugged.dumping_this_wand"
+
 local function get_all_wands_in_inventory()
 	if not player then return end
 
@@ -82,20 +84,20 @@ for _, wand_id in ipairs( wands_to_listen or {} ) do
 	local stored = stored_action_views[ wand_id ]
 	local from_wand = view_actions( wand_id )
 
-	if not stored then
-		stored_action_views[ wand_id ] = from_wand
-		goto continue
-	end
+	if deep_equals( stored, from_wand ) then goto continue end
+
+	stored_action_views[ wand_id ] = from_wand
+
+	if stored == nil then goto continue end
+
+	if EntityHasTag( wand_id, EditPanelTags.Dumping ) then goto continue end
 
 	local data = edit_panel_api.access_data( wand_id )
-	if data.vars.force_compact_enabled then goto continue end
-
-	if not deep_equals( stored, from_wand ) then
-		stored_action_views[ wand_id ] = from_wand
-		data:new_state_history(
-			wrap_key( "operation_read_from_wand" ), edit_panel_api.dump_state( wand_id ), data.vars.selection
-		)
-	end
+	-- if data.vars.force_compact_enabled then goto continue end
+	stored_action_views[ wand_id ] = from_wand
+	data:new_state_history(
+		wrap_key( "operation_read_from_wand" ), edit_panel_api.dump_state( wand_id ), data.vars.selection
+	)
 
 	::continue::
 end

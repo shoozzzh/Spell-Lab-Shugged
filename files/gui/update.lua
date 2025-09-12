@@ -133,7 +133,7 @@ function show_edit_panel_toggle_options()
 				data:undo()
 			end
 			GuiTooltip( gui, text_get_translated( "undo" ) .. " " .. GameTextGetTranslatedOrNot( operation_to_undo ),
-				GameTextGet( wrap_key( "current_history" ), edit_panel_state.get_current_history_index() ) )
+				GameTextGet( wrap_key( "current_history" ), data.vars.current_history_index, #edit_panel_api.get_histories( held_wand ) ) )
 		else cant_undo() end
 		if operation_to_redo then
 			if GuiImageButton( gui, next_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/redo.png" ) then
@@ -141,7 +141,7 @@ function show_edit_panel_toggle_options()
 				data:redo()
 			end
 			GuiTooltip( gui, text_get_translated( "redo" ) .. " " .. GameTextGetTranslatedOrNot( operation_to_redo ),
-				GameTextGet( wrap_key( "current_history" ), edit_panel_state.get_current_history_index() ) )
+				GameTextGet( wrap_key( "current_history" ), data.vars.current_history_index, #edit_panel_api.get_histories( held_wand ) ) )
 		else cant_redo() end
 	GuiLayoutEnd( gui )
 end

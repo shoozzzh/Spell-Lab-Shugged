@@ -1,15 +1,11 @@
 dofile_once( "mods/spell_lab_shugged/files/lib/var.lua" )
-dofile_once( "mods/spell_lab_shugged/files/lib/stream.lua" )
+dofile_once( "mods/spell_lab_shugged/files/lib/helper.lua" )
 local smallfolk = dofile_once( "mods/spell_lab_shugged/files/lib/smallfolk.lua" )
 local polytools = dofile_once( "mods/spell_lab_shugged/files/lib/polytools/polytools.lua" )
 
 local edit_panel_api = {}
 
 local var_name_prefix = "spell_lab_shugged."
-local tag_init = "spell_lab_shugged.edit_panel_init"
-local tag_dumping = "spell_lab_shugged.dumping_this_wand"
-local tag_history = "spell_lab_shugged.history"
-local vfile_wand_id = "mods/spell_lab_shugged/vfiles/load_to_this_wand.txt"
 
 local function create_action( action_id, uses_remaining )
 	local action = CreateItemActionEntity( action_id )
@@ -66,10 +62,6 @@ local var_map = {
 
 local data_access_funcs = {}
 
-local function get_histories( wand_id )
-	return EntityGetComponentIncludingDisabled( wand_id, "ItemChestComponent", tag_history ) or {}
-end
-
 local history_lens
 do
 	local history_layout = {
@@ -94,12 +86,16 @@ do
 	history_lens = setmetatable( {}, history_lens_mt )
 end
 
+function edit_panel_api.get_histories( wand_id )
+	return EntityGetComponentIncludingDisabled( wand_id, "ItemChestComponent", EditPanelTags.History ) or {}
+end
+
 function data_access_funcs:new_state_history( operation_name, state_str, selection_str )
 	local limit = math.max( mod_setting_get( "wand_edit_panel_history_limit" ), 1 )
-	local max_index, current_index = #get_histories( self.entity ), self.vars.current_history_index
+	local max_index, current_index = #edit_panel_api.get_histories( self.entity ), self.vars.current_history_index
 
 	if current_index ~= max_index then
-		for _, history_comp in ipairs( get_histories( self.entity ) ) do
+		for _, history_comp in ipairs( edit_panel_api.get_histories( self.entity ) ) do
 			if history_lens( history_comp ).index > current_index then
 				EntityRemoveComponent( self.entity, history_comp )
 			end
@@ -111,7 +107,7 @@ function data_access_funcs:new_state_history( operation_name, state_str, selecti
 
 	local overflow = index - limit
 	if overflow > 0 then
-		for _, history_comp in ipairs( get_histories( self.entity ) ) do
+		for _, history_comp in ipairs( edit_panel_api.get_histories( self.entity ) ) do
 			local idx = history_lens( history_comp ).index
 			if idx > overflow then
 				history_lens( history_comp ).index = idx - overflow
@@ -123,7 +119,7 @@ function data_access_funcs:new_state_history( operation_name, state_str, selecti
 	end
 
 	local history = history_lens( EntityAddComponent2( self.entity, "ItemChestComponent", {
-		_tags = tag_history,
+		_tags = EditPanelTags.History,
 		_enabled = false,
 	} ) )
 
@@ -140,7 +136,7 @@ function data_access_funcs:get_selection()
 end
 
 function data_access_funcs:get_state_history( index )
-	for _, history_comp in ipairs( get_histories( self.entity ) ) do
+	for _, history_comp in ipairs( edit_panel_api.get_histories( self.entity ) ) do
 		if history_lens( history_comp ).index == index then
 			return history_comp
 		end
@@ -152,15 +148,15 @@ function data_access_funcs:undo()
 	self.vars.current_history_index = self.vars.current_history_index - 1
 	local history_comp = self:get_state_history( self.vars.current_history_index )
 	edit_panel_api.load_state( wand_id, history_lens( history_comp ).state_str )
-	self.vars.selection_str = history_lens( history_comp ).selection_str
+	self.vars.selection = history_lens( history_comp ).selection_str
 end
 
 function data_access_funcs:redo()
-	if self.vars.current_history_index == #get_histories( self.entity ) then return end
+	if self.vars.current_history_index == #edit_panel_api.get_histories( self.entity ) then return end
 	self.vars.current_history_index = self.vars.current_history_index + 1
 	local history_comp = self:get_state_history( self.vars.current_history_index )
 	edit_panel_api.load_state( wand_id, history_lens( history_comp ).state_str )
-	self.vars.selection_str = history_lens( history_comp ).selection_str
+	self.vars.selection = history_lens( history_comp ).selection_str
 end
 
 function data_access_funcs:peek_undo()
@@ -169,7 +165,7 @@ function data_access_funcs:peek_undo()
 end
 
 function data_access_funcs:peek_redo()
-	if self.vars.current_history_index == #get_histories( self.entity ) then return nil end
+	if self.vars.current_history_index == #edit_panel_api.get_histories( self.entity ) then return nil end
 	return history_lens( self:get_state_history( self.vars.current_history_index + 1 ) ).operation_name
 end
 
@@ -184,11 +180,11 @@ end
 data_access_funcs.__index = data_access_funcs
 
 function edit_panel_api.access_data( wand_id )
-	local data_init = not EntityAddTag( entity_id, tag_init )
+	local data_init = not EntityAddTag( entity_id, EditPanelTags.Init )
 
 	if data_init then
 		EntityLoadToEntity( "mods/spell_lab_shugged/files/entities/wand_data_holder.xml", wand_id )
-		EntityAddTag( entity_id, tag_init )
+		EntityAddTag( entity_id, EditPanelTags.Init )
 	end
 
 	local data = setmetatable( {
@@ -208,38 +204,41 @@ end
 edit_panel_api.access_data = memoize( edit_panel_api.access_data )
 
 function edit_panel_api.dump_state( wand_id )
-	if EntityHasTag( wand_id, tag_dumping ) then
+	if EntityHasTag( wand_id, EditPanelTags.Dumping ) then
 		error( ("The wand with id %s has already been dumped at frame %d!"):format( wand_id, GameGetFrameNum() ) )
 	end
-	EntityAddTag( wand_id, tag_dumping )
+	EntityAddTag( wand_id, EditPanelTags.Dumping )
 	print( ("dumping wand %d at frame %d"):format( wand_id, GameGetFrameNum() ) )
 
-	local state_entity = EntityCreateNew()
-	EntityAddComponent2( state_entity, "VariableStorageComponent", { value_int = wand_id } )
-	EntityAddComponent2( state_entity, "LuaComponent", {
+	local state_entity = EntityCreateNew( tostring( wand_id ) ) -- use name to pass wand_id when dumping
+	local script = EntityAddComponent2( state_entity, "LuaComponent", {
 		script_source_file = "mods/spell_lab_shugged/files/entities/return_actions.lua",
 		execute_every_n_frame = -1,
-		execute_on_added = true,
-		execute_on_removed = true,
-		mNextExecutionTime = now,
+		execute_on_removed = false,
 	} )
-	EntityAddComponent2( state_entity, "LifetimeComponent", {
-		lifetime = 1,
-		serialize_duration = true,
-	} )
+	ComponentSetValue2( script, "execute_on_added", true ) -- make it so it doesn't execute right now
 
 	stream_actions( wand_id ).foreach( function( a )
 		EntityRemoveFromParent( a )
 		EntityAddChild( state_entity, a )
 	end )
 
-	return polytools.save( state_entity )
+	-- polymorph!
+	local poly_effect = LoadGameEffectEntityTo( state_entity, "mods/spell_lab_shugged/files/entities/poly_serializer.xml" )
+	if EntityGetIsAlive( state_entity ) then
+		GamePrintImportant( "WAIT ITS NOT POLYMORPHED" )
+	end
+
+	ModTextFileSetContent_Saved( VFiles.FinishingDumping, "1" )
+
+	local result = ComponentGetValue2( EntityGetFirstComponentIncludingDisabled( poly_effect, "GameEffectComponent" ), "mSerializedData" )
+	return result
 end
 
 function edit_panel_api.load_state( wand_id, state )
 	stream_actions( wand_id ).foreach( delete_action )
 
-	ModTextFileSetContent( vfile_wand_id, tostring( wand_id ) )
+	ModTextFileSetContent_Saved( VFiles.WandId, tostring( wand_id ) )
 
 	polytools.load( EntityCreateNew(), state )
 end

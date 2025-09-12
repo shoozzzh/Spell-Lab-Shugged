@@ -203,7 +203,7 @@ if player then EntityRemoveTag( player, "player_unit" ) end
 
 local action_metadata = {}
 for _, action in pairs( gun_globals.actions ) do
-	action_metadata[ action.id ] = get_action_metadata( action )
+	action_metadata[ action.id ] = get_action_metadata( action_data[ action.id ] )
 end
 
 local extra_modifiers_supported =

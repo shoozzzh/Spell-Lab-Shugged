@@ -260,3 +260,22 @@ Type_Adjustment = {
 	Add = 1,
 	Set = 2,
 }
+
+EditPanelTags = {
+	Init = "spell_lab_shugged.edit_panel_init",
+	Dumping = "spell_lab_shugged.dumping_this_wand",
+	History = "spell_lab_shugged.history",
+}
+
+VFiles = {
+	FinishingDumping = "mods/spell_lab_shugged/vfiles/is_dumping.txt",
+	WandId = "mods/spell_lab_shugged/vfiles/load_to_this_wand.txt",
+}
+
+dofile_once( "mods/spell_lab_shugged/files/lib/stream.lua" )
+
+function stream_actions( wand_id )
+	return stream( EntityGetAllChildren( wand_id ) or {} )
+		.filter( function( e ) return EntityGetFirstComponentIncludingDisabled( e, "ItemComponent" ) ~= nil end )
+		.filter( function( e ) return EntityGetFirstComponentIncludingDisabled( e, "ItemActionComponent" ) ~= nil end )
+end

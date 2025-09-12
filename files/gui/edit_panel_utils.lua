@@ -393,14 +393,16 @@ end
 
 function do_panel_action( gui, x, y, i, action_entity, selected )
 	local action_id, action_type = "", nil
+	local this_action_data, this_action_metadata
 	do
 		if not EntityGetIsAlive( action_entity ) then goto done	end
 
 		local ia_comp = EntityGetFirstComponentIncludingDisabled( action_entity, "ItemActionComponent" )
 		if not ia_comp then goto done end
 
-		action_id   = ComponentGetValue2( ia_comp, "action_id" )
-		action_type = action_data[ action_id ].type
+		action_id = ComponentGetValue2( ia_comp, "action_id" )
+		this_action_data, this_action_metadata = action_data[ action_id ], action_metadata[ action_id ]
+		action_type = this_action_data.type
 	end
 	::done::
 
@@ -433,27 +435,29 @@ function do_panel_action( gui, x, y, i, action_entity, selected )
 	local this_action_metadata = action_metadata[ action_id ]
 
 	local left_click, right_click, hover = do_action_button( x, y, selected, action_type, sprite_file )
-	do_custom_tooltip( function()
-		GuiLayoutBeginVertical( gui, 0, 0 )
-		if this_action_data then
-			local title = GameTextGetTranslatedOrNot( this_action_data.name )
-			if uses_remaining then
-				title = ("%s(%s)"):format( title, tostring( uses_remaining ) )
+	if this_action_data and this_action_metadata and hover then
+		force_do_custom_tooltip( function()
+			GuiLayoutBeginVertical( gui, 0, 0 )
+			if this_action_data then
+				local title = GameTextGetTranslatedOrNot( this_action_data.name )
+				if uses_remaining then
+					title = ("%s(%s)"):format( title, tostring( uses_remaining ) )
+				end
+				GuiText( gui, 0, 0, title )
 			end
-			GuiText( gui, 0, 0, title )
-		end
 
-		do_least_tooltip( this_action_data, this_action_metadata )
+			do_least_tooltip( this_action_data, this_action_metadata )
 
-		local note
-		if selected then
-			note = text_get( "spell_box_commmon_tips_selected", shortcut_texts.deselect )
-		else
-			note = text_get( "spell_box_commmon_tips", shortcut_texts.select )
-		end
-		GuiDimText( gui, 0, 0, note )
-		GuiLayoutEnd( gui )
-	end, 2, -2, true )
+			local note
+			if selected then
+				note = text_get( "spell_box_commmon_tips_selected", shortcut_texts.deselect )
+			else
+				note = text_get( "spell_box_commmon_tips", shortcut_texts.select )
+			end
+			GuiDimText( gui, 0, 0, note )
+			GuiLayoutEnd( gui )
+		end, 2, -2, true, x, y, 20 )
+	end
 
 	show_uses_remaining( x, y, uses_remaining )
 	if is_permanent then
