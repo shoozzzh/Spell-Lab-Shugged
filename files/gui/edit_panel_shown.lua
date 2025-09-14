@@ -102,13 +102,17 @@ do
 
 		local a = actions.common[ i ]
 		row[ #row + 1 ] = { a, selection[ i ] }
+		
+		if i == capacity and not data.vars.autocap_enabled then
+			do_horizontal_centered_button_list( gui, action_func, row, y_first_row + math.floor( ( i - first_i ) / actions_per_row ) * ( 20 + 2 ) )
+			row = nil
+			break
+		end
 
 		if #row == actions_per_row or i == last_i then
 			do_horizontal_centered_button_list( gui, action_func, row, y_first_row + math.floor( ( i - first_i ) / actions_per_row ) * ( 20 + 2 ) )
 			row = nil
 		end
-		
-		if i == capacity and not data.vars.autocap_enabled then break end
 	end
 end
 
@@ -127,6 +131,6 @@ end
 data.vars.row_offset = row_offset
 
 edit_panel_shortcut_args = nil
-if operation then
+if operation and not EntityHasTag( held_wand, EditPanelTags.Recording ) then
 	api.do_operation( data, actions, operation )
 end

@@ -185,6 +185,19 @@ function get_held_wand()
 	end
 end
 
+function get_all_wands_in_inventory()
+	if not player then return end
+
+	local children = EntityGetAllChildren( player )
+	if not children then return end
+
+	for _, child in pairs( children ) do
+		if EntityGetName( child ) == "inventory_quick" then
+			return EntityGetAllChildren( child, "wand" )
+		end
+	end
+end
+
 function force_refresh_held_wands()
 	if not player then return end
 	local inv2_comp = EntityGetFirstComponent( player, "Inventory2Component" )
@@ -263,7 +276,8 @@ Type_Adjustment = {
 
 EditPanelTags = {
 	Init = "spell_lab_shugged.edit_panel_init",
-	Dumping = "spell_lab_shugged.dumping_this_wand",
+	Recording = "spell_lab_shugged.recording_history_state",
+	UncachedChanges = "spell_lab_shugged.uncached_changes",
 	History = "spell_lab_shugged.history",
 }
 
@@ -278,4 +292,25 @@ function stream_actions( wand_id )
 	return stream( EntityGetAllChildren( wand_id ) or {} )
 		.filter( function( e ) return EntityGetFirstComponentIncludingDisabled( e, "ItemComponent" ) ~= nil end )
 		.filter( function( e ) return EntityGetFirstComponentIncludingDisabled( e, "ItemActionComponent" ) ~= nil end )
+end
+
+function deep_equals( a, b )
+	local tipe = type( a )
+	if tipe ~= type( b ) then return false end
+
+	if tipe == "table" then
+		for k, v in pairs( a ) do
+			if not deep_equals( v, b[ k ] ) then
+				return false
+			end
+		end
+		for k, v in pairs( b ) do
+			if a[ k ] == nil then
+				return false
+			end
+		end
+		return true
+	else
+		return a == b
+	end
 end

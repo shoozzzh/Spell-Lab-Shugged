@@ -5,7 +5,6 @@ end
 
 print( "[spell lab] setting up GUI" )
 
-dofile_once( "data/scripts/gun/gun.lua" )
 dofile_once( "data/scripts/lib/utilities.lua" )
 dofile_once( "mods/spell_lab_shugged/files/lib/helper.lua")
 dofile_once( "mods/spell_lab_shugged/files/gui/gui_utils.lua")
@@ -35,6 +34,8 @@ type_text = {
 	[ACTION_TYPE_UTILITY]           = "$inventory_actiontype_utility",
 	[ACTION_TYPE_PASSIVE]           = "$inventory_actiontype_passive",
 }
+
+local actions = get_globals( "data/scripts/gun/gun_actions.lua" ).actions
 
 sorted_actions = {}
 action_data = {}
@@ -255,7 +256,7 @@ function do_gui()
 	player = get_player()
 	held_wand = get_held_wand()
 	
-	dofile( "mods/spell_lab_shugged/files/gui/wand_listener.lua" )
+	edit_panel_api.listen_wand_changes()
 
 	keyboard_focus.update()
 

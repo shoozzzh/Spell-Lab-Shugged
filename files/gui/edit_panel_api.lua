@@ -7,6 +7,81 @@ local edit_panel_api = {}
 
 local var_name_prefix = "spell_lab_shugged."
 
+local function view_actions( wand_id )
+	local permanent = {}
+	local common = {}
+
+	for i, a in ipairs( EntityGetAllChildren( wand_id ) or {} ) do
+		local item_comp = EntityGetFirstComponentIncludingDisabled( a, "ItemComponent" )
+		local ia_comp   = EntityGetFirstComponentIncludingDisabled( a, "ItemActionComponent" )
+		if not item_comp or not ia_comp then goto continue end
+
+		local action_id = ComponentGetValue2( ia_comp, "action_id" )
+		if action_id == "" then goto continue end
+
+		local uses_remaining = ComponentGetValue2( item_comp, "uses_remaining" )
+		local index
+		if ComponentGetValue2( item_comp, "permanently_attached" ) then
+			permanent[ #permanent + 1 ] = { action_id, uses_remaining }
+		else
+			local x, _ = ComponentGetValue2( item_comp, "inventory_slot" )
+			if common[ x ] ~= nil then
+				local pos = common[ x ]
+				pos[ #pos + 1 ] = action_id
+				pos[ #pos + 1 ] = uses_remaining
+			end
+			common[ x ] = { action_id, uses_remaining }
+		end
+
+		::continue::
+	end
+	return { permanent = permanent, common = common }
+end
+
+local cached_wand_snapshots = {}
+
+function edit_panel_api.listen_wand_changes()
+	local wands_to_listen
+	local wand_listener_type = mod_setting_get( "wand_listener_type" )
+	if wand_listener_type == "INV" then
+		wands_to_listen = get_all_wands_in_inventory()
+	elseif wand_listener_type == "HAND" then
+		wands_to_listen = { held_wand }
+	elseif wand_listener_type == "PANEL" then
+		if mod_setting_get( "show_wand_edit_panel" ) then
+			wands_to_listen = { held_wand }
+		end
+	else
+		GamePrint( "Something is very wrong!" )
+		GamePrintImportant( "Something is very wrong!" )
+		print( "Something is very wrong!" )
+	end
+
+	for _, wand_id in ipairs( wands_to_listen or {} ) do
+		local cached = cached_wand_snapshots[ wand_id ]
+		local new = view_actions( wand_id )
+	
+		if deep_equals( cached, new ) then goto continue end
+		cached_wand_snapshots[ wand_id ] = new
+		if cached == nil then goto continue end
+		if EntityHasTag( wand_id, EditPanelTags.UncachedChanges ) then
+			EntityRemoveTag( wand_id, EditPanelTags.UncachedChanges )
+			goto continue
+		end
+		-- if data.vars.force_compact_enabled then goto continue end
+		local data = edit_panel_api.access_data( wand_id )
+		data:record_new_history( wrap_key( "operation_read_from_wand" ) )
+	
+		::continue::
+	end
+	
+	for wand_id, _ in pairs( cached_wand_snapshots ) do
+		if not EntityGetIsAlive( wand_id ) then
+			cached_wand_snapshots[ wand_id ] = nil
+		end
+	end
+end
+
 local function create_action( action_id, uses_remaining )
 	local action = CreateItemActionEntity( action_id )
 	EntitySetComponentsWithTagEnabled( action, "enabled_in_world", false )
@@ -90,7 +165,13 @@ function edit_panel_api.get_histories( wand_id )
 	return EntityGetComponentIncludingDisabled( wand_id, "ItemChestComponent", EditPanelTags.History ) or {}
 end
 
-function data_access_funcs:new_state_history( operation_name, state_str, selection_str )
+function data_access_funcs:record_new_history( operation_name )
+	if EntityHasTag( wand_id, EditPanelTags.Recording ) then
+		print_error( ("The wand with id %s has already been dumped at frame %d!"):format( wand_id, GameGetFrameNum() ) )
+		return
+	end
+	EntityAddTag( wand_id, EditPanelTags.Recording )
+
 	local limit = math.max( mod_setting_get( "wand_edit_panel_history_limit" ), 1 )
 	local max_index, current_index = #edit_panel_api.get_histories( self.entity ), self.vars.current_history_index
 
@@ -124,9 +205,9 @@ function data_access_funcs:new_state_history( operation_name, state_str, selecti
 	} ) )
 
 	history.index          = index
-	history.state_str      = state_str
-	history.selection_str  = selection_str
 	history.operation_name = operation_name
+	history.selection_str  = self.vars.selection
+	history.state_str      = edit_panel_api.dump_state( self.entity )
 
 	self.vars.current_history_index = index
 end
@@ -147,7 +228,7 @@ function data_access_funcs:undo()
 	if self.vars.current_history_index == 1 then return end
 	self.vars.current_history_index = self.vars.current_history_index - 1
 	local history_comp = self:get_state_history( self.vars.current_history_index )
-	edit_panel_api.load_state( wand_id, history_lens( history_comp ).state_str )
+	edit_panel_api.load_state( self.entity, history_lens( history_comp ).state_str )
 	self.vars.selection = history_lens( history_comp ).selection_str
 end
 
@@ -155,7 +236,7 @@ function data_access_funcs:redo()
 	if self.vars.current_history_index == #edit_panel_api.get_histories( self.entity ) then return end
 	self.vars.current_history_index = self.vars.current_history_index + 1
 	local history_comp = self:get_state_history( self.vars.current_history_index )
-	edit_panel_api.load_state( wand_id, history_lens( history_comp ).state_str )
+	edit_panel_api.load_state( self.entity, history_lens( history_comp ).state_str )
 	self.vars.selection = history_lens( history_comp ).selection_str
 end
 
@@ -180,22 +261,14 @@ end
 data_access_funcs.__index = data_access_funcs
 
 function edit_panel_api.access_data( wand_id )
-	local data_init = not EntityAddTag( entity_id, EditPanelTags.Init )
-
-	if data_init then
-		EntityLoadToEntity( "mods/spell_lab_shugged/files/entities/wand_data_holder.xml", wand_id )
-		EntityAddTag( entity_id, EditPanelTags.Init )
-	end
-
 	local data = setmetatable( {
 		vars = access_vars( wand_id, var_map, var_name_prefix ),
 		entity = wand_id,
 	}, data_access_funcs )
 
-	if data_init then
-		data:new_state_history(
-			wrap_key( "operation_read_from_wand" ), edit_panel_api.dump_state( wand_id ), data.vars.selection
-		)
+	if not EntityHasTag( wand_id, EditPanelTags.Init ) then
+		EntityAddTag( wand_id, EditPanelTags.Init )
+		data:record_new_history( wrap_key( "operation_read_from_wand" ) )
 	end
 
 	return data
@@ -204,30 +277,28 @@ end
 edit_panel_api.access_data = memoize( edit_panel_api.access_data )
 
 function edit_panel_api.dump_state( wand_id )
-	if EntityHasTag( wand_id, EditPanelTags.Dumping ) then
-		error( ("The wand with id %s has already been dumped at frame %d!"):format( wand_id, GameGetFrameNum() ) )
-	end
-	EntityAddTag( wand_id, EditPanelTags.Dumping )
-	print( ("dumping wand %d at frame %d"):format( wand_id, GameGetFrameNum() ) )
-
 	local state_entity = EntityCreateNew( tostring( wand_id ) ) -- use name to pass wand_id when dumping
-	local script = EntityAddComponent2( state_entity, "LuaComponent", {
-		script_source_file = "mods/spell_lab_shugged/files/entities/return_actions.lua",
-		execute_every_n_frame = -1,
-		execute_on_removed = false,
-	} )
-	ComponentSetValue2( script, "execute_on_added", true ) -- make it so it doesn't execute right now
 
 	stream_actions( wand_id ).foreach( function( a )
 		EntityRemoveFromParent( a )
 		EntityAddChild( state_entity, a )
 	end )
 
-	-- polymorph!
+	-- use this child to run script
+	-- because when de-polymorphing, children are spawned in after the parent does
+	-- when state entity is just spawned in, triggering the execute_on_added on it
+	-- the action children have not been spawned in yet
+	local script_child = EntityCreateNew()
+	local script = EntityAddComponent2( script_child, "LuaComponent", {
+		script_source_file = "mods/spell_lab_shugged/files/entities/return_actions.lua",
+		execute_every_n_frame = -1,
+	} )
+	ComponentSetValue2( script, "execute_on_added", true ) -- make it so it doesn't execute right now
+	EntityAddChild( state_entity, script_child )
+
+	-- this doesn't immediately do polymorphing
+	-- but generates the serialized data and marks the state entity and its children as dead
 	local poly_effect = LoadGameEffectEntityTo( state_entity, "mods/spell_lab_shugged/files/entities/poly_serializer.xml" )
-	if EntityGetIsAlive( state_entity ) then
-		GamePrintImportant( "WAIT ITS NOT POLYMORPHED" )
-	end
 
 	ModTextFileSetContent_Saved( VFiles.FinishingDumping, "1" )
 
@@ -236,6 +307,7 @@ function edit_panel_api.dump_state( wand_id )
 end
 
 function edit_panel_api.load_state( wand_id, state )
+	EntityAddTag( wand_id, EditPanelTags.UncachedChanges )
 	stream_actions( wand_id ).foreach( delete_action )
 
 	ModTextFileSetContent_Saved( VFiles.WandId, tostring( wand_id ) )
@@ -362,7 +434,7 @@ function edit_panel_api.do_operation( data, actions, operation )
 		actions.permanent:apply_changes( unpack( operation.permanent ) )
 	end
 	
-	data:new_state_history( edit_panel_api.dump_state( data.entity ), data.vars.selection, operation.name )
+	data:record_new_history( operation.name )
 end
 
 return edit_panel_api

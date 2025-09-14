@@ -2,19 +2,20 @@ dofile_once( "mods/spell_lab_shugged/files/lib/entity_xml_parser.lua" )
 
 local gun_globals = get_globals( "data/scripts/gun/gun.lua" )
 local function new_parsing_env( metadata )
-	local env_masking = {}
-	local c = metadata.c
+	local parsing_env = {}
+	local c            = metadata.c
+	local shot_effects = metadata.shot_effects
 
-	env_masking.c = metadata.c
-	env_masking.shot_effects = metadata.shot_effects
-	env_masking.reflecting = true
+	parsing_env.c = metadata.c
+	parsing_env.shot_effects = metadata.shot_effects
+	parsing_env.reflecting = true
 
-	env_masking.add_projectile_trigger_timer = function( entity_filename, delay_frames, action_draw_count )
+	parsing_env.add_projectile_trigger_timer = function( entity_filename, delay_frames, action_draw_count )
 		metadata.last_projectile_timer_time = delay_frames
 		Reflection_RegisterProjectile( entity_filename )
 	end
 
-	env_masking.Reflection_RegisterProjectile = function( filepath )
+	parsing_env.Reflection_RegisterProjectile = function( filepath )
 		metadata.projectiles = metadata.projectiles or {}
 		if metadata.projectiles[filepath] then
 			metadata.projectiles[filepath].projectiles = metadata.projectiles[filepath].projectiles + 1
@@ -92,11 +93,11 @@ local function new_parsing_env( metadata )
 		metadata.projectiles[filepath] = properties
 	end
 
-	env_masking.draw_actions = function( how_many ) c.draws = c.draws + how_many end
+	parsing_env.draw_actions = function( how_many ) c.draws = c.draws + how_many end
 
-	env_masking.EntityLoad = function() end
+	parsing_env.EntityLoad = function() end
 
-	env_masking.current_reload_time = 0
+	parsing_env.current_reload_time = 0
 
 	gun_globals.reset_modifiers( c )
 	gun_globals.ConfigGunShotEffects_Init( shot_effects )
@@ -126,7 +127,7 @@ local function new_parsing_env( metadata )
 		}
 	)
 
-	return env_masking
+	return parsing_env
 end
 local function get_action_metadata( this_action_data )
 	if not this_action_data then return end
@@ -139,19 +140,18 @@ local function get_action_metadata( this_action_data )
 		shot_effects = {},
 		last_projectile_timer_time = nil,
 	}
-	local env_masking = new_parsing_env( metadata )
+	local parsing_env = new_parsing_env( metadata )
 	
 	local action_action = this_action_data.action
-	local action_env = getfenv( action_action )
-	for k, v in pairs( env_masking ) do
-		action_env[ k ] = v
-	end
-	setfenv( action_action, action_env )
+	setmetatable( parsing_env, { __index = getfenv( action_action ) } )
+	
+	setfenv( action_action, parsing_env )
 
 	pcall( action_action )
 
-	local c = metadata.c
-	c.reload_time = action_env.current_reload_time
+	local c            = metadata.c
+	local shot_effects = metadata.shot_effects
+	c.reload_time = parsing_env.current_reload_time
 
 	if rawget( shot_effects, "spell_lab_shugged_count_recoil_set" ) == 1 then
 		if rawget( shot_effects, "spell_lab_shugged_count_recoil_get" ) == 1 then

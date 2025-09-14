@@ -343,7 +343,6 @@ picker.buttons = function()
 							local saved_wand = current_page[ i ]
 							WANDS.initialize_wand( held_wand, saved_wand )
 							force_refresh_held_wands()
-							reload_state_for_wand( held_wand ) -- for force compact
 							wand_box_selected_indexes[ i ] = false
 							break
 						end

@@ -402,37 +402,50 @@ function do_panel_action( gui, x, y, i, action_entity, selected )
 
 		action_id = ComponentGetValue2( ia_comp, "action_id" )
 		this_action_data, this_action_metadata = action_data[ action_id ], action_metadata[ action_id ]
-		action_type = this_action_data.type
+		if this_action_data then
+			action_type = this_action_data.type
+		end
 	end
 	::done::
 
-	local sprite_file = "mods/spell_lab_shugged/files/gui/buttons/empty_spell.png"
 	local name, uses_remaining = "", nil
 	local is_permanent = false
+	local sprite_file = "mods/spell_lab_shugged/files/gui/buttons/empty_spell.png"
 	do
 		if not EntityGetIsAlive( action_entity ) then goto done_2 end
 
 		local item_comp = EntityGetFirstComponentIncludingDisabled( action_entity, "ItemComponent" )
 		if not item_comp then goto done_2 end
+		name = ComponentGetValue2( item_comp, "item_name" )
 
-		sprite_file    = ComponentGetValue2( item_comp, "ui_sprite" )
-		name           = ComponentGetValue2( item_comp, "item_name" )
 		uses_remaining = ComponentGetValue2( item_comp, "uses_remaining" )
+		if uses_remaining < 0 then
+			uses_remaining = nil
+		end
 
 		is_permanent = ComponentGetValue2( item_comp, "permanently_attached" )
 
-		if not ModDoesFileExist( sprite_file ) then
-			sprite_file = "mods/spell_lab_shugged/files/gui/buttons/missing_sprite.png"
+		sprite_file = ComponentGetValue2( item_comp, "ui_sprite" )
+		if ModDoesFileExist( sprite_file ) then goto done_2 end
+
+		if this_action_data then
+			sprite_file = this_action_data.sprite
+			if ModDoesFileExist( sprite_file ) then goto done_2 end
 		end
+
+		local ab_comp = EntityGetFirstComponentIncludingDisabled( action_entity, "AbilityComponent" )
+		if ab_comp then
+			sprite_file = ComponentGetValue2( ab_comp, "sprite_file" )
+			if ModDoesFileExist( sprite_file ) then goto done_2 end
+		end
+		
+		sprite_file = "mods/spell_lab_shugged/files/gui/buttons/missing_sprite.png"
 	end
 	::done_2::
 	
 	if is_permanent then
 		note = note .. "\n" .. text_get( "spell_box_permanent_tips", shortcut_texts.always_cast )
 	end
-
-	local this_action_data     = action_data[ action_id ]
-	local this_action_metadata = action_metadata[ action_id ]
 
 	local left_click, right_click, hover = do_action_button( x, y, selected, action_type, sprite_file )
 	if this_action_data and this_action_metadata and hover then
