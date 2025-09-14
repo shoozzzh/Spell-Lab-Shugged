@@ -430,10 +430,11 @@ picker.menu = function()
 			end
 			show_locked_state( x, y, this_action_data )
 			if left_click or right_click then
-				local is_unlocked_action = action.spawn_requires_flag and HasFlagPersistent( action.spawn_requires_flag ) 
+				local is_unlocked_action = this_action_data.spawn_requires_flag
+					and HasFlagPersistent( this_action_data.spawn_requires_flag ) 
 				if shortcut_detector.is_fired( shortcuts.relock, left_click, right_click ) then
 					if is_unlocked_action then
-						RemoveFlagPersistent( action.spawn_requires_flag )
+						RemoveFlagPersistent( this_action_data.spawn_requires_flag )
 					end
 					return
 				end
@@ -442,7 +443,7 @@ picker.menu = function()
 					or not mod_setting_get( "show_wand_edit_panel" ) or not held_wand then
 					if not player then return end
 					local x, y = EntityGetTransform( player )
-					local action_entity = CreateItemActionEntity( action.id, x, y )
+					local action_entity = CreateItemActionEntity( this_action_data.id, x, y )
 					local inventory_full
 					local player_child_entities = EntityGetAllChildren( player )
 					if not player_child_entities then return end
@@ -456,9 +457,9 @@ picker.menu = function()
 					if inventory_full then
 						EntitySetComponentsWithTagEnabled( action_entity, "enabled_in_world", false )
 						EntityAddChild( inventory_full, action_entity )
-						GamePrint( GameTextGet( wrap_key( "action_added_to_inventory" ), GameTextGetTranslatedOrNot( action.name ) ) )
+						GamePrint( GameTextGet( wrap_key( "action_added_to_inventory" ), GameTextGetTranslatedOrNot( this_action_data.name ) ) )
 						if filter_type ~= FILTER_TYPE_RECENT then
-							new_action_history_entry( action.id )
+							new_action_history_entry( this_action_data.id )
 						end
 					end
 					return
@@ -467,18 +468,18 @@ picker.menu = function()
 				local do_replace = mod_setting_get( "replace_mode" )
 				if shift then do_replace = not do_replace end
 				local uses_remaining = nil
-				if action.max_uses then
-					if not world_state_unlimited_spells or action.never_unlimited then
+				if this_action_data.max_uses then
+					if not world_state_unlimited_spells or this_action_data.never_unlimited then
 						if not mod_setting_get( "zero_uses" ) then
-							uses_remaining = action.max_uses
+							uses_remaining = this_action_data.max_uses
 						else
 							uses_remaining = 0
 						end
 					end
 				end
-				set_action( access_edit_panel_state( held_wand ), action.id, uses_remaining, do_replace, EntityGetWandCapacity( held_wand ), right_click )
+				set_action( access_edit_panel_state( held_wand ), this_action_data.id, uses_remaining, do_replace, EntityGetWandCapacity( held_wand ), right_click )
 				if filter_type ~= FILTER_TYPE_RECENT then
-					new_action_history_entry( action.id )
+					new_action_history_entry( this_action_data.id )
 				end
 			end
 		end )

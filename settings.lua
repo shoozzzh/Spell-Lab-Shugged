@@ -1,6 +1,7 @@
 dofile_once( "data/scripts/lib/utilities.lua" )
 dofile_once( "data/scripts/lib/mod_settings.lua" )
 dofile_once( "mods/spell_lab_shugged/files/lib/shortcut_setting.lua" )
+dofile_once( "mods/spell_lab_shugged/files/gui/spellbox_packs.lua" )
 
 local mod_id = "spell_lab_shugged"
 
@@ -284,10 +285,30 @@ mod_settings = {
 		id            = "action_button_click_sound",
 		value_default = false,
 	},
+	{
+		id = "spellbox_pack",
+		change_fn = function( mod_id, gui, in_main_menu, setting, old_value, new_value )
+			ModSettingSetNextValue( mod_id .. ".spellbox_pack_changed", true, false )
+		end,
+	}
 }
 
 local function load_mod_settings( cur_lang )
 	local text
+
+	local function load_spellpack_texts( l )
+		text.spellbox_pack_values = {}
+		for key, pack in pairs( spellbox_packs ) do
+			local name = pack.ui_name[ l ]
+			local value = { key, name }
+			text.spellbox_pack_values[ #text.spellbox_pack_values + 1 ] = value
+			
+			if name == "GOKIS" then
+				text.spellbox_pack_value_default = value
+			end
+		end
+	end
+
 	if cur_lang == "简体中文" or cur_lang == "喵体中文" or cur_lang == "汪体中文" or cur_lang == "完全汉化" then
 		text = {
 			wand_edit_panel = "法杖编辑面板",
@@ -370,7 +391,10 @@ local function load_mod_settings( cur_lang )
 			dummy_target_show_full_damage_number_description = "开启时，将以完整形式而不是科学计数法显示伤害数字",
 			button_click_sound = "按钮点击音效",
 			action_button_click_sound = "法术按钮点击音效",
+			spellbox_pack = "法术框贴图",
 		}
+
+		load_spellpack_texts( "zh_cn" )
 	else
 		text = {
 			wand_edit_panel = "Wand Edit Panel",
@@ -453,7 +477,10 @@ local function load_mod_settings( cur_lang )
 			dummy_target_show_full_damage_number_description = "Should dummy targets always has full-length damage numbers shown?",
 			button_click_sound = "Button Click Sound",
 			action_button_click_sound = "Spell Button Click sound",
+			spellbox_pack = "Spell Box Sprites",
 		}
+
+		load_spellpack_texts( "DEFAULT" )
 	end
 	local function recursive( setting )
 		if setting.id ~= nil then

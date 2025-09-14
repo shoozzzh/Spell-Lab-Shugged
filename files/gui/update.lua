@@ -9,6 +9,7 @@ dofile_once( "data/scripts/lib/utilities.lua" )
 dofile_once( "mods/spell_lab_shugged/files/lib/helper.lua")
 dofile_once( "mods/spell_lab_shugged/files/gui/gui_utils.lua")
 dofile_once( "mods/spell_lab_shugged/files/gui/gui_elements.lua")
+dofile_once( "mods/spell_lab_shugged/files/gui/spellbox_packs.lua" )
 dofile_once( "mods/spell_lab_shugged/files/gui/get_player.lua" )
 WANDS = dofile_once( "mods/spell_lab_shugged/files/lib/wands.lua")
 dofile_once( "data/scripts/debug/keycodes.lua" )
@@ -271,6 +272,8 @@ function do_gui()
 			last_cur_lang = cur_lang
 			reload_shortcut_texts()
 		end
+
+		change_spellbox_pack_if_needed()
 	end
 
 	local mod_button_reservation = tonumber( GlobalsGetValue( "spell_lab_shugged_mod_button_reservation", "0" ) )

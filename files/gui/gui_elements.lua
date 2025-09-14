@@ -80,26 +80,6 @@ function do_flag_toggle_image_button( filepath, flag, option_text, click_callbac
 	return left_click, right_click
 end
 
-function do_action_image( id, action_id, x, y, alpha, scale_x, scale_y, rotation )
-	x = x or 0
-	y = y or 0
-	alpha = alpha or 1.0
-	scale_x = scale_x or 1.0
-	scale_y = scale_y or 1.0
-	rotation = rotation or 0.0
-
-	local image_sprite = "mods/spell_lab_shugged/files/gui/buttons/empty_spell.png"
-	local this_action_data = action_data[action_id]
-	local spell_box_suffix = ""
-	if this_action_data then spell_box_suffix = spell_box_suffix .. "_" .. this_action_data.type end
-	if this_action_data then
-		image_sprite = this_action_data.sprite
-	end
-	GuiImage( gui, id, x, y, image_sprite, alpha, scale_x, scale_y, rotation )
-	GuiZSetForNextWidget( gui, 1 )
-	GuiImage( gui, next_id(), -20, 0, "mods/spell_lab_shugged/files/gui/buttons/spell_box"..spell_box_suffix..".png", 1.0, 1.0, 0 )
-end
-
 function do_action_button( x, y, selected, action_type, sprite_file )
 	GuiZSetForNextWidget( gui, 3 )
 	GuiOptionsAddForNextWidget( gui, GUI_OPTION.NonInteractive )
@@ -110,29 +90,14 @@ function do_action_button( x, y, selected, action_type, sprite_file )
 	GuiImageButton( gui, next_id(), _x + 2, _y + 2, "", "mods/spell_lab_shugged/files/gui/buttons/transparent_16x16.png" )
 	local left_click, right_click, hover = previous_data( gui )
 
-	local spell_box = { "mods/spell_lab_shugged/files/gui/buttons/spell_box" }
-	if action_type then
-		spell_box[ #spell_box + 1 ] = "_"
-		spell_box[ #spell_box + 1 ] = tostring( action_type )
-	end
-	if selected then
-		spell_box[ #spell_box + 1 ] = "_"
-		spell_box[ #spell_box + 1 ] = "active"
-	elseif hover then -- temporarily remove this
-		spell_box[ #spell_box + 1 ] = "_"
-		spell_box[ #spell_box + 1 ] = "hover"
-	end
-	spell_box[ #spell_box + 1 ] = ".png"
-	spell_box = table.concat( spell_box )
-
 	GuiZSetForNextWidget( gui, 1 )
 	GuiOptionsAddForNextWidget( gui, GUI_OPTION.Layout_NoLayouting )
 	local width, height = GuiGetImageDimensions( gui, sprite_file )
 	GuiImage( gui, next_id(), _x + 20 / 2 - width / 2, _y + 20 / 2 - height / 2, sprite_file, 1, 1, 0 )
 
-	GuiZSetForNextWidget( gui, 2 )
-	GuiOptionsAddForNextWidget( gui, GUI_OPTION.Layout_NoLayouting )
-	GuiImage( gui, next_id(), _x, _y, spell_box, 1, 1, 0 )
+	GuiZSet( gui, 2 )
+	show_spellbox( gui, next_id(), _x, _y, action_type, selected, hovered, 1, 1, 0, 0 )
+	GuiZSet( gui, -2 )
 
 	if left_click or right_click then
 		sound_action_button_clicked()
