@@ -543,23 +543,6 @@ function WANDS.initialize_wand( wand, wand_data, do_clear_actions )
 	end
 end
 
-function WANDS.wand_explode_action( wand, x, include_permanent_actions, include_frozen_actions, ox, oy )
-	local actions = WANDS.wand_get_actions_absolute( wand )
-	if actions then
-		local action = actions[x]
-		if action then
-			local action_to_remove = action.entity
-			EntityRemoveFromParent( action_to_remove )
-			EntityApplyTransform( action_to_remove, EntityGetTransform( wand ) )
-			EntitySetComponentsWithTagEnabled( action_to_remove, "enabled_in_hand", false )
-			EntitySetComponentsWithTagEnabled( action_to_remove, "enabled_in_inventory", false )
-			EntitySetComponentsWithTagEnabled( action_to_remove, "enabled_in_world", true )
-			ComponentSetValue2( EntityGetFirstComponent( action_to_remove, "VelocityComponent" ), "mVelocity", Random( -150, 150 ), Random( -250, -100 ) )
-			return action_to_remove
-		end
-	end
-end
-
 local function wand_explode_action_impl( wand, action_to_remove, vx, vy )
 	EntityRemoveFromParent( action_to_remove )
 	EntityApplyTransform( action_to_remove, EntityGetTransform( wand ) )
@@ -601,81 +584,6 @@ function WANDS.wand_check_actions_out_of_bound( wand, deck_capacity )
 	return true
 end
 
-function WANDS.wand_explode_random_action( wand, include_permanent_actions, include_frozen_actions, ox, oy )
-	local x, y = EntityGetTransform( wand )
-	local actions = {}
-	local children = EntityGetAllChildren( wand, "card_action" ) or {}
-	for i,action in ipairs( children ) do
-		local item_action = EntityGetFirstComponentIncludingDisabled( action, "ItemActionComponent" )
-		if item_action ~= nil then
-			local item = EntityGetFirstComponentIncludingDisabled( action, "ItemComponent" )
-			if item ~= nil then
-				local action_id = ComponentGetValue2( item_action, "action_id" )
-				if action_id ~= nil then
-					if include_permanent_actions == true or ComponentGetValue2( item, "permanently_attached" ) == false then
-						if include_frozen_actions == true or ComponentGetValue2( item, "is_frozen" ) == false then
-							table.insert( actions, { action_id=action_id, permanent=permanent, entity=action } )
-						end
-					end
-				end
-			end
-		end
-	end
-	if #actions > 0 then
-		local r = math.ceil( math.random() * #actions )
-		local action_to_remove = actions[ r ]
-		local card = CreateItemActionEntity( action_to_remove.action_id, ox or x, oy or y )
-		ComponentSetValue2( EntityGetFirstComponent( card, "VelocityComponent" ), "mVelocity", Random( -150, 150 ), Random( -250, -100 ) )
-		EntityRemoveFromParent( action_to_remove.entity )
-		return action_to_remove
-	end
-end
-
-function WANDS.wand_remove_first_action( wand, include_permanent_actions, include_frozen_actions )
-	local x, y = EntityGetTransform( wand )
-	local actions = {}
-	local children = EntityGetAllChildren( wand, "card_action" ) or {}
-	for _,action in pairs( children ) do
-		local item_action = EntityGetFirstComponentIncludingDisabled( action, "ItemActionComponent" )
-		if item_action ~= nil then
-			local item = EntityGetFirstComponentIncludingDisabled( action, "ItemComponent" )
-			if item ~= nil then
-				if include_permanent_actions == true or ComponentGetValue2( item, "permanently_attached" ) == false then
-					if include_frozen_actions == true or ComponentGetValue2( item, "is_frozen" ) == false then
-						EntityRemoveFromParent( action )
-						EntitySetComponentsWithTagEnabled( action,  "enabled_in_world", true )
-						EntitySetComponentsWithTagEnabled( action,  "enabled_in_hand", false )
-						EntitySetComponentsWithTagEnabled( action,  "enabled_in_inventory", false )
-						EntitySetComponentsWithTagEnabled( action,  "item_unidentified", false )
-						EntitySetTransform( action, x, y )
-						return action
-					end
-				end
-			end
-		end
-	end
-end
-
-function WANDS.wand_lock( wand, lock_spells, lock_wand )
-	if lock_spells == nil then lock_spells = true end
-	if lock_wand == nil then lock_wand = true end
-	if lock_spells then
-		local children = EntityGetAllChildren( wand, "card_action" ) or {}
-		for i,action in ipairs( children ) do
-			local item = EntityGetFirstComponentIncludingDisabled( action, "ItemComponent" )
-			if item ~= nil then
-				ComponentSetValue2( item, "is_frozen", true )
-			end
-		end
-	end
-	if lock_wand then
-		local item = EntityGetFirstComponentIncludingDisabled( wand, "ItemComponent" )
-		if item ~= nil then
-			ComponentSetValue2( item, "is_frozen", true )
-		end
-	end
-end
-
 function WANDS.wand_attach_action( wand, action, permanent, locked )
 	EntityAddChild( wand, action )
 	local item_action = EntityGetFirstComponentIncludingDisabled( action, "ItemActionComponent" )
@@ -686,44 +594,24 @@ function WANDS.wand_attach_action( wand, action, permanent, locked )
 	end
 end
 
-function WANDS.wand_is_always_cast_valid( wand )
-	local children = EntityGetAllChildren( wand, "card_action" ) or {}
-	for i,v in ipairs( children ) do
-		local items = EntityGetComponentIncludingDisabled( v, "ItemComponent" )
-		local has_a_valid_spell = false
-		for _,item in pairs( items or {}) do
-			if ComponentGetValue2( item, "permanently_attached" ) == false then
-				has_a_valid_spell = true
-				break
-			end
-		end
-		if has_a_valid_spell then
-			return true
-		end
-	end
-	return false
-end
+function WANDS.ensure_actions_in_capacity( wand_id )
+	local num_pa = WANDS.wand_get_num_actions_permanent( wand_id )
 
-function WANDS.force_always_cast( wand, amount )
-	if amount == nil then amount = 1 end
-	local children = EntityGetAllChildren( wand, "card_action" ) or {}
-	local always_cast_count = 0
-	for _,child in pairs( children ) do
-		local item_component = EntityGetFirstComponentIncludingDisabled( child, "ItemComponent" )
-		if item_component then
-			if ComponentGetValue2( item_component, "permanently_attached" ) == true then
-				always_cast_count = always_cast_count + 1
-				break
-			end
-		end
-	end
-	while always_cast_count < amount do
-		local random_child = children[ Random( 1,#children ) ]
-		local item_component = EntityGetFirstComponentIncludingDisabled( random_child, "ItemComponent" )
-		if item_component and ComponentGetValue2( item_component, "permanently_attached" ) ~= true then
-			ComponentSetValue2( item_component, "permanently_attached", true )
-			always_cast_count = always_cast_count + 1
-		end
+	local max_common_x = 0
+	stream_actions( wand_id ).foreach( function( a )
+		local item_comp = EntityGetFirstComponentIncludingDisabled( a, "ItemComponent" )
+		if not item_comp then return end
+
+		if ComponentGetValue2( item_comp, "permanently_attached" ) then return end
+
+		local x, _ = ComponentGetValue2( item_comp, "inventory_slot" )
+		max_common_x = math.max( max_common_x, x )
+	end )
+
+	local least_capacity = max_common_x + 1
+	local current_capacity = EntityGetWandCapacity( wand_id )
+	if least_capacity > current_capacity then
+		WANDS.wand_set_stat( wand_id, "capacity", least_capacity )
 	end
 end
 	

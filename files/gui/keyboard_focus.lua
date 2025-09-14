@@ -26,6 +26,7 @@ function keyboard_focus.update()
 end
 
 local controls_freezer = dofile_once( "mods/spell_lab_shugged/files/lib/controls_freezer.lua" )
+local edit_panel_api = dofile_once( "mods/spell_lab_shugged/files/gui/edit_panel_api.lua" )
 keyboard_focus.focusables.player_controls = {
 	on_focused = function()
 		controls_freezer.unfreeze_controls()
@@ -43,8 +44,8 @@ keyboard_focus.focusables.player_controls = {
 
 		if not held_wand or not mod_setting_get( "show_wand_edit_panel" ) then return end
 
---[[		local edit_panel_state = access_edit_panel_state( held_wand )
-		if shortcut_detector.is_fired( shortcuts.left_delete, shortcut_used_keys ) then
+		local data = edit_panel_api.access_data( held_wand )
+--[[		if shortcut_detector.is_fired( shortcuts.left_delete, shortcut_used_keys ) then
 			local current_actions = {}
 			local did = false
 			for s, a, u in state_str_iter_actions( edit_panel_state.get() ) do
@@ -85,13 +86,13 @@ keyboard_focus.focusables.player_controls = {
 			if did then
 				edit_panel_state.set( table_to_state_str( current_actions ), wrap_key( "operation_delete_action" ) )
 			end
-		end
+		end]]
 		if shortcut_detector.is_fired( shortcuts.undo, shortcut_used_keys ) then
-			edit_panel_state.undo()
+			data:undo()
 		end
 		if shortcut_detector.is_fired( shortcuts.redo, shortcut_used_keys ) then
-			edit_panel_state.redo()
-		end]]
+			data:redo()
+		end
 	end,
 }
 

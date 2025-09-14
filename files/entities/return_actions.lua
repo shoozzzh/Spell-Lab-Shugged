@@ -1,4 +1,5 @@
 dofile_once( "mods/spell_lab_shugged/files/lib/helper.lua" )
+dofile_once( "mods/spell_lab_shugged/files/lib/wands.lua" )
 
 local entity_id = EntityGetParent( GetUpdatedEntityID() )
 
@@ -12,6 +13,7 @@ if loading_to_this_wand and #loading_to_this_wand > 0 then
 			EntityRemoveFromParent( a )
 			EntityAddChild( wand_id, a )
 		end )
+	WANDS.ensure_actions_in_capacity( wand_id )
 
 	EntitySetComponentIsEnabled( entity_id, GetUpdatedComponentID(), false )
 	EntityKill( entity_id )
@@ -29,6 +31,8 @@ if ModTextFileGetContent( VFiles.FinishingDumping ) == "1" then
 			EntityRemoveFromParent( a )
 			EntityAddChild( wand_id, a )
 		end )
+	-- is this really needed?
+	-- WANDS.ensure_actions_in_capacity( wand_id )
 
 	EntitySetComponentIsEnabled( entity_id, GetUpdatedComponentID(), false )
 	EntityKill( entity_id )
