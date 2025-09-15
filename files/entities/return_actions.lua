@@ -1,5 +1,5 @@
 dofile_once( "mods/spell_lab_shugged/files/lib/helper.lua" )
-dofile_once( "mods/spell_lab_shugged/files/lib/wands.lua" )
+WANDS = dofile_once( "mods/spell_lab_shugged/files/lib/wands.lua" )
 
 local entity_id = EntityGetParent( GetUpdatedEntityID() )
 
