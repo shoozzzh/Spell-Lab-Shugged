@@ -1,3 +1,5 @@
+local gui_pos = dofile_once( "mods/spell_lab_shugged/files/lib/gui_pos.lua" )
+
 function fit_into_capacity( current_actions, times_inserting, max_capacity )
 	local empty_slots_taken = 0
 	for i = max_capacity + times_inserting, 1, -1 do
@@ -391,7 +393,7 @@ function do_real_sprite_action( gui, x, y, i, action_entity, selected )
 	end
 end
 
-function do_panel_action( gui, x, y, i, action_entity, selected )
+function do_panel_action( gui, x, y, action_entity, selected )
 	local action_id, action_type = "", nil
 	local this_action_data, this_action_metadata
 	do
@@ -447,8 +449,19 @@ function do_panel_action( gui, x, y, i, action_entity, selected )
 		note = note .. "\n" .. text_get( "spell_box_permanent_tips", shortcut_texts.always_cast )
 	end
 
+	local dragging = selected and edit_panel_cache.dragging_selection
+
+	if dragging then
+		local mouse_x, mouse_y = gui_pos.get_pos_on_screen( gui, DEBUG_GetMouseWorld() )
+		GuiOptionsAddForNextWidget( gui, GUI_OPTION.NonInteractive )
+		do_action_button( mouse_x - 10.25, mouse_y - 10.2, selected, action_type, sprite_file )
+		
+		sprite_file = "mods/spell_lab_shugged/files/gui/buttons/empty_spell.png"
+		GuiOptionsAddForNextWidget( gui, GUI_OPTION.NonInteractive )
+	end
+
 	local left_click, right_click, hover = do_action_button( x, y, selected, action_type, sprite_file )
-	if this_action_data and this_action_metadata and hover then
+	if not dragging and this_action_data and this_action_metadata and hover then
 		force_do_custom_tooltip( function()
 			GuiLayoutBeginVertical( gui, 0, 0 )
 			if this_action_data then
@@ -477,7 +490,6 @@ function do_panel_action( gui, x, y, i, action_entity, selected )
 		show_permanent_icon( x, y )
 	end
 
-	edit_panel_shortcut_args[1] = i
 	if is_permanent then
 		detect_shortcuts(
 			gui, action_button_shortcuts, shortcut_used_keys, left_click, right_click, hover, edit_panel_shortcut_args
@@ -487,4 +499,50 @@ function do_panel_action( gui, x, y, i, action_entity, selected )
 			gui, permanent_action_button_shortcuts, shortcut_used_keys, left_click, right_click, hover, edit_panel_shortcut_args
 		)
 	end
+end
+
+function create_action( action_id, uses_remaining )
+	local action = CreateItemActionEntity( action_id )
+	EntitySetComponentsWithTagEnabled( action, "enabled_in_world", false )
+	EntitySetComponentsWithTagEnabled( action, "enabled_in_inventory", false )
+
+	if not uses_remaining then return end
+
+	local max_uses = action_data[ data[1] ].max_uses
+	if not max_uses or max_uses <= 0 then return end
+
+	local never_unlimited = action_data[ data[1] ].never_unlimited
+	if world_state_unlimited_spells and not never_unlimited then return end
+
+	local item_comp = EntityGetFirstComponentIncludingDisabled( action, "ItemComponent" )
+	ComponentSetValue2( item_comp, "uses_remaining", uses_remaining )
+end
+
+function delete_action( action_entity )
+	if not action_entity or not EntityGetIsAlive( action_entity ) then return end
+	EntityRemoveFromParent( action_entity )
+	EntityKill( action_entity )
+end
+
+function move_actions( from_section, range_start, range_end, to_section, to )
+	local actions = from_section:take_range( range_start, range_end )
+
+	for i = to, to + range_end - range_start do
+		delete_action( to_section:take( i ) )
+	end
+	to_section:put_range( actions, to )
+
+	from_section:on_changed()
+	to_section:on_changed()
+end
+
+function move_slots( from_section, range_start, range_end, to_section, to )
+	local actions = from_section:take_range( range_start, range_end )
+	from_section:trim_space( range_start, range_end )
+
+	to_section:insert_space( range_start, range_end )
+	to_section:put_range( actions, to )
+
+	from_section:on_changed()
+	to_section:on_changed()
 end

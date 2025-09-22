@@ -82,49 +82,8 @@ function edit_panel_api.listen_wand_changes()
 	end
 end
 
-local function create_action( action_id, uses_remaining )
-	local action = CreateItemActionEntity( action_id )
-	EntitySetComponentsWithTagEnabled( action, "enabled_in_world", false )
-
-	if not uses_remaining then return end
-
-	local max_uses = action_data[ data[1] ].max_uses
-	if not max_uses or max_uses <= 0 then return end
-
-	local never_unlimited = action_data[ data[1] ].never_unlimited
-	if world_state_unlimited_spells and not never_unlimited then return end
-
-	local item_comp = EntityGetFirstComponentIncludingDisabled( action, "ItemComponent" )
-	ComponentSetValue2( item_comp, "uses_remaining", uses_remaining )
-end
-
-local function delete_action( action_entity )
-	EntityRemoveFromParent( action_entity )
-	EntityKill( action_entity )
-end
-
-local function dump_selection( selection )
-	local str = {}
-	for slot, _ in pairs( selection ) do
-		if selection[ slot ] then
-			str[ #str + 1 ] = tostring( slot )
-		end
-	end
-	return table.concat( str, "," )
-end
-
-local function load_selection( selection_str )
-	local selection = {}
-	for str in selection_str:gmatch( "([^,]+)," ) do
-		selection[ tonumber( str ) ] = true
-	end
-	return selection
-end
-
-local function stream_actions( wand_id )
-	return stream( EntityGetAllChildren( wand_id ) or {} )
-		.filter( function( e ) return EntityGetFirstComponentIncludingDisabled( e, "ItemComponent" ) ~= nil end )
-		.filter( function( e ) return EntityGetFirstComponentIncludingDisabled( e, "ItemActionComponent" ) ~= nil end )
+function edit_panel_api.get_histories( wand_id )
+	return EntityGetComponentIncludingDisabled( wand_id, "VariableStorageComponent", EditPanelTags.History ) or {}
 end
 
 local var_map = {
@@ -132,18 +91,22 @@ local var_map = {
 	current_history_index = "value_int",
 	autocap_enabled       = "value_bool",
 	force_compact_enabled = "value_bool",
-	selection             = "value_string",
 }
 
-local data_access_funcs = {}
+local selection_var_map = {
+	range_start  = "value_int",
+	range_end    = "value_int",
+	section_name = "value_string",
+}
+
+local data_access_funcs = new_prototype()
 
 local history_lens
 do
 	local history_layout = {
-		index          = "level",
-		state_str      = "actions",
-		selection_str  = "action_uses_remaining",
-		operation_name = "other_entities_to_spawn",
+		index          = "value_int",
+		state          = "value_string",
+		operation_name = "name",
 	}
 	
 	local history_lens_mt = {
@@ -159,10 +122,6 @@ do
 		end,
 	}
 	history_lens = setmetatable( {}, history_lens_mt )
-end
-
-function edit_panel_api.get_histories( wand_id )
-	return EntityGetComponentIncludingDisabled( wand_id, "ItemChestComponent", EditPanelTags.History ) or {}
 end
 
 function data_access_funcs:record_new_history( operation_name )
@@ -199,21 +158,19 @@ function data_access_funcs:record_new_history( operation_name )
 		new_index = limit
 	end
 
-	local history = history_lens( EntityAddComponent2( self.entity, "ItemChestComponent", {
+	local history = history_lens( EntityAddComponent2( self.entity, "VariableStorageComponent", {
 		_tags = EditPanelTags.History,
-		_enabled = false,
 	} ) )
 
 	history.index          = index
 	history.operation_name = operation_name
-	history.selection_str  = self.vars.selection
-	history.state_str      = edit_panel_api.dump_state( self.entity )
+	history.state          = edit_panel_api.dump_state( self.entity )
 
 	self.vars.current_history_index = index
 end
 
 function data_access_funcs:get_selection()
-	return load_selection( self.vars.selection )
+	return self.selection.section_name, self.selection.range_start, self.selection.range_end
 end
 
 function data_access_funcs:get_state_history( index )
@@ -228,16 +185,14 @@ function data_access_funcs:undo()
 	if self.vars.current_history_index == 1 then return end
 	self.vars.current_history_index = self.vars.current_history_index - 1
 	local history_comp = self:get_state_history( self.vars.current_history_index )
-	edit_panel_api.load_state( self.entity, history_lens( history_comp ).state_str )
-	self.vars.selection = history_lens( history_comp ).selection_str
+	edit_panel_api.load_state( self.entity, history_lens( history_comp ).state )
 end
 
 function data_access_funcs:redo()
 	if self.vars.current_history_index == #edit_panel_api.get_histories( self.entity ) then return end
 	self.vars.current_history_index = self.vars.current_history_index + 1
 	local history_comp = self:get_state_history( self.vars.current_history_index )
-	edit_panel_api.load_state( self.entity, history_lens( history_comp ).state_str )
-	self.vars.selection = history_lens( history_comp ).selection_str
+	edit_panel_api.load_state( self.entity, history_lens( history_comp ).state )
 end
 
 function data_access_funcs:peek_undo()
@@ -251,18 +206,21 @@ function data_access_funcs:peek_redo()
 end
 
 function data_access_funcs:get_capacity()
-	return EntityGetWandCapacity( self.entity )
+	if data.vars.autocap_enabled then
+		return EntityGetWandCapacity( self.entity )
+	else
+		return math.huge
+	end 
 end
 
 function data_access_funcs:get_num_permannt_actions()
-	return WANDS.wand_get_stat( self.entity, "deck_capacity" ) - self:get_capacity()
+	return WANDS.wand_get_stat( self.entity, "deck_capacity" ) - EntityGetWandCapacity( self.entity )
 end
-
-data_access_funcs.__index = data_access_funcs
 
 function edit_panel_api.access_data( wand_id )
 	local data = setmetatable( {
 		vars = access_vars( wand_id, var_map, var_name_prefix ),
+		selection = access_vars( wand_id, selection_var_map, var_name_prefix ),
 		entity = wand_id,
 	}, data_access_funcs )
 
@@ -293,7 +251,7 @@ function edit_panel_api.dump_state( wand_id )
 		script_source_file = "mods/spell_lab_shugged/files/entities/return_actions.lua",
 		execute_every_n_frame = -1,
 	} )
-	ComponentSetValue2( script, "execute_on_added", true ) -- make it so it doesn't execute right now
+	ComponentSetValue2( script, "execute_on_added", true ) -- make it so it won't run right now
 	EntityAddChild( state_entity, script_child )
 
 	-- this doesn't immediately do polymorphing
@@ -315,94 +273,138 @@ function edit_panel_api.load_state( wand_id, state )
 	polytools.load( EntityCreateNew(), state )
 end
 
-local permanent_section_mt = {}
-function permanent_section_mt:apply_changes( changes )
-	for _, i in ipairs( changes.removal ) do
-		delete_action( self[ i ] )
-		self[ i ] = nil
-	end
+-- must provide: take( at ), put( action, at )
+local abstract_section_mt = new_prototype()
 
+function abstract_section_mt:take_range( range_start, range_end )
+	local taken = {}
+	for i = range_start, range_end do
+		taken[ #taken + 1 ] = self:take( i )
+	end
+	return taken
+end
+
+function abstract_section_mt:put_range( actions, range_start )
+	for idx, a in pairs( actions ) do
+		self:put( a, idx + range_start - 1 )
+	end
+end
+
+function abstract_section_mt:reorder( idx_map )
 	local temp = {}
-	for k, v in pairs( changes.reordering ) do
-		temp[ k ] = self[ k ]
-		self[ k ] = nil
+	for old_idx, _ in pairs( idx_map ) do
+		temp[ k ] = self:take( k )
 	end
-	for old_idx, new_idx in pairs( changes.reordering ) do
-		self[ new_idx ] = temp[ old_idx ]
+	for old_idx, new_idx in pairs( idx_map ) do
+		self:put( temp[ old_idx ], new_idx )
+	end
+end
+
+function abstract_section_mt:swap( index_1, index_2 )
+	self[ index_1 ], self[ index_2 ] = self[ index_2 ], self[ index_1 ]
+end
+
+function abstract_section_mt:on_changed() end
+
+function abstract_section_mt:insert_space( range_start, range_end )
+	local size = range_end - range_start + 1
+	for i = maxn( self ), range_start, -1 do
+		self:swap( i, i + size )
+	end
+end
+
+function abstract_section_mt:trim_space( range_start, range_end )
+	local size = range_end - range_start + 1
+	for i = range_end, maxn( self ) do
+		self:swap( i, i - size )
+	end
+end
+
+local permanent_section_mt = new_prototype( abstract_section_mt )
+
+function permanent_section_mt:take( at )
+	local taken = self[ at ]
+	if not taken then return nil end
+
+	EntityRemoveFromParent( taken )
+	local item_comp = EntityGetFirstComponentIncludingDisabled( taken, "ItemComponent" )
+	ComponentSetValue2( item_comp, "inventory_slot", 0, 0 )
+	ComponentSetValue2( item_comp, "permanently_attached", false )
+	self[ at ] = nil
+
+	return taken
+end
+
+function permanent_section_mt:put( action, at )
+	if self[ i ] then
+		print_error( ("trying to put action %d at index %d but it's not empty there!"):format( action, at ) )
+		return
 	end
 
-	for _, data in ipairs( changes.addition ) do
-		local idx, action_id, uses_remaining = unpack( data )
-		if self[ idx ] ~= nil then
-			error( ("trying to create action %s at %d but that slot has been already taken!"):format( action_id, idx ) )
-		end
-		self[ idx ] = create_action( action_id, uses_remaining )
-	end
+	EntityRemoveFromParent( action )
+	EntityAddChild( self.wand, action )
+	local item_comp = EntityGetFirstComponentIncludingDisabled( taken, "ItemComponent" )
+	ComponentSetValue2( item_comp, "permanently_attached", true )
+	local x, y = EntityGetTransform( self.wand )
+	EntitySetTransform( a, x, y )
+	self[ at ] = action
+end
 
-	if #self == 0 then return end
-	local wand_id = EntityGetParent( self[1] )
-	local x, y = EntityGetTransform( wand_id )
+function permanent_section_mt:on_changed()
+	local x, y = EntityGetTransform( self.wand )
 
-	for _, a in pairs( self ) do
+	for _, a in ipairs( self ) do
 		EntityRemoveFromParent( a )
 	end
-	for i = 1, maxn( self ) do
-		local a = self[ i ]
-		if a then
-			EntityAddChild( wand_id, a )
-			EntitySetTransform( a, x, y )
-
-			local item_comp = EntityGetFirstComponentIncludingDisabled( a, "ItemComponent" )
-			ComponentSetValue2( item_comp, "permanently_attached", true )
-		end
-	end
-end
-permanent_section_mt.__index = permanent_section_mt
-
-local common_section_mt = {}
-function common_section_mt:apply_changes( changes )
-	for _, i in ipairs( changes.removal ) do
-		delete_action( self[ i ] )
-		self[ i ] = nil
-	end
-
-	local temp = {}
-	for k, v in pairs( changes.reordering ) do
-		temp[ k ] = self[ k ]
-		self[ k ] = nil
-	end
-	for old_idx, new_idx in pairs( changes.reordering ) do
-		self[ new_idx ] = temp[ old_idx ]
-	end
-
-	for _, data in ipairs( changes.addition ) do
-		local idx, action_id, uses_remaining = unpack( data )
-		if self[ idx ] ~= nil then
-			error( ("trying to create action %s at %d but that slot has been already taken!"):format( action_id, idx ) )
-		end
-		self[ idx ] = create_action( action_id, uses_remaining )
-	end
-	
-	local wand_id
-	for _, first in pairs( self ) do
-		wand_id = EntityGetParent( first )
-		break
-	end
-	if wand_id == nil then return end
-	local x, y = EntityGetTransform( wand_id )
-
-	for idx, a in pairs( self ) do
+	for _, a in ipairs( self ) do
+		EntityAddChild( self.wand, a )
 		EntitySetTransform( a, x, y )
-		EntityAddChild( wand_id, a )
+
 		local item_comp = EntityGetFirstComponentIncludingDisabled( a, "ItemComponent" )
-		ComponentSetValue2( item_comp, "inventory_slot", idx - 1, 0 )
+		ComponentSetValue2( item_comp, "permanently_attached", true )
 	end
 end
-common_section_mt.__index = common_section_mt
+
+local common_section_mt = new_prototype( abstract_section_mt )
+
+function common_section_mt:take( at )
+	local taken = self[ at ]
+	if not taken then return nil end
+
+	EntityRemoveFromParent( taken )
+	local item_comp = EntityGetFirstComponentIncludingDisabled( taken, "ItemComponent" )
+	ComponentSetValue2( item_comp, "inventory_slot", 0, 0 )
+	self[ at ] = nil
+
+	return taken
+end
+
+function common_section_mt:put( action, at )
+	if self[ i ] then
+		print_error( ("trying to put action %d at index %d but it's not empty there!"):format( action, at ) )
+		return
+	end
+
+	EntityRemoveFromParent( action )
+	EntityAddChild( self.wand, action )
+	local x, y = EntityGetTransform( self.wand )
+	EntitySetTransform( action, x, y )
+	local item_comp = EntityGetFirstComponentIncludingDisabled( action, "ItemComponent" )
+	ComponentSetValue2( item_comp, "inventory_slot", at - 1, 0 )
+	self[ at ] = action
+end
+
+function common_section_mt:swap( index_1, index_2 )
+	getmetatable( common_section_mt ).swap( self, index_1, index_2 )
+	local item_comp_1 = EntityGetFirstComponentIncludingDisabled( self[ index_1 ], "ItemComponent" )
+	local item_comp_2 = EntityGetFirstComponentIncludingDisabled( self[ index_2 ], "ItemComponent" )
+	ComponentSetValue2( item_comp_1, "inventory_slot", index_1 - 1, 0 )
+	ComponentSetValue2( item_comp_2, "inventory_slot", index_2 - 1, 0 )
+end
 
 function edit_panel_api.access_actions( wand_id )
-	local common = {}
-	local permanent = {}
+	local common = { wand = wand_id }
+	local permanent = { wand = wand_id }
 
 	stream_actions( wand_id )
 		.foreach( function( a )
@@ -421,20 +423,6 @@ function edit_panel_api.access_actions( wand_id )
 	setmetatable( permanent, permanent_section_mt )
 
 	return { common = common, permanent = permanent }
-end
-
-function edit_panel_api.do_operation( data, actions, operation )
-	if operation.selection then
-		data.vars.selection = dump_selection( operation.selection )
-	end
-	if operation.common then
-		actions.common:apply_changes( unpack( operation.common ) )
-	end
-	if operation.permanent then
-		actions.permanent:apply_changes( unpack( operation.permanent ) )
-	end
-	
-	data:record_new_history( operation.name )
 end
 
 return edit_panel_api

@@ -1,5 +1,5 @@
 local function find_var_comp( entity_id, var_name )
-	local var_comps = EntityGetComponent( entity_id, "VariableStorageComponent" )
+	local var_comps = EntityGetComponentIncludingDisabled( entity_id, "VariableStorageComponent" )
 	if not var_comps or #var_comps == 0 then
 		return
 	end

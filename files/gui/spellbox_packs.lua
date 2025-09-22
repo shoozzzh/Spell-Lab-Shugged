@@ -19,14 +19,14 @@ local gokis = function( gui, id, x, y, action_type, selected, hovered, alpha, sc
 end
 
 local vanilla_bgs = {
-	[0]        = "data/ui_gfx/inventory/item_bg_projectile.png",
+	[0] = "data/ui_gfx/inventory/item_bg_projectile.png",
 	[1] = "data/ui_gfx/inventory/item_bg_static_projectile.png",
-	[2]          = "data/ui_gfx/inventory/item_bg_modifier.png",
-	[3]         = "data/ui_gfx/inventory/item_bg_draw_many.png",
-	[4]          = "data/ui_gfx/inventory/item_bg_material.png",
-	[5]             = "data/ui_gfx/inventory/item_bg_other.png",
-	[6]           = "data/ui_gfx/inventory/item_bg_utility.png",
-	[7]           = "data/ui_gfx/inventory/item_bg_passive.png",
+	[2] = "data/ui_gfx/inventory/item_bg_modifier.png",
+	[3] = "data/ui_gfx/inventory/item_bg_draw_many.png",
+	[4] = "data/ui_gfx/inventory/item_bg_material.png",
+	[5] = "data/ui_gfx/inventory/item_bg_other.png",
+	[6] = "data/ui_gfx/inventory/item_bg_utility.png",
+	[7] = "data/ui_gfx/inventory/item_bg_passive.png",
 }
 
 local vanilla = function( gui, id, x, y, action_type, selected, hovered, alpha, scale, scale_y, rotation )

@@ -314,3 +314,12 @@ function deep_equals( a, b )
 		return a == b
 	end
 end
+
+function new_prototype( parent )
+	local t = {}
+	t.__index = t
+	if parent then
+		setmetatable( t, parent )
+	end
+	return t
+end

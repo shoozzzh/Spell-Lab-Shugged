@@ -434,11 +434,12 @@ function do_horizontal_centered_buttons( gui, button_funcs, y )
 	end
 end
 
-function do_horizontal_centered_button_list( gui, button_func, extra_args_list, y )
+function do_horizontal_centered_button_list( gui, button_func, extra_args_list, y, preprocess )
 	local num = #extra_args_list
 	local x = horizontal_centered_x( num )
 	for i, extra_args in ipairs( extra_args_list ) do
-		button_func( gui, x, y, i, unpack( extra_args ) )
+		optional_call( preprocess, i )
+		button_func( gui, x, y, unpack( extra_args ) )
 		x = x + 20 + 2
 	end
 end

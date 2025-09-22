@@ -235,8 +235,6 @@ function do_gui()
 	shift = InputIsKeyDown( Key_LSHIFT ) or InputIsKeyDown( Key_RSHIFT )
 	alt = InputIsKeyDown( Key_LALT ) or InputIsKeyDown( Key_RALT )
 
-	cached_mouse_x, cached_mouse_y = nil, nil
-
 	now = GameGetFrameNum()
 	reset_z()
 

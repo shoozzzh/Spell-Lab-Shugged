@@ -1,30 +1,43 @@
 if not held_wand then return end
 
+local gui_pos = dofile_once( "mods/spell_lab_shugged/files/lib/gui_pos.lua" )
+
+do
+	local refresh_cache = false
+	if edit_panel_cache == nil then 
+		refresh_cache = true
+	elseif edit_panel_last_frame_shown + 1 ~= now then
+		edit_panel_last_frame_shown = now
+		refresh_cache = true
+	elseif edit_panel_cache.wand ~= held_wand then
+		refresh_cache = true
+	end
+
+	if refresh_cache then
+		edit_panel_cache = {
+			wand = held_wand,
+			dragging_selection = false,
+			selecting = false,
+		}
+	end
+end
+local cache = edit_panel_cache
+
 local api = dofile_once( "mods/spell_lab_shugged/files/gui/edit_panel_api.lua" )
 
 local data = api.access_data( held_wand )
 local actions = api.access_actions( held_wand )
 local capacity = data:get_capacity()
-local selection = data:get_selection()
-
-local last_taken_slot = maxn( actions.common )
-local num_empty_slots
-do
-	local num_taken_slots = 0
-	for i = 0, last_taken_slot do
-		if actions.common[ i ] == nil then
-			num_taken_slots = num_taken_slots + 1
-		end
-	end
-	if data.vars.autocap_enabled then
-		num_empty_slots = math.huge
-	else
-		num_empty_slots = capacity - num_taken_slots
-	end
+local selected_section, selection_start, selection_end = data:get_selection()
+local function is_selected( section_name, index )
+	return selected_section == section_name and selection_start <= index and index <= selection_end
 end
 
 edit_panel_shortcut_args = { nil, actions, data, selection }
-operation = nil
+
+local function set_i( i )
+	edit_panel_shortcut_args[1] = i
+end
 
 local actions_per_row = math.floor( screen_width / ( 20 + 2 ) - 3 )
 do
@@ -78,18 +91,20 @@ do
 	for i, a in ipairs( permanent_actions ) do
 		row = row or {}
 
-		row[ #row + 1 ] = { a, selection[ i ] }
+		row[ #row + 1 ] = { a, is_selected( "permanent", i ) }
 		
 		if #row == actions_per_row or i == -num_pa then
-			pa_rows[ #pa_row + 1 ] = row
+			pa_rows[ #pa_rows + 1 ] = row
 			row = nil
 		end
 	end
 end
 
-for i, content in ipairs( pa_rows ) do
-	do_horizontal_centered_button_list( gui, action_func, content, y_first_row + ( #pa_rows - i + 1 ) * ( 20 + 2 ) )
+for i, row in ipairs( pa_rows ) do
+	do_horizontal_centered_button_list( gui, action_func, row, y_first_row + ( #pa_rows - i + 1 ) * ( 20 + 2 ), set_i )
 end
+
+local common_rows = {}
 
 do
 	local total_count = num_rows_shown * actions_per_row
@@ -101,18 +116,30 @@ do
 		row = row or {}
 
 		local a = actions.common[ i ]
-		row[ #row + 1 ] = { a, selection[ i ] }
+		if cache.dragging_section == "common" and i == cache.dragging_index then
+			row[ #row + 1 ] = { 0, false }
+		else
+			row[ #row + 1 ] = { a, is_selected( "common", i ) }
+		end
 		
-		if i == capacity and not data.vars.autocap_enabled then
-			do_horizontal_centered_button_list( gui, action_func, row, y_first_row + math.floor( ( i - first_i ) / actions_per_row ) * ( 20 + 2 ) )
+		local row_end = #row == actions_per_row or i == last_i
+		local action_end = i == capacity
+
+		if row_end or action_end then
+			common_rows[ #common_rows + 1 ] = row
 			row = nil
-			break
 		end
 
-		if #row == actions_per_row or i == last_i then
-			do_horizontal_centered_button_list( gui, action_func, row, y_first_row + math.floor( ( i - first_i ) / actions_per_row ) * ( 20 + 2 ) )
-			row = nil
-		end
+		if action_end then break end
+	end
+end
+
+do
+	local first_i = row_offset * actions_per_row + 1
+	for i, row in ipairs( common_rows ) do
+		do_horizontal_centered_button_list(
+			gui, action_func, row, y_first_row + math.floor( ( i - first_i ) / actions_per_row ) * ( 20 + 2 ), set_i
+		)
 	end
 end
 
@@ -128,9 +155,99 @@ if not reached_last_row then
 	end
 end
 
-data.vars.row_offset = row_offset
-
 edit_panel_shortcut_args = nil
-if operation and not EntityHasTag( held_wand, EditPanelTags.Recording ) then
-	api.do_operation( data, actions, operation )
+
+local left_just_down  = InputIsMouseButtonJustDown( Mouse_left )
+local left_holding    = InputIsMouseButtonDown( Mouse_left )
+local left_just_up    = InputIsMouseButtonJustUp( Mouse_left )
+local right_just_down = InputIsMouseButtonJustDown( Mouse_right )
+local right_holding   = InputIsMouseButtonDown( Mouse_right )
+local right_just_up   = InputIsMouseButtonJustUp( Mouse_right )
+
+
+if left_just_down or left_holding or left_just_up then
+	local mouse_x, mouse_y = gui_pos.get_pos_on_screen( gui, DEBUG_GetMouseWorld() )
+	local pa_first_row = y_first_row + #pa_rows * ( 20 + 2 )
+
+	local hovered_section, hovered_index
+	if mouse_y < pa_first_row then -- above permanent actions
+		hovered_section = "permanent"
+
+		local num_pa = 0
+		for _, row in ipairs( pa_rows ) do
+			num_pa = num_pa + #row
+		end
+		hovered_index = num_pa + 1
+	elseif pa_first_row <= mouse_y and mouse_y < y_first_row then -- among permanent actions
+		hovered_section = "permanent"
+
+		local row = math.ceil( ( mouse_y - pa_first_row ) / ( 20 + 2 ) )
+		local row_length = #pa_rows[ row ]
+
+		local offset = horizontal_centered_x( #pa_rows[ row ] )
+		local column = math.ceil( ( mouse_x - offset ) / ( 20 + 2 ) )
+		column = math.max( column, 1 )
+		column = math.min( column, row_length )
+
+		hovered_index = ( row - 1 ) * actions_per_row + column
+	elseif y_baseline <= mouse_y then -- below common actions
+		hovered_section = "common"
+		hovered_index = math.min( capacity, ( row_offset + num_rows_shown ) * actions_per_row )
+	else -- among common actions
+		hovered_section = "common"
+
+		local row = math.ceil( ( mouse_y - y_first_row ) / ( 20 + 2 ) )
+		local row_length = #common_rows[ row ]
+
+		local offset = horizontal_centered_x( row_length )
+		local column = math.ceil( ( mouse_x - offset ) / ( 20 + 2 ) )
+		column = math.max( column, 1 )
+		column = math.min( column, row_length )
+
+		hovered_index = ( row - 1 ) * actions_per_row + column
+	end
+
+	if not hovered_section then goto not_hovering end
+
+	if left_just_down then
+		if is_selected( hovered_section, hovered_index ) then
+			cache.dragging_selection = true
+		elseif data.selection.section_name ~= "" then
+			data.selection.section_name = ""
+			data.selection.range_start = -1
+			data.selection.range_end = -1
+		else
+			data.selection.section_name = hovered_section
+			data.selection.range_start = hovered_index
+			data.selection.range_end = hovered_index
+			cache.selecting = true
+		end
+	elseif left_holding then
+		if cache.selecting and data.selection.section_name == hovered_section then
+			if hovered_index <= data.selection.range_start then
+				data.selection.range_start = hovered_index
+			else
+				data.selection.range_end = hovered_index
+			end
+		end
+	elseif left_just_up then
+		if cache.selecting then
+			cache.selecting = false
+		elseif cache.dragging_selection then
+			cache.dragging_selection = false
+			local selected_section, selection_start, selection_end = data:get_selection()
+			move_actions( actions[ selected_section ], selection_start, selection_end, actions[ hovered_section ], hovered_index )
+
+			data.selection.section_name = hovered_section
+			data.selection.range_start = hovered_index
+			data.selection.range_end = hovered_index + selection_end - selection_start
+
+			data:record_new_history( wrap_key( "operation_set_action" ) )
+		end
+	elseif right_just_down then -- TODO
+	end
+
+	::not_hovering::
 end
+
+data.vars.row_offset = row_offset
