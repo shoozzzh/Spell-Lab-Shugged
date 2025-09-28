@@ -6,8 +6,7 @@ do
 	local refresh_cache = false
 	if edit_panel_cache == nil then 
 		refresh_cache = true
-	elseif edit_panel_last_frame_shown + 1 ~= now then
-		edit_panel_last_frame_shown = now
+	elseif edit_panel_last_frame_shown ~= now - 1 then
 		refresh_cache = true
 	elseif edit_panel_cache.wand ~= held_wand then
 		refresh_cache = true
@@ -20,6 +19,7 @@ do
 			selecting = false,
 		}
 	end
+	edit_panel_last_frame_shown = now
 end
 local cache = edit_panel_cache
 
@@ -135,10 +135,9 @@ do
 end
 
 do
-	local first_i = row_offset * actions_per_row + 1
 	for i, row in ipairs( common_rows ) do
 		do_horizontal_centered_button_list(
-			gui, action_func, row, y_first_row + math.floor( ( i - first_i ) / actions_per_row ) * ( 20 + 2 ), set_i
+			gui, action_func, row, y_first_row + ( i - 1 ) * ( 20 + 2 ), set_i
 		)
 	end
 end

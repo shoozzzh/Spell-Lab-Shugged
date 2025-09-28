@@ -131,7 +131,7 @@ function data_access_funcs:record_new_history( operation_name )
 	end
 	EntityAddTag( wand_id, EditPanelTags.Recording )
 
-	local limit = math.max( mod_setting_get( "wand_edit_panel_history_limit" ), 1 )
+	local limit = math.max( tonumber( mod_setting_get( "wand_edit_panel_history_limit" ) ) or 1 , 1 )
 	local max_index, current_index = #edit_panel_api.get_histories( self.entity ), self.vars.current_history_index
 
 	if current_index ~= max_index then
@@ -155,7 +155,7 @@ function data_access_funcs:record_new_history( operation_name )
 				EntityRemoveComponent( self.entity, history_comp )
 			end
 		end
-		new_index = limit
+		index = limit
 	end
 
 	local history = history_lens( EntityAddComponent2( self.entity, "VariableStorageComponent", {
@@ -206,10 +206,10 @@ function data_access_funcs:peek_redo()
 end
 
 function data_access_funcs:get_capacity()
-	if data.vars.autocap_enabled then
-		return EntityGetWandCapacity( self.entity )
-	else
+	if self.vars.autocap_enabled then
 		return math.huge
+	else
+		return EntityGetWandCapacity( self.entity )
 	end 
 end
 
@@ -343,7 +343,7 @@ function permanent_section_mt:put( action, at )
 
 	EntityRemoveFromParent( action )
 	EntityAddChild( self.wand, action )
-	local item_comp = EntityGetFirstComponentIncludingDisabled( taken, "ItemComponent" )
+	local item_comp = EntityGetFirstComponentIncludingDisabled( action, "ItemComponent" )
 	ComponentSetValue2( item_comp, "permanently_attached", true )
 	local x, y = EntityGetTransform( self.wand )
 	EntitySetTransform( a, x, y )
