@@ -30,6 +30,8 @@ local CHARACTERS_ACTION_ID = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWX
 
 local fzy = dofile_once( "mods/spell_lab_shugged/files/lib/fzy_lua.lua" )
 
+local actions = get_globals( "data/scripts/gun/gun.lua" ).actions
+
 local current_action_search_needle = dofile( "mods/spell_lab_shugged/files/gui/editable_text.lua" )
 local current_action_search_result = {}
 local action_search_haystacks = {}

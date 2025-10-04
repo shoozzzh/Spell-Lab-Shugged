@@ -445,6 +445,12 @@ function do_panel_action( gui, x, y, action_entity, selected )
 	end
 	::done_2::
 	
+	local note
+	if selected then
+		note = text_get( "spell_box_commmon_tips_selected", shortcut_texts.deselect )
+	else
+		note = text_get( "spell_box_commmon_tips", shortcut_texts.select )
+	end
 	if is_permanent then
 		note = note .. "\n" .. text_get( "spell_box_permanent_tips", shortcut_texts.always_cast )
 	end
@@ -455,7 +461,7 @@ function do_panel_action( gui, x, y, action_entity, selected )
 		local mouse_x, mouse_y = gui_pos.get_pos_on_screen( gui, DEBUG_GetMouseWorld() )
 		GuiOptionsAddForNextWidget( gui, GUI_OPTION.NonInteractive )
 		do_action_button( mouse_x - 10.25, mouse_y - 10.2, selected, action_type, sprite_file )
-		
+
 		sprite_file = "mods/spell_lab_shugged/files/gui/buttons/empty_spell.png"
 		GuiOptionsAddForNextWidget( gui, GUI_OPTION.NonInteractive )
 	end
@@ -474,12 +480,6 @@ function do_panel_action( gui, x, y, action_entity, selected )
 
 			do_least_tooltip( this_action_data, this_action_metadata )
 
-			local note
-			if selected then
-				note = text_get( "spell_box_commmon_tips_selected", shortcut_texts.deselect )
-			else
-				note = text_get( "spell_box_commmon_tips", shortcut_texts.select )
-			end
 			GuiDimText( gui, 0, 0, note )
 			GuiLayoutEnd( gui )
 		end, 2, -2, true, x, y, 20 )

@@ -86,22 +86,28 @@ local action_func = create_real_sprite and do_real_sprite_panel_action or do_pan
 
 local pa_rows = {}
 do
-	local permanent_actions = actions.permanent
 	local row = nil
-	for i, a in ipairs( permanent_actions ) do
+	for i, a in ipairs( actions.permanent ) do
 		row = row or {}
 
 		row[ #row + 1 ] = { a, is_selected( "permanent", i ) }
 		
-		if #row == actions_per_row or i == -num_pa then
+		if #row == actions_per_row then
 			pa_rows[ #pa_rows + 1 ] = row
 			row = nil
 		end
 	end
+
+	if row ~= nil then
+		pa_rows[ #pa_rows + 1 ] = row
+	end
 end
 
-for i, row in ipairs( pa_rows ) do
-	do_horizontal_centered_button_list( gui, action_func, row, y_first_row + ( #pa_rows - i + 1 ) * ( 20 + 2 ), set_i )
+do
+	local num_pa_rows = #pa_rows
+	for i, row in ipairs( pa_rows ) do
+		do_horizontal_centered_button_list( gui, action_func, row, y_first_row - ( num_pa_rows - i + 1 ) * ( 20 + 2 ), set_i )
+	end
 end
 
 local common_rows = {}
@@ -166,17 +172,17 @@ local right_just_up   = InputIsMouseButtonJustUp( Mouse_right )
 
 if left_just_down or left_holding or left_just_up then
 	local mouse_x, mouse_y = gui_pos.get_pos_on_screen( gui, DEBUG_GetMouseWorld() )
-	local pa_first_row = y_first_row + #pa_rows * ( 20 + 2 )
+	local pa_first_row = y_first_row - #pa_rows * ( 20 + 2 )
 
 	local hovered_section, hovered_index
-	if mouse_y < pa_first_row then -- above permanent actions
+	if pa_first_row - ( 20 + 2 ) <= mouse_y and mouse_y < pa_first_row then -- just above permanent actions
 		hovered_section = "permanent"
 
 		local num_pa = 0
 		for _, row in ipairs( pa_rows ) do
 			num_pa = num_pa + #row
 		end
-		hovered_index = num_pa + 1
+		hovered_index = num_pa
 	elseif pa_first_row <= mouse_y and mouse_y < y_first_row then -- among permanent actions
 		hovered_section = "permanent"
 
@@ -189,10 +195,7 @@ if left_just_down or left_holding or left_just_up then
 		column = math.min( column, row_length )
 
 		hovered_index = ( row - 1 ) * actions_per_row + column
-	elseif y_baseline <= mouse_y then -- below common actions
-		hovered_section = "common"
-		hovered_index = math.min( capacity, ( row_offset + num_rows_shown ) * actions_per_row )
-	else -- among common actions
+	elseif y_first_row <= mouse_y and mouse_y < y_baseline then -- among common actions
 		hovered_section = "common"
 
 		local row = math.ceil( ( mouse_y - y_first_row ) / ( 20 + 2 ) )
@@ -204,6 +207,9 @@ if left_just_down or left_holding or left_just_up then
 		column = math.min( column, row_length )
 
 		hovered_index = ( row - 1 ) * actions_per_row + column
+	elseif y_baseline <= mouse_y and mouse_y < y_baseline + ( 20 + 2 ) then -- below common actions
+		hovered_section = "common"
+		hovered_index = math.min( capacity, ( row_offset + num_rows_shown ) * actions_per_row )
 	end
 
 	if not hovered_section then goto not_hovering end
@@ -235,7 +241,7 @@ if left_just_down or left_holding or left_just_up then
 		elseif cache.dragging_selection then
 			cache.dragging_selection = false
 			local selected_section, selection_start, selection_end = data:get_selection()
-			move_actions( actions[ selected_section ], selection_start, selection_end, actions[ hovered_section ], hovered_index )
+			move_actions( actions[ selected_section ], selection_start, selection_end, actions[ hovered_section ], hovered_index + 1 )
 
 			data.selection.section_name = hovered_section
 			data.selection.range_start = hovered_index

@@ -6,6 +6,7 @@ end
 print( "[spell lab] setting up GUI" )
 
 dofile_once( "data/scripts/lib/utilities.lua" )
+dofile_once( "data/scripts/gun/gun_enums.lua")
 dofile_once( "mods/spell_lab_shugged/files/lib/helper.lua")
 dofile_once( "mods/spell_lab_shugged/files/gui/gui_utils.lua")
 dofile_once( "mods/spell_lab_shugged/files/gui/gui_elements.lua")
@@ -36,16 +37,18 @@ type_text = {
 	[ACTION_TYPE_PASSIVE]           = "$inventory_actiontype_passive",
 }
 
-local actions = get_globals( "data/scripts/gun/gun_actions.lua" ).actions
+local gun_global = get_globals( "data/scripts/gun/gun.lua" )
+local actions = gun_global.actions
 
 sorted_actions = {}
 action_data = {}
 for k, _ in pairs( type_text ) do
 	sorted_actions[ k ] = {}
 end
-for _, action in pairs( actions ) do
-	sorted_actions[action.type][ #sorted_actions[action.type] + 1 ] = action
-	action_data[action.id] = action
+for _, action in ipairs( actions ) do
+	local typed = sorted_actions[ action.type ]
+	typed[ #typed + 1 ] = action
+	action_data[ action.id ] = action
 end
 action_metadata, extra_modifier_metadata, metadata_to_show =
 	unpack( dofile( "mods/spell_lab_shugged/files/gui/action_metadata.lua" ) )

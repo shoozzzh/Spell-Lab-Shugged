@@ -214,7 +214,7 @@ for _, id in pairs( extra_modifiers_supported ) do
 		local fake_action = {
 			id = "FAKE_ACTION_" .. string.upper( id ),
 			mana = 0,
-			action = extra_modifiers[ id ],
+			action = gun_globals.extra_modifiers[ id ],
 		}
 		local metadata = get_action_metadata( fake_action ).c
 		for k, v in pairs( metadata ) do
