@@ -10,7 +10,7 @@ local projectile_adders = {
 }
 
 local function new_parsing_env( metadata )
-	local parsing_env = {}
+	local parsing_env = setmetatable( {}, { __index = gun_globals } )
 	local c            = metadata.c
 	local shot_effects = metadata.shot_effects
 
