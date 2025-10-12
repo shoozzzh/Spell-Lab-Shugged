@@ -1,6 +1,14 @@
 dofile_once( "mods/spell_lab_shugged/files/lib/entity_xml_parser.lua" )
 
 local gun_globals = get_globals( "data/scripts/gun/gun.lua" )
+
+local projectile_adders = {
+	"add_projectile",
+	"add_projectile_trigger_timer",
+	"add_projectile_trigger_hit_world",
+	"add_projectile_trigger_death",
+}
+
 local function new_parsing_env( metadata )
 	local parsing_env = {}
 	local c            = metadata.c
@@ -9,11 +17,6 @@ local function new_parsing_env( metadata )
 	parsing_env.c = metadata.c
 	parsing_env.shot_effects = metadata.shot_effects
 	parsing_env.reflecting = true
-
-	parsing_env.add_projectile_trigger_timer = function( entity_filename, delay_frames, action_draw_count )
-		metadata.last_projectile_timer_time = delay_frames
-		Reflection_RegisterProjectile( entity_filename )
-	end
 
 	parsing_env.Reflection_RegisterProjectile = function( filepath )
 		metadata.projectiles = metadata.projectiles or {}
@@ -93,6 +96,18 @@ local function new_parsing_env( metadata )
 		metadata.projectiles[filepath] = properties
 	end
 
+	for _, func_name in ipairs( projectile_adders ) do
+		parsing_env[ func_name ] = parsing_env.Reflection_RegisterProjectile
+	end
+
+	do
+		local old = parsing_env.add_projectile_trigger_timer
+		parsing_env.add_projectile_trigger_timer = function( entity_filename, delay_frames, action_draw_count )
+			metadata.last_projectile_timer_time = delay_frames
+			old( entity_filename, delay_frames, action_draw_count )
+		end
+	end
+
 	parsing_env.draw_actions = function( how_many ) c.draws = c.draws + how_many end
 
 	parsing_env.EntityLoad = function() end
@@ -147,7 +162,10 @@ local function get_action_metadata( this_action_data )
 	
 	setfenv( action_action, parsing_env )
 
-	pcall( action_action )
+	local success, result = pcall( action_action )
+	if not success then
+		print( result )
+	end
 
 	local c            = metadata.c
 	local shot_effects = metadata.shot_effects
@@ -189,13 +207,15 @@ local function get_action_metadata( this_action_data )
 		end
 	end
 
+	-- convert map to list
 	if metadata.projectiles then
 		local temp = metadata.projectiles
 		metadata.projectiles = {}
-		for _, d in pairs( temp ) do
-			table.insert( metadata.projectiles, d )
+		for _, proj in pairs( temp ) do
+			table.insert( metadata.projectiles, proj )
 		end
 	end
+
 	return metadata
 end
 

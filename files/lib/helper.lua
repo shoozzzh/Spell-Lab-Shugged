@@ -297,16 +297,18 @@ end
 
 function get_globals( filepath )
 	local f = loadfile( filepath )
-	local e_backup = getfenv( f )
 
 	local e = {}
 	local mask = setmetatable( dofile_mask( e ), { __index = _G } )
 	setmetatable( e, { __index = mask } )
 	setfenv( f, e )()
-	setmetatable( e, nil )
 
-	setfenv( f, e_backup )
-	return e
+	local globals = {}
+	for k, v in pairs( e ) do
+		globals[ k ] = v
+	end
+
+	return globals
 end
 
 get_globals = memoize( get_globals )
