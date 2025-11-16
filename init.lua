@@ -96,7 +96,7 @@ function OnModPostInit()
 			table.insert( parsed.children, 1, nxml.new_element( "LuaComponent", {
 				script_source_file = "mods/spell_lab_shugged/files/scripts/remove_toxic_effect.lua",
 				execute_on_added = true,
-				remove_after_executed = true,
+				execute_every_n_frame = 1,
 			} ) )
 			ModTextFileSetContent( effect_path, tostring( parsed ) )
 		end
