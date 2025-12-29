@@ -67,7 +67,7 @@ picker.menu = function()
 					and this_action_data.sprite or "data/ui_gfx/gun_actions/_unidentified.png"
 
 				local spell_box = { "mods/spell_lab_shugged/files/gui/buttons/spell_box", "", ".png" }
-				if this_action_data then spell_box[2] = "_" .. this_action_data.type or "" end
+				if this_action_data then spell_box[2] = ( "_" .. this_action_data.type ) or "" end
 
 				local x_offset, y_offset
 				if i == 1 then x_offset, y_offset = 1, 1

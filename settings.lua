@@ -504,7 +504,7 @@ local function load_mod_settings( cur_lang )
 	end
 end
 
-load_mod_settings()
+load_mod_settings( GameTextGet( "$current_language" ) )
 
 function ModSettingsUpdate( init_scope )
 	mod_settings_update( mod_id, mod_settings, init_scope )

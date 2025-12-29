@@ -135,7 +135,7 @@ function do_fake_action_button( action_type, action_sprite, name, id, desc, type
 	if semi_transparent then
 		GuiOptionsAddForNextWidget( gui, GUI_OPTION.DrawSemiTransparent )
 	end
-	GuiImageButton( gui, next_id(), x1 - 2 + ( 20 - sprite_width ) / 2, y1 - 2 + ( 20 - sprite_height ) / 2, "", action_sprite, 1 )
+	GuiImageButton( gui, next_id(), x1 - 2 + ( 20 - sprite_width ) / 2, y1 - 2 + ( 20 - sprite_height ) / 2, "", action_sprite )
 
 	GuiZSetForNextWidget( gui, 1 )
 	if semi_transparent then
