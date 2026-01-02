@@ -13,11 +13,11 @@ end
 local player_projectiles = EntityGetWithTag( "spell_lab_shugged_player_projectile" ) or {}
 local total_projectile_damage = 0
 local total_projectiles = #player_projectiles
-for k,v in pairs( player_projectiles ) do
+for _, v in pairs( player_projectiles ) do
 	local projectile = EntityGetFirstComponent( v, "ProjectileComponent" )
 	if projectile then
 		local damage = ComponentGetValue2( projectile, "damage" )
-		total_projectile_damage = total_projectile_damage + damage
+		total_projectile_damage = total_projectile_damage + math.max( damage, 0 )
 	end
 end
 GuiTextCentered( gui, x_pos, 0, text_get_translated( "damage_info_total_projectile_damage" ) .. separator( math.floor( total_projectile_damage * 25 + 0.5 ) ) )

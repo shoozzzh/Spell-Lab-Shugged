@@ -646,15 +646,28 @@ function do_gui()
 
 				GuiImageButton( gui, next_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/spawn_target_dummy.png" )
 				do
-					local left_click,right_click = previous_data( gui )
-					if left_click then
+					local snap_gird_size = 10
+					local left_click,right_click,hover = previous_data( gui )
+					if alt and hover then
+						local x, y = get_player_or_camera_position()
+						x = math.floor( x / snap_gird_size + 0.5 ) * snap_gird_size
+						y = math.floor( y / snap_gird_size + 0.5 ) * snap_gird_size
+
+						-- nolla why do you have to do this
+						GameCreateSpriteForXFrames( "mods/spell_lab_shugged/files/entities/dummy_target/dummy_target.png", x, y, false, 14, 10.5, 2, true )
+					end
+					if left_click or right_click then
+						local x, y = get_player_or_camera_position()
+						if alt then
+							x = math.floor( x / snap_gird_size + 0.5 ) * snap_gird_size
+							y = math.floor( y / snap_gird_size + 0.5 ) * snap_gird_size
+						end
+						if left_click then
+							EntityLoad( "mods/spell_lab_shugged/files/entities/dummy_target/dummy_target.xml", x, y )
+						elseif right_click then
+							EntityLoad( "mods/spell_lab_shugged/files/entities/dummy_target/dummy_target_final.xml", x, y )
+						end
 						sound_button_clicked()
-						local x,y = get_player_or_camera_position()
-						EntityLoad( "mods/spell_lab_shugged/files/entities/dummy_target/dummy_target.xml", x, y )
-					elseif right_click then
-						sound_button_clicked()
-						local x,y = get_player_or_camera_position()
-						EntityLoad( "mods/spell_lab_shugged/files/entities/dummy_target/dummy_target_final.xml", x, y )
 					end
 				end
 				-- GuiTooltip( gui, wrap_key( "spawn_target_dummy" ), wrap_key( "spawn_target_dummy_description" ) )
