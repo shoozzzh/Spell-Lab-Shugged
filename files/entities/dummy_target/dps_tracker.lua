@@ -2,12 +2,12 @@ dofile_once( "mods/spell_lab_shugged/files/lib/helper.lua" )
 dofile_once( "mods/spell_lab_shugged/files/lib/variables.lua" )
 dofile_once( "data/scripts/lib/utilities.lua" )
 
-local function set_text( entity_id, tag_sprite, value, offset_y )
+local function set_text( entity_id, tag_sprite, value )
 	local child_id = ( EntityGetAllChildren( entity_id, "spell_lab_shugged_dummy_target_child" ) or {} )[1]
 	if not EntityGetIsAlive( child_id ) then return end
 	local sprite_comp = EntityGetFirstComponent( child_id, "SpriteComponent", tag_sprite )
 	if not sprite_comp then return end
-	local text = format_damage( value, not ModSettingGet( "spell_lab_shugged.dummy_target_show_full_damage_number" ), "i" )
+	local text = format_damage( value, ModSettingGet( "spell_lab_shugged.dummy_target_show_full_damage_number" ), "i" )
 	ComponentSetValue2( sprite_comp, "offset_x", center_text( text ) )
 	ComponentSetValue2( sprite_comp, "text", text )
 	EntityRefreshSprite( entity_id, sprite_comp )
