@@ -11,16 +11,12 @@ function do_scroll_table( scroll_id, width, height, height_autofit, hover_callba
 
 	GuiBeginScrollContainer( gui, scroll_id, 0, 0, width, height )
 		do
-			local _,_,_,x,y,width,height,_,_,_,_ = previous_data( gui )
-			_x, _y = x, y
-			local mx, my = get_mouse_pos_on_screen()
-			-- extra 2 pixels for the margins
-			local hovered = -2 <= mx - x and mx - x <= width + 2 and -2 <= my - y and my - y <= height + 2
-			if hover_callback then
-				hover_callback( hovered )
-			end
+			_,_,_,_x,_y,_,_,_,_,_,_ = previous_data( gui )
+			local hovered = previous_hovered(2)
+			optional_call( hover_callback, hovered )
 			scroll_box_no_wand_switching( hovered )
 		end
+		local x, y = _x + 4, _y + 2
 		GuiLayoutBeginVertical( gui, 0, 0 )
 			local index = 1
 			local cell = cell_list[ index ]
@@ -33,6 +29,7 @@ function do_scroll_table( scroll_id, width, height, height_autofit, hover_callba
 						index = index + 1
 						cell = cell_list[ index ]
 					end
+					GuiImageButton( gui, next_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/transparent_16x16.png" )
 				GuiLayoutEnd( gui )
 				GuiLayoutAddVerticalSpacing( gui, -2 )
 			end
@@ -68,86 +65,30 @@ function do_flag_toggle_image_button( filepath, flag, option_text, click_callbac
 	return left_click, right_click
 end
 
-function do_action_image( id, action_id, x, y, alpha, scale_x, scale_y, rotation )
-	x = x or 0
-	y = y or 0
-	alpha = alpha or 1.0
-	scale_x = scale_x or 1.0
-	scale_y = scale_y or 1.0
-	rotation = rotation or 0.0
+function do_action_button( x, y, selected, action_type, sprite_file )
+	GuiZSetForNextWidget( gui, 3 )
+	GuiOptionsAddForNextWidget( gui, GUI_OPTION.NonInteractive )
+	GuiImageButton( gui, next_id(), x, y, "", "mods/spell_lab_shugged/files/gui/buttons/transparent_20x20.png" )
+	local _, _, _, _x, _y = previous_data( gui )
 
-	local image_sprite = "mods/spell_lab_shugged/files/gui/buttons/empty_spell.png"
-	local this_action_data = action_data[action_id]
-	local spell_box_suffix = ""
-	if this_action_data then spell_box_suffix = spell_box_suffix .. "_" .. this_action_data.type end
-	if this_action_data then
-		image_sprite = this_action_data.sprite
-	end
-	GuiImage( gui, id, x, y, image_sprite, alpha, scale_x, scale_y, rotation )
-	GuiZSetForNextWidget( gui, 1 )
-	GuiImage( gui, next_id(), -20, 0, "mods/spell_lab_shugged/files/gui/buttons/spell_box"..spell_box_suffix..".png", 1.0, 1.0, 0 )
-end
-
-function do_action_button( action_id, x, y, selected, tooltip_func, uses_remaining, note, extra_gui, empty_slot_show_tooltip, no_title )
-	if x == nil then x = 0 end
-	if y == nil then y = 0 end
-	local image_sprite = "mods/spell_lab_shugged/files/gui/buttons/empty_spell.png"
-	local this_action_data =  action_data[action_id]
-	local left_click,right_click,hover
-	local spell_box_suffix = ""
-
-	GuiLayoutBeginHorizontal( gui, 0, 0 )
-	
-	if this_action_data then spell_box_suffix = spell_box_suffix .. "_" .. this_action_data.type end
-	if this_action_data then
-		image_sprite = this_action_data.sprite
-	end
-	local this_action_metadata = action_metadata[ action_id ]
-
-	GuiImageButton( gui, next_id(), 2, 2, "", image_sprite )
-	local left_click,right_click,hover = previous_data( gui )
-
-	if selected then
-		spell_box_suffix = spell_box_suffix .. "_active"
-	elseif hover then
-		spell_box_suffix = spell_box_suffix .. "_hover"
-	end
-
-	--if tooltip_string ~= nil then GuiTooltip( gui, tooltip_string, "" ) end
-	--if this_action_data then GuiTooltip( gui, GameTextGetTranslatedOrNot( this_action_data.name ) .. " (" .. this_action_data.id .. ")", "" ) end
-	if this_action_data or empty_slot_show_tooltip then
-		do_custom_tooltip( function()
-			GuiLayoutBeginVertical( gui, 0, 0 )
-				if this_action_data and not no_title then
-					local title = GameTextGetTranslatedOrNot( this_action_data.name )
-					if uses_remaining then
-						title = title .. "(" .. tostring( uses_remaining ) .. ")"
-					end
-					GuiText( gui, 0, 0, title )
-				end
-				if tooltip_func then
-					tooltip_func( this_action_data, this_action_metadata )
-				end
-				if note then
-					GuiDimText( gui, 0, 0, note )
-				end
-			GuiLayoutEnd( gui )
-		end, 2, -2 ) -- make it looks as if it belongs to the spell box
-	end
+	GuiOptionsAddForNextWidget( gui, GUI_OPTION.Layout_NoLayouting )
+	GuiImageButton( gui, next_id(), _x + 2, _y + 2, "", "mods/spell_lab_shugged/files/gui/buttons/transparent_16x16.png" )
+	local left_click, right_click, hover = previous_data( gui )
 
 	GuiZSetForNextWidget( gui, 1 )
-	GuiImage( gui, next_id(), -20, 0, "mods/spell_lab_shugged/files/gui/buttons/spell_box"..spell_box_suffix..".png", 1.0, 1.0, 0 )
-	if extra_gui then
-		local _,_,_,x,y,_,_,_,_,_,_ = previous_data( gui )
-		extra_gui( x, y, this_action_data, uses_remaining )
-	end
+	GuiOptionsAddForNextWidget( gui, GUI_OPTION.Layout_NoLayouting )
+	local width, height = GuiGetImageDimensions( gui, sprite_file )
+	GuiImage( gui, next_id(), _x + 20 / 2 - width / 2, _y + 20 / 2 - height / 2, sprite_file, 1, 1, 0 )
 
-	GuiLayoutEnd( gui )
+	GuiZSet( gui, 2 )
+	show_spellbox( gui, next_id(), _x, _y, action_type, selected, hovered, 1, 1, 0, 0 )
+	GuiZSet( gui, -2 )
 
 	if left_click or right_click then
 		sound_action_button_clicked()
 	end
-	return left_click, right_click
+
+	return left_click, right_click, hover
 end
 
 function do_fake_action_button( action_type, action_sprite, name, id, desc, type, semi_transparent, uses_remaining, properties )
@@ -179,7 +120,7 @@ function do_fake_action_button( action_type, action_sprite, name, id, desc, type
 	if semi_transparent then
 		GuiOptionsAddForNextWidget( gui, GUI_OPTION.DrawSemiTransparent )
 	end
-	GuiImageButton( gui, next_id(), x1 - 2 + ( 20 - sprite_width ) / 2, y1 - 2 + ( 20 - sprite_height ) / 2, "", action_sprite, 1 )
+	GuiImageButton( gui, next_id(), x1 - 2 + ( 20 - sprite_width ) / 2, y1 - 2 + ( 20 - sprite_height ) / 2, "", action_sprite )
 
 	GuiZSetForNextWidget( gui, 1 )
 	if semi_transparent then
@@ -191,7 +132,7 @@ function do_fake_action_button( action_type, action_sprite, name, id, desc, type
 	end
 	GuiImage( gui, next_id(), --[[-( 2 + sprite_width / 2 + 10 )]]-20, 0, "mods/spell_lab_shugged/files/gui/buttons/spell_box_"..spell_box_suffix..".png", 1.0, 1.0, 0 )
 	if uses_remaining then
-		show_uses_remaining( x1, y1, nil, uses_remaining )
+		show_uses_remaining( x1, y1, uses_remaining )
 	end
 
 	GuiLayoutEnd( gui )
@@ -220,12 +161,12 @@ function show_locked_state( x, y, this_action_data )
 	end
 end
 
-function show_uses_remaining( x, y, _, uses_remaining, scale )
+function show_uses_remaining( x, y, uses_remaining, scale )
 	if not uses_remaining or tonumber( uses_remaining ) < 0 then return end
 	scale = scale or 1
 	local offset = -2 * scale
 	x, y = x + offset, y + offset
-	GuiZSetForNextWidget( gui, -1 )
+	GuiZSetForNextWidget( gui, -2 )
 	GuiOptionsAddForNextWidget( gui, GUI_OPTION.Layout_NoLayouting )
 	GuiText( gui, x, y, tostring( uses_remaining ), scale, "data/fonts/font_pixel_noshadow.xml", true )
 end
@@ -334,12 +275,16 @@ local function autobox_size( content_fn )
 end
 
 function do_custom_tooltip( callback, x_offset, y_offset, animated )
+	local _,_,hover,x,y,width = previous_data( gui )
+	if not hover then return end
+
+	force_do_custom_tooltip( callback, x_offset, y_offset, animated, x, y, width )
+end
+
+function force_do_custom_tooltip( callback, x_offset, y_offset, animated, x, y, width )
 	if not callback then return end
 	x_offset = x_offset or 0
 	y_offset = y_offset or 0
-
-	local left_click,right_click,hover,x,y,width,height,draw_x,draw_y,draw_width,draw_height = previous_data( gui )
-	if not hover then return end
 
 	local tooltip_width, tooltip_height = autobox_size( callback )
 
@@ -396,7 +341,7 @@ local function show_simple_action_image( action_id, uses_remaining )
 	end
 	GuiZSet( gui, -1 )
 	local _,_,_,x,y = previous_data( gui )
-	show_uses_remaining( x, y, nil, uses_remaining, 0.5 )
+	show_uses_remaining( x, y, uses_remaining, 0.5 )
 	GuiZSet( gui, 1 )
 end
 
@@ -462,5 +407,24 @@ function do_wand_stats( gui, stats )
 			GuiLayoutEnd( gui )
 			GuiLayoutAddVerticalSpacing( gui, -4 )
 		end
+	end
+end
+
+function do_horizontal_centered_buttons( gui, button_funcs, y )
+	local num = #button_funcs
+	local x = horizontal_centered_x( num )
+	for i, f in ipairs( button_funcs ) do
+		f( gui, x, y, i )
+		x = x + 20 + 2
+	end
+end
+
+function do_horizontal_centered_button_list( gui, button_func, extra_args_list, y, preprocess )
+	local num = #extra_args_list
+	local x = horizontal_centered_x( num )
+	for i, extra_args in ipairs( extra_args_list ) do
+		optional_call( preprocess, i )
+		button_func( gui, x, y, unpack( extra_args ) )
+		x = x + 20 + 2
 	end
 end

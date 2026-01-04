@@ -523,23 +523,6 @@ function WANDS.initialize_wand( wand, wand_data, do_clear_actions )
 	end
 end
 
-function WANDS.wand_explode_action( wand, x, include_permanent_actions, include_frozen_actions, ox, oy )
-	local actions = WANDS.wand_get_actions_absolute( wand )
-	if actions then
-		local action = actions[x]
-		if action then
-			local action_to_remove = action.entity
-			EntityRemoveFromParent( action_to_remove )
-			EntityApplyTransform( action_to_remove, EntityGetTransform( wand ) )
-			EntitySetComponentsWithTagEnabled( action_to_remove, "enabled_in_hand", false )
-			EntitySetComponentsWithTagEnabled( action_to_remove, "enabled_in_inventory", false )
-			EntitySetComponentsWithTagEnabled( action_to_remove, "enabled_in_world", true )
-			ComponentSetValue2( EntityGetFirstComponent( action_to_remove, "VelocityComponent" ), "mVelocity", Random( -150, 150 ), Random( -250, -100 ) )
-			return action_to_remove
-		end
-	end
-end
-
 local function wand_explode_action_impl( wand, action_to_remove, vx, vy )
 	EntityRemoveFromParent( action_to_remove )
 	EntityApplyTransform( action_to_remove, EntityGetTransform( wand ) )

@@ -185,6 +185,19 @@ function get_held_wand()
 	end
 end
 
+function get_all_wands_in_inventory()
+	if not player then return end
+
+	local children = EntityGetAllChildren( player )
+	if not children then return end
+
+	for _, child in pairs( children ) do
+		if EntityGetName( child ) == "inventory_quick" then
+			return EntityGetAllChildren( child, "wand" )
+		end
+	end
+end
+
 function force_refresh_held_wands()
 	if not player then return end
 	local inv2_comp = EntityGetFirstComponent( player, "Inventory2Component" )
@@ -216,4 +229,152 @@ function is_action_unlocked( action )
 		return not action.spawn_requires_flag or HasFlagPersistent( action.spawn_requires_flag )
 	end
 	return false
+end
+
+function optional_call( f, ... )
+	if f then return f( ... ) end
+end
+
+function memoize( f )
+	return setmetatable( {}, {
+		__call = function( self, arg )
+			local cache = self[ arg ]
+			if cache ~= nil then return cache end
+			local result = f( arg )
+			self[ arg ] = result
+			return result
+		end,
+	} )
+end
+
+local function dofile_mask( env )
+	local loadonce, loaded = {}, {}
+	local mask = {}
+	mask.do_mod_appends = function( filepath )
+		local appends = {}
+		local dofile_backup = _G.dofile
+		_G.dofile = function( filepath )
+			appends[ #appends + 1 ] = filepath
+		end
+		do_mod_appends( filepath )
+		_G.dofile = dofile_backup
+
+		for _, filepath in ipairs( appends ) do
+			mask.dofile( filepath )
+		end
+	end
+	mask.dofile_once = function( filepath )
+	    local result
+	    local cached = loadonce[ filepath ]
+	    if cached ~= nil then
+	        result = cached[1]
+	    else
+	        local f, err = loadfile( filepath )
+	        if f == nil then return f, err end
+	        setfenv( f, env )
+	        result = f()
+	        loadonce[ filepath ] = { result }
+	        mask.do_mod_appends( filepath )
+	    end
+	    return result
+	end
+	mask.dofile = function( filepath )
+	    local f = loaded[ filepath ]
+	    if f == nil then
+	    	local err
+	        f, err = loadfile( filepath )
+	        if f == nil then return f, err end
+	        setfenv( f, env )
+	        loaded[ filepath ] = f
+	    end
+	    local result = f()
+	    mask.do_mod_appends( filepath )
+	    return result
+	end
+
+	return mask
+end
+
+function get_globals( filepath )
+	local f = loadfile( filepath )
+
+	local e = {}
+	local mask = setmetatable( dofile_mask( e ), { __index = _G } )
+	setmetatable( e, { __index = mask } )
+	setfenv( f, e )()
+
+	local globals = {}
+	for k, v in pairs( e ) do
+		globals[ k ] = v
+	end
+
+	return globals
+end
+
+get_globals = memoize( get_globals )
+
+function dofile_wrapped( filepath )
+	local f = loadfile( filepath )
+	local e_backup = getfenv( f )
+	local e = setmetatable( {}, { __index = e_backup } )
+	local result = setfenv( f, e )()
+	setfenv( f, e_backup )
+	return result
+end
+
+dofile_once_wrapped = memoize( dofile_wrapped )
+
+Type_Adjustment = {
+	Add = 1,
+	Set = 2,
+}
+
+EditPanelTags = {
+	Init = "spell_lab_shugged.edit_panel_init",
+	Recording = "spell_lab_shugged.recording_history_state",
+	UncachedChanges = "spell_lab_shugged.uncached_changes",
+	History = "spell_lab_shugged.history",
+}
+
+VFiles = {
+	FinishingDumping = "mods/spell_lab_shugged/vfiles/is_dumping.txt",
+	WandId = "mods/spell_lab_shugged/vfiles/load_to_this_wand.txt",
+}
+
+dofile_once( "mods/spell_lab_shugged/files/lib/stream.lua" )
+
+function stream_actions( wand_id )
+	return stream( EntityGetAllChildren( wand_id ) or {} )
+		.filter( function( e ) return EntityGetFirstComponentIncludingDisabled( e, "ItemComponent" ) ~= nil end )
+		.filter( function( e ) return EntityGetFirstComponentIncludingDisabled( e, "ItemActionComponent" ) ~= nil end )
+end
+
+function deep_equals( a, b )
+	local tipe = type( a )
+	if tipe ~= type( b ) then return false end
+
+	if tipe == "table" then
+		for k, v in pairs( a ) do
+			if not deep_equals( v, b[ k ] ) then
+				return false
+			end
+		end
+		for k, v in pairs( b ) do
+			if a[ k ] == nil then
+				return false
+			end
+		end
+		return true
+	else
+		return a == b
+	end
+end
+
+function new_prototype( parent )
+	local t = {}
+	t.__index = t
+	if parent then
+		setmetatable( t, parent )
+	end
+	return t
 end

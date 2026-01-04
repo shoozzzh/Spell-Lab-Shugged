@@ -5,11 +5,12 @@ end
 
 print( "[spell lab] setting up GUI" )
 
-dofile_once( "data/scripts/gun/gun.lua" )
 dofile_once( "data/scripts/lib/utilities.lua" )
+dofile_once( "data/scripts/gun/gun_enums.lua")
 dofile_once( "mods/spell_lab_shugged/files/lib/helper.lua")
 dofile_once( "mods/spell_lab_shugged/files/gui/gui_utils.lua")
 dofile_once( "mods/spell_lab_shugged/files/gui/gui_elements.lua")
+dofile_once( "mods/spell_lab_shugged/files/gui/spellbox_packs.lua" )
 dofile_once( "mods/spell_lab_shugged/files/gui/get_player.lua" )
 WANDS = dofile_once( "mods/spell_lab_shugged/files/lib/wands.lua")
 dofile_once( "data/scripts/debug/keycodes.lua" )
@@ -34,22 +35,23 @@ type_text = {
 	[ACTION_TYPE_PASSIVE]           = "$inventory_actiontype_passive",
 }
 
+local gun_global = get_globals( "data/scripts/gun/gun.lua" )
+local actions = gun_global.actions
+
 sorted_actions = {}
 action_data = {}
 for k, _ in pairs( type_text ) do
 	sorted_actions[ k ] = {}
 end
-for _, action in pairs( actions ) do
-	sorted_actions[action.type][ #sorted_actions[action.type] + 1 ] = action
-	action_data[action.id] = action
+for _, action in ipairs( actions ) do
+	local typed = sorted_actions[ action.type ]
+	typed[ #typed + 1 ] = action
+	action_data[ action.id ] = action
 end
 action_metadata, extra_modifier_metadata, metadata_to_show =
 	unpack( dofile( "mods/spell_lab_shugged/files/gui/action_metadata.lua" ) )
 
 local is_panel_open = false
-
-dofile_once( "mods/spell_lab_shugged/files/gui/edit_panel_utils.lua" )
-dofile_once( "mods/spell_lab_shugged/files/gui/pickers.lua" )
 
 action_id_to_idx = {}
 
@@ -72,32 +74,32 @@ end
 
 wand_stats = dofile( "mods/spell_lab_shugged/files/gui/wand_stats.lua" )
 
-dofile_once( "mods/spell_lab_shugged/files/gui/edit_panel_api.lua" )
+local edit_panel_api = dofile_once( "mods/spell_lab_shugged/files/gui/edit_panel_api.lua" )
 
 dofile_once( "mods/spell_lab_shugged/files/gui/keyboard_listener.lua" )
 dofile_once( "mods/spell_lab_shugged/files/gui/keyboard_focus.lua" )
 
 function show_edit_panel_toggle_options()
+	local data = edit_panel_api.access_data( held_wand )
 	GuiLayoutBeginHorizontal( gui, 0, 0, true )
-		local edit_panel_state = access_edit_panel_state( held_wand )
-		local force_compact_enabled = edit_panel_state.get_force_compact_enabled()
+		local force_compact_enabled = data.vars.force_compact_enabled
 		if not force_compact_enabled then
 			GuiOptionsAddForNextWidget( gui, GUI_OPTION.DrawSemiTransparent )
 		end
 		if GuiImageButton( gui, next_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/force_compact.png" ) then
 			sound_button_clicked()
-			edit_panel_state.set_force_compact_enabled( not force_compact_enabled )
-			edit_panel_state.force_sync()
+			data.vars.force_compact_enabled = not force_compact_enabled
 		end
 		GuiTooltip( gui, text_get_translated( force_compact_enabled and "disable" or "enable" ) .. text_get_translated( "wand_force_compact" ), text_get_translated( "wand_force_compact_description" ) .. "\n" .. text_get_translated( "inventory_get_ignored" )  )
-		local autocap_enabled = edit_panel_state.get_autocap_enabled()
+		
+		local autocap_enabled = data.vars.autocap_enabled
 		if not autocap_enabled then
 			GuiOptionsAddForNextWidget( gui, GUI_OPTION.DrawSemiTransparent )
 		end
 		if GuiImageButton( gui, next_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/automatic_capacity.png" ) then
 			sound_button_clicked()
-			edit_panel_state.set_autocap_enabled( not autocap_enabled )
-			if autocap_enabled and edit_panel_state.get_force_compact_enabled() then
+			data.vars.autocap_enabled = not autocap_enabled
+--[[			if autocap_enabled and force_compact_enabled then
 				local new_capacity = 0
 				for _ in state_str_iter_permanent_actions( edit_panel_state.get_permanent() ) do
 					new_capacity = new_capacity + 1
@@ -111,7 +113,7 @@ function show_edit_panel_toggle_options()
 					end
 				end
 				WANDS.wand_set_stat( held_wand, "deck_capacity", new_capacity )
-			end
+			end]]
 		end
 		GuiTooltip( gui, text_get_translated( autocap_enabled and "disable" or "enable" ) .. text_get_translated( "automatic_capacity" ), wrap_key( "automatic_capacity_description" ) )
 	GuiLayoutEnd( gui )
@@ -127,23 +129,25 @@ function show_edit_panel_toggle_options()
 			GuiImageButton( gui, next_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/redo.png" )
 			GuiTooltip( gui, text_get_translated( "cant_redo" ), "" )
 		end
-		local operation_to_undo = edit_panel_state.peek_undo()
-		local operation_to_redo = edit_panel_state.peek_redo()
+
+		local operation_to_undo = data:peek_undo()
+		local operation_to_redo = data:peek_redo()
+
 		if operation_to_undo then
 			if GuiImageButton( gui, next_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/undo.png" ) then
 				sound_button_clicked()
-				edit_panel_state.undo()
+				data:undo()
 			end
 			GuiTooltip( gui, text_get_translated( "undo" ) .. " " .. GameTextGetTranslatedOrNot( operation_to_undo ),
-				GameTextGet( wrap_key( "current_history" ), edit_panel_state.get_current_history_index() ) )
+				GameTextGet( wrap_key( "current_history" ), data.vars.current_history_index, #edit_panel_api.get_histories( held_wand ) ) )
 		else cant_undo() end
 		if operation_to_redo then
 			if GuiImageButton( gui, next_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/redo.png" ) then
 				sound_button_clicked()
-				edit_panel_state.redo()
+				data:redo()
 			end
 			GuiTooltip( gui, text_get_translated( "redo" ) .. " " .. GameTextGetTranslatedOrNot( operation_to_redo ),
-				GameTextGet( wrap_key( "current_history" ), edit_panel_state.get_current_history_index() ) )
+				GameTextGet( wrap_key( "current_history" ), data.vars.current_history_index, #edit_panel_api.get_histories( held_wand ) ) )
 		else cant_redo() end
 	GuiLayoutEnd( gui )
 end
@@ -217,11 +221,12 @@ end
 
 reload_shortcuts()
 
+dofile_once( "mods/spell_lab_shugged/files/gui/pickers.lua" )
+dofile_once( "mods/spell_lab_shugged/files/gui/edit_panel_utils.lua" )
+
 function do_gui()
 	shift = InputIsKeyDown( Key_LSHIFT ) or InputIsKeyDown( Key_RSHIFT )
 	alt = InputIsKeyDown( Key_LALT ) or InputIsKeyDown( Key_RALT )
-
-	cached_mouse_x, cached_mouse_y = nil, nil
 
 	now = GameGetFrameNum()
 	reset_z()
@@ -242,10 +247,8 @@ function do_gui()
 
 	player = get_player()
 	held_wand = get_held_wand()
-
-	keyboard_input_holding = listen_keyboard_down()
-
-	dofile( "mods/spell_lab_shugged/files/gui/wand_listener.lua" )
+	
+	edit_panel_api.listen_wand_changes()
 
 	update_keyboard_input( listen_keyboard_just_down() )
 
@@ -260,6 +263,8 @@ function do_gui()
 			last_cur_lang = cur_lang
 			reload_shortcut_texts()
 		end
+
+		change_spellbox_pack_if_needed()
 	end
 
 	local mod_button_reservation = tonumber( GlobalsGetValue( "spell_lab_shugged_mod_button_reservation", "0" ) )

@@ -1,0 +1,7 @@
+<Entity>
+	<GameEffectComponent
+		effect="POLYMORPH"
+        frames="1"
+        polymorph_target="mods/spell_lab_shugged/files/entities/empty_entity.xml">
+	</GameEffectComponent>
+</Entity>

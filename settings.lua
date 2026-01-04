@@ -1,6 +1,7 @@
 dofile_once( "data/scripts/lib/utilities.lua" )
 dofile_once( "data/scripts/lib/mod_settings.lua" )
 dofile_once( "mods/spell_lab_shugged/files/lib/shortcut_setting.lua" )
+dofile_once( "mods/spell_lab_shugged/files/gui/spellbox_packs.lua" )
 
 mod_settings_version = 1
 local function load_mod_settings( cur_lang )
@@ -82,7 +83,10 @@ local function load_mod_settings( cur_lang )
 			dummy_target_show_full_damage_number_description = "开启时，将以完整形式而不是科学计数法显示伤害数字",
 			button_click_sound = "按钮点击音效",
 			action_button_click_sound = "法术按钮点击音效",
+			spellbox_pack = "法术框贴图",
 		}
+
+		load_spellpack_texts( "zh_cn" )
 	else
 		text = {
 			wand_edit_panel = "Wand Edit Panel",
@@ -161,7 +165,10 @@ local function load_mod_settings( cur_lang )
 			dummy_target_show_full_damage_number_description = "Should dummy targets always has full-length damage numbers shown?",
 			button_click_sound = "Button Click Sound",
 			action_button_click_sound = "Spell Button Click sound",
+			spellbox_pack = "Spell Box Sprites",
 		}
+
+		load_spellpack_texts( "DEFAULT" )
 	end
 	mod_settings = {
 		{
@@ -561,7 +568,8 @@ local function load_mod_settings( cur_lang )
 		},
 	}
 end
-load_mod_settings()
+
+load_mod_settings( GameTextGet( "$current_language" ) )
 
 local mod_id = "spell_lab_shugged"
 

@@ -2,6 +2,8 @@ ModLuaFileAppend( "data/scripts/gun/gun.lua", "mods/spell_lab_shugged/files/appe
 ModLuaFileAppend( "data/scripts/gun/gun.lua", "mods/spell_lab_shugged/files/append/gun/cast_delay_fixer.lua" )
 ModLuaFileAppend( "data/scripts/gun/gun.lua", "mods/spell_lab_shugged/files/append/gun/disable_casting.lua" )
 
+dofile( "mods/spell_lab_shugged/files/lib/polytools/polytools_init.lua" ).init( "mods/spell_lab_shugged/files/lib/polytools/" )
+
 local translations = ModTextFileGetContent( "mods/spell_lab_shugged/files/translations.csv" )
 local main = "data/translations/common.csv"
 local main_content = ModTextFileGetContent( main )

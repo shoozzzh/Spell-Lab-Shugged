@@ -1,23 +1,24 @@
 dofile_once( "mods/spell_lab_shugged/files/lib/entity_xml_parser.lua" )
-TYPE_ADJUSTMENT = {
-	Add = 1,
-	Set = 2,
-}
-function get_action_metadata( this_action_data )
-	if not this_action_data then return end
-	local metadata = {
-		c = {},
-		projectiles = nil,
-		shot_effects = {},
-	}
 
-	reflecting = true
-	local last_projectile_timer_time = nil
-	local add_projectile_trigger_timer_injected = function( entity_filename, delay_frames, action_draw_count )
-		last_projectile_timer_time = delay_frames
-		Reflection_RegisterProjectile( entity_filename )
-	end
-	Reflection_RegisterProjectile = function( filepath )
+local gun_globals = get_globals( "data/scripts/gun/gun.lua" )
+
+local projectile_adders = {
+	"add_projectile",
+	"add_projectile_trigger_timer",
+	"add_projectile_trigger_hit_world",
+	"add_projectile_trigger_death",
+}
+
+local function new_parsing_env( metadata )
+	local parsing_env = setmetatable( {}, { __index = gun_globals } )
+	local c            = metadata.c
+	local shot_effects = metadata.shot_effects
+
+	parsing_env.c = metadata.c
+	parsing_env.shot_effects = metadata.shot_effects
+	parsing_env.reflecting = true
+
+	parsing_env.Reflection_RegisterProjectile = function( filepath )
 		metadata.projectiles = metadata.projectiles or {}
 		if metadata.projectiles[filepath] then
 			metadata.projectiles[filepath].projectiles = metadata.projectiles[filepath].projectiles + 1
@@ -87,125 +88,153 @@ function get_action_metadata( this_action_data )
 			properties.air_friction = vel_comp.attr.air_friction or 0.55
 		end
 
-		if last_projectile_timer_time then
-			properties.timer_time = last_projectile_timer_time
-			last_projectile_timer_time = nil
+		if metadata.last_projectile_timer_time then
+			properties.timer_time = metadata.last_projectile_timer_time
+			metadata.last_projectile_timer_time = nil
 		end
 
 		metadata.projectiles[filepath] = properties
 	end
-	local _shot_effects = shot_effects
-	local _c = c
-		c = {}
-		shot_effects = {}
-		current_reload_time = 0
 
-		local draws = 0
-		local _draw_actions = draw_actions
-		draw_actions = function( how_many ) draws = draws + how_many end
+	for _, func_name in ipairs( projectile_adders ) do
+		parsing_env[ func_name ] = parsing_env.Reflection_RegisterProjectile
+	end
 
-		local _EntityLoad = EntityLoad
-		EntityLoad = function() end
-
-		reset_modifiers( c )
-		ConfigGunShotEffects_Init( shot_effects )
-
-		c.friendly_fire = nil
-
-		shot_effects.spell_lab_shugged_recoil_knockback = shot_effects.recoil_knockback
-		shot_effects.recoil_knockback = nil
-		shot_effects.spell_lab_shugged_count_recoil_get = 0
-		shot_effects.spell_lab_shugged_count_recoil_set = 0
-		setmetatable( shot_effects,
-			{
-				__index = function( t, key )
-					if key == "recoil_knockback" then
-						rawset( t, "spell_lab_shugged_count_recoil_get", rawget( t, "spell_lab_shugged_count_recoil_get" ) + 1 )
-						return rawget( t, "spell_lab_shugged_recoil_knockback" )
-					end
-					return rawget( t, key )
-				end,
-				__newindex = function( t, key, value )
-					if key == "recoil_knockback" then
-						rawset( t, "spell_lab_shugged_count_recoil_set", rawget( t, "spell_lab_shugged_count_recoil_set" ) + 1 )
-						rawset( t, "spell_lab_shugged_recoil_knockback", value )
-					end
-					rawset( t, key, value )
-				end,
-			}
-		)
-
-		local action_action = this_action_data.action
-		local action_env = getfenv( action_action )
-		action_env.add_projectile_trigger_timer = add_projectile_trigger_timer_injected
-		setfenv( action_action, action_env )
-
-		pcall( action_action )
-
-		draw_actions = _draw_actions
-		c.draw_actions = draws
-		c.reload_time = current_reload_time
-		c.mana = this_action_data.mana
-		if rawget( shot_effects, "spell_lab_shugged_count_recoil_set" ) == 1 then
-			if rawget( shot_effects, "spell_lab_shugged_count_recoil_get" ) == 1 then
-				c.spell_lab_shugged_recoil = { value = shot_effects.spell_lab_shugged_recoil_knockback, type = TYPE_ADJUSTMENT.Add }
-			elseif rawget( shot_effects, "spell_lab_shugged_count_recoil_get" ) == 0 then
-				c.spell_lab_shugged_recoil = { value = shot_effects.spell_lab_shugged_recoil_knockback, type = TYPE_ADJUSTMENT.Set }
-			end
+	do
+		local old = parsing_env.add_projectile_trigger_timer
+		parsing_env.add_projectile_trigger_timer = function( entity_filename, delay_frames, action_draw_count )
+			metadata.last_projectile_timer_time = delay_frames
+			old( entity_filename, delay_frames, action_draw_count )
 		end
-		c.lifetime_cap = { nil, nil }
-		if #c.extra_entities > 0 then
-			string.gsub( c.extra_entities, "[^,]+", function( extra_entity )
-				local extra_entity_content = parse_entity_xml( extra_entity )
-				if extra_entity_content == nil then return end
-				for lifetime_comp in extra_entity_content:each_of( "LifetimeComponent" ) do
-					local lifetime = tonumber( lifetime_comp.attr.lifetime )
-					if lifetime and lifetime >= 0 then
-						local randomize_min = tonumber( lifetime_comp.attr["randomize_lifetime.min"] ) or 0
-						local randomize_max = tonumber( lifetime_comp.attr["randomize_lifetime.max"] ) or 0
-						local lifetime2 = lifetime + randomize_max
-						lifetime = lifetime + randomize_min
-						if not c.lifetime_cap[1] or lifetime < c.lifetime_cap[1] then
-							c.lifetime_cap[1] = lifetime
-						end
-						if not c.lifetime_cap[2] or lifetime2 < c.lifetime_cap[2] then
-							c.lifetime_cap[2] = lifetime2
-						end
-					end
+	end
+
+	parsing_env.draw_actions = function( how_many ) c.draws = c.draws + how_many end
+
+	parsing_env.EntityLoad = function() end
+
+	parsing_env.current_reload_time = 0
+
+	gun_globals.reset_modifiers( c )
+	gun_globals.ConfigGunShotEffects_Init( shot_effects )
+
+	c.friendly_fire = nil
+
+	shot_effects.spell_lab_shugged_recoil_knockback = shot_effects.recoil_knockback
+	shot_effects.recoil_knockback = nil
+	shot_effects.spell_lab_shugged_count_recoil_get = 0
+	shot_effects.spell_lab_shugged_count_recoil_set = 0
+	setmetatable( shot_effects,
+		{
+			__index = function( t, key )
+				if key == "recoil_knockback" then
+					rawset( t, "spell_lab_shugged_count_recoil_get", rawget( t, "spell_lab_shugged_count_recoil_get" ) + 1 )
+					return rawget( t, "spell_lab_shugged_recoil_knockback" )
 				end
-			end )
-		end
-		metadata.c = c
+				return rawget( t, key )
+			end,
+			__newindex = function( t, key, value )
+				if key == "recoil_knockback" then
+					rawset( t, "spell_lab_shugged_count_recoil_set", rawget( t, "spell_lab_shugged_count_recoil_set" ) + 1 )
+					rawset( t, "spell_lab_shugged_recoil_knockback", value )
+				end
+				rawset( t, key, value )
+			end,
+		}
+	)
 
-		EntityLoad = _EntityLoad
-	c = _c
-	shot_effects = _shot_effects
-	reflecting = false
+	return parsing_env
+end
+local function get_action_metadata( this_action_data )
+	if not this_action_data then return end
+	local metadata = {
+		c = {
+			draws = 0,
+			mana = this_action_data.mana,
+		},
+		projectiles = nil,
+		shot_effects = {},
+		last_projectile_timer_time = nil,
+	}
+	local parsing_env = new_parsing_env( metadata )
+	
+	local action_action = this_action_data.action
+	setmetatable( parsing_env, { __index = getfenv( action_action ) } )
+	
+	setfenv( action_action, parsing_env )
+
+	local success, result = pcall( action_action )
+	if not success then
+		print( result )
+	end
+
+	local c            = metadata.c
+	local shot_effects = metadata.shot_effects
+	c.reload_time = parsing_env.current_reload_time
+
+	if rawget( shot_effects, "spell_lab_shugged_count_recoil_set" ) == 1 then
+		if rawget( shot_effects, "spell_lab_shugged_count_recoil_get" ) == 1 then
+			c.spell_lab_shugged_recoil = { value = shot_effects.spell_lab_shugged_recoil_knockback, type = Type_Adjustment.Add }
+		elseif rawget( shot_effects, "spell_lab_shugged_count_recoil_get" ) == 0 then
+			c.spell_lab_shugged_recoil = { value = shot_effects.spell_lab_shugged_recoil_knockback, type = Type_Adjustment.Set }
+		end
+	end
+
+	c.lifetime_cap = { nil, nil }
+	if #c.extra_entities > 0 then
+		for extra_entity in string.gmatch( c.extra_entities, "[^,]+" ) do
+			local extra_entity_content = parse_entity_xml( extra_entity )
+			if extra_entity_content == nil then goto continue end
+
+			for lifetime_comp in extra_entity_content:each_of( "LifetimeComponent" ) do
+				local lifetime = tonumber( lifetime_comp.attr.lifetime )
+				if lifetime and lifetime >= 0 then goto continue_2 end
+
+				local randomize_min = tonumber( lifetime_comp.attr["randomize_lifetime.min"] ) or 0
+				local randomize_max = tonumber( lifetime_comp.attr["randomize_lifetime.max"] ) or 0
+				local lifetime2 = lifetime + randomize_max
+				lifetime = lifetime + randomize_min
+				if not c.lifetime_cap[1] or lifetime < c.lifetime_cap[1] then
+					c.lifetime_cap[1] = lifetime
+				end
+				if not c.lifetime_cap[2] or lifetime2 < c.lifetime_cap[2] then
+					c.lifetime_cap[2] = lifetime2
+				end
+
+				::continue_2::
+			end
+
+			::continue::
+		end
+	end
+
+	-- convert map to list
 	if metadata.projectiles then
 		local temp = metadata.projectiles
 		metadata.projectiles = {}
-		for _, d in pairs( temp ) do
-			table.insert( metadata.projectiles, d )
+		for _, proj in pairs( temp ) do
+			table.insert( metadata.projectiles, proj )
 		end
 	end
+
 	return metadata
 end
 
 if player then EntityRemoveTag( player, "player_unit" ) end
 
 local action_metadata = {}
-for _, action in pairs( actions ) do
-	action_metadata[ action.id ] = get_action_metadata( action )
+for _, action in pairs( gun_globals.actions ) do
+	action_metadata[ action.id ] = get_action_metadata( action_data[ action.id ] )
 end
 
-dofile_once( "mods/spell_lab_shugged/files/gui/extra_modifiers_supported.lua" )
+local extra_modifiers_supported =
+	get_globals( "mods/spell_lab_shugged/files/gui/extra_modifiers_supported.lua" ).extra_modifiers_supported
 local extra_modifier_metadata = {}
 for _, id in pairs( extra_modifiers_supported ) do
 	do
 		local fake_action = {
 			id = "FAKE_ACTION_" .. string.upper( id ),
 			mana = 0,
-			action = extra_modifiers[ id ],
+			action = gun_globals.extra_modifiers[ id ],
 		}
 		local metadata = get_action_metadata( fake_action ).c
 		for k, v in pairs( metadata ) do
@@ -224,7 +253,7 @@ if player then EntityAddTag( player, "player_unit" ) end
 
 local metadata_to_show = {
 	c = {
-		{ "draw_actions"            , wrap_key( "draws" ), 0, function(value) return format_value( value, 0 ) end },
+		{ "draws"                   , wrap_key( "draws" ), 0, function(value) return format_value( value, 0 ) end },
 		{ "max_uses"                , wrap_key( "max_uses" ), nil, function(value) return format_value( value, 0 ) end },
 		{ "mana"                    , "$inventory_manadrain", nil, function(value) return format_value( value, 0 ) end },
 		{ "fire_rate_wait"          , "$inventory_castdelay", 0, function(value) return format_time( value, 3 ) end },
@@ -245,7 +274,7 @@ local metadata_to_show = {
 		{ "gravity"                 , wrap_key( "gravity" ), 0, function(value) return format_value( value, 0, true ) end },
 		{ "bounces"                 , "$inventory_mod_bounces", 0, function(value) return format_value( value, 0, true ) end },
 		{ "spell_lab_shugged_recoil", wrap_key( "recoil" ), nil, function(value)
-			if value.type == TYPE_ADJUSTMENT.Set then
+			if value.type == Type_Adjustment.Set then
 				return GameTextGet( wrap_key( "value_set_to" ), format_value( value.value, 0 ) )
 			else
 				if value.value ~= 0 then
