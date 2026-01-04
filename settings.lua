@@ -2,8 +2,6 @@ dofile_once( "data/scripts/lib/utilities.lua" )
 dofile_once( "data/scripts/lib/mod_settings.lua" )
 dofile_once( "mods/spell_lab_shugged/files/lib/shortcut_setting.lua" )
 
-local mod_id = "spell_lab_shugged"
-
 mod_settings_version = 1
 local function load_mod_settings( cur_lang )
 	if cur_lang == "简体中文" or cur_lang == "喵体中文" or cur_lang == "汪体中文" or cur_lang == "完全汉化" then
@@ -330,7 +328,7 @@ local function load_mod_settings( cur_lang )
 					value_default  = false,
 					scope          = MOD_SETTING_SCOPE_RUNTIME,
 					change_fn      = function( mod_id, gui, in_main_menu, setting, old_value, new_value )
-						ModSettingSet( mod_id .. ".shortcut_changed", true, false )
+						ModSettingSet( mod_id .. ".shortcut_changed", true )
 					end,
 				},
 				{
@@ -564,6 +562,8 @@ local function load_mod_settings( cur_lang )
 	}
 end
 load_mod_settings()
+
+local mod_id = "spell_lab_shugged"
 
 function ModSettingsUpdate( init_scope )
 	local old_version = mod_settings_get_version( mod_id ) -- This can be used to migrate some settings between mod versions.

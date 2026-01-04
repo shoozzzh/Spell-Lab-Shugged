@@ -110,34 +110,3 @@ function scroll_box_no_wand_switching( hovered )
 		ModTextFileSetContent_Saved( "mods/spell_lab_shugged/scroll_box_hovered.txt", "false" )
 	end
 end
-
-local ID_GAP = 64
-local id_remainder_table = {}
-local next_id_remainder = 1
-
--- to avoid any id confliction
-function do_content_wrapped( content_fn, push_this_string )
-	local id_offset = id_remainder_table[ push_this_string ]
-	if not id_offset then
-		id_offset = next_id_remainder
-		id_remainder_table[ push_this_string ] = next_id_remainder
-		next_id_remainder = next_id_remainder + 1
-	end
-	local peek_next_id = function()
-		return id_offset
-	end
-	local next_id = function()
-		id_offset = id_offset + ID_GAP
-		return id_offset
-	end
-
-	local e = getfenv( content_fn )
-	e.id_offset = id_offset
-	e.peek_next_id = peek_next_id
-	e.next_id = next_id
-	setfenv( content_fn, e )
-
-	GuiIdPushString( gui, push_this_string )
-	content_fn()
-	GuiIdPop( gui )
-end
