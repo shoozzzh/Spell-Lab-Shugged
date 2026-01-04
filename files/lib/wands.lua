@@ -257,26 +257,6 @@ function WANDS.wand_copy_stats( base_wand, copy_wand )
 	end
 end
 
-function WANDS.wand_copy( base_wand, copy_wand, copy_sprite, copy_actions )
-	WANDS.wand_copy_stats( base_wand, copy_wand )
-	if copy_sprite ~= false then
-		local base_ability = EntityGetFirstComponentIncludingDisabled( base_wand, "AbilityComponent" )
-		local target_ability = EntityGetFirstComponentIncludingDisabled( copy_wand, "AbilityComponent" )
-		ComponentSetValue2( target_ability, "sprite_file", ComponentGetValue2( base_ability, "sprite_file" ) )
-		local base_sprite = EntityGetFirstComponentIncludingDisabled( base_wand, "SpriteComponent" )
-		local copy_sprite = EntityGetFirstComponentIncludingDisabled( copy_wand, "SpriteComponent" )
-		CopyListedComponentMembers( base_sprite, copy_sprite, "image_file","offset_x","offset_y")
-		local base_hotspot = EntityGetFirstComponentIncludingDisabled( base_wand, "HotspotComponent", "shoot_pos" )
-		local copy_hotspot = EntityGetFirstComponentIncludingDisabled( copy_wand, "HotspotComponent", "shoot_pos" )
-		CopyComponentMembers( base_hotspot, copy_hotspot )
-		local base_hotspot_x, base_hotspot_y = ComponentGetValue2( base_hotspot, "offset" )
-		ComponentSetValue2( copy_hotspot, "offset", base_hotspot_x, base_hotspot_y )
-	end
-	if copy_actions ~= false then
-		WANDS.wand_copy_actions( base_wand, copy_wand )
-	end
-end
-
 function WANDS.ability_component_get_stat( ability, stat )
 	local setter = WAND_STAT_SETTERS[stat]
 	if setter ~= nil then
@@ -584,35 +564,4 @@ function WANDS.wand_check_actions_out_of_bound( wand, deck_capacity )
 	return true
 end
 
-function WANDS.wand_attach_action( wand, action, permanent, locked )
-	EntityAddChild( wand, action )
-	local item_action = EntityGetFirstComponentIncludingDisabled( action, "ItemActionComponent" )
-	if item_action ~= nil then
-		EntitySetComponentsWithTagEnabled( action,  "enabled_in_world", false )
-		EntitySetComponentsWithTagEnabled( action,  "enabled_in_hand", false )
-		EntitySetComponentsWithTagEnabled( action,  "enabled_in_inventory", false )
-	end
-end
-
-function WANDS.ensure_actions_in_capacity( wand_id )
-	local num_pa = WANDS.wand_get_num_actions_permanent( wand_id )
-
-	local max_common_x = 0
-	stream_actions( wand_id ).foreach( function( a )
-		local item_comp = EntityGetFirstComponentIncludingDisabled( a, "ItemComponent" )
-		if not item_comp then return end
-
-		if ComponentGetValue2( item_comp, "permanently_attached" ) then return end
-
-		local x, _ = ComponentGetValue2( item_comp, "inventory_slot" )
-		max_common_x = math.max( max_common_x, x )
-	end )
-
-	local least_capacity = max_common_x + 1
-	local current_capacity = EntityGetWandCapacity( wand_id )
-	if least_capacity > current_capacity then
-		WANDS.wand_set_stat( wand_id, "capacity", least_capacity )
-	end
-end
-	
 return WANDS

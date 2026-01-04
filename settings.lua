@@ -3,8 +3,6 @@ dofile_once( "data/scripts/lib/mod_settings.lua" )
 dofile_once( "mods/spell_lab_shugged/files/lib/shortcut_setting.lua" )
 dofile_once( "mods/spell_lab_shugged/files/gui/spellbox_packs.lua" )
 
-local mod_id = "spell_lab_shugged"
-
 mod_settings_version = 1
 mod_settings = {
 	{
@@ -505,6 +503,8 @@ local function load_mod_settings( cur_lang )
 end
 
 load_mod_settings( GameTextGet( "$current_language" ) )
+
+local mod_id = "spell_lab_shugged"
 
 function ModSettingsUpdate( init_scope )
 	mod_settings_update( mod_id, mod_settings, init_scope )
