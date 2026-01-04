@@ -1,7 +1,14 @@
 if do_gui then
 	do_content_wrapped( do_gui, "main" )
 	return
+else
+	if gui_loaded == true then
+		GamePrint( "[Spell Lab Shugged] The mod gui has crashed/failed to load. Please contact with Shug" )
+		return
+	end
 end
+
+gui_loaded = true
 
 print( "[spell lab] setting up GUI" )
 
