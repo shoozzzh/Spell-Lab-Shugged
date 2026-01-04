@@ -44,7 +44,7 @@ function do_scroll_table( scroll_id, width, height, height_autofit, hover_callba
 						index = index + 1
 						cell = cell_list[ index ]
 					end
-					GuiImageButton( gui, next_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/transparent_16x16.png" )
+					GuiImageButton( gui, get_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/transparent_16x16.png" )
 				GuiLayoutEnd( gui )
 				GuiLayoutAddVerticalSpacing( gui, -2 )
 			end
@@ -61,7 +61,7 @@ function do_flag_toggle_image_button( filepath, flag, option_text, click_callbac
 	if not ModSettingGet( mod_settings_key ) then
 		GuiOptionsAddForNextWidget( gui, GUI_OPTION.DrawSemiTransparent )
 	end
-	local left_click, right_click = GuiImageButton( gui, next_id(), 0, 0, "", filepath )
+	local left_click, right_click = GuiImageButton( gui, get_id(), 0, 0, "", filepath )
 	if left_click then
 		sound_button_clicked()
 		local new = not ModSettingGet( mod_settings_key )
@@ -83,20 +83,20 @@ end
 function do_action_button( x, y, selected, action_type, sprite_file )
 	GuiZSetForNextWidget( gui, 3 )
 	GuiOptionsAddForNextWidget( gui, GUI_OPTION.NonInteractive )
-	GuiImageButton( gui, next_id(), x, y, "", "mods/spell_lab_shugged/files/gui/buttons/transparent_20x20.png" )
+	GuiImageButton( gui, get_id(), x, y, "", "mods/spell_lab_shugged/files/gui/buttons/transparent_20x20.png" )
 	local _, _, _, _x, _y = previous_data( gui )
 
 	GuiOptionsAddForNextWidget( gui, GUI_OPTION.Layout_NoLayouting )
-	GuiImageButton( gui, next_id(), _x + 2, _y + 2, "", "mods/spell_lab_shugged/files/gui/buttons/transparent_16x16.png" )
+	GuiImageButton( gui, get_id(), _x + 2, _y + 2, "", "mods/spell_lab_shugged/files/gui/buttons/transparent_16x16.png" )
 	local left_click, right_click, hover = previous_data( gui )
 
 	GuiZSetForNextWidget( gui, 1 )
 	GuiOptionsAddForNextWidget( gui, GUI_OPTION.Layout_NoLayouting )
 	local width, height = GuiGetImageDimensions( gui, sprite_file )
-	GuiImage( gui, next_id(), _x + 20 / 2 - width / 2, _y + 20 / 2 - height / 2, sprite_file, 1, 1, 0 )
+	GuiImage( gui, get_id(), _x + 20 / 2 - width / 2, _y + 20 / 2 - height / 2, sprite_file, 1, 1, 0 )
 
 	GuiZSet( gui, 2 )
-	show_spellbox( gui, next_id(), _x, _y, action_type, selected, hovered, 1, 1, 0, 0 )
+	show_spellbox( gui, get_id(), _x, _y, action_type, selected, hovered, 1, 1, 0, 0 )
 	GuiZSet( gui, -2 )
 
 	if left_click or right_click then
@@ -109,7 +109,7 @@ end
 function do_fake_action_button( action_type, action_sprite, name, id, desc, type, semi_transparent, uses_remaining, properties )
 	GuiLayoutBeginHorizontal( gui, 0, 0 )
 
-	GuiImageButton( gui, next_id(), 2, 2, "", "mods/spell_lab_shugged/files/gui/buttons/transparent_16x16.png" )
+	GuiImageButton( gui, get_id(), 2, 2, "", "mods/spell_lab_shugged/files/gui/buttons/transparent_16x16.png" )
 	
 	local left_click, right_click,hover,x1,y1 = previous_data( gui )
 	do_custom_tooltip( function()
@@ -135,7 +135,7 @@ function do_fake_action_button( action_type, action_sprite, name, id, desc, type
 	if semi_transparent then
 		GuiOptionsAddForNextWidget( gui, GUI_OPTION.DrawSemiTransparent )
 	end
-	GuiImageButton( gui, next_id(), x1 - 2 + ( 20 - sprite_width ) / 2, y1 - 2 + ( 20 - sprite_height ) / 2, "", action_sprite )
+	GuiImageButton( gui, get_id(), x1 - 2 + ( 20 - sprite_width ) / 2, y1 - 2 + ( 20 - sprite_height ) / 2, "", action_sprite )
 
 	GuiZSetForNextWidget( gui, 1 )
 	if semi_transparent then
@@ -145,7 +145,7 @@ function do_fake_action_button( action_type, action_sprite, name, id, desc, type
 	if hover then
 		spell_box_suffix = spell_box_suffix .. "_hover"
 	end
-	GuiImage( gui, next_id(), --[[-( 2 + sprite_width / 2 + 10 )]]-20, 0, "mods/spell_lab_shugged/files/gui/buttons/spell_box_"..spell_box_suffix..".png", 1.0, 1.0, 0 )
+	GuiImage( gui, get_id(), --[[-( 2 + sprite_width / 2 + 10 )]]-20, 0, "mods/spell_lab_shugged/files/gui/buttons/spell_box_"..spell_box_suffix..".png", 1.0, 1.0, 0 )
 	if uses_remaining then
 		show_uses_remaining( x1, y1, uses_remaining )
 	end
@@ -158,7 +158,7 @@ end
 function show_permanent_icon( x, y )
 	GuiZSetForNextWidget( gui, -1 )
 	GuiOptionsAddForNextWidget( gui, GUI_OPTION.Layout_NoLayouting )
-	GuiImage( gui, next_id(), x-2, y-2, "data/ui_gfx/inventory/icon_gun_permanent_actions.png", 1.0, 1.0, 0 )
+	GuiImage( gui, get_id(), x-2, y-2, "data/ui_gfx/inventory/icon_gun_permanent_actions.png", 1.0, 1.0, 0 )
 end
 
 function show_locked_state( x, y, this_action_data )
@@ -167,12 +167,12 @@ function show_locked_state( x, y, this_action_data )
 		if mod_setting_get( "show_icon_unlocked" ) then
 			GuiZSetForNextWidget( gui, -1 )
 			GuiOptionsAddForNextWidget( gui, GUI_OPTION.Layout_NoLayouting )
-			GuiImage( gui, next_id(), x+14, y-2, "mods/spell_lab_shugged/files/gui/unlocked.png", 0.3, 1.0, 0 )
+			GuiImage( gui, get_id(), x+14, y-2, "mods/spell_lab_shugged/files/gui/unlocked.png", 0.3, 1.0, 0 )
 		end
 	else
 		GuiZSetForNextWidget( gui, -1 )
 		GuiOptionsAddForNextWidget( gui, GUI_OPTION.Layout_NoLayouting )
-		GuiImage( gui, next_id(), x+14, y-2, "mods/spell_lab_shugged/files/gui/locked.png", 1.0, 1.0, 0 )
+		GuiImage( gui, get_id(), x+14, y-2, "mods/spell_lab_shugged/files/gui/locked.png", 1.0, 1.0, 0 )
 	end
 end
 
@@ -269,7 +269,7 @@ end
 
 local function autobox_size( content_fn )
 	local id_offset = 0
-	local function next_id()
+	local function get_id()
 		id_offset = id_offset + 1
 		return id_offset
 	end
@@ -277,7 +277,7 @@ local function autobox_size( content_fn )
 	GuiIdPushString( gui, "INVISIBLE_TOOLTIP" )
 
 	GuiAnimateBegin( gui )
-	GuiAnimateAlphaFadeIn( gui, next_id(), 0, 0, false )
+	GuiAnimateAlphaFadeIn( gui, get_id(), 0, 0, false )
 
 	show_tooltip( content_fn, 0, 0 )
 
@@ -307,8 +307,8 @@ function force_do_custom_tooltip( callback, x_offset, y_offset, animated, x, y, 
 
 	if animated then
 		GuiAnimateBegin( gui )
-		GuiAnimateAlphaFadeIn( gui, 2 * peek_next_id(), 0.08, 0.1, false )
-		GuiAnimateScaleIn( gui, 2 * peek_next_id() + 1, 0.08, false )
+		GuiAnimateAlphaFadeIn( gui, get_id(), 0.08, 0.1, false )
+		GuiAnimateScaleIn( gui, get_id(), 0.08, false )
 	end
 
 	GuiZSet( gui, -1024 )
@@ -349,10 +349,10 @@ local function show_simple_action_image( action_id, uses_remaining )
 		local this_action_data = action_data[ action_id ]
 		local sprite = ( this_action_data and this_action_data.sprite ) and this_action_data.sprite or "data/ui_gfx/gun_actions/_unidentified.png"
 		GuiZSetForNextWidget( gui, -1 )
-		GuiImage( gui, next_id(), 0, 0, sprite, 1.0, 0.5, 0 )
-		GuiImage( gui, next_id(), -11, -1, "mods/spell_lab_shugged/files/gui/buttons/spell_box.png", 1.0, 0.5, 0 )
+		GuiImage( gui, get_id(), 0, 0, sprite, 1.0, 0.5, 0 )
+		GuiImage( gui, get_id(), -11, -1, "mods/spell_lab_shugged/files/gui/buttons/spell_box.png", 1.0, 0.5, 0 )
 	else
-		GuiImage( gui, next_id(), -1, -1, "mods/spell_lab_shugged/files/gui/buttons/spell_box.png", 1.0, 0.5, 0 )
+		GuiImage( gui, get_id(), -1, -1, "mods/spell_lab_shugged/files/gui/buttons/spell_box.png", 1.0, 0.5, 0 )
 	end
 	GuiZSet( gui, -1 )
 	local _,_,_,x,y = previous_data( gui )
@@ -408,7 +408,7 @@ end
 function do_flat_action_list( actions )
 	for _,action_id in ipairs( actions ) do
 		local this_action_data = action_data[action_id]
-		if this_action_data then GuiImage( gui, next_id(), 0, 0, this_action_data.sprite, 1.0, 0.5, 0 ) end
+		if this_action_data then GuiImage( gui, get_id(), 0, 0, this_action_data.sprite, 1.0, 0.5, 0 ) end
 	end
 end
 

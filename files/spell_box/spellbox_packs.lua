@@ -7,11 +7,12 @@ local gokis = function( gui, id, x, y, action_type, selected, hovered, alpha, sc
 	if selected then
 		spell_box[ #spell_box + 1 ] = "_"
 		spell_box[ #spell_box + 1 ] = "active"
-	elseif hover then
+	elseif hovered then
 		spell_box[ #spell_box + 1 ] = "_"
 		spell_box[ #spell_box + 1 ] = "hover"
 	end
 	spell_box[ #spell_box + 1 ] = ".png"
+	---@diagnostic disable-next-line: cast-local-type
 	spell_box = table.concat( spell_box )
 
 	GuiOptionsAddForNextWidget( gui, GUI_OPTION.Layout_NoLayouting )

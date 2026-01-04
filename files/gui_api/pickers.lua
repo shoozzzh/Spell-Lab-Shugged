@@ -39,11 +39,11 @@ function change_picker( picker )
 end
 
 function do_active_picker_menu()
-	do_content_wrapped( active_picker_data.menu, active_picker_data.name .. "_menu" )
+	active_picker_data.menu()
 end
 
 function do_active_picker_buttons()
-	do_content_wrapped( active_picker_data.buttons, active_picker_data.name .. "_buttons" )
+	active_picker_data.buttons()
 end
 
 function do_picker_button( filepath, picker, option_text, click_callback )
@@ -51,7 +51,7 @@ function do_picker_button( filepath, picker, option_text, click_callback )
 		GuiOptionsAddForNextWidget( gui, GUI_OPTION.DrawSemiTransparent )
 	end
 	local result
-	if GuiImageButton( gui, next_id(), 0, 0, "", filepath ) then
+	if GuiImageButton( gui, get_id(), 0, 0, "", filepath ) then
 		sound_button_clicked()
 		result = change_picker( picker )
 		if click_callback then

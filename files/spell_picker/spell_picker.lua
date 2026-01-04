@@ -86,7 +86,7 @@ local function show_keyboard_key( character, x, y, key_width, clicked_func )
 	local bracket_width,_ = GuiGetTextDimensions( gui, "[" )
 	GuiAnimateBegin( gui )
 		GuiAnimateAlphaFadeIn( gui, 1, 0, 0, true )
-		GuiButton( gui, next_id(), x + key_width / 2 - text_width / 2, y, button_text )
+		GuiButton( gui, get_id(), x + key_width / 2 - text_width / 2, y, button_text )
 		local left_click,right_click = previous_data( gui )
 		if left_click or right_click then
 			clicked_func( left_click, right_click )
@@ -110,7 +110,7 @@ local function show_keyboard_key( character, x, y, key_width, clicked_func )
 	if hover then
 		GuiColorSetForNextWidget( gui, 1, 1, 0.5, 1 )
 	end
-	GuiButton( gui, next_id(), x + key_width / 2 - character_width / 2, y, character )
+	GuiButton( gui, get_id(), x + key_width / 2 - character_width / 2, y, character )
 end
 
 local spell_search_focused = false
@@ -306,7 +306,7 @@ picker.menu = function()
 
 	local function show_filter( i, tooltip_text )
 		if filter_type ~= i then GuiOptionsAddForNextWidget( gui, GUI_OPTION.DrawSemiTransparent ) end
-		GuiImageButton( gui, next_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/type_filter_"..i..".png" )
+		GuiImageButton( gui, get_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/type_filter_"..i..".png" )
 		local left_click,right_click,hover,_,_,_ = previous_data( gui )
 		GuiTooltip( gui, tooltip_text, "" )
 		if filter_type ~= i then
@@ -336,7 +336,7 @@ picker.menu = function()
 		local x, y = 640 * 0.05 + 2, 360 * 0.16 - 16
 		local tab_width, tab_height = GuiGetImageDimensions( gui, "mods/spell_lab_shugged/files/gui/buttons/tab.png" )
 		for i, tab in ipairs( { "types", "search", "recent", "in_inv" } ) do
-			if GuiImageButton( gui, next_id(), x, y, "", "mods/spell_lab_shugged/files/gui/buttons/tab_transparent.png" ) then
+			if GuiImageButton( gui, get_id(), x, y, "", "mods/spell_lab_shugged/files/gui/buttons/tab_transparent.png" ) then
 				if i == 1 then filter_type = 0 else filter_type = i + 6 end
 				sound_button_clicked()
 			end
@@ -353,13 +353,13 @@ picker.menu = function()
 			local selected = i + 6 == filter_type or ( i == 1 and filter_type <= 7 )
 			if selected then
 				GuiZSetForNextWidget( gui, -3 )
-				GuiImage( gui, next_id(), x, y - 1, "mods/spell_lab_shugged/files/gui/buttons/tab_selected.png", 1, 1, 0 )
+				GuiImage( gui, get_id(), x, y - 1, "mods/spell_lab_shugged/files/gui/buttons/tab_selected.png", 1, 1, 0 )
 			elseif hover then
 				GuiZSetForNextWidget( gui, -2.5 )
-				GuiImage( gui, next_id(), x, y, "mods/spell_lab_shugged/files/gui/buttons/tab_hovered.png", 1, 1, 0 )
+				GuiImage( gui, get_id(), x, y, "mods/spell_lab_shugged/files/gui/buttons/tab_hovered.png", 1, 1, 0 )
 			else
 				GuiZSetForNextWidget( gui, -2 )
-				GuiImage( gui, next_id(), x, y, "mods/spell_lab_shugged/files/gui/buttons/tab.png", 1, 1, 0 )
+				GuiImage( gui, get_id(), x, y, "mods/spell_lab_shugged/files/gui/buttons/tab.png", 1, 1, 0 )
 			end
 
 			local y_offset = 1.5
@@ -390,7 +390,7 @@ picker.menu = function()
 	GuiLayoutBeginVertical( gui, 640 * 0.05, 360 * 0.16, true )
 		local scroll_ids = {}
 		for i = 0, 10 do
-			scroll_ids[ i ] = next_id()
+			scroll_ids[ i ] = get_id()
 		end
 
 		local height = nil
@@ -489,7 +489,7 @@ picker.menu = function()
 		if filter_type == FILTER_TYPE_SEARCH then
 			GuiOptionsAddForNextWidget( gui, GUI_OPTION.NonInteractive )
 			GuiZSetForNextWidget( gui, 1 )
-			GuiTextInput( gui, next_id(), 3, 10, "", input_bar_width, -1, CHARACTERS_ACTION_ID )
+			GuiTextInput( gui, get_id(), 3, 10, "", input_bar_width, -1, CHARACTERS_ACTION_ID )
 			local _,_,_,_,_,_,text_input_height,_,_,_,_ = previous_data( gui )
 			GuiLayoutAddVerticalSpacing( gui, -( text_input_height + 10 ) )
 
@@ -498,7 +498,7 @@ picker.menu = function()
 				keyboard_height = 10 --[[ incorrectly assumed height of text input ]]+ 40
 			end
 
-			GuiBeginScrollContainer( gui, next_id(), 0, 8, SCROLL_TABLE_WIDTH, keyboard_height )
+			GuiBeginScrollContainer( gui, get_id(), 0, 8, SCROLL_TABLE_WIDTH, keyboard_height )
 				if InputIsMouseButtonJustDown( Mouse_left ) and previous_hovered(2) then
 					interacting = true
 				end
@@ -517,11 +517,11 @@ picker.menu = function()
 				end
 				GuiOptionsAddForNextWidget( gui, GUI_OPTION.NonInteractive )
 				if spell_search_focused or current_action_search_needle.text ~= "" then
-					GuiTextInput( gui, next_id(), 0, 0, current_action_search_needle.text, input_bar_width, -1, CHARACTERS_ACTION_ID )
+					GuiTextInput( gui, get_id(), 0, 0, current_action_search_needle.text, input_bar_width, -1, CHARACTERS_ACTION_ID )
 				else
 					GuiZSetForNextWidget( gui, -1 )
-					GuiTextInput( gui, next_id(), 0, 0, text_get_translated( "spell_picker_searchbox" ), input_bar_width, -1, CHARACTERS_ACTION_ID )
-					GuiTextInput( gui, next_id(), 0, 0, "", input_bar_width, -1, CHARACTERS_ACTION_ID )
+					GuiTextInput( gui, get_id(), 0, 0, text_get_translated( "spell_picker_searchbox" ), input_bar_width, -1, CHARACTERS_ACTION_ID )
+					GuiTextInput( gui, get_id(), 0, 0, "", input_bar_width, -1, CHARACTERS_ACTION_ID )
 				end
 				local hovered = previous_hovered(2)
 				local _,_,_,x,y,width,height,_,_,_,_ = previous_data( gui )
@@ -532,7 +532,7 @@ picker.menu = function()
 					GuiZSetForNextWidget( gui, -1 )
 					local image_height = 10
 					local scale = text_input_height / image_height
-					GuiImage( gui, next_id(), x + 1 + input_anchor_offset, y + 2 * ( text_input_height - 2 ) / ( image_height - 2 ), "mods/spell_lab_shugged/files/gui/input_anchor.png", 1, scale, 0 )
+					GuiImage( gui, get_id(), x + 1 + input_anchor_offset, y + 2 * ( text_input_height - 2 ) / ( image_height - 2 ), "mods/spell_lab_shugged/files/gui/input_anchor.png", 1, scale, 0 )
 					GuiLayoutEndLayer( gui )
 				end
 				if InputIsMouseButtonJustDown( Mouse_left ) and hovered then

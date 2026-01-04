@@ -88,8 +88,8 @@ function scroll_box_no_wand_switching( hovered )
 		GuiEndScrollContainer( gui )
 		GuiAnimateEnd( gui )
 		GuiIdPop( gui )
-		ModTextFileSetContent_Saved( "mods/spell_lab_shugged/scroll_box_hovered.txt", "true" )
+		ModTextFileSetContent( "mods/spell_lab_shugged/scroll_box_hovered.txt", "true" )
 	else
-		ModTextFileSetContent_Saved( "mods/spell_lab_shugged/scroll_box_hovered.txt", "false" )
+		ModTextFileSetContent( "mods/spell_lab_shugged/scroll_box_hovered.txt", "false" )
 	end
 end

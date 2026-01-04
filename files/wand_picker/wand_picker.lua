@@ -13,7 +13,7 @@ picker.menu = function()
 							GuiOptionsAddForNextWidget( gui, GUI_OPTION.Layout_NoLayouting )
 							GuiColoredText( gui, 1.0, 0.75, 0.5, 1.0, x + width + 10, y, stat.text_callback( stat.current ) )
 							if not precise_mode then
-								stat.current = stat.value_callback( GuiSlider( gui, next_id(), 70, 0, " ", stat.current, stat.min, stat.max, stat.default, 1.0, stat.formatter, 140 ) )
+								stat.current = stat.value_callback( GuiSlider( gui, get_id(), 70, 0, " ", stat.current, stat.min, stat.max, stat.default, 1.0, stat.formatter, 140 ) )
 							else
 								local first_button = true
 								for _, button in ipairs( stat.buttons_precise_mode or {} ) do
@@ -27,7 +27,7 @@ picker.menu = function()
 										text = text()
 									end
 									GuiOptionsAddForNextWidget( gui, GUI_OPTION.NoSound )
-									GuiButton( gui, _x, 0, text, next_id() )
+									GuiButton( gui, _x, 0, text, get_id() )
 									local left_click, right_click = previous_data( gui )
 									if type( stat.current ) == "boolean" then
 										stat.current = stat.current and 1 or 0
@@ -47,7 +47,7 @@ picker.menu = function()
 						GuiLayoutEnd( gui )
 					end
 					GuiLayoutBeginHorizontal( gui, 0, 360 * 0.02, true )
-					if GuiButton( gui, 0, 0, wrap_key( "wand_picker_spawn_wand" ), next_id() ) then
+					if GuiButton( gui, 0, 0, wrap_key( "wand_picker_spawn_wand" ), get_id() ) then
 						if player then
 							local x, y = EntityGetTransform( player )
 							local wand = EntityLoad( "data/entities/items/wand_level_01.xml", x, y )
@@ -62,7 +62,7 @@ picker.menu = function()
 						end
 					end
 					if held_wand then
-						if GuiButton( gui, 8, 0, wrap_key( "wand_picker_copy_held_wand" ), next_id() ) then
+						if GuiButton( gui, 8, 0, wrap_key( "wand_picker_copy_held_wand" ), get_id() ) then
 							if not held_wand then goto skip end
 							local stats = WANDS.wand_get_stats( held_wand )
 							if not stats then goto skip end
@@ -76,7 +76,7 @@ picker.menu = function()
 							end
 							::skip::
 						end
-						if GuiButton( gui, 8, 0, wrap_key( "wand_picker_update_held_wand" ), next_id() ) then
+						if GuiButton( gui, 8, 0, wrap_key( "wand_picker_update_held_wand" ), get_id() ) then
 							if player and held_wand then
 								local x, y = EntityGetTransform( player )
 								local wand_data = {
@@ -102,7 +102,7 @@ picker.menu = function()
 							end
 						end
 					end
-					if GuiButton( gui, 8, 0, text_get( "wand_picker_precise_mode", text_get_translated( precise_mode and "disable" or "enable" ) ), next_id() ) then
+					if GuiButton( gui, 8, 0, text_get( "wand_picker_precise_mode", text_get_translated( precise_mode and "disable" or "enable" ) ), get_id() ) then
 						mod_setting_set( "wand_picker_precise_mode", not precise_mode )
 					end
 					if precise_mode then

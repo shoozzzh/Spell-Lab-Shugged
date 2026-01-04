@@ -258,7 +258,7 @@ function edit_panel_api.dump_state( wand_id )
 	-- but generates the serialized data and marks the state entity and its children as dead
 	local poly_effect = LoadGameEffectEntityTo( state_entity, "mods/spell_lab_shugged/files/entities/poly_serializer.xml" )
 
-	ModTextFileSetContent_Saved( VFiles.FinishingDumping, "1" )
+	ModTextFileSetContent( VFiles.FinishingDumping, "1" )
 
 	local result = ComponentGetValue2( EntityGetFirstComponentIncludingDisabled( poly_effect, "GameEffectComponent" ), "mSerializedData" )
 	return result
@@ -268,7 +268,7 @@ function edit_panel_api.load_state( wand_id, state )
 	EntityAddTag( wand_id, EditPanelTags.UncachedChanges )
 	stream_actions( wand_id ).foreach( delete_action )
 
-	ModTextFileSetContent_Saved( VFiles.WandId, tostring( wand_id ) )
+	ModTextFileSetContent( VFiles.WandId, tostring( wand_id ) )
 
 	polytools.load( EntityCreateNew(), state )
 end

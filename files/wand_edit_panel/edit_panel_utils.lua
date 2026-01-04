@@ -380,7 +380,7 @@ function do_real_sprite_action( gui, x, y, i, action_entity, selected )
 	if not item_comp then return end
 
 	GuiOptionsAddForNextWidget( gui, GUI_OPTION.NonInteractive )
-	GuiImageButton( gui, next_id(), x, y, "", "mods/spell_lab_shugged/files/gui/buttons/transparent_20x20.png" )
+	GuiImageButton( gui, get_id(), x, y, "", "mods/spell_lab_shugged/files/gui/buttons/transparent_20x20.png" )
 
 	local sprite_file = ComponentGetValue2( item_comp, "ui_sprite" )
 	local world_x, world_y = get_world_position( x, y )

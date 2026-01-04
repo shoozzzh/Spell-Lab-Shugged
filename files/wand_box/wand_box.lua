@@ -237,7 +237,7 @@ picker.menu = function()
 						else
 							spell_box = "mods/spell_lab_shugged/files/gui/buttons/spell_box.png"
 						end
-						GuiImageButton( gui, next_id(), 0, 0, "", spell_box )
+						GuiImageButton( gui, get_id(), 0, 0, "", spell_box )
 					end
 					local left_click,right_click,_,x,y,_,_,_,_ = previous_data( gui )
 					if left_click or right_click then
@@ -266,7 +266,7 @@ picker.menu = function()
 							
 							GuiZSetForNextWidget( gui, -1 )
 							GuiOptionsAddForNextWidget( gui, GUI_OPTION.Layout_NoLayouting )
-							GuiImage( gui, next_id(), x + ( 20 - image_height ) / 2.5, y + 10, dynamic_wand_data.file, 1.0, 1.0, 1.0, -60 / 180 * math.pi )
+							GuiImage( gui, get_id(), x + ( 20 - image_height ) / 2.5, y + 10, dynamic_wand_data.file, 1.0, 1.0, 1.0, -60 / 180 * math.pi )
 						end
 					end
 					wand_index = wand_index + 1
@@ -285,7 +285,7 @@ picker.buttons = function()
 	GuiLayoutBeginHorizontal( gui, horizontal_centered_x(buttons_num,4), percent_to_ui_scale_y(2), true )
 		local current_page = saved_wands[ wand_box_current_page_index ]
 		if #current_page < 100 then
-			if GuiImageButton( gui, next_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/save_wand.png" ) then
+			if GuiImageButton( gui, get_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/save_wand.png" ) then
 				if held_wand then
 					sound_button_clicked()
 					local data = WANDS.wand_get_data( held_wand )
@@ -296,7 +296,7 @@ picker.buttons = function()
 			GuiTooltip( gui, wrap_key( "wand_box_save" ), "" )
 		else
 			GuiOptionsAddForNextWidget( gui, GUI_OPTION.DrawSemiTransparent )
-			GuiImageButton( gui, next_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/save_wand.png" )
+			GuiImageButton( gui, get_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/save_wand.png" )
 			GuiTooltip( gui, wrap_key( "wand_box_save_reached_page_limit" ), "" )
 		end
 		local selected_indexes = {}
@@ -306,7 +306,7 @@ picker.buttons = function()
 			end
 		end
 		if #selected_indexes > 0 then
-			if GuiImageButton( gui, next_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/delete_wand.png" ) then
+			if GuiImageButton( gui, get_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/delete_wand.png" ) then
 				sound_button_clicked()
 				if not wand_box_delete_wand_confirming then
 					wand_box_delete_wand_confirming = true
@@ -330,13 +330,13 @@ picker.buttons = function()
 			end
 		else
 			GuiOptionsAddForNextWidget( gui, GUI_OPTION.DrawSemiTransparent )
-			GuiImageButton( gui, next_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/delete_wand.png" )
+			GuiImageButton( gui, get_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/delete_wand.png" )
 			GuiTooltip( gui, wrap_key( "wand_box_no_wand_selected" ), "" )
 		end
 
 		if held_wand then
 			if #selected_indexes > 0 then
-				if GuiImageButton( gui, next_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/load_into_wand.png" ) then
+				if GuiImageButton( gui, get_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/load_into_wand.png" ) then
 					for i = 1, #current_page do
 						if wand_box_selected_indexes[ i ] then
 							sound_button_clicked()
@@ -351,12 +351,12 @@ picker.buttons = function()
 				GuiTooltip( gui, wrap_key( "wand_box_load_to_hand" ), "" )
 			else
 				GuiOptionsAddForNextWidget( gui, GUI_OPTION.DrawSemiTransparent )
-				GuiImageButton( gui, next_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/load_into_wand.png" )
+				GuiImageButton( gui, get_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/load_into_wand.png" )
 				GuiTooltip( gui, wrap_key( "wand_box_no_wand_selected" ), "" )
 			end
 		end
 
-		if GuiImageButton( gui, next_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/load_into_world.png" ) then
+		if GuiImageButton( gui, get_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/load_into_world.png" ) then
 			local wands_to_load = {}
 			for i = 1, #current_page do
 				local saved_wand = current_page[ i ]
@@ -379,7 +379,7 @@ picker.buttons = function()
 		GuiTooltip( gui, wrap_key( "wand_box_load_to_world" ), "" )
 
 		if wand_box_current_page_index > 1 then
-			if GuiImageButton( gui, next_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/pagelast.png" ) then
+			if GuiImageButton( gui, get_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/pagelast.png" ) then
 				sound_button_clicked()
 				wand_box_current_page_index = wand_box_current_page_index - 1
 				wand_box_remove_page_confirming = false
@@ -388,11 +388,11 @@ picker.buttons = function()
 			GuiTooltip( gui, wrap_key( "wand_box_last_page" ), GameTextGet( wrap_key( "wand_box_current_page" ), wand_box_current_page_index, mod_setting_get( "wand_box_page_max_index" ) ) )
 		else
 			GuiOptionsAddForNextWidget( gui, GUI_OPTION.DrawSemiTransparent )
-			GuiImageButton( gui, next_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/pagelast.png" )
+			GuiImageButton( gui, get_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/pagelast.png" )
 			GuiTooltip( gui, wrap_key( "wand_box_no_last_page" ), "" )
 		end
 		if wand_box_current_page_index < mod_setting_get( "wand_box_page_max_index" ) then
-			if GuiImageButton( gui, next_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/pagenext.png" ) then
+			if GuiImageButton( gui, get_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/pagenext.png" ) then
 				sound_button_clicked()
 				wand_box_current_page_index = wand_box_current_page_index + 1
 				wand_box_remove_page_confirming = false
@@ -401,18 +401,18 @@ picker.buttons = function()
 			GuiTooltip( gui, wrap_key( "wand_box_next_page" ), GameTextGet( wrap_key( "wand_box_current_page" ), wand_box_current_page_index, mod_setting_get( "wand_box_page_max_index" ) ) )
 		else
 			GuiOptionsAddForNextWidget( gui, GUI_OPTION.DrawSemiTransparent )
-			GuiImageButton( gui, next_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/pagenext.png" )
+			GuiImageButton( gui, get_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/pagenext.png" )
 			GuiTooltip( gui, wrap_key( "wand_box_no_next_page" ), "" )
 		end
 
-		if GuiImageButton( gui, next_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/pagenew.png" ) then
+		if GuiImageButton( gui, get_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/pagenew.png" ) then
 			sound_button_clicked()
 			wand_box_remove_page_confirming = false
 			wand_box_new_page( wand_box_current_page_index, {} )
 			wand_box_selected_indexes = {}
 		end
 		GuiTooltip( gui, wrap_key( "wand_box_new_page" ), "" )
-		if GuiImageButton( gui, next_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/pagedelete.png" ) then
+		if GuiImageButton( gui, get_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/pagedelete.png" ) then
 			sound_button_clicked()
 			if not wand_box_remove_page_confirming then
 				wand_box_remove_page_confirming = true

@@ -41,8 +41,8 @@ local picker = {}
 local selected_spell_group_index = 0
 picker.menu = function()
 	GuiLayoutBeginVertical( gui, 640 * 0.05, 360 * 0.16, true )
-		do_scroll_table( next_id(), nil, nil, true, nil, saved_spell_groups, function( saved_spell_group, index )
-			GuiImageButton( gui, next_id(), 2, 2, "", "mods/spell_lab_shugged/files/gui/buttons/transparent_16x16.png" )
+		do_scroll_table( get_id(), nil, nil, true, nil, saved_spell_groups, function( saved_spell_group, index )
+			GuiImageButton( gui, get_id(), 2, 2, "", "mods/spell_lab_shugged/files/gui/buttons/transparent_16x16.png" )
 			detect_shortcuts( gui, spell_group_button_shortcut, shortcut_used_keys )
 			
 			do_custom_tooltip( function()
@@ -56,7 +56,7 @@ picker.menu = function()
 			else
 				spell_box = "mods/spell_lab_shugged/files/gui/buttons/transparent_20x20.png"
 			end
-			GuiImage( gui, next_id(), -20, 0, spell_box, 1, 1, 0 )
+			GuiImage( gui, get_id(), -20, 0, spell_box, 1, 1, 0 )
 
 			local i = 1
 			while i <= 4 and i <= #saved_spell_group do
@@ -84,11 +84,11 @@ picker.menu = function()
 				if this_action_data then
 					GuiOptionsAddForNextWidget( gui, GUI_OPTION.Layout_NoLayouting )
 					GuiZSetForNextWidget( gui, -2 )
-					GuiImage( gui, next_id(), x + x_offset, y + y_offset, action_sprite, 1.0, 0.5, 0 )
+					GuiImage( gui, get_id(), x + x_offset, y + y_offset, action_sprite, 1.0, 0.5, 0 )
 				end
 				GuiOptionsAddForNextWidget( gui, GUI_OPTION.Layout_NoLayouting )
 				GuiZSetForNextWidget( gui, -1 )
-				GuiImage( gui, next_id(), x + x_offset - 1, y + y_offset - 1, table.concat( spell_box ), 1.0, 0.5, 0 )
+				GuiImage( gui, get_id(), x + x_offset - 1, y + y_offset - 1, table.concat( spell_box ), 1.0, 0.5, 0 )
 
 				i = i + 1
 			end
@@ -103,7 +103,7 @@ picker.buttons = function()
 	end
 	GuiLayoutBeginHorizontal( gui, horizontal_centered_x(buttons_num,4), percent_to_ui_scale_y(2), true )
 		if held_wand and mod_setting_get( "show_wand_edit_panel" ) then
-			if GuiImageButton( gui, next_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/save_wand.png" ) then
+			if GuiImageButton( gui, get_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/save_wand.png" ) then
 				if not held_wand then return end
 				sound_button_clicked()
 				local edit_panel_state = access_edit_panel_state( held_wand )
@@ -122,7 +122,7 @@ picker.buttons = function()
 			GuiTooltip( gui, wrap_key( "spell_group_box_save" ), "" )
 		end
 
-		if GuiImageButton( gui, next_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/delete_wand.png" ) then
+		if GuiImageButton( gui, get_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/delete_wand.png" ) then
 			if selected_spell_group_index ~= 0 then
 				sound_button_clicked()
 				table.remove( saved_spell_groups, selected_spell_group_index )
@@ -132,7 +132,7 @@ picker.buttons = function()
 		GuiTooltip( gui, wrap_key( "spell_group_box_delete" ), "" )
 
 		if held_wand and mod_setting_get( "show_wand_edit_panel" ) then
-			local left_click, right_click = GuiImageButton( gui, next_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/load_into_wand.png" )
+			local left_click, right_click = GuiImageButton( gui, get_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/load_into_wand.png" )
 			if left_click or right_click then
 				local saved_spell_group = saved_spell_groups[ selected_spell_group_index ]
 				local do_replace = mod_setting_get( "replace_mode" )

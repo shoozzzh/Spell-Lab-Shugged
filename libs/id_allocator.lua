@@ -11,8 +11,9 @@ function id_allocator.new_frame()
 	end
 end
 
-function id_allocator.get_id()
-	local loc = jit.util.funcinfo( setfenv( 2, getfenv(2) ) ).loc
+function id_allocator.get_id( extra_call_depth )
+	local call_depth = 2 + ( extra_call_depth or 0 )
+	local loc = jit.util.funcinfo( setfenv( call_depth, getfenv( call_depth ) ) ).loc
 
 	local call_num = call_map[ loc ]
 	if not call_num then

@@ -149,13 +149,13 @@ do
 end
 
 if row_offset > 0 then
-	if GuiImageButton( gui, next_id(), horizontal_centered_x(1), y_first_row - ( #pa_rows + 1 ) * ( 20 + 2 ), "", "mods/spell_lab_shugged/files/gui/buttons/pageup.png" ) then
+	if GuiImageButton( gui, get_id(), horizontal_centered_x(1), y_first_row - ( #pa_rows + 1 ) * ( 20 + 2 ), "", "mods/spell_lab_shugged/files/gui/buttons/pageup.png" ) then
 		row_offset = row_offset - 1
 	end
 end
 
 if not reached_last_row then
-	if GuiImageButton( gui, next_id(), horizontal_centered_x(1), y_baseline, "", "mods/spell_lab_shugged/files/gui/buttons/pagedown.png" ) then
+	if GuiImageButton( gui, get_id(), horizontal_centered_x(1), y_baseline, "", "mods/spell_lab_shugged/files/gui/buttons/pagedown.png" ) then
 		row_offset = row_offset + 1
 	end
 end
