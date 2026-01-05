@@ -28,218 +28,17 @@ shortcut_detector = dofile_once( "mods/spell_lab_shugged/files/lib/shortcut_dete
 keyboard_focus = dofile_once( "mods/spell_lab_shugged/files/gui/keyboard_focus.lua" )
 
 gui = gui or GuiCreate()
-local id_allocator = dofile_once( "mods/spell_lab_shugged/files/lib/id_allocator.lua" )
+local id_allocator = dofile_once( "mods/spell_lab_shugged/libs/id_allocator.lua" )
 get_id = id_allocator.get_id
 
 GuiStartFrame( gui )
 screen_width, screen_height = GuiGetScreenDimensions( gui )
 
-local version = "Shugged v1.8.11"
-
-type_text = {
-	[ACTION_TYPE_MODIFIER]          = "$inventory_actiontype_modifier",
-	[ACTION_TYPE_PROJECTILE]        = "$inventory_actiontype_projectile",
-	[ACTION_TYPE_STATIC_PROJECTILE] = "$inventory_actiontype_staticprojectile",
-	[ACTION_TYPE_OTHER]             = "$inventory_actiontype_other",
-	[ACTION_TYPE_MATERIAL]          = "$inventory_actiontype_material",
-	[ACTION_TYPE_DRAW_MANY]         = "$inventory_actiontype_drawmany",
-	[ACTION_TYPE_UTILITY]           = "$inventory_actiontype_utility",
-	[ACTION_TYPE_PASSIVE]           = "$inventory_actiontype_passive",
-}
-
-local gun_global = get_globals( "data/scripts/gun/gun.lua" )
-local actions = gun_global.actions
-
-sorted_actions = {}
-action_data = {}
-for k, _ in pairs( type_text ) do
-	sorted_actions[ k ] = {}
-end
-for _, action in ipairs( actions ) do
-	local typed = sorted_actions[ action.type ]
-	typed[ #typed + 1 ] = action
-	action_data[ action.id ] = action
-end
-action_metadata, extra_modifier_metadata, metadata_to_show =
-	unpack( dofile( "mods/spell_lab_shugged/files/gui/action_metadata.lua" ) )
-
 local is_panel_open = false
-
-action_id_to_idx = {}
-
-for i, a in ipairs( actions ) do
-	if a.id and a.id ~= "" then
-		action_id_to_idx[ a.id ] = i
-	end
-	if a.max_uses ~= nil then
-		local hell_no = type( a.max_uses )
-		if hell_no == "string" then
-			a.max_uses = tonumber( a.max_uses ) or 0
-		elseif hell_no ~= "number" then
-			a.max_uses = 0
-		end
-		if a.max_uses < 0 then
-			a.max_uses = nil
-		end
-	end
-end
 
 wand_stats = dofile( "mods/spell_lab_shugged/files/gui/wand_stats.lua" )
 
 local edit_panel_api = dofile_once( "mods/spell_lab_shugged/files/gui/edit_panel_api.lua" )
-
-function show_edit_panel_toggle_options()
-	local data = edit_panel_api.access_data( held_wand )
-	GuiLayoutBeginHorizontal( gui, 0, 0, true )
-		local force_compact_enabled = data.vars.force_compact_enabled
-		if not force_compact_enabled then
-			GuiOptionsAddForNextWidget( gui, GUI_OPTION.DrawSemiTransparent )
-		end
-		if GuiImageButton( gui, get_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/force_compact.png" ) then
-			sound_button_clicked()
-			data.vars.force_compact_enabled = not force_compact_enabled
-		end
-		GuiTooltip( gui, text_get_translated( force_compact_enabled and "disable" or "enable" ) .. text_get_translated( "wand_force_compact" ), text_get_translated( "wand_force_compact_description" ) .. "\n" .. text_get_translated( "inventory_get_ignored" )  )
-
-		local autocap_enabled = data.vars.autocap_enabled
-		if not autocap_enabled then
-			GuiOptionsAddForNextWidget( gui, GUI_OPTION.DrawSemiTransparent )
-		end
-		if GuiImageButton( gui, get_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/automatic_capacity.png" ) then
-			sound_button_clicked()
-			data.vars.autocap_enabled = not autocap_enabled
---[[			if autocap_enabled and force_compact_enabled then
-				local new_capacity = 0
-				for _ in state_str_iter_permanent_actions( edit_panel_state.get_permanent() ) do
-					new_capacity = new_capacity + 1
-				end
-				local temp = 0
-				for _, a, _ in state_str_iter_actions( edit_panel_state.get() ) do
-					temp = temp + 1
-					if a and a ~= "" then
-						new_capacity = new_capacity + temp
-						temp = 0
-					end
-				end
-				WANDS.wand_set_stat( held_wand, "deck_capacity", new_capacity )
-			end]]
-		end
-		GuiTooltip( gui, text_get_translated( autocap_enabled and "disable" or "enable" ) .. text_get_translated( "automatic_capacity" ), wrap_key( "automatic_capacity_description" ) )
-	GuiLayoutEnd( gui )
-
-	GuiLayoutBeginHorizontal( gui, 0, 0, true )
-		local function cant_undo()
-			GuiOptionsAddForNextWidget( gui, GUI_OPTION.DrawSemiTransparent )
-			GuiImageButton( gui, get_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/undo.png" )
-			GuiTooltip( gui, text_get_translated( "cant_undo" ), "" )
-		end
-		local function cant_redo()
-			GuiOptionsAddForNextWidget( gui, GUI_OPTION.DrawSemiTransparent )
-			GuiImageButton( gui, get_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/redo.png" )
-			GuiTooltip( gui, text_get_translated( "cant_redo" ), "" )
-		end
-
-		local operation_to_undo = data:peek_undo()
-		local operation_to_redo = data:peek_redo()
-
-		if operation_to_undo then
-			if GuiImageButton( gui, get_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/undo.png" ) then
-				sound_button_clicked()
-				data:undo()
-			end
-			GuiTooltip( gui, text_get_translated( "undo" ) .. " " .. GameTextGetTranslatedOrNot( operation_to_undo ),
-				GameTextGet( wrap_key( "current_history" ), data.vars.current_history_index, #edit_panel_api.get_histories( held_wand ) ) )
-		else cant_undo() end
-		if operation_to_redo then
-			if GuiImageButton( gui, get_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/redo.png" ) then
-				sound_button_clicked()
-				data:redo()
-			end
-			GuiTooltip( gui, text_get_translated( "redo" ) .. " " .. GameTextGetTranslatedOrNot( operation_to_redo ),
-				GameTextGet( wrap_key( "current_history" ), data.vars.current_history_index, #edit_panel_api.get_histories( held_wand ) ) )
-		else cant_redo() end
-	GuiLayoutEnd( gui )
-end
-
-shortcuts = {
-	select = { "Mouse_left" },
-	deselect = { "Mouse_right" },
-	multi_select = { "Key_CTRL", "Mouse_left" },
-	expand_selection_left = { "Key_CTRL", "Key_ALT", "Mouse_left" },
-	expand_selection_right = { "Key_CTRL", "Key_ALT", "Mouse_right" },
-	swap = { "Key_ALT", "Mouse_left" },
-	override = { "Key_ALT", "Mouse_right" },
-	duplicate = { "Key_ALT", "Key_SHIFT", "Mouse_left" },
-	delete_action = { "Key_SHIFT", "Mouse_left" },
-	delete_slot = { "Key_SHIFT", "Mouse_right" },
-	always_cast = { "Key_CTRL", "Key_SHIFT", "Mouse_left" },
-	left_delete = { "Key_BACKSPACE" },
-	right_delete = { "Key_DELETE" },
-	undo = { "Key_CTRL", "Key_z" },
-	redo = { "Key_CTRL", "Key_y" },
-	relock = { "Key_CTRL", "Key_SHIFT", "Mouse_left" },
-	show_wand_stats = { "Key_CTRL" },
-	replace_switch_temp = { "Key_SHIFT" },
-	replace_switch = {},
-	confirm = { "Key_SHIFT" },
-	clear_action_history = { "Key_SHIFT", "Mouse_right" },
-	transform_mortal_into_dummy = { "Key_SHIFT" },
-}
-
-dofile_once( "mods/spell_lab_shugged/files/lib/shortcut_tostring.lua" )
-
-shortcut_texts = {}
-
-local edit_panel_shortcut_tips
-
-function reload_shortcuts()
-	for name, _ in pairs( shortcuts ) do
-		local value = mod_setting_get( "shortcut_" .. name )
-		local status
-		if value == nil then goto continue end
-
-		status, value = pcall( smallfolk.loads, value )
-		if not status or ( value == nil ) then goto continue end
-
-		shortcuts[ name ] = value
-		::continue::
-	end
-
-	if not mod_setting_get( "shortcut_strict" ) then
-		shortcut_used_keys = {}
-
-		local inverted = {}
-		for _, shortcut in pairs( shortcuts ) do
-			for _, key in ipairs( shortcut ) do
-				inverted[ key ] = true
-			end
-		end
-		inverted.Mouse_left = nil
-		inverted.Mouse_right = nil
-		for key, _ in pairs( inverted ) do
-			shortcut_used_keys[ #shortcut_used_keys + 1 ] = key
-		end
-	else
-		shortcut_used_keys = nil
-	end
-
-	reload_shortcut_texts()
-end
-
-local last_cur_lang = GameTextGet( "$current_language" )
-
-function reload_shortcut_texts()
-	for name, v in pairs( shortcuts ) do
-		shortcut_texts[ name ] = shortcut_tostring( v, last_cur_lang )
-	end
-
-	edit_panel_shortcut_tips = text_get_translated( "shortcut_tips" )
-	for name, v in pairs( shortcuts ) do
-		edit_panel_shortcut_tips = edit_panel_shortcut_tips:gsub( "{" .. name .. "}", shortcut_texts[ name ] )
-	end
-end
-
-reload_shortcuts()
 
 dofile_once( "mods/spell_lab_shugged/files/gui/pickers.lua" )
 dofile_once( "mods/spell_lab_shugged/files/gui/edit_panel_utils.lua" )
@@ -252,6 +51,7 @@ function do_gui()
 	reset_z()
 
 	GuiStartFrame( gui )
+	id_allocator.new_frame()
 
 	screen_width, screen_height = GuiGetScreenDimensions( gui )
 
@@ -285,44 +85,6 @@ function do_gui()
 		end
 
 		change_spellbox_pack_if_needed()
-	end
-
-	local mod_button_reservation = tonumber( GlobalsGetValue( "spell_lab_shugged_mod_button_reservation", "0" ) )
-	local current_button_reservation = tonumber( GlobalsGetValue( "mod_button_tr_current", "0" ) )
-	if current_button_reservation > mod_button_reservation then
-		current_button_reservation = mod_button_reservation
-	elseif current_button_reservation < mod_button_reservation then
-		current_button_reservation = math.max( 0, mod_button_reservation + ( current_button_reservation - mod_button_reservation ) )
-	else
-		current_button_reservation = mod_button_reservation
-	end
-	GlobalsSetValue( "mod_button_tr_current", tostring( current_button_reservation + 15 ) )
-
-	-- GuiOptionsAddForNextWidget( gui, GUI_OPTION.NonInteractive )
-	-- GuiOptionsAddForNextWidget( gui, GUI_OPTION.AlwaysClickable )
-	if GuiImageButton( gui, get_id(), screen_width - 14 - current_button_reservation, 2, "", "mods/spell_lab_shugged/files/gui/wrench.png" ) then
-		sound_button_clicked()
-		is_panel_open = not is_panel_open
-	end
-
-	if previous_hovered() then
-		local _,_,_,x,y = previous_data( gui )
-		local text = wrap_key( ( is_panel_open and "hide" or "show" ) .. "_spell_lab" )
-		local text_width = GuiGetTextDimensions( gui, text )
-		GuiAnimateBegin( gui )
-		GuiAnimateAlphaFadeIn( gui, get_id(), 0.08, 0.1, false )
-		GuiAnimateScaleIn( gui, get_id(), 0.08, false )
-		GuiOptionsAdd( gui, GUI_OPTION.Align_Left )
-		GuiZSet( gui, -100 )
-		show_tooltip( function()
-			GuiZSetForNextWidget( gui, -100 )
-			GuiText( gui, 0, 0, text )
-			GuiZSetForNextWidget( gui, -100 )
-			GuiDimText( gui, 0, 0, version )
-		end, x - 5 - 2 - 3, y + 10 )
-		GuiZSet( gui, 100 )
-		GuiOptionsRemove( gui, GUI_OPTION.Align_Left )
-		GuiAnimateEnd( gui )
 	end
 
 	if is_panel_open and not GameIsInventoryOpen() and player and not GameHasFlagRun( "gkbrkn_config_menu_open" ) then

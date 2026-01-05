@@ -3,12 +3,12 @@ local keyboard_focus = {}
 keyboard_focus.focusables = {}
 
 local on = "player_controls"
-function keyboard_focus.change_to( focusable )
+function keyboard_focus:change_to( focusable )
 	local new = focusable
 
 	if on == new then return false end
 
-	local from, to = focusables[ on ], focusables[ new ]
+	local from, to = self.focusables[ on ], self.focusables[ new ]
 	optional_call( from.on_unfocused )
 	optional_call( to.on_focused )
 

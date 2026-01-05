@@ -1,5 +1,6 @@
 local _, keycodes_by_type = unpack( dofile_once( "mods/spell_lab_shugged/files/lib/keycodes_wrapped.lua" ) )
 
+---@class keystroke_listener
 local keystroke_listener = {}
 
 local listeners = {}

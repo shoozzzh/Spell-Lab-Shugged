@@ -1,5 +1,6 @@
-
-shortcuts = {
+---@type table<string,shortcut>
+local shortcuts = {
+	---@class shortcut
 	select = { "Mouse_left" },
 	deselect = { "Mouse_right" },
 	multi_select = { "Key_CTRL", "Mouse_left" },
@@ -26,11 +27,25 @@ shortcuts = {
 
 dofile_once( "mods/spell_lab_shugged/files/lib/shortcut_tostring.lua" )
 
+---@type table<string,string>
 shortcut_texts = {}
 
 local edit_panel_shortcut_tips
 
-function reload_shortcuts()
+local last_cur_lang = GameTextGet( "$current_language" )
+
+local function reload_shortcut_texts()
+	for name, v in pairs( shortcuts ) do
+		shortcut_texts[ name ] = shortcut_tostring( v, last_cur_lang )
+	end
+
+	edit_panel_shortcut_tips = text_get_translated( "shortcut_tips" )
+	for name, v in pairs( shortcuts ) do
+		edit_panel_shortcut_tips = edit_panel_shortcut_tips:gsub( "{" .. name .. "}", shortcut_texts[ name ] )
+	end
+end
+
+local function reload_shortcuts()
 	for name, _ in pairs( shortcuts ) do
 		local value = mod_setting_get( "shortcut_" .. name )
 		local status
@@ -64,17 +79,28 @@ function reload_shortcuts()
 	reload_shortcut_texts()
 end
 
-local last_cur_lang = GameTextGet( "$current_language" )
+reload_shortcuts()
 
-function reload_shortcut_texts()
-	for name, v in pairs( shortcuts ) do
-		shortcut_texts[ name ] = shortcut_tostring( v, last_cur_lang )
-	end
+local keystroke_listener = dofile( mod_path .. "files/keystroke_listener.lua" )
+shortcut_detector = dofile_once( module_path .. "detector.lua" )( keystroke_listener, shortcuts )
 
-	edit_panel_shortcut_tips = text_get_translated( "shortcut_tips" )
-	for name, v in pairs( shortcuts ) do
-		edit_panel_shortcut_tips = edit_panel_shortcut_tips:gsub( "{" .. name .. "}", shortcut_texts[ name ] )
+---@type callbacks
+local callbacks = {}
+
+function callbacks.OnWorldPreUpdate()
+	if GameGetFrameNum() % 60 == 0 then
+		if mod_setting_get( "shortcut_changed" ) then
+			mod_setting_set( "shortcut_changed", false )
+			reload_shortcuts()
+		end
+
+		local cur_lang = GameTextGet( "$current_language" )
+		if cur_lang ~= last_cur_lang then
+			last_cur_lang = cur_lang
+			reload_shortcut_texts()
+		end
 	end
 end
 
-reload_shortcuts()
+return callbacks
+

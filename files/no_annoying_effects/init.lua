@@ -71,3 +71,25 @@ if ModDoesFileExist( glue_lua_path ) and glue_lua then
 		[[if EntityHasTag( target2, "player_unit" ) and ModSettingGet( "spell_lab_shugged.disable_toxic_statuses" ) then return end
 		if target2 ~= target then]] ) )
 end
+
+---@type callbacks
+local callbacks = {}
+
+function callbacks.OnModPostInit()
+	local nxml = dofile_once( mod_path .. "files/lib/nxml.lua" )
+	dofile_once( mod_path .. "files/scripts/toxic_effect_entities.lua" )
+	for _, effect_path in ipairs( toxic_effect_entities ) do
+		local effect = ModTextFileGetContent( effect_path )
+		if ModDoesFileExist( effect_path ) and effect then
+			local parsed = nxml.parse( effect )
+			table.insert( parsed.children, 1, nxml.new_element( "LuaComponent", {
+				script_source_file = mod_path .. "files/scripts/remove_toxic_effect.lua",
+				execute_on_added = true,
+				execute_every_n_frame = 1,
+			} ) )
+			ModTextFileSetContent( effect_path, tostring( parsed ) )
+		end
+	end
+end
+
+return callbacks

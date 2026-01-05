@@ -1,7 +1,11 @@
+local mod_path = "mods/spell_lab_shugged/"
+
 dofile_once( "data/scripts/lib/utilities.lua" )
 dofile_once( "data/scripts/lib/mod_settings.lua" )
-dofile_once( "mods/spell_lab_shugged/files/lib/shortcut_setting.lua" )
+dofile_once( mod_path .. "libs/shortcut_setting.lua" )
 dofile_once( "mods/spell_lab_shugged/files/gui/spellbox_packs.lua" )
+
+mod_setting_shortcut()
 
 mod_settings_version = 1
 mod_settings = {

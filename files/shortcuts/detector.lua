@@ -1,10 +1,16 @@
-return function( keystroke_listener )
+---@param keystroke_listener keystroke_listener
+---@param shortcuts table<string,shortcut>
+return function( keystroke_listener, shortcuts )
+	---@class shortcut_detector
 	local shortcut_detector = {}
-	
+
 	local cache = {}
-	
+
 	local xor = function( a, b ) return ( a and not b ) or ( not a and b ) end
 
+	---@param shortcut shortcut
+	---@param dont_cache bool
+	---@return table<string,bool>
 	local function get_inverted( shortcut, dont_cache )
 		local inverted = cache[ shortcut ]
 		if inverted == nil then
@@ -22,10 +28,17 @@ return function( keystroke_listener )
 		end
 		return inverted
 	end
-	
-	function shortcut_detector.is_fired( shortcut, left_click, right_click, detection_range, dont_cache )
+
+	---@param shortcut_name string
+	---@param left_click bool
+	---@param right_click bool
+	---@param detection_range table<integer,integer>
+	---@param dont_cache bool
+	---@return boolean
+	function shortcut_detector.is_fired( shortcut_name, left_click, right_click, detection_range, dont_cache )
+		local shortcut = shortcuts[ shortcut_name ]
 		if #shortcut == 0 then return false end
-		
+
 		detection_range = detection_range or keystroke_listener.listened_keys
 
 		local inverted_shortcut = get_inverted( shortcut, dont_cache )
@@ -46,9 +59,14 @@ return function( keystroke_listener )
 		return true
 	end
 
-	function shortcut_detector.is_held( shortcut, detection_range, dont_cache )
+	---@param shortcut_name string
+	---@param detection_range table<integer,integer>
+	---@param dont_cache bool
+	---@return boolean
+	function shortcut_detector.is_held( shortcut_name, detection_range, dont_cache )
+		local shortcut = shortcuts[ shortcut_name ]
 		if #shortcut == 0 then return false end
-		
+
 		detection_range = detection_range or keystroke_listener.listened_keys
 
 		local inverted_shortcut = get_inverted( shortcut, dont_cache )
@@ -59,6 +77,6 @@ return function( keystroke_listener )
 
 		return true
 	end
-	
+
 	return shortcut_detector
 end

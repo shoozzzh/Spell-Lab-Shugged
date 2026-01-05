@@ -1,3 +1,4 @@
+spell_api = {}
 
 local gun_global = get_globals( "data/scripts/gun/gun.lua" )
 local actions = gun_global.actions
@@ -12,6 +13,7 @@ for _, action in ipairs( actions ) do
 	typed[ #typed + 1 ] = action
 	action_data[ action.id ] = action
 end
+
 action_metadata, extra_modifier_metadata, metadata_to_show =
 	unpack( dofile( "mods/spell_lab_shugged/files/gui/action_metadata.lua" ) )
 
@@ -44,3 +46,12 @@ for i, a in ipairs( actions ) do
 		end
 	end
 end
+
+---@type callbacks
+local callbacks = {}
+
+function callbacks.OnWorldPreUpdate()
+	
+end
+
+return callbacks

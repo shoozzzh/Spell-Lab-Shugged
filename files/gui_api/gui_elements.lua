@@ -96,7 +96,7 @@ function do_action_button( x, y, selected, action_type, sprite_file )
 	GuiImage( gui, get_id(), _x + 20 / 2 - width / 2, _y + 20 / 2 - height / 2, sprite_file, 1, 1, 0 )
 
 	GuiZSet( gui, 2 )
-	show_spellbox( gui, get_id(), _x, _y, action_type, selected, hovered, 1, 1, 0, 0 )
+	show_spellbox( gui, get_id(), _x, _y, action_type, selected, hover, 1, 1, 0, 0 )
 	GuiZSet( gui, -2 )
 
 	if left_click or right_click then

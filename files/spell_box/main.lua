@@ -1,3 +1,5 @@
+---@module "spell_box"
+
 local gokis = function( gui, id, x, y, action_type, selected, hovered, alpha, scale, scale_y, rotation )
 	local spell_box = { "mods/spell_lab_shugged/files/gui/buttons/spell_box" }
 	if action_type then
@@ -12,11 +14,9 @@ local gokis = function( gui, id, x, y, action_type, selected, hovered, alpha, sc
 		spell_box[ #spell_box + 1 ] = "hover"
 	end
 	spell_box[ #spell_box + 1 ] = ".png"
-	---@diagnostic disable-next-line: cast-local-type
-	spell_box = table.concat( spell_box )
 
 	GuiOptionsAddForNextWidget( gui, GUI_OPTION.Layout_NoLayouting )
-	GuiImage( gui, id, x, y, spell_box, alpha, scale, scale_y, rotation )
+	GuiImage( gui, id, x, y, table.concat( spell_box ), alpha, scale, scale_y, rotation )
 end
 
 local vanilla_bgs = {
@@ -50,7 +50,10 @@ local vanilla = function( gui, id, x, y, action_type, selected, hovered, alpha, 
 	GuiIdPop( gui )
 end
 
-spellbox_packs = {
+
+---@type table<string,spellbox_pack>
+local spellbox_packs = {
+	---@class spellbox_pack
 	GOKIS = {
 		func = gokis,
 		ui_name = {
@@ -67,18 +70,31 @@ spellbox_packs = {
 	},
 }
 
-if not mod_setting_get then return end -- if being loaded from settings.lua
+if not mod_setting_get then -- if being loaded from settings.lua
+	return spellbox_packs
+end
 
-local current_spellbox_pack = spellbox_packs[ mod_setting_get( "spellbox_pack" ) ].func
+--- @class spell_box
+local spell_box = {}
 
-function change_spellbox_pack_if_needed()
+local current_pack = spellbox_packs[ tostring( mod_setting_get( "spellbox_pack" ) ) ].func
+
+local function update()
+	local new_key = mod_setting_get( "spellbox_pack" )
+	current_pack = spellbox_packs[ tostring( new_key ) ].func
+end
+
+update()
+
+function spell_box.update()
 	if not mod_setting_get( "spellbox_pack_changed" ) then return end
 	mod_setting_set( "spellbox_pack_changed", false )
 
-	local new_key = mod_setting_get( "spellbox_pack" )
-	current_spellbox_pack = spellbox_packs[ new_key ]
+	update()
 end
 
-function show_spellbox( ... )
-	current_spellbox_pack( ... )
+function spell_box.show( ... )
+	current_pack( ... )
 end
+
+return spell_box
