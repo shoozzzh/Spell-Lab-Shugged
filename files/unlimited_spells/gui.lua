@@ -18,4 +18,4 @@ if GuiImageButton( gui, get_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/bu
 		end
 	end
 end
-GuiTooltip( gui, text_get_translated( world_state_unlimited_spells and "disable" or "enable" ) .. text_get_translated( "$perk_unlimited_spells" ), "" )
+GuiTooltip( gui, get_text( world_state_unlimited_spells and "disable" or "enable" ) .. get_text( "$perk_unlimited_spells" ), "" )

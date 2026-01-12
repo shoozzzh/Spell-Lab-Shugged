@@ -1,9 +1,11 @@
+local module_path = this_folder()
+
 local mod_button_reservation = tonumber( GlobalsGetValue( "spell_lab_shugged_mod_button_reservation", "0" ) )
 local current_button_reservation = tonumber( GlobalsGetValue( "mod_button_tr_current", "0" ) )
 if current_button_reservation > mod_button_reservation then
 	current_button_reservation = mod_button_reservation
 elseif current_button_reservation < mod_button_reservation then
-	current_button_reservation = math.max( 0, mod_button_reservation + ( current_button_reservation - mod_button_reservation ) )
+	current_button_reservation = math.max( 0, current_button_reservation )
 else
 	current_button_reservation = mod_button_reservation
 end
@@ -11,12 +13,14 @@ GlobalsSetValue( "mod_button_tr_current", tostring( current_button_reservation +
 
 -- GuiOptionsAddForNextWidget( gui, GUI_OPTION.NonInteractive )
 -- GuiOptionsAddForNextWidget( gui, GUI_OPTION.AlwaysClickable )
-if GuiImageButton( gui, get_id(), screen_width - 14 - current_button_reservation, 2, "", "mods/spell_lab_shugged/files/gui/wrench.png" ) then
+if GuiImageButton( gui, get_id(), screen_width - 14 - current_button_reservation, 2, "", module_path .. "button.png" ) then
 	sound_button_clicked()
 	is_panel_open = not is_panel_open
 end
 
-if previous_hovered() then
+local _,_,hover = previous_data( gui )
+
+if hover then
 	local _,_,_,x,y = previous_data( gui )
 	local text = wrap_key( ( is_panel_open and "hide" or "show" ) .. "_spell_lab" )
 	local text_width = GuiGetTextDimensions( gui, text )

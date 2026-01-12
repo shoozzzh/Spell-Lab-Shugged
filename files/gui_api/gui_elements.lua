@@ -1,3 +1,5 @@
+gui_elements = {}
+
 function GuiColoredText( gui, red, green, blue, alpha, ... )
 	GuiColorSetForNextWidget( gui, red, green, blue, alpha )
 	GuiText( gui, ... )
@@ -14,7 +16,7 @@ function GuiDimText( gui, ... )
 end
 
 SCROLL_TABLE_WIDTH = 174
-function do_scroll_table( scroll_id, width, height, height_autofit, hover_callback, cell_list, cell_gui_func, row_size )
+function gui_elements.scroll_table( scroll_id, width, height, height_autofit, hover_callback, cell_list, cell_gui_func, row_size )
 	row_size = row_size or 8
 	width = width or SCROLL_TABLE_WIDTH
 	if height_autofit then
@@ -56,8 +58,8 @@ function do_scroll_table( scroll_id, width, height, height_autofit, hover_callba
 	return _x, _y, width, height
 end
 
-function do_flag_toggle_image_button( filepath, flag, option_text, click_callback, description )
-	local mod_settings_key = wrap_setting_key( flag )
+function gui_elements.flag_toggle_button( filepath, flag, option_text, click_callback, description )
+	local mod_settings_key = mod_setting_prefix .. flag
 	if not ModSettingGet( mod_settings_key ) then
 		GuiOptionsAddForNextWidget( gui, GUI_OPTION.DrawSemiTransparent )
 	end
@@ -71,16 +73,16 @@ function do_flag_toggle_image_button( filepath, flag, option_text, click_callbac
 		end
 	end
 	option_text = option_text or flag
-	option_text = text_get_translated( option_text )
+	option_text = get_text( option_text )
 	if ModSettingGet( mod_settings_key ) then
-		GuiTooltip( gui, text_get_translated( "disable" ) .. option_text, description or "" )
+		GuiTooltip( gui, get_text( "disable" ) .. option_text, description or "" )
 	else
-		GuiTooltip( gui, text_get_translated( "enable" ) .. option_text, description or "" )
+		GuiTooltip( gui, get_text( "enable" ) .. option_text, description or "" )
 	end
 	return left_click, right_click
 end
 
-function do_action_button( x, y, selected, action_type, sprite_file )
+function gui_elements.action_button( x, y, selected, action_type, sprite_file )
 	GuiZSetForNextWidget( gui, 3 )
 	GuiOptionsAddForNextWidget( gui, GUI_OPTION.NonInteractive )
 	GuiImageButton( gui, get_id(), x, y, "", "mods/spell_lab_shugged/files/gui/buttons/transparent_20x20.png" )
@@ -96,7 +98,7 @@ function do_action_button( x, y, selected, action_type, sprite_file )
 	GuiImage( gui, get_id(), _x + 20 / 2 - width / 2, _y + 20 / 2 - height / 2, sprite_file, 1, 1, 0 )
 
 	GuiZSet( gui, 2 )
-	show_spellbox( gui, get_id(), _x, _y, action_type, selected, hover, 1, 1, 0, 0 )
+	show_spell_box( gui, get_id(), _x, _y, action_type, selected, hover, 1, 1, 0, 0 )
 	GuiZSet( gui, -2 )
 
 	if left_click or right_click then

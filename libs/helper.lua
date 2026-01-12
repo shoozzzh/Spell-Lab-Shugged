@@ -1,44 +1,4 @@
-local mod_settings_prefix = "spell_lab_shugged."
 
-function mod_setting_get( key )
-	return ModSettingGet( mod_settings_prefix .. key )
-end
-function mod_setting_set( key, value )
-	return ModSettingSet( mod_settings_prefix .. key, value )
-end
-function wrap_setting_key( key )
-	return mod_settings_prefix .. key
-end
-
-local transl_key_prefix = "$spell_lab_shugged_"
-
-function wrap_key( key )
-	if string.sub( key, 1, 1 ) == "$" then
-		return key
-	end
-	return transl_key_prefix .. key
-end
-function text_get_translated( key )
-	return GameTextGetTranslatedOrNot( wrap_key( key ) )
-end
-function text_get( key, ... )
-	return GameTextGet( wrap_key( key ), ... )
-end
-
-do
-	local function c( h )
-		return ( h + 1 ) / 256
-	end
-	function color( r, g, b, a )
-		return c( r ), c( g ), c( b ), c( a )
-	end
-end
-
-function maxn( t )
-	local result = table.maxn( t )
-	if result == 0 and not t[0] then return -1 end
-	return result
-end
 
 local function thousands_separator( value_text )
 	local formatted = value_text

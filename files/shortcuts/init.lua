@@ -39,7 +39,7 @@ local function reload_shortcut_texts()
 		shortcut_texts[ name ] = shortcut_tostring( v, last_cur_lang )
 	end
 
-	edit_panel_shortcut_tips = text_get_translated( "shortcut_tips" )
+	edit_panel_shortcut_tips = get_text( "shortcut_tips" )
 	for name, v in pairs( shortcuts ) do
 		edit_panel_shortcut_tips = edit_panel_shortcut_tips:gsub( "{" .. name .. "}", shortcut_texts[ name ] )
 	end

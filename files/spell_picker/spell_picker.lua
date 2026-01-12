@@ -368,14 +368,14 @@ picker.menu = function()
 			end
 			GuiZSetForNextWidget( gui, -4 )
 			local scale = 1
-			local width, height = GuiGetTextDimensions( gui, text_get_translated( "spell_picker_tab_" .. tab ) )
+			local width, height = GuiGetTextDimensions( gui, get_text( "spell_picker_tab_" .. tab ) )
 			local max_width = tab_width - 4
 			if width > max_width then
 				scale = max_width / width
 				width = max_width
 			end
 			local args = { x + tab_width / 2 - width / 2, y + y_offset + tab_height / 2 - height / 2, wrap_key( "spell_picker_tab_" .. tab ), scale, "data/fonts/font_pixel.xml", true }
-			if zh_cn_languages[ text_get_translated( "$current_language" ) ] then
+			if zh_cn_languages[ get_text( "$current_language" ) ] then
 				args[5] = ""
 			end
 			if selected then
@@ -404,7 +404,7 @@ picker.menu = function()
 			height_autofit = false
 		end
 
-		do_scroll_table( scroll_ids[ filter_type ], nil,
+		gui_elements.scroll_table( scroll_ids[ filter_type ], nil,
 			height, height_autofit, function( hovered ) interacting = interacting or hovered end,
 			actions_data_to_show, function( this_action_data, _, x, y )
 			local this_action_metadata = action_metadata[ this_action_data.id ]
@@ -418,7 +418,7 @@ picker.menu = function()
 				sprite_file = "mods/spell_lab_shugged/files/gui/buttons/missing_sprite.png"
 			end
 
-			local left_click, right_click, hover = do_action_button( 0, 0, false, action_type, sprite_file )
+			local left_click, right_click, hover = gui_elements.action_button( 0, 0, false, action_type, sprite_file )
 			local _,_,_,x,y,_,_,_,_,_,_ = previous_data( gui )
 			if this_action_data and hover then
 				force_do_custom_tooltip( function()
@@ -520,7 +520,7 @@ picker.menu = function()
 					GuiTextInput( gui, get_id(), 0, 0, current_action_search_needle.text, input_bar_width, -1, CHARACTERS_ACTION_ID )
 				else
 					GuiZSetForNextWidget( gui, -1 )
-					GuiTextInput( gui, get_id(), 0, 0, text_get_translated( "spell_picker_searchbox" ), input_bar_width, -1, CHARACTERS_ACTION_ID )
+					GuiTextInput( gui, get_id(), 0, 0, get_text( "spell_picker_searchbox" ), input_bar_width, -1, CHARACTERS_ACTION_ID )
 					GuiTextInput( gui, get_id(), 0, 0, "", input_bar_width, -1, CHARACTERS_ACTION_ID )
 				end
 				local hovered = previous_hovered(2)
@@ -629,12 +629,12 @@ picker.buttons = function()
 	end
 	GuiLayoutBeginHorizontal( gui, horizontal_centered_x(buttons_num,4), percent_to_ui_scale_y(2), true )
 		if held_wand and mod_setting_get( "show_wand_edit_panel" ) then
-			do_flag_toggle_image_button( "mods/spell_lab_shugged/files/gui/buttons/quick_spell_picker.png", "quick_spell_picker" )
+			gui_elements.flag_toggle_button( "mods/spell_lab_shugged/files/gui/buttons/quick_spell_picker.png", "quick_spell_picker" )
 		end
-		do_flag_toggle_image_button( "mods/spell_lab_shugged/files/gui/buttons/show_locked_spells.png", "show_locked_spells", nil, nil, text_get( "relock_tips", shortcut_texts.relock ) )
-		do_flag_toggle_image_button( "mods/spell_lab_shugged/files/gui/buttons/zero_uses.png", "zero_uses" )
+		gui_elements.flag_toggle_button( "mods/spell_lab_shugged/files/gui/buttons/show_locked_spells.png", "show_locked_spells", nil, nil, text_get( "relock_tips", shortcut_texts.relock ) )
+		gui_elements.flag_toggle_button( "mods/spell_lab_shugged/files/gui/buttons/zero_uses.png", "zero_uses" )
 		if held_wand and mod_setting_get( "show_wand_edit_panel" ) then
-			do_flag_toggle_image_button( "mods/spell_lab_shugged/files/gui/buttons/spell_replacement.png", "replace_mode", "spell_replacement", nil, text_get( "spell_replacement_tips", shortcut_texts.replace_switch_temp ) )
+			gui_elements.flag_toggle_button( "mods/spell_lab_shugged/files/gui/buttons/spell_replacement.png", "replace_mode", "spell_replacement", nil, text_get( "spell_replacement_tips", shortcut_texts.replace_switch_temp ) )
 		end
 	GuiLayoutEnd( gui )
 end

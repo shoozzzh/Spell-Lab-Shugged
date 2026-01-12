@@ -1,3 +1,4 @@
+---@class id_allocator
 local id_allocator = {}
 
 local call_map = {}

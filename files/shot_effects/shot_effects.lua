@@ -173,7 +173,7 @@ picker.menu = function()
 		count_table[ id ] = ( count_table[ id ] or 0 ) + 1
 	end
 	GuiLayoutBeginVertical( gui, 640 * 0.05, 360 * 0.16, true )
-		do_scroll_table( get_id(), nil, nil, true, nil, shot_effect_data, function( shot_effect )
+		gui_elements.scroll_table( get_id(), nil, nil, true, nil, shot_effect_data, function( shot_effect )
 			local count = count_table[ shot_effect.id ] or 0
 			local max_count = shot_effect.max_count
 			local unsafe_count_allowed = mod_setting_get( "shot_effect_unsafe_count_allowed" ) and not shot_effect.no_unsafe
@@ -214,7 +214,7 @@ end
 
 picker.buttons = function()
 	GuiLayoutBeginHorizontal( gui, horizontal_centered_x(1,4), percent_to_ui_scale_y(2), true )
-		do_flag_toggle_image_button( "mods/spell_lab_shugged/files/gui/buttons/unsafe_values.png", "shot_effect_unsafe_count_allowed" )
+		gui_elements.flag_toggle_button( "mods/spell_lab_shugged/files/gui/buttons/unsafe_values.png", "shot_effect_unsafe_count_allowed" )
 	GuiLayoutEnd( gui )
 end
 

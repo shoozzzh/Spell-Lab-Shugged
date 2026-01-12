@@ -41,13 +41,13 @@ local picker = {}
 local selected_spell_group_index = 0
 picker.menu = function()
 	GuiLayoutBeginVertical( gui, 640 * 0.05, 360 * 0.16, true )
-		do_scroll_table( get_id(), nil, nil, true, nil, saved_spell_groups, function( saved_spell_group, index )
+		gui_elements.scroll_table( get_id(), nil, nil, true, nil, saved_spell_groups, function( saved_spell_group, index )
 			GuiImageButton( gui, get_id(), 2, 2, "", "mods/spell_lab_shugged/files/gui/buttons/transparent_16x16.png" )
 			detect_shortcuts( gui, spell_group_button_shortcut, shortcut_used_keys )
 			
 			do_custom_tooltip( function()
 				do_simple_common_action_list( saved_spell_group, #saved_spell_group )
-				GuiDimText( gui, 0, 0, text_get_translated( "spell_group_select" ) )
+				GuiDimText( gui, 0, 0, get_text( "spell_group_select" ) )
 			end, 3, -0.5 )
 
 			local spell_box
@@ -143,7 +143,7 @@ picker.buttons = function()
 				end
 			end
 			GuiTooltip( gui, wrap_key( "spell_group_box_load" ), "" )
-			do_flag_toggle_image_button( "mods/spell_lab_shugged/files/gui/buttons/spell_replacement.png",
+			gui_elements.flag_toggle_button( "mods/spell_lab_shugged/files/gui/buttons/spell_replacement.png",
 				"replace_mode", "spell_replacement", nil,
 				text_get( "spell_replacement_tips", shortcut_texts.replace_switch_temp )
 			)

@@ -10,7 +10,7 @@ function show_edit_panel_toggle_options()
 			sound_button_clicked()
 			data.vars.force_compact_enabled = not force_compact_enabled
 		end
-		GuiTooltip( gui, text_get_translated( force_compact_enabled and "disable" or "enable" ) .. text_get_translated( "wand_force_compact" ), text_get_translated( "wand_force_compact_description" ) .. "\n" .. text_get_translated( "inventory_get_ignored" )  )
+		GuiTooltip( gui, get_text( force_compact_enabled and "disable" or "enable" ) .. get_text( "wand_force_compact" ), get_text( "wand_force_compact_description" ) .. "\n" .. get_text( "inventory_get_ignored" )  )
 
 		local autocap_enabled = data.vars.autocap_enabled
 		if not autocap_enabled then
@@ -35,19 +35,19 @@ function show_edit_panel_toggle_options()
 				WANDS.wand_set_stat( held_wand, "deck_capacity", new_capacity )
 			end]]
 		end
-		GuiTooltip( gui, text_get_translated( autocap_enabled and "disable" or "enable" ) .. text_get_translated( "automatic_capacity" ), wrap_key( "automatic_capacity_description" ) )
+		GuiTooltip( gui, get_text( autocap_enabled and "disable" or "enable" ) .. get_text( "automatic_capacity" ), wrap_key( "automatic_capacity_description" ) )
 	GuiLayoutEnd( gui )
 
 	GuiLayoutBeginHorizontal( gui, 0, 0, true )
 		local function cant_undo()
 			GuiOptionsAddForNextWidget( gui, GUI_OPTION.DrawSemiTransparent )
 			GuiImageButton( gui, get_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/undo.png" )
-			GuiTooltip( gui, text_get_translated( "cant_undo" ), "" )
+			GuiTooltip( gui, get_text( "cant_undo" ), "" )
 		end
 		local function cant_redo()
 			GuiOptionsAddForNextWidget( gui, GUI_OPTION.DrawSemiTransparent )
 			GuiImageButton( gui, get_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/redo.png" )
-			GuiTooltip( gui, text_get_translated( "cant_redo" ), "" )
+			GuiTooltip( gui, get_text( "cant_redo" ), "" )
 		end
 
 		local operation_to_undo = data:peek_undo()
@@ -58,7 +58,7 @@ function show_edit_panel_toggle_options()
 				sound_button_clicked()
 				data:undo()
 			end
-			GuiTooltip( gui, text_get_translated( "undo" ) .. " " .. GameTextGetTranslatedOrNot( operation_to_undo ),
+			GuiTooltip( gui, get_text( "undo" ) .. " " .. GameTextGetTranslatedOrNot( operation_to_undo ),
 				GameTextGet( wrap_key( "current_history" ), data.vars.current_history_index, #edit_panel_api.get_histories( held_wand ) ) )
 		else cant_undo() end
 		if operation_to_redo then
@@ -66,7 +66,7 @@ function show_edit_panel_toggle_options()
 				sound_button_clicked()
 				data:redo()
 			end
-			GuiTooltip( gui, text_get_translated( "redo" ) .. " " .. GameTextGetTranslatedOrNot( operation_to_redo ),
+			GuiTooltip( gui, get_text( "redo" ) .. " " .. GameTextGetTranslatedOrNot( operation_to_redo ),
 				GameTextGet( wrap_key( "current_history" ), data.vars.current_history_index, #edit_panel_api.get_histories( held_wand ) ) )
 		else cant_redo() end
 	GuiLayoutEnd( gui )

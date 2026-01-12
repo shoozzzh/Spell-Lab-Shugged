@@ -1,14 +1,31 @@
 local mod_id = "spell_lab_shugged"
 
 local key_prefix = "$" .. mod_id .. "_"
+local mod_settings_prefix = mod_id .. "."
+
+---@param key string
 function wrap_key( key )
 	return key_prefix .. key
 end
 
+---@param key string
 function get_text( key )
 	return GameTextGetTranslatedOrNot( wrap_key( key ) )
 end
 
+---@param key string
+function mod_setting_get( key )
+	return ModSettingGet( mod_settings_prefix .. key )
+end
+
+---@param key string
+---@param value boolean|string|number|nil
+function mod_setting_set( key, value )
+	ModSettingSet( mod_settings_prefix .. key, value )
+end
+
+---@param f fun( ... )|nil
+---@return any
 function optional_call( f, ... )
 	if f then return f( ... ) end
 end
@@ -65,6 +82,7 @@ local function dofile_mask( env )
 	return mask
 end
 
+---@return table<string,any>
 function get_globals( filepath, extra_globals )
 	local f, err = loadfile( filepath )
 	if f == nil then
@@ -90,6 +108,22 @@ local extract_folder = memoize( function( source )
 end )
 
 local finfo = jit.util.funcinfo
+
+---@return string
 function this_folder()
 	return extract_folder( finfo( setfenv( 2, getfenv(2) ) ).source )
+end
+
+local function c( h )
+	return ( h + 1 ) / 256
+end
+
+function color( r, g, b, a )
+	return c( r ), c( g ), c( b ), c( a )
+end
+
+function maxn( t )
+	local result = table.maxn( t )
+	if result == 0 and not t[0] then return -1 end
+	return result
 end

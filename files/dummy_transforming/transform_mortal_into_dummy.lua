@@ -6,14 +6,14 @@ if not is_valid_entity( mortal_id ) or ( mx - mortal_x ) ^ 2 + ( my - mortal_y )
 	mortal_id = EntityGetClosestWithTag( mx, my, "enemy" )
 	mortal_x, mortal_y = EntityGetTransform( mortal_id )
 	if not is_valid_entity( mortal_id ) or ( mx - mortal_x ) ^ 2 + ( my - mortal_y ) ^ 2 > 1600 then
-		error_msg = text_get_translated( "transform_mortal_failed_no_mortal_found" )
+		error_msg = get_text( "transform_mortal_failed_no_mortal_found" )
 	end
 end
 if EntityHasTag( mortal_id, "player_unit" ) or EntityHasTag( mortal_id, "polymorphed_player" ) then
-	error_msg = text_get_translated( "transform_mortal_failed_cant_transform_player" )
+	error_msg = get_text( "transform_mortal_failed_cant_transform_player" )
 end
 if EntityHasTag( mortal_id, "spell_lab_shugged_target_dummy" ) then
-	error_msg = text_get_translated(  "transform_mortal_failed_already_transformed" )
+	error_msg = get_text(  "transform_mortal_failed_already_transformed" )
 end
 if not error_msg then
 	-- GameDropAllItems( mortal_id )

@@ -1,4 +1,17 @@
-local smallfolk = dofile_once( "mods/spell_lab_shugged/files/lib/smallfolk.lua" )
+function ser( shortcut )
+	local result = {'{"'}
+	for i = 1, #shortcut do
+		result[ i + 1 ] = shortcut[ i ]
+	end
+	result[ #result + 1 ] = '"}'
+	return table.concat( result, '","' )
+end
+
+function deser( shortcut )
+	ModTextFileSetContent( "mods/shortcut_set.lua", "return " .. shortcut )
+	return loadfile( "mods/shortcut_set.lua" )()
+end
+
 dofile_once( "mods/spell_lab_shugged/files/lib/shortcut_tostring.lua" )
 local keystroke_listener = dofile_once( "mods/spell_lab_shugged/files/gui/keystroke_listener.lua" )
 
@@ -80,7 +93,7 @@ function mod_setting_shortcut( mod_id, gui, in_main_menu, im_id, setting )
 
 		if left_click or right_click then
 			changed = true
-			ModSettingSetNextValue( mod_setting_get_id( mod_id, setting ), smallfolk.dumps( shortcut_inputed ), false )
+			ModSettingSetNextValue( mod_setting_get_id( mod_id, setting ), ser( shortcut_inputed ), false )
 			current_key_detector = nil
 			shortcut_inputed = nil
 		end
@@ -92,7 +105,7 @@ function mod_setting_shortcut( mod_id, gui, in_main_menu, im_id, setting )
 		GuiLayoutBeginHorizontal( gui, mod_setting_group_x_offset + 120, 0, true, 2, 2 )
 		if GuiButton( gui, 4 * im_id + 1, 0, 0, ( shortcut_text[ cur_lang ] or shortcut_text.DEFAULT ).done ) then
 			changed = true
-			ModSettingSetNextValue( mod_setting_get_id( mod_id, setting ), smallfolk.dumps( shortcut_inputed ), false )
+			ModSettingSetNextValue( mod_setting_get_id( mod_id, setting ), ser( shortcut_inputed ), false )
 			current_key_detector = nil
 			shortcut_inputed = nil
 		end
@@ -112,7 +125,7 @@ function mod_setting_shortcut( mod_id, gui, in_main_menu, im_id, setting )
 			local shortcut
 			do
 				local status, _ = pcall( function()
-					shortcut = smallfolk.loads( value )
+					shortcut = deser( value )
 				end )
 				if not status then
 					shortcut = {}

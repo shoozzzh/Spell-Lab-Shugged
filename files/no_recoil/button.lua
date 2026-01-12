@@ -1,1 +1,1 @@
-do_flag_toggle_image_button( "mods/spell_lab_shugged/files/gui/buttons/no_recoil.png", "no_recoil" )
+gui_elements.flag_toggle_button( "mods/spell_lab_shugged/files/gui/buttons/no_recoil.png", "no_recoil" )

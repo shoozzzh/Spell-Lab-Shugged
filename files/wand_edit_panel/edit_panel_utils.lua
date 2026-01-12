@@ -47,7 +47,7 @@ function set_action( edit_panel_state, action_id, uses_remaining, do_replace, ma
 	end
 	if not do_replace and max_capacity then
 		if not fit_into_capacity( current_actions, times_inserting, max_capacity ) then
-			GamePrint( text_get_translated( "no_enough_space" ) )
+			GamePrint( get_text( "no_enough_space" ) )
 			return
 		end
 	end
@@ -100,7 +100,7 @@ function set_action_group( edit_panel_state, action_group, do_replace, max_capac
 	end
 	if not do_replace and max_capacity then
 		if not fit_into_capacity( current_actions, times_inserting, max_capacity ) then
-			GamePrint( text_get_translated( "no_enough_space" ) )
+			GamePrint( get_text( "no_enough_space" ) )
 			return
 		end
 	end
@@ -131,7 +131,7 @@ local permanent_action_button_shortcuts = {
 	[ shortcuts.always_cast ] = function( i, actions, data, selection )
 		local empty_slot = empty_slot_scanner( actions ).next_empty_slot()
 		if not empty_slot then
-			GamePrint( text_get_translated( "demotion_no_space" ) )
+			GamePrint( get_text( "demotion_no_space" ) )
 			return
 		end
 
@@ -460,13 +460,13 @@ function do_panel_action( gui, x, y, action_entity, selected )
 	if dragging then
 		local mouse_x, mouse_y = gui_pos.get_pos_on_screen( gui, DEBUG_GetMouseWorld() )
 		GuiOptionsAddForNextWidget( gui, GUI_OPTION.NonInteractive )
-		do_action_button( mouse_x - 10.25, mouse_y - 10.2, selected, action_type, sprite_file )
+		gui_elements.action_button( mouse_x - 10.25, mouse_y - 10.2, selected, action_type, sprite_file )
 
 		sprite_file = "mods/spell_lab_shugged/files/gui/buttons/empty_spell.png"
 		GuiOptionsAddForNextWidget( gui, GUI_OPTION.NonInteractive )
 	end
 
-	local left_click, right_click, hover = do_action_button( x, y, selected, action_type, sprite_file )
+	local left_click, right_click, hover = gui_elements.action_button( x, y, selected, action_type, sprite_file )
 	if not dragging and this_action_data and this_action_metadata and hover then
 		force_do_custom_tooltip( function()
 			GuiLayoutBeginVertical( gui, 0, 0 )

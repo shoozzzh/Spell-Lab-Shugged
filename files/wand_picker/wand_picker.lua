@@ -102,7 +102,7 @@ picker.menu = function()
 							end
 						end
 					end
-					if GuiButton( gui, 8, 0, text_get( "wand_picker_precise_mode", text_get_translated( precise_mode and "disable" or "enable" ) ), get_id() ) then
+					if GuiButton( gui, 8, 0, text_get( "wand_picker_precise_mode", get_text( precise_mode and "disable" or "enable" ) ), get_id() ) then
 						mod_setting_set( "wand_picker_precise_mode", not precise_mode )
 					end
 					if precise_mode then

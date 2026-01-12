@@ -58,10 +58,10 @@ function do_picker_button( filepath, picker, option_text, click_callback )
 			click_callback( result )
 		end
 	end
-	option_text = text_get_translated( option_text )
+	option_text = get_text( option_text )
 	if picker == active_picker then
-		GuiTooltip( gui, text_get_translated( "disable" ) .. option_text, "" )
+		GuiTooltip( gui, get_text( "disable" ) .. option_text, "" )
 	else
-		GuiTooltip( gui, text_get_translated( "enable" ) .. option_text, "" )
+		GuiTooltip( gui, get_text( "enable" ) .. option_text, "" )
 	end
 end
