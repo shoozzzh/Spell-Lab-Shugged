@@ -1,7 +1,9 @@
 ---@module "spell_box"
 
-local gokis = function( gui, id, x, y, action_type, selected, hovered, alpha, scale, scale_y, rotation )
-	local spell_box = { "mods/spell_lab_shugged/files/gui/buttons/spell_box" }
+local module_path = this_folder()
+
+local gokis = function( x, y, action_type, selected, hovered )
+	local spell_box = { module_path, "goki/" }
 	if action_type then
 		spell_box[ #spell_box + 1 ] = "_"
 		spell_box[ #spell_box + 1 ] = tostring( action_type )
@@ -15,8 +17,7 @@ local gokis = function( gui, id, x, y, action_type, selected, hovered, alpha, sc
 	end
 	spell_box[ #spell_box + 1 ] = ".png"
 
-	GuiOptionsAddForNextWidget( gui, GUI_OPTION.Layout_NoLayouting )
-	GuiImage( gui, id, x, y, table.concat( spell_box ), alpha, scale, scale_y, rotation )
+	pop.image( x, y, table.concat( spell_box ) )
 end
 
 local vanilla_bgs = {
@@ -30,24 +31,17 @@ local vanilla_bgs = {
 	[7] = "data/ui_gfx/inventory/item_bg_passive.png",
 }
 
-local vanilla = function( gui, id, x, y, action_type, selected, hovered, alpha, scale, scale_y, rotation )
+local vanilla = function( x, y, action_type, selected, hovered )
 	local box = selected
 		and "data/ui_gfx/inventory/full_inventory_box_highlight.png"
 		or "data/ui_gfx/inventory/full_inventory_box.png"
 
-	GuiOptionsAddForNextWidget( gui, GUI_OPTION.Layout_NoLayouting )
-	GuiImage( gui, id, x, y, box, alpha, scale, scale_y, rotation )
+	pop.image( x, y, box )
 
 	if action_type == nil then return end
 
-	local bg = vanilla_bgs[ action_type ]
-	GuiIdPushString( gui, "VANIILA_SPELLBOX" )
-
-	GuiZSetForNextWidget( gui, -0.5 )
-	GuiOptionsAddForNextWidget( gui, GUI_OPTION.Layout_NoLayouting )
-	GuiImage( gui, id, x, y, bg, alpha, scale, scale_y, rotation )
-
-	GuiIdPop( gui )
+	pop.z_mod(-0.5)
+	pop.image( x, y, vanilla_bgs[ action_type ] )
 end
 
 
@@ -70,13 +64,6 @@ local spellbox_packs = {
 	},
 }
 
-if not mod_setting_get then -- if being loaded from settings.lua
-	return spellbox_packs
-end
-
---- @class spell_box
-local spell_box = {}
-
 local current_pack = spellbox_packs[ tostring( mod_setting_get( "spellbox_pack" ) ) ].func
 
 local function update()
@@ -85,6 +72,9 @@ local function update()
 end
 
 update()
+
+--- @class spell_box
+local spell_box = {}
 
 function spell_box.update()
 	if not mod_setting_get( "spellbox_pack_changed" ) then return end

@@ -7,11 +7,11 @@ mod_setting_prefix = mod_id .. "."
 
 setmetatable( _G, { __index = { ModTextFileSetContent = ModTextFileSetContent } } )
 
-ModLuaFileAppend( "data/scripts/gun/gun.lua", mod_path .. "files/append/gun/no_recoil.lua" )
-ModLuaFileAppend( "data/scripts/gun/gun.lua", mod_path .. "files/append/gun/cast_delay_fixer.lua" )
-ModLuaFileAppend( "data/scripts/gun/gun.lua", mod_path .. "files/append/gun/disable_casting.lua" )
+-- ModLuaFileAppend( "data/scripts/gun/gun.lua", mod_path .. "files/append/gun/no_recoil.lua" )
+-- ModLuaFileAppend( "data/scripts/gun/gun.lua", mod_path .. "files/append/gun/cast_delay_fixer.lua" )
+-- ModLuaFileAppend( "data/scripts/gun/gun.lua", mod_path .. "files/append/gun/disable_casting.lua" )
 
-dofile( mod_path .. "files/lib/polytools/polytools_init.lua" ).init( mod_path .. "files/lib/polytools/" )
+dofile( mod_path .. "libs/polytools/polytools_init.lua" ).init( mod_path .. "libs/polytools/" )
 
 local translations = ModTextFileGetContent( mod_path .. "files/translations.csv" )
 local main = "data/translations/common.csv"

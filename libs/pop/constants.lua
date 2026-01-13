@@ -1,4 +1,3 @@
----@alias gui_option integer
 ---@alias playback_type integer
 
 -- these come from data/scripts/lib/utilities.lua, and is modified
@@ -11,7 +10,47 @@
 -- You just have to live with the fact that the gui library exists mainly to support the game, and we have limited time to work on it.
 
 -- volatile: must be kept in sync with the ImGuiWidgetOptions enum in imgui.h
----@class gui_options
+
+---@alias gui_option
+---|>"None"
+---| "IsDraggable"
+---| "NonInteractive"
+---| "AlwaysClickable"
+---| "ClickCancelsDoubleClick"
+---| "IgnoreContainer"
+---| "NoPositionTween"
+---| "ForceFocusable"
+---| "HandleDoubleClickAsClick"
+---| "GamepadDefaultWidget"
+---| "Layout_InsertOutsideLeft"
+---| "Layout_InsertOutsideRight"
+---| "Layout_InsertOutsideAbove"
+---| "Layout_ForceCalculate"
+---| "Layout_NextSameLine"
+---| "Layout_NoLayouting"
+---| "Align_HorizontalCenter"
+---| "Align_Left"
+---| "FocusSnapToRightEdge"
+---| "NoPixelSnapY"
+---| "DrawAlwaysVisible"
+---| "DrawNoHoverAnimation"
+---| "DrawWobble"
+---| "DrawFadeIn"
+---| "DrawScaleIn"
+---| "DrawWaveAnimateOpacity"
+---| "DrawSemiTransparent"
+---| "DrawActiveWidgetCursorOnBothSides"
+---| "DrawActiveWidgetCursorOff"
+---| "TextRichRendering"
+---| "NoSound"
+---| "Hack_ForceClick"
+---| "Hack_AllowDuplicateIds"
+---| "ScrollContainer_Smooth"
+---| "IsExtraDraggable"
+---| "_SnapToCenter"
+---| "Disabled"
+
+---@type table<gui_option,integer>
 local GUI_OPTION = {
 	None = 0,
 

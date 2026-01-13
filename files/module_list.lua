@@ -1,7 +1,6 @@
 return {
 	"gui_entry_point",
-	"gui_api",
-	-- "gui_main",
+	"gui_main",
 	-- "all_seeing_eye",
 	-- "clear_projectiles",
 	-- "convenient_wand",

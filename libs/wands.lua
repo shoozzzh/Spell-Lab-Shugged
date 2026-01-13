@@ -1,5 +1,5 @@
 dofile_once( "data/scripts/gun/procedural/gun_procedural.lua" )
-dofile_once( "mods/spell_lab_shugged/files/lib/variables.lua" )
+dofile_once( "mods/spell_lab_shugged/libs/variables.lua" )
 
 -- override the one from gun_procedural.lua
 -- which uses EntityGetFirstComponent instead of EntityGetFirstComponentIncludingDisabled,
