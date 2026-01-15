@@ -271,13 +271,13 @@ mod_settings = {
 
 local function load_mod_settings( cur_lang )
 	local lang_id = "en"
-	if cur_lang == "简体中文" or cur_lang == "喵体中文" or cur_lang == "汪体中文" or cur_lang == "完全汉化" then
+	if cur_lang:find "中文" or cur_lang:find "汉化" then
 		lang_id = "zh_cn"
 	end
 	cc.load_lang( mod_settings, lang_id )
 end
 
-load_mod_settings( GameTextGet( "$current_language" ) )
+load_mod_settings( GameTextGet "$current_language"  )
 
 local mod_id = "spell_lab_shugged"
 
@@ -291,7 +291,7 @@ end
 
 local last_cur_lang
 function ModSettingsGui( gui, in_main_menu )
-	local cur_lang = GameTextGet( "$current_language" )
+	local cur_lang = GameTextGet "$current_language"
 	if cur_lang ~= last_cur_lang then
 		load_mod_settings( cur_lang )
 		last_cur_lang = cur_lang
