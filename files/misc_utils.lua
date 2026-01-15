@@ -1,8 +1,6 @@
 local mod_id = "spell_lab_shugged"
 
 local key_prefix = "$" .. mod_id .. "_"
-local mod_settings_prefix = mod_id .. "."
-
 ---@param key string
 function wrap_key( key )
 	return key_prefix .. key
@@ -13,23 +11,15 @@ function get_text( key )
 	return GameTextGetTranslatedOrNot( wrap_key( key ) )
 end
 
----@param key string
-function mod_setting_get( key )
-	return ModSettingGet( mod_settings_prefix .. key )
-end
-
----@param key string
----@param value boolean|string|number|nil
-function mod_setting_set( key, value )
-	ModSettingSet( mod_settings_prefix .. key, value )
-end
-
 ---@param f fun( ... )|nil
 ---@return any
 function optional_call( f, ... )
 	if f then return f( ... ) end
 end
 
+---@generic T: fun()
+---@param f T
+---@return T
 function memoize( f )
 	return setmetatable( {}, {
 		__call = function( self, arg )
@@ -46,8 +36,8 @@ local function dofile_mask( env )
 	local loadonce, loaded = {}, {}
 	local mask = {}
 	mask.do_mod_appends = function( filepath )
-		for _, filepath in ipairs( ModLuaFileGetAppends( filepath ) ) do
-			mask.dofile( filepath )
+		for _, append_filepath in ipairs( ModLuaFileGetAppends( filepath ) ) do
+			mask.dofile( append_filepath )
 		end
 	end
 	mask.dofile_once = function( filepath )
@@ -146,122 +136,12 @@ function get_image_size( image_filename, scale )
 	return GuiGetImageDimensions( gui_measurer, image_filename, scale or 1 )
 end
 
-local function thousands_separator( value_text )
-	local formatted = value_text
-	local num_separators = 0
-	while true do
-		formatted, k = string.gsub(formatted, "^(-?%d+)(%d%d%d)", '%1,%2')
-		if k == 0 then
-			break
-		end
+function is_cur_lang_cn()
+	local cur_lang = GameTextGet "$current_language"
+	if cur_lang:find "中文" or cur_lang:find "汉化" then
+		return true
 	end
-	return formatted
-end
-
-local function ten_thousands_separator( value_text )
-	local formatted = value_text
-	local num_separators = 0
-	while true do
-		formatted, k = string.gsub(formatted, "^(-?%d+)(%d%d%d%d)", '%1,%2')
-		if k == 0 then
-			break
-		end
-	end
-	return formatted
-end
-
-function word_wrap( str, wrap_size )
-	if GameTextGetTranslatedOrNot( "$current_language" ) ~= "English" then
-		return str
-	end
-	if wrap_size == nil then wrap_size = 60 end
-	local last_space_index = 1
-	local last_wrap_index = 0
-	for i=1,#str do
-		if str:sub(i,i) == " " then
-			last_space_index = i
-		end
-		if str:sub(i,i) == "\n" then
-			last_space_index = i
-			last_wrap_index = i
-		end
-		if i - last_wrap_index > wrap_size then
-			str = str:sub(1,last_space_index-1) .. "\n" .. str:sub(last_space_index + 1)
-			last_wrap_index = i
-		end
-	end
-	return str
-end
-
-local not_a_gui = GuiCreate()
-function center_text( text )
-	return GuiGetTextDimensions( not_a_gui, text, 1, 0, "mods/spell_lab_shugged/files/font/font_small_numbers.xml", true ) / 2
-end
-
-zh_cn_languages = {
-	["简体中文"] = true,
-	["喵体中文"] = true,
-	["汪体中文"] = true,
-	["完全汉化"] = true,
-}
-
-function separator( text )
-	return ( zh_cn_languages[ GameTextGetTranslatedOrNot( "$current_language" ) ]
-	and ten_thousands_separator or thousands_separator )( text )
-end
-
-FORMAT = {
-	Floor = 0,
-	Round = 1,
-	Ceiling = 2
-}
-
-local inf = 1 / 0
-local threshold = 10 ^ 10
-function format_damage( damage, never_use_scientific_notation, result_inf )
-	if damage == inf then
-		return result_inf or "∞"
-	end
-	damage = damage * 25
-	if not never_use_scientific_notation and ( damage > threshold or -damage > threshold ) then
-		return string.format( "%.10e", damage )
-	end
-	return separator( string.format( "%.2f", damage ) )
-end
-
-function format_value( value, decimals, show_sign, format )
-	local text = ""
-	if value ~= nil then
-		if show_sign and value > 0 then
-			text = "+"
-		end
-		local rounder = math.floor
-		local value_offset = 0
-		if format == FORMAT.Ceiling then
-			rounder = math.ceil
-		elseif format == FORMAT.Round then
-			value_offset = 0.5
-		end
-		local power = math.pow( 10, decimals )
-		text = text .. tostring( rounder( value * power + value_offset ) / power )
-	else
-		return "missing"
-	end
-	return text
-end
-
-function format_time( time, digits )
-	digits = digits or 2
-	return format_value( time / 60, digits, true, FORMAT.Round ) .. " s (" .. GameTextGet( wrap_key( "frames" ), format_value( time, 0 ) ) .. ")"
-end
-
-function format_range( min, max )
-	if not min or not max then return nil end
-	if min ~= max then
-		return min .. " - " .. max
-	else
-		return tostring( min )
-	end
+	return false
 end
 
 function get_player_or_camera_position()
@@ -338,99 +218,6 @@ function is_action_unlocked( action )
 	end
 	return false
 end
-
-function optional_call( f, ... )
-	if f then return f( ... ) end
-end
-
-function memoize( f )
-	return setmetatable( {}, {
-		__call = function( self, arg )
-			local cache = self[ arg ]
-			if cache ~= nil then return cache end
-			local result = f( arg )
-			self[ arg ] = result
-			return result
-		end,
-	} )
-end
-
-local function dofile_mask( env )
-	local loadonce, loaded = {}, {}
-	local mask = {}
-	mask.do_mod_appends = function( filepath )
-		local appends = {}
-		local dofile_backup = _G.dofile
-		_G.dofile = function( filepath )
-			appends[ #appends + 1 ] = filepath
-		end
-		do_mod_appends( filepath )
-		_G.dofile = dofile_backup
-
-		for _, filepath in ipairs( appends ) do
-			mask.dofile( filepath )
-		end
-	end
-	mask.dofile_once = function( filepath )
-	    local result
-	    local cached = loadonce[ filepath ]
-	    if cached ~= nil then
-	        result = cached[1]
-	    else
-	        local f, err = loadfile( filepath )
-	        if f == nil then return f, err end
-	        setfenv( f, env )
-	        result = f()
-	        loadonce[ filepath ] = { result }
-	        mask.do_mod_appends( filepath )
-	    end
-	    return result
-	end
-	mask.dofile = function( filepath )
-	    local f = loaded[ filepath ]
-	    if f == nil then
-	    	local err
-	        f, err = loadfile( filepath )
-	        if f == nil then return f, err end
-	        setfenv( f, env )
-	        loaded[ filepath ] = f
-	    end
-	    local result = f()
-	    mask.do_mod_appends( filepath )
-	    return result
-	end
-
-	return mask
-end
-
-function get_globals( filepath )
-	local f = loadfile( filepath )
-
-	local e = {}
-	local mask = setmetatable( dofile_mask( e ), { __index = _G } )
-	setmetatable( e, { __index = mask } )
-	setfenv( f, e )()
-
-	local globals = {}
-	for k, v in pairs( e ) do
-		globals[ k ] = v
-	end
-
-	return globals
-end
-
-get_globals = memoize( get_globals )
-
-function dofile_wrapped( filepath )
-	local f = loadfile( filepath )
-	local e_backup = getfenv( f )
-	local e = setmetatable( {}, { __index = e_backup } )
-	local result = setfenv( f, e )()
-	setfenv( f, e_backup )
-	return result
-end
-
-dofile_once_wrapped = memoize( dofile_wrapped )
 
 dofile_once( mod_path .. "libs/stream.lua" )
 

@@ -1,5 +1,10 @@
 dofile_once( "data/scripts/lib/utilities.lua" )
-dofile_once( "mods/spell_lab_shugged/files/lib/helper.lua" )
+-- dofile_once( "mods/spell_lab_shugged/files/lib/helper.lua" )
+
+not_a_gui = not_a_gui or GuiCreate()
+function center_text( text )
+	return GuiGetTextDimensions( not_a_gui, text, 1, 0, "mods/spell_lab_shugged/files/font/font_small_numbers.xml", true ) / 2
+end
 
 local entity_id = GetUpdatedEntityID()
 local parent_id = EntityGetParent( entity_id )
