@@ -40,7 +40,8 @@ The input parameter must be nil or one of type table, boolean, number, string, o
   each call.
 * If input is nil (or not provided at all), then the new stream is empty.
 --]]
-function stream(input)
+---@param input function|table
+local function stream(input)
 
     -- The following _* functions are internal functions that implement the stream's behaviour based
     -- on iterator functions.
@@ -526,6 +527,7 @@ function stream(input)
 
     -- Returns a new stream created form the given interator function.
     local function _stream(iter)
+        ---@class stream
         local result = {
             -- Returns the iterator function for the elements of this stream.
             iter = function()
@@ -706,3 +708,5 @@ function stream(input)
         error("input must be nil or of type table, boolean, number, string, or function, but was a "..type(input))
     end
 end
+
+return stream
