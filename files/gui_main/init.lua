@@ -90,8 +90,9 @@ end
 local callbacks = {}
 
 function callbacks.OnWorldPreUpdate()
-	-- shift = InputIsKeyDown( Key_LSHIFT ) or InputIsKeyDown( Key_RSHIFT )
-	-- alt = InputIsKeyDown( Key_LALT ) or InputIsKeyDown( Key_RALT )
+	ctrl = InputIsKeyDown( Key_LCTRL ) or InputIsKeyDown( Key_RCTRL )
+	shift = InputIsKeyDown( Key_LSHIFT ) or InputIsKeyDown( Key_RSHIFT )
+	alt = InputIsKeyDown( Key_LALT ) or InputIsKeyDown( Key_RALT )
 
 	pop.start_frame()
 	now = GameGetFrameNum()
