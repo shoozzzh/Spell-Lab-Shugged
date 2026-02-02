@@ -11,6 +11,10 @@ setmetatable( _G, { __index = { ModTextFileSetContent = ModTextFileSetContent } 
 -- ModLuaFileAppend( "data/scripts/gun/gun.lua", mod_path .. "files/append/gun/cast_delay_fixer.lua" )
 -- ModLuaFileAppend( "data/scripts/gun/gun.lua", mod_path .. "files/append/gun/disable_casting.lua" )
 
+mod_setting = dofile_once( mod_path .. "files/mod_setting.lua" )
+stream = dofile_once( mod_path .. "libs/stream.lua" )
+format = dofile_once( mod_path .. "files/format.lua" )
+
 dofile( mod_path .. "libs/polytools/polytools_init.lua" ).init( mod_path .. "libs/polytools/" )
 
 local translations = ModTextFileGetContent( mod_path .. "files/translations.csv" )
@@ -22,15 +26,15 @@ end
 ModTextFileSetContent( main, main_content .. translations:gsub( "^[^\n]*\n", "", 1 ) )
 
 local default_settings = {
-	["quick_spell_picker"] = true,
-	["spell_replacement"] = true,
-	["show_toggle_options"] = true,
-	["show_locked_spells"] = true,
+	[ "quick_spell_picker" ] = true,
+	[ "spell_replacement" ] = true,
+	[ "show_toggle_options" ] = true,
+	[ "show_locked_spells" ] = true,
 }
 
 for key, value in pairs( default_settings ) do
-	if ModSettingGet( mod_setting_prefix .. key ) == nil then
-		ModSettingSet( mod_setting_prefix .. key, value )
+	if mod_setting.get( key ) == nil then
+		mod_setting.set( key, value )
 	end
 end
 
@@ -83,7 +87,7 @@ for _, module in ipairs( module_list ) do
 	local module_callbacks = dofile( init_lua ) or {}
 
 	for name, funcs in pairs( callbacks ) do
-		funcs[ #funcs + 1 ] = module_callbacks[ name ]
+		funcs[ #funcs+1 ] = module_callbacks[ name ]
 	end
 
 	::continue::

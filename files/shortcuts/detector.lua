@@ -6,7 +6,7 @@ return function( keystroke_listener, shortcuts )
 
 	local cache = {}
 
-	local xor = function( a, b ) return ( a and not b ) or ( not a and b ) end
+	local xor = function( a, b ) return (a and not b) or (not a and b) end
 
 	---@param shortcut shortcut
 	---@param dont_cache bool

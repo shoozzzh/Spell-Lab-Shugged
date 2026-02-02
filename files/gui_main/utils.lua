@@ -13,13 +13,13 @@ TextColors = {
 -- end
 
 function sound_button_clicked()
-	if mod_setting_get( "button_click_sound" ) then
+	if mod_setting.get "button_click_sound" then
 		GamePlaySound( "data/audio/Desktop/ui.bank", "ui/button_click", GameGetCameraPos() )
 	end
 end
 
 function sound_action_button_clicked()
-	if mod_setting_get( "action_button_click_sound" ) then
+	if mod_setting.get "action_button_click_sound" then
 		GamePlaySound( "data/audio/Desktop/ui.bank", "ui/button_click", GameGetCameraPos() )
 	end
 end

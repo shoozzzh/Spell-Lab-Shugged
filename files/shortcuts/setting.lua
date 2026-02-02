@@ -12,8 +12,8 @@ function deser( shortcut )
 	return loadfile( "mods/shortcut_set.lua" )()
 end
 
-dofile_once( "mods/spell_lab_shugged/files/lib/shortcut_tostring.lua" )
-local keystroke_listener = dofile_once( "mods/spell_lab_shugged/files/gui/keystroke_listener.lua" )
+dofile_once( "mods/spell_lab_shugged/files/shortcuts/tostring.lua" )
+local keystroke_listener = dofile_once( "mods/spell_lab_shugged/files/keystroke_listener.lua" )
 
 local shortcut_text = {
 	["简体中文"] = {

@@ -1,4 +1,31 @@
-local _, keycodes_by_type = unpack( dofile_once( "mods/spell_lab_shugged/files/lib/keycodes_wrapped.lua" ) )
+local function get_keycodes()
+	local f = loadfile "data/scripts/debug/keycodes.lua"
+	local raw = {}
+	setfenv( f, raw )()
+
+	local by_type = { Mouse = {}, Keyboard = {}, Joystick = {} }
+	for k, v in pairs( raw ) do
+		if k:find "^Mouse_" then
+			by_type.Mouse[ k ] = v
+		elseif k:find "^Key_" then
+			by_type.Keyboard[ k ] = v
+		elseif k:find "^JOY_BUTTON_" then
+			by_type.Joystick[ k ] = v
+		end
+	end
+
+	local excluded_keys = { "JOY_BUTTON_0", "JOY_BUTTON_1", "JOY_BUTTON_2", "JOY_BUTTON_3" }
+
+	for _, t in ipairs { raw, by_type.Mouse, by_type.Keyboard, by_type.Joystick } do
+		for _, key in ipairs( excluded_keys ) do
+			t[ key ] = nil
+		end
+	end
+
+	return { raw, by_type }
+end
+
+local keycodes_by_type = get_keycodes()[ 2 ]
 
 ---@class keystroke_listener
 local keystroke_listener = {}
@@ -43,8 +70,8 @@ do
 
 		for _, key in ipairs( from_these_keys ) do
 			local down_listener, just_down_listener = unpack( listeners[ key ] )
-			down_listeners[ #down_listeners + 1 ] = down_listener
-			just_down_listeners[ #just_down_listeners + 1 ] = just_down_listener
+			down_listeners[ #down_listeners+1 ] = down_listener
+			just_down_listeners[ #just_down_listeners+1 ] = just_down_listener
 
 			listeners[ key ] = nil
 		end
@@ -70,7 +97,7 @@ for name, code in pairs( keycodes_by_type.Joystick ) do
 	end
 
 	local down_listener = function()
-		for index = 0,7 do
+		for index = 0, 7 do
 			if joysticks_connected[ index ] and InputIsJoystickButtonDown( index, code ) then
 				return true
 			end
@@ -85,15 +112,15 @@ end
 
 do
 	local listened_keys = {}
-	
+
 	for key, _ in pairs( listeners ) do
-		listened_keys[ #listened_keys + 1 ] = key
+		listened_keys[ #listened_keys+1 ] = key
 	end
 
 	for key, _ in ipairs( keycodes_by_type.Joystick ) do
-		listened_keys[ #listened_keys + 1 ] = key
+		listened_keys[ #listened_keys+1 ] = key
 	end
-	
+
 	keystroke_listener.listened_keys = listened_keys
 end
 
@@ -109,7 +136,7 @@ function keystroke_listener:update()
 	local just_down = self.just_down
 	local down = self.down
 
-	for i = 0,7 do
+	for i = 0, 7 do
 		joysticks_connected[ i ] = InputIsJoystickConnected( i )
 	end
 
@@ -129,7 +156,7 @@ function keystroke_listener:update()
 		if current_frames_held > 30 then
 			just_down[ name ] = true
 		end
-		
+
 		down[ name ] = down_now
 
 		if down[ name ] then

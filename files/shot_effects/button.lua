@@ -1,1 +1,5 @@
-do_picker_button( "mods/spell_lab_shugged/files/gui/buttons/shot_effects.png", PICKERS.ShotEffects, "shot_effects" )
+local module_path = this_folder()
+
+return function()
+    menus:toggle_button( "shot_effects", module_path .. "button.png" )
+end

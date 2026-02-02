@@ -1,22 +1,5 @@
 local mod_id = "spell_lab_shugged"
 
-local key_prefix = "$" .. mod_id .. "_"
----@param key string
-function wrap_key( key )
-	return key_prefix .. key
-end
-
----@param key string
-function get_text( key )
-	return GameTextGetTranslatedOrNot( wrap_key( key ) )
-end
-
----@param f fun( ... )|nil
----@return any
-function optional_call( f, ... )
-	if f then return f( ... ) end
-end
-
 ---@generic T: fun()
 ---@param f T
 ---@return T
@@ -32,6 +15,38 @@ function memoize( f )
 	} )
 end
 
+local extract_folder = memoize( function( source )
+	return source:match "^(.*/)"
+end )
+
+local finfo = jit.util.funcinfo
+
+---@return string
+function this_folder()
+	return extract_folder( finfo( setfenv( 2, getfenv( 2 ) ) ).source )
+end
+
+local key_prefix = "$" .. mod_id .. "_"
+---@param key string
+function wrap_key( key )
+	if key == nil then
+		local caller = finfo( setfenv( 3, getfenv( 3 ) ) ).source
+		print_error( caller )
+	end
+	return key_prefix .. key
+end
+
+---@param key string
+function get_text( key )
+	return GameTextGetTranslatedOrNot( wrap_key( key ) )
+end
+
+---@param f fun( ... )|nil
+---@return any
+function optional_call( f, ... )
+	if f then return f( ... ) end
+end
+
 local function dofile_mask( env )
 	local loadonce, loaded = {}, {}
 	local mask = {}
@@ -41,32 +56,32 @@ local function dofile_mask( env )
 		end
 	end
 	mask.dofile_once = function( filepath )
-	    local result
-	    local cached = loadonce[ filepath ]
-	    if cached ~= nil then
-	        result = cached[1]
-	    else
-	        local f, err = loadfile( filepath )
-	        if f == nil then return f, err end
-	        setfenv( f, env )
-	        result = f()
-	        loadonce[ filepath ] = { result }
-	        mask.do_mod_appends( filepath )
-	    end
-	    return result
+		local result
+		local cached = loadonce[ filepath ]
+		if cached ~= nil then
+			result = cached[ 1 ]
+		else
+			local f, err = loadfile( filepath )
+			if f == nil then return f, err end
+			setfenv( f, env )
+			result = f()
+			loadonce[ filepath ] = { result }
+			mask.do_mod_appends( filepath )
+		end
+		return result
 	end
 	mask.dofile = function( filepath )
-	    local f = loaded[ filepath ]
-	    if f == nil then
-	    	local err
-	        f, err = loadfile( filepath )
-	        if f == nil then return f, err end
-	        setfenv( f, env )
-	        loaded[ filepath ] = f
-	    end
-	    local result = f()
-	    mask.do_mod_appends( filepath )
-	    return result
+		local f = loaded[ filepath ]
+		if f == nil then
+			local err
+			f, err = loadfile( filepath )
+			if f == nil then return f, err end
+			setfenv( f, env )
+			loaded[ filepath ] = f
+		end
+		local result = f()
+		mask.do_mod_appends( filepath )
+		return result
 	end
 
 	return mask
@@ -81,7 +96,7 @@ function get_globals( filepath, extra_globals )
 	end
 
 	local e = extra_globals or {}
-	local mask = setmetatable( dofile_mask( e ), { __index = getfenv(2) } )
+	local mask = setmetatable( dofile_mask( e ), { __index = getfenv( 2 ) } )
 	setmetatable( e, { __index = mask } )
 	setfenv( f, e )()
 
@@ -93,28 +108,18 @@ function get_globals( filepath, extra_globals )
 	return globals
 end
 
-local extract_folder = memoize( function( source )
-	return source:match("^(.*/)")
-end )
-
-local finfo = jit.util.funcinfo
-
----@return string
-function this_folder()
-	return extract_folder( finfo( setfenv( 2, getfenv(2) ) ).source )
-end
-
-local function c( h )
-	return ( h + 1 ) / 256
-end
-
-function color( r, g, b, a )
-	return c( r ), c( g ), c( b ), c( a )
+---@param r number
+---@param g number
+---@param b number
+---@param a number
+---@return color
+function rgba( r, g, b, a )
+	return { r = r, g = g, b = b, a = a }
 end
 
 function maxn( t )
 	local result = table.maxn( t )
-	if result == 0 and not t[0] then return -1 end
+	if result == 0 and not t[ 0 ] then return -1 end
 	return result
 end
 

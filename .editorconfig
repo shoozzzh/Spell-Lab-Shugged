@@ -1,0 +1,16 @@
+root = true
+
+[*]
+indent_style = space
+indent_size = 4
+end_of_line = crlf
+charset = utf-8
+
+[*.lua]
+space_inside_function_param_list_parentheses = true
+space_inside_square_brackets = true
+call_arg_parentheses = remove
+trailing_table_separator = smart
+insert_final_newline = true
+space_inside_function_call_parentheses = true
+space_around_table_append_operator = true

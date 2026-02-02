@@ -58,7 +58,7 @@ local named_keys = {
 }
 
 local custom_keys_i18n = {
-	["简体中文"] = {
+	[ "简体中文" ] = {
 		Mouse_left = "左键",
 		Mouse_right = "右键",
 	},
@@ -71,7 +71,7 @@ local custom_keys_i18n = {
 do
 	local other_zh_cn_languages = { "喵体中文", "汪体中文", "完全汉化" }
 	for _, v in ipairs( other_zh_cn_languages ) do
-		custom_keys_i18n[ v ] = custom_keys_i18n["简体中文"]
+		custom_keys_i18n[ v ] = custom_keys_i18n[ "简体中文" ]
 	end
 end
 
@@ -85,8 +85,8 @@ local function keyname_to_text( keyname, lang )
 
 	if keyname:find "^Mouse_" then
 		return GameTextGet( "$input_" .. keyname:gsub( "_", "" ):lower() ):upper()
-	elseif keyname:find "^Key_"  then
-		local name = keyname:sub(5):upper()
+	elseif keyname:find "^Key_" then
+		local name = keyname:sub( 5 ):upper()
 
 		result = special_chars[ name ]
 		if result then return result end
@@ -99,7 +99,7 @@ local function keyname_to_text( keyname, lang )
 
 		return name
 	elseif keyname:find "^JOY_BUTTON_" then
-		local result = GameTextGet( "$input_xboxbutton_" .. keyname:sub(12):lower() )
+		local result = GameTextGet( "$input_xboxbutton_" .. keyname:sub( 12 ):lower() )
 		if keyname:find "%d%d_DOWN$" then
 			result = result .. " DOWN"
 		elseif keyname:find "%d%d_MOVED$" then
@@ -110,7 +110,7 @@ local function keyname_to_text( keyname, lang )
 
 		return result
 	end
-	return GameTextGet( "$menuoptions_configurecontrols_keyname_unknown" )
+	return GameTextGet "$menuoptions_configurecontrols_keyname_unknown"
 end
 
 local order = {
@@ -145,11 +145,11 @@ function shortcut_tostring( shortcut, lang )
 
 	shortcut_sort( copy )
 
-	copy[ #copy + 1 ] = trigger_key
+	copy[ #copy+1 ] = trigger_key
 
 	local strs_to_concat = {}
 	for _, key in ipairs( copy ) do
-		strs_to_concat[ #strs_to_concat + 1 ] = keyname_to_text( key, lang )
+		strs_to_concat[ #strs_to_concat+1 ] = keyname_to_text( key, lang )
 	end
 	return table.concat( strs_to_concat, " + " )
 end

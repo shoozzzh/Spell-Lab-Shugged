@@ -1,4 +1,4 @@
-local this_path = jit.util.funcinfo( setfenv( 1, getfenv() ) ).source:match( "^.*/" )
+local this_path = jit.util.funcinfo( setfenv( 1, getfenv() ) ).source:match "^.*/"
 
 local gui = GuiCreate()
 
@@ -17,7 +17,8 @@ local function new_prop()
 	end
 
 	function prop.push( p )
-		prop.stack[ #prop.stack + 1 ] = p
+		prop.stack[ #prop.stack+1 ] = p
+		return true
 	end
 
 	function prop.pop()
@@ -63,25 +64,62 @@ local pop = {
 	call_depth_next = nil,
 	---@class prop_font
 	---@field next fun( font: font )
-	---@field push fun( font: font )
+	---@field push fun( font: font ): bool
 	---@field pop fun()
 	---@field get fun(): font?
 	font = new_prop(),
 	---@class prop_image_xform
 	---@field next fun( image_xform: image_xform )
-	---@field push fun( image_xform: image_xform )
+	---@field push fun( image_xform: image_xform ): bool
 	---@field pop fun()
 	---@field get fun(): image_xform?
 	image_xform = new_prop(),
 	---@class prop_image_animation
 	---@field next fun( image_animation: image_animation )
-	---@field push fun( image_animation: image_animation )
+	---@field push fun( image_animation: image_animation ): bool
 	---@field pop fun()
 	---@field get fun(): image_animation?
 	image_animation = new_prop(),
 	text_line_height = 6,
 	---@type dragging_data?
 	dragging = nil,
+}
+
+pop.pos = {
+	stack = {},
+	next_value = nil,
+	next = function( x, y )
+		pop.pos.next_value = { x, y }
+	end,
+	push = function( x, y )
+		pop.pos.stack[ #pop.pos.stack+1 ] = { x, y }
+		return true
+	end,
+	pop = function()
+		pop.pos.stack[ #pop.pos.stack ] = nil
+	end,
+	get = function()
+		local x, y = 0, 0
+		for _, offset in ipairs( pop.pos.stack ) do
+			x, y = x + offset[ 1 ], y + offset[ 2 ]
+		end
+		local next_value = pop.pos.next_value
+		pop.pos.next_value = nil
+		if next_value then
+			x, y = x + next_value[ 1 ], y + next_value[ 2 ]
+		end
+		return x, y
+	end,
+	layer = function( x, y )
+		return function( content_fn )
+			local stack, next_value = pop.pos.stack, pop.pos.next_value
+			pop.pos.stack, pop.pos.next_value = {}, nil
+			pop.pos.push( x, y )
+			content_fn()
+			pop.pos.pop()
+			pop.pos.stack, pop.pos.next_value = stack, next_value
+		end
+	end,
 }
 
 local id_allocator = dofile( this_path .. "id_allocator.lua" )
@@ -120,7 +158,7 @@ pop.option = setmetatable( {}, {
 	end,
 	__index = function( t, k )
 		return option_list[ k ]
-	end
+	end,
 } )
 
 function pop.option_clear()
@@ -155,7 +193,7 @@ end
 ---@field a integer
 
 local function h2d( h )
-	return ( h + 1 ) / 256
+	return (h + 1) / 256
 end
 
 ---@param color color
@@ -182,17 +220,16 @@ function pop.animate_end()
 end
 
 function pop.animate_fade_in( speed, step, reset )
-	GuiAnimateAlphaFadeIn( gui, get_id(), speed, step, reset)
+	GuiAnimateAlphaFadeIn( gui, get_id(), speed, step, reset )
 end
 
 function pop.animate_scale_in( acceleration, reset )
 	GuiAnimateScaleIn( gui, get_id(), acceleration, reset )
 end
 
----@param x number
----@param y number
 ---@param text string
-function pop.text( x, y, text )
+function pop.text( text )
+	local x, y = pop.pos.get()
 	local font_file, is_pixel
 
 	local font = pop.font:get()
@@ -204,10 +241,9 @@ function pop.text( x, y, text )
 	GuiText( gui, x, y, text, 1, font_file or "", is_pixel )
 end
 
----@param x number
----@param y number
 ---@param sprite_filename string
-function pop.image( x, y, sprite_filename )
+function pop.image( sprite_filename )
+	local x, y = pop.pos.get()
 	local alpha, scale, scale_y, rotation = 1, 1, 0, nil
 	local playback_type, animation_name
 
@@ -224,21 +260,19 @@ function pop.image( x, y, sprite_filename )
 	GuiImage( gui, get_id(), x, y, sprite_filename, alpha, scale, scale_y, rotation, playback_type, animation_name or "" )
 end
 
----@param x number
----@param y number
 ---@param sprite_filename string
 ---@param width number
 ---@param height number
-function pop.image_9piece( x, y, sprite_filename, width, height )
+function pop.image_9piece( sprite_filename, width, height )
+	local x, y = pop.pos.get()
 	GuiImageNinePiece( gui, get_id(), x, y, width, height, 1, sprite_filename, sprite_filename )
 end
 
----@param x number
----@param y number
 ---@param text string
 ---@return bool
 ---@return bool
-function pop.text_button( x, y, text )
+function pop.text_button( text )
+	local x, y = pop.pos.get()
 	local font_file, is_pixel
 
 	local font = pop.font:get()
@@ -249,39 +283,41 @@ function pop.text_button( x, y, text )
 	return GuiButton( gui, get_id(), x, y, text, 1, font_file or "", is_pixel )
 end
 
----@param x number
----@param y number
 ---@param sprite_filename string
 ---@return bool
 ---@return bool
-function pop.button( x, y, sprite_filename )
+function pop.button( sprite_filename )
+	local x, y = pop.pos.get()
 	return GuiImageButton( gui, get_id(), x, y, "", sprite_filename )
 end
 
----@param x number
----@param y number
 ---@param value number
 ---@param width number
 ---@return number
-function pop.slider( x, y, value, width )
+function pop.slider( value, width )
+	local x, y = pop.pos.get()
 	return GuiSlider( gui, get_id(), x, y, "", value, 0, 1, value, 0, "", width )
 end
 
-function pop.input_text( x, y, value, width, max_length, allowed_chars )
+function pop.input_text( value, width, max_length, allowed_chars )
+	local x, y = pop.pos.get()
 	return GuiTextInput( gui, get_id(), x, y, value, width, max_length, allowed_chars )
 end
 
-function pop.input_any_text( x, y, value, width, max_length )
+function pop.input_any_text( value, width, max_length )
+	local x, y = pop.pos.get()
 	return GuiTextInput( gui, get_id(), x, y, value, width, max_length, "" )
 end
 
-function pop.input_int( x, y, value, width, max_length )
+function pop.input_int( value, width, max_length )
+	local x, y = pop.pos.get()
 	local old_text = ("%.0f"):format( value )
 	local new_text = GuiTextInput( gui, get_id(), x, y, old_text, width, max_length, "0123456789+-" )
 	return tonumber( new_text )
 end
 
-function pop.input_float( x, y, value, width, max_length )
+function pop.input_float( value, width, max_length )
+	local x, y = pop.pos.get()
 	local old_text = ("%.3f"):format( value )
 	local new_text = GuiTextInput( gui, get_id(), x, y, old_text, width, max_length, "0123456789+-." )
 	return tonumber( new_text )
@@ -299,25 +335,29 @@ end
 -- no we don't use vanilla tooltip function
 
 local function tooltip( content_fn, x, y )
-	pop.call_depth_mod(1)
+	pop.call_depth_mod( 1 )
 	GuiLayoutBeginLayer( gui )
 	GuiBeginAutoBox( gui )
-	content_fn( x, y )
-	pop.z_mod_next(1)
+
+	pop.pos.layer( x, y )( content_fn )
+
+	pop.z_mod_next( 1 )
 	GuiEndAutoBoxNinePiece( gui )
 	GuiLayoutEndLayer( gui )
-	pop.call_depth_mod(-1)
+	pop.call_depth_mod( -1 )
 end
 
 function pop.tooltip( ... )
 	local text = { ... }
 
-	pop.tooltip_custom( 2, 0, true )( function( x, y )
+	pop.tooltip_custom( 2, 0, true )( function()
+		local line_num = 0
 		for _, line in ipairs( text ) do
 			line = GameTextGetTranslatedOrNot( line )
 			for t in string.gmatch( line or "", "[^\n]+" ) do
-				pop.text( x, y, t )
-				y = y + pop.text_line_height
+				pop.pos.next( 0, pop.text_line_height * line_num )
+				pop.text( t )
+				line_num = line_num + 1
 			end
 		end
 	end )
@@ -338,9 +378,9 @@ local function show_tooltip_custom( callback, x_min, x_max, x_offset, y, animate
 
 	local _, tooltip_height = autobox_size( callback )
 
-	local x_mid = ( x_min + x_max ) / 2
+	local x_mid = (x_min + x_max) / 2
 
-	local align_left = x_mid > pop.screen_size[1] / 2
+	local align_left = x_mid > pop.screen_size[ 1 ] / 2
 	local old_align_Left
 	if align_left then
 		old_align_Left = pop.option.Align_Left
@@ -357,11 +397,11 @@ local function show_tooltip_custom( callback, x_min, x_max, x_offset, y, animate
 		x = x + x_offset
 	end
 
-	if y + tooltip_height > pop.screen_size[2] then
-		y = pop.screen_size[2] - tooltip_height
+	if y + tooltip_height > pop.screen_size[ 2 ] then
+		y = pop.screen_size[ 2 ] - tooltip_height
 	end
 
-	pop.z_mod(-1024)
+	pop.z_mod( -1024 )
 
 	if animated then
 		pop.animate_begin()
@@ -375,7 +415,7 @@ local function show_tooltip_custom( callback, x_min, x_max, x_offset, y, animate
 		pop.animate_end()
 	end
 
-	pop.z_mod(1024)
+	pop.z_mod( 1024 )
 
 	if align_left then
 		pop.option.Align_Left = old_align_Left
@@ -393,7 +433,8 @@ end
 
 ---@param margin_x number? 2
 ---@param margin_y number? 2
-function pop.scroll_box_begin( x, y, width, height, margin_x, margin_y )
+function pop.scroll_box_begin( width, height, margin_x, margin_y )
+	local x, y = pop.pos.get()
 	GuiBeginScrollContainer( gui, get_id(), x, y, width, height, true, margin_x, margin_y )
 end
 
@@ -459,24 +500,14 @@ function pop.block_mousewheel()
 	end
 end
 
-function pop.matrix( x, y, cell_2dlist, cell_width, cell_height, cell_gui_func )
-	for _, row in ipairs( cell_2dlist ) do
-		for _, cell in ipairs( row ) do
-			cell_gui_func( x, y, cell )
-			x = x + cell_width
-		end
-		y = y + cell_height
-	end
-end
-
----@param x number
----@param y number
 ---@param width number
 ---@param height number
+---@param use_right_click bool
 ---@return number x
 ---@return number y
 ---@return bool dragging
-function pop.draggable_space( x, y, width, height, use_right_click )
+function pop.draggable_space( width, height, use_right_click )
+	local x, y = pop.pos.get()
 	local id = get_id()
 	local keycode = 1
 	if use_right_click then
@@ -505,6 +536,86 @@ function pop.draggable_space( x, y, width, height, use_right_click )
 		return x, y, true
 	end
 	return x, y, false
+end
+
+function pop.layout_stack( offset_x, offset_y )
+	offset_x = offset_x or 0
+	offset_y = offset_y or 0
+	local x, y = 0, 0
+
+	local stack, next_value = pop.pos.stack, pop.pos.next_value
+
+	return {
+		next = function()
+			pop.pos.stack, pop.pos.next_value = { unpack( stack ) }, next_value and { unpack( next_value ) }
+			x, y = x + offset_x, y + offset_y
+			pop.pos.push( x, y )
+		end,
+		finish = function()
+			pop.pos.stack, pop.pos.next_value = stack, next_value
+		end,
+	}
+end
+
+function pop.layout_hwrap( offset_x, offset_y, line_size )
+	local x, y = 0, 0
+
+	local stack, next_value = pop.pos.stack, pop.pos.next_value
+	local cur_line_size = 1
+	return {
+		next = function()
+			pop.pos.stack, pop.pos.next_value = { unpack( stack ) }, { unpack( next_value ) }
+			cur_line_size = cur_line_size + 1
+			if cur_line_size <= line_size then
+				x = x + offset_x
+			else
+				x = 0
+				y = y + offset_y
+			end
+			pop.pos.push( x, y )
+		end,
+		finish = function()
+			pop.pos.stack, pop.pos.next_value = stack, next_value
+		end,
+	}
+end
+
+function pop.auto_layout_stack( offset_x, offset_y )
+	offset_x = offset_x or 0
+	offset_y = offset_y or 0
+	local x, y = pop.pos.get()
+	---@param content_fn fun( layout_options: auto_layout_stack_options )
+	return function( content_fn )
+		---@class auto_layout_stack_options
+		local options = {
+			pause_after_next = false,
+			paused_for_next = false,
+			paused = false,
+		}
+
+		local get = pop.pos.get
+		pop.pos.get = function()
+			local _x, _y = get()
+			if not options.paused then
+				if options.paused_for_next then
+					options.paused_for_next = false
+				else
+					pop.pos.push( offset_x, offset_y )
+				end
+			end
+			if options.pause_after_next then
+				options.pause_after_next = false
+				options.paused = true
+			end
+			return _x, _y
+		end
+
+		pop.pos.layer( x, y )( function()
+			content_fn( options )
+		end )
+
+		pop.pos.get = get
+	end
 end
 
 return pop

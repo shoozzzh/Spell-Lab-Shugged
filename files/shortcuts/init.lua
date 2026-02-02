@@ -1,3 +1,7 @@
+local module_path = this_folder()
+
+dofile_once( module_path .. "tostring.lua" )
+
 ---@type table<string,shortcut>
 local shortcuts = {
 	---@class shortcut
@@ -25,21 +29,19 @@ local shortcuts = {
 	transform_mortal_into_dummy = { "Key_SHIFT" },
 }
 
-dofile_once( "mods/spell_lab_shugged/files/lib/shortcut_tostring.lua" )
-
 ---@type table<string,string>
 shortcut_texts = {}
 
-local edit_panel_shortcut_tips
+edit_panel_shortcut_tips = ""
 
-local last_cur_lang = GameTextGet( "$current_language" )
+local last_cur_lang = GameTextGet "$current_language"
 
 local function reload_shortcut_texts()
 	for name, v in pairs( shortcuts ) do
 		shortcut_texts[ name ] = shortcut_tostring( v, last_cur_lang )
 	end
 
-	edit_panel_shortcut_tips = get_text( "shortcut_tips" )
+	edit_panel_shortcut_tips = get_text "shortcut_tips"
 	for name, v in pairs( shortcuts ) do
 		edit_panel_shortcut_tips = edit_panel_shortcut_tips:gsub( "{" .. name .. "}", shortcut_texts[ name ] )
 	end
@@ -47,18 +49,18 @@ end
 
 local function reload_shortcuts()
 	for name, _ in pairs( shortcuts ) do
-		local value = mod_setting_get( "shortcut_" .. name )
+		local value = mod_setting.get( "shortcut_" .. name )
 		local status
 		if value == nil then goto continue end
 
 		status, value = pcall( smallfolk.loads, value )
-		if not status or ( value == nil ) then goto continue end
+		if not status or (value == nil) then goto continue end
 
 		shortcuts[ name ] = value
 		::continue::
 	end
 
-	if not mod_setting_get( "shortcut_strict" ) then
+	if not mod_setting.get "shortcut_strict" then
 		shortcut_used_keys = {}
 
 		local inverted = {}
@@ -70,7 +72,7 @@ local function reload_shortcuts()
 		inverted.Mouse_left = nil
 		inverted.Mouse_right = nil
 		for key, _ in pairs( inverted ) do
-			shortcut_used_keys[ #shortcut_used_keys + 1 ] = key
+			shortcut_used_keys[ #shortcut_used_keys+1 ] = key
 		end
 	else
 		shortcut_used_keys = nil
@@ -88,19 +90,17 @@ shortcut_detector = dofile_once( module_path .. "detector.lua" )( keystroke_list
 local callbacks = {}
 
 function callbacks.OnWorldPreUpdate()
-	if GameGetFrameNum() % 60 == 0 then
-		if mod_setting_get( "shortcut_changed" ) then
-			mod_setting_set( "shortcut_changed", false )
-			reload_shortcuts()
-		end
+	if GameGetFrameNum() % 60 ~= 0 then return end
+	if mod_setting.get "shortcut_changed" then
+		mod_setting.set( "shortcut_changed", false )
+		reload_shortcuts()
+	end
 
-		local cur_lang = GameTextGet( "$current_language" )
-		if cur_lang ~= last_cur_lang then
-			last_cur_lang = cur_lang
-			reload_shortcut_texts()
-		end
+	local cur_lang = GameTextGet "$current_language"
+	if cur_lang ~= last_cur_lang then
+		last_cur_lang = cur_lang
+		reload_shortcut_texts()
 	end
 end
 
 return callbacks
-

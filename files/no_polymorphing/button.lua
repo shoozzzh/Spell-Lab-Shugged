@@ -1,2 +1,5 @@
+local module_path = this_folder()
 
-		gui_elements.flag_toggle_button( "mods/spell_lab_shugged/files/gui/buttons/disable_polymorphing.png", "no_polymorphing", "$status_protection_polymorph" )
+return function()
+	gui_elements.button_setting_toggle( module_path .. "button.png", "no_polymorphing", "$status_protection_polymorph" )
+end

@@ -1,1 +1,5 @@
-gui_elements.flag_toggle_button( "mods/spell_lab_shugged/files/gui/buttons/disable_projectiles.png", "disable_casting" )
+local module_path = this_folder()
+
+return function()
+    gui_elements.button_setting_toggle( module_path .. "button.png", "disable_casting" )
+end

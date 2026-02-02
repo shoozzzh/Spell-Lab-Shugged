@@ -1,1 +1,5 @@
-do_picker_button( "mods/spell_lab_shugged/files/gui/buttons/wand_list.png", PICKERS.WandBox, "wand_box" )
+local module_path = this_folder()
+
+return function()
+    menus:toggle_button( "wand_box", module_path .. "button.png" )
+end

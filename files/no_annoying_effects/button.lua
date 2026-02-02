@@ -1,1 +1,6 @@
-gui_elements.flag_toggle_button( "mods/spell_lab_shugged/files/gui/buttons/disable_toxic_statuses.png", "disable_toxic_statuses", nil, nil, wrap_key( "disable_toxic_statuses_description" ) )
+local module_path = this_folder()
+
+return function()
+    gui_elements.button_setting_toggle( module_path .. "button.png", "disable_toxic_statuses", nil,
+        wrap_key "disable_toxic_statuses_description" )
+end

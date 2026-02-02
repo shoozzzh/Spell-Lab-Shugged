@@ -1,4 +1,6 @@
-GuiLayoutBeginHorizontal( gui, horizontal_centered_x(9,4), percent_to_ui_scale_y(2), true )
-GuiImageButton( gui, get_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/shortcut_tips.png" )
+local module_path = this_folder()
 
-GuiTooltip( gui, wrap_key( "shortcut_tips_title" ), edit_panel_shortcut_tips )
+return function()
+    pop.button( module_path .. "button.png" )
+    pop.tooltip( wrap_key "shortcut_tips_title", edit_panel_shortcut_tips )
+end

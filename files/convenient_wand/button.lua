@@ -1,6 +1,7 @@
-GuiImageButton( gui, get_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/spawn_convenient_wand.png" )
-do
-	local left_click,right_click = previous_data( gui )
+local module_path = this_folder()
+
+return function()
+	local left_click, right_click = pop.button( module_path .. "button.png" )
 	local wand_data = {
 		stats = {
 			shuffle_deck_when_empty = false,
@@ -32,5 +33,5 @@ do
 		sound_button_clicked()
 		WANDS.initialize_wand( held_wand, wand_data, false )
 	end
+	pop.tooltip( wrap_key "spawn_best_wand", wrap_key "spawn_best_wand_description" )
 end
-GuiTooltip( gui, wrap_key( "spawn_best_wand" ), wrap_key( "spawn_best_wand_description" ) )
