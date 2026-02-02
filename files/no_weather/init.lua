@@ -1,4 +1,4 @@
-local module_path = this_folder()
+local module_path = module_path()
 
 if ModSettingGet( mod_setting_prefix .. "no_weather" ) then
 	local init_lua_path = "data/scripts/init.lua"

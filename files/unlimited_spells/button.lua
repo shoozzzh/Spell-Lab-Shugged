@@ -1,4 +1,4 @@
-local module_path = this_folder()
+local module_path = module_path()
 
 return function()
 	if not world_state_unlimited_spells then

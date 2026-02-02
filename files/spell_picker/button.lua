@@ -1,4 +1,4 @@
-local module_path = this_folder()
+local module_path = module_path()
 
 return function()
 	local changed, is_active = menus:toggle_button( "spell_picker", module_path .. "button.png", "spell_picker" )

@@ -1,4 +1,4 @@
-local module_path = this_folder()
+local module_path = module_path()
 
 return function()
 	if not selecting_mortal_to_transform then

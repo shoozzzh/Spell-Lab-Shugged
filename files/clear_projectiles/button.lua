@@ -1,4 +1,4 @@
-local module_path = this_folder()
+local module_path = module_path()
 
 local function silent_kill( proj_id )
 	for _, proj_comp in ipairs( EntityGetComponentIncludingDisabled( proj_id, "ProjectileComponent" ) or {} ) do

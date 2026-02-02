@@ -38,6 +38,28 @@ for key, value in pairs( default_settings ) do
 	end
 end
 
+local function replace_placeholders( file, folder )
+	file = folder .. file
+	if not ModDoesFileExist( file ) then
+		print_error "file does not exist at:"
+		print_error( file )
+	end
+	local content = ModTextFileGetContent( file )
+	content = content:gsub( "___", mod_id )
+	content = content:gsub( "__THIS_FOLDER__", folder )
+	ModTextFileSetContent( file, content )
+end
+
+function apply_placeholders( path, folder )
+	for key, value in pairs( path ) do
+		if type( key ) == "number" then
+			replace_placeholders( value, folder )
+		elseif type( key ) == "string" then
+			apply_placeholders( value, folder .. key .. "/" )
+		end
+	end
+end
+
 function OnPlayerSpawned( player_id )
 	dofile_once( mod_path .. "libs/controls_freezer.lua" ).unfreeze()
 end

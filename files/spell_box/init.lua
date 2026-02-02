@@ -1,4 +1,4 @@
-local module_path = this_folder()
+local module_path = module_path()
 
 local spell_box = dofile_once( module_path .. "main.lua" )
 

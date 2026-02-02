@@ -1,4 +1,4 @@
-local module_path = this_folder()
+local module_path = module_path()
 
 local button_image = module_path .. "button.png"
 local button_width, button_height = get_image_size( button_image )

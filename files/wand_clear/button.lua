@@ -1,4 +1,4 @@
-local module_path = this_folder()
+local module_path = module_path()
 
 return function()
 	if pop.button( module_path .. "button.png" ) then

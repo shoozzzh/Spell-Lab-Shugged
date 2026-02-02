@@ -1,4 +1,4 @@
-local module_path = this_folder()
+local module_path = module_path()
 
 return function()
 	local num_effects_positive = GameGetGameEffectCount( player, "EDIT_WANDS_EVERYWHERE" )

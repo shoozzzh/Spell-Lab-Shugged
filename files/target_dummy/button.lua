@@ -1,4 +1,4 @@
-local module_path = this_folder()
+local module_path = module_path()
 
 return function()
 	local left_click, right_click = pop.button( module_path .. "button.png" )
@@ -20,9 +20,9 @@ return function()
 				y = math.floor( y / snap_gird_size + 0.5 ) * snap_gird_size
 			end
 			if left_click then
-				EntityLoad( module_path .. "dummy_target/dummy_target.xml", x, y )
+				EntityLoad( module_path .. "entity.xml", x, y )
 			elseif right_click then
-				EntityLoad( module_path .. "dummy_target/dummy_target_final.xml", x, y )
+				EntityLoad( module_path .. "entity_final.xml", x, y )
 			end
 			sound_button_clicked()
 		end

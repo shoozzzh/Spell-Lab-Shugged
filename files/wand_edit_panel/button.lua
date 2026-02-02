@@ -1,4 +1,4 @@
-local module_path = this_folder()
+local module_path = module_path()
 
 return function()
 	local gif_mode = mod_setting.get "gif_mode"

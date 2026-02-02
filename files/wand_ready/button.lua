@@ -1,8 +1,8 @@
-local module_path = this_folder()
+local module_path = module_path()
 
-local raw_value_key = "spell_lab_shugged.wand_cast_delay_fixed_to_raw_value"
-local cast_delay_key = "spell_lab_shugged.wand_cast_delay_fixed_to"
-local reload_time_key = "spell_lab_shugged.wand_reload_time_fixed_to"
+local raw_value_key = mod_id .. ".wand_cast_delay_fixed_to_raw_value"
+local cast_delay_key = mod_id .. ".wand_cast_delay_fixed_to"
+local reload_time_key = mod_id .. ".wand_reload_time_fixed_to"
 
 return function()
 	local fixed_to_raw_value = GlobalsGetValue( raw_value_key, "0" ) == "1"

@@ -1,4 +1,4 @@
-local module_path = this_folder()
+local module_path = module_path()
 
 return function()
 	local hp_fixer = EntityGetWithName "spell_lab_shugged_hp_fixer"

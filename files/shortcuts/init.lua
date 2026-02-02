@@ -1,4 +1,4 @@
-local module_path = this_folder()
+local module_path = module_path()
 
 dofile_once( module_path .. "tostring.lua" )
 

@@ -2,7 +2,7 @@ print "[spell lab] setting up GUI"
 
 dofile_once( mod_path .. "files/misc_utils.lua" )
 
-local module_path = this_folder()
+local module_path = module_path()
 
 pop = dofile( mod_path .. "libs/pop/main.lua" )
 
@@ -69,10 +69,10 @@ local function show_gui()
 	layout.next()
 	show_button_line( functions_line )
 
-	if mod_setting.get "show_toggle_options" then
-		layout.next()
-		show_button_line( toggles_line )
-	end
+	-- if mod_setting.get "show_toggle_options" then
+	-- 	layout.next()
+	-- 	show_button_line( toggles_line )
+	-- end
 
 	layout.finish()
 

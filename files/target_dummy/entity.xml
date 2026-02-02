@@ -1,5 +1,5 @@
-<Entity tags="prop,hittable,mortal,homing_target,enemy,teleportable_NOT,polymorphable_NOT,spell_lab_shugged_target_dummy" >
-	<Base file="mods/spell_lab_shugged/files/entities/dummy_target/base_dummy_target.xml" />
+<Entity tags="prop,hittable,mortal,homing_target,enemy,teleportable_NOT,polymorphable_NOT,___.target_dummy" >
+	<Base file="__THIS_FOLDER__base.xml" />
 <!-- 	<CharacterCollisionComponent/>
 	<CharacterDataComponent
 		collision_aabb_min_x="-10.5"
@@ -12,7 +12,9 @@
 	<SpriteAnimatorComponent/>
 	<StatusEffectDataComponent/>
 	<SpriteStainsComponent/>
-	<SpriteComponent image_file="mods/spell_lab_shugged/files/entities/dummy_target/dummy_target_sprite.xml" />
+	<SpriteComponent
+		image_file="__THIS_FOLDER__sprite.png" offset_x="10.5" offset_y="14">
+	</SpriteComponent>
 	<SpriteOffsetAnimatorComponent
 		y_amount="2"
 		y_speed="2.5"

@@ -1,4 +1,5 @@
-local mod_id = "spell_lab_shugged"
+mod_id = "spell_lab_shugged"
+mod_path = "mods/" .. mod_id .. "/"
 
 ---@generic T: fun()
 ---@param f T
@@ -15,15 +16,24 @@ function memoize( f )
 	} )
 end
 
+local finfo = jit.util.funcinfo
+
 local extract_folder = memoize( function( source )
 	return source:match "^(.*/)"
 end )
 
-local finfo = jit.util.funcinfo
-
 ---@return string
 function this_folder()
 	return extract_folder( finfo( setfenv( 2, getfenv( 2 ) ) ).source )
+end
+
+local extract_module_path = memoize( function( source )
+	return source:match "^(mods/[^/]+/files/[^/]+/)"
+end )
+
+---@return string
+function module_path()
+	return extract_module_path( finfo( setfenv( 2, getfenv( 2 ) ) ).source )
 end
 
 local key_prefix = "$" .. mod_id .. "_"
