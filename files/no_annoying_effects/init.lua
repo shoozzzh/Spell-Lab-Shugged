@@ -1,3 +1,5 @@
+local module_path = module_path()
+
 local injected_lua_folder = mod_path .. "files/scripts/saved/"
 
 local twitchy_effect_path = "data/entities/misc/effect_twitchy.xml"
@@ -36,7 +38,8 @@ if ModDoesFileExist( twitchy_effect_path ) and twitchy_effect then
 				end
 				old_shot( projectile_id )
 			end]] )
-		twitchy_effect = twitchy_effect:gsub( twitchy_lua_path:gsub( "%.", "%." ), injected_lua_folder .. "twitchy_shot.lua" )
+		twitchy_effect = twitchy_effect:gsub( twitchy_lua_path:gsub( "%.", "%." ),
+			injected_lua_folder .. "twitchy_shot.lua" )
 	end
 
 	ModTextFileSetContent( twitchy_effect_path, twitchy_effect )
@@ -58,7 +61,8 @@ if ModDoesFileExist( neutralized_effect_path ) and neutralized_effect then
 				end
 				old_shot( projectile_id )
 			end]] )
-		neutralized_effect = neutralized_effect:gsub( neutralized_lua_path:gsub( "%.", "%." ), injected_lua_folder .. "neutralized.lua" )
+		neutralized_effect = neutralized_effect:gsub( neutralized_lua_path:gsub( "%.", "%." ),
+			injected_lua_folder .. "neutralized.lua" )
 	end
 
 	ModTextFileSetContent( neutralized_effect_path, neutralized_effect )
@@ -76,16 +80,16 @@ end
 local callbacks = {}
 
 function callbacks.OnModPostInit()
-	local nxml = dofile_once( mod_path .. "files/lib/nxml.lua" )
-	dofile_once( mod_path .. "files/scripts/toxic_effect_entities.lua" )
+	local nxml = dofile_once( mod_path .. "libs/nxml.lua" )
+	dofile_once( module_path .. "toxic_effect_entities.lua" )
 	for _, effect_path in ipairs( toxic_effect_entities ) do
 		local effect = ModTextFileGetContent( effect_path )
 		if ModDoesFileExist( effect_path ) and effect then
 			local parsed = nxml.parse( effect )
 			table.insert( parsed.children, 1, nxml.new_element( "LuaComponent", {
-				script_source_file = mod_path .. "files/scripts/remove_toxic_effect.lua",
-				execute_on_added = true,
-				execute_every_n_frame = 1,
+				script_source_file = module_path .. "remove_toxic_effect.lua",
+				execute_on_added = "1",
+				execute_every_n_frame = "1",
 			} ) )
 			ModTextFileSetContent( effect_path, tostring( parsed ) )
 		end

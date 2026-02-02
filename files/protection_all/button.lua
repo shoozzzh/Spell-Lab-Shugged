@@ -1,1 +1,5 @@
-gui_elements.flag_toggle_button( "mods/spell_lab_shugged/files/gui/buttons/invincible.png", "invincible", "$status_protection_all" )
+local module_path = module_path()
+
+return function()
+    gui_elements.button_setting_toggle( module_path .. "button.png", "invincible", "$status_protection_all" )
+end

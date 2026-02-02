@@ -22,5 +22,5 @@ return function()
 		end
 	end
 	pop.tooltip(
-		get_text( world_state_unlimited_spells and "disable" or "enable" ) .. get_text "$perk_unlimited_spells" )
+		get_text( world_state_unlimited_spells and "disable" or "enable" ) .. GameTextGet  "$perk_unlimited_spells"  )
 end

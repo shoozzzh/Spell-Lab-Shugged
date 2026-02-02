@@ -36,7 +36,8 @@ function gui_elements.button_setting_toggle( sprite_filename, key, name, descrip
 		value = not value
 		ModSettingSet( mod_setting_prefix .. key, value )
 	end
-	pop.tooltip( get_text( value and "enable" or "disable" ) .. get_text( name or key ), description )
+	pop.tooltip( get_text( value and "enable" or "disable" ) .. GameTextGetTranslatedOrNot( name or wrap_key( key ) ),
+		description )
 	return left_click, right_click
 end
 
@@ -119,7 +120,7 @@ end
 function show_locked_state( x, y, this_action_data )
 	if not this_action_data or not this_action_data.spawn_requires_flag then return end
 	if HasFlagPersistent( this_action_data.spawn_requires_flag ) then
-		if mod_setting_get  "show_icon_unlocked"  then
+		if mod_setting_get "show_icon_unlocked" then
 			GuiZSetForNextWidget( gui, -1 )
 			GuiOptionsAddForNextWidget( gui, GUI_OPTION.Layout_NoLayouting )
 			GuiImage( gui, get_id(), x + 14, y - 2, "mods/spell_lab_shugged/files/gui/unlocked.png", 0.3, 1.0, 0 )
@@ -175,7 +176,7 @@ function do_verbose_tooltip( this_action_data, this_action_metadata )
 	if not this_action_metadata then return end
 	GuiLayoutAddVerticalSpacing( gui, 5 )
 	if this_action_metadata.projectiles then
-		GuiText( gui, 0, 0, wrap_key  "spell_data"  )
+		GuiText( gui, 0, 0, wrap_key "spell_data" )
 	end
 
 	do_property_list( c_lines )
@@ -183,9 +184,9 @@ function do_verbose_tooltip( this_action_data, this_action_metadata )
 	local only_one_proj = #projectiles_lines == 1
 	for proj_index, proj_lines in ipairs( projectiles_lines ) do
 		if only_one_proj then
-			GuiText( gui, 0, 0, wrap_key  "projectile_data"  )
+			GuiText( gui, 0, 0, wrap_key "projectile_data" )
 		else
-			GuiText( gui, 0, 0, GameTextGet( wrap_key  "projectile_nth_data" , tostring( proj_index ) ) )
+			GuiText( gui, 0, 0, GameTextGet( wrap_key "projectile_nth_data", tostring( proj_index ) ) )
 		end
 		do_property_list( proj_lines )
 	end
@@ -195,7 +196,7 @@ local function show_simple_action_image( action_id, uses_remaining )
 	if action_id and action_id ~= "" then
 		local this_action_data = action_data[ action_id ]
 		local sprite = (this_action_data and this_action_data.sprite) and this_action_data.sprite or
-		"data/ui_gfx/gun_actions/_unidentified.png"
+			"data/ui_gfx/gun_actions/_unidentified.png"
 		GuiZSetForNextWidget( gui, -1 )
 		GuiImage( gui, get_id(), 0, 0, sprite, 1.0, 0.5, 0 )
 		GuiImage( gui, get_id(), -11, -1, "mods/spell_lab_shugged/files/gui/buttons/spell_box.png", 1.0, 0.5, 0 )
@@ -266,7 +267,7 @@ function do_wand_stats( gui, stats )
 			GuiLayoutBeginHorizontal( gui, 0, 0 )
 			GuiText( gui, 0, 0, v.label )
 			local left_click, right_click, hover, x, y, width, height, draw_x, draw_y, draw_width, draw_height =
-			previous_data( gui )
+				previous_data( gui )
 			GuiColoredText( gui, 1.0, 0.75, 0.5, 1.0, 72 - width, 0, v.text_callback( stats[ v.stat ] ) )
 			GuiLayoutEnd( gui )
 			GuiLayoutAddVerticalSpacing( gui, -4 )

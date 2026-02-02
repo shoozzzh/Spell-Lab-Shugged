@@ -39,7 +39,7 @@ local functions_line = {
 
 local toggles_line = {
 	"wand_no_shooting", "no_annoying_effects", "protection_all", "no_polymorphing",
-	"no_recoil", "unlimited_spells", "creative_mode_flight",
+	"no_recoil", "unlimited_spells", "creative_mode_flight", "all_seeing_eye",
 }
 
 local module_button_path = mod_path .. "files/%s/button.lua"
@@ -69,10 +69,10 @@ local function show_gui()
 	layout.next()
 	show_button_line( functions_line )
 
-	-- if mod_setting.get "show_toggle_options" then
-	-- 	layout.next()
-	-- 	show_button_line( toggles_line )
-	-- end
+	if mod_setting.get "show_toggle_options" then
+		layout.next()
+		show_button_line( toggles_line )
+	end
 
 	layout.finish()
 
