@@ -4,6 +4,14 @@ local var = dofile_once( mod_path .. "files/var.lua" )
 
 local module_path = module_path()
 
+---@class target_dummy_vars
+---@field last_hit_frame integer
+---@field first_hit_frame integer
+---@field current_dps number
+---@field highest_dps number
+---@field total_damage number
+---@field last_frame_damage number
+
 local var_map = {
     last_hit_frame = "value_int",
     first_hit_frame = "value_int",
@@ -14,6 +22,7 @@ local var_map = {
 }
 
 function access_vars( entity_id )
+    ---@type target_dummy_vars
     return var.access( entity_id, var_map, mod_id .. "." )
 end
 

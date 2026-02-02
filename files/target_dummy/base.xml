@@ -1,5 +1,5 @@
 <Entity>
-	<LuaComponent script_damage_received="__THIS_FOLDER__dps_tracker.lua" />
+	<LuaComponent script_damage_received="__THIS_FOLDER__script_damaged.lua" />
 	<LuaComponent
 		script_source_file="__THIS_FOLDER__load_child.lua"
 		execute_on_added="1"

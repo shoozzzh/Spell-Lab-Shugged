@@ -29,22 +29,22 @@ function damage_received( damage, message, entity_thats_responsible, is_fatal )
 
 	vars.current_dps = vars.current_dps + damage
 
-	if vars.current_dps > (reset and 0 or vars.highest_dps_comp) then
-		vars.highest_dps_comp = vars.current_dps
+	if vars.current_dps > (reset and 0 or vars.highest_dps) then
+		vars.highest_dps = vars.current_dps
 	end
 
 	vars.total_damage = (reset and 0 or vars.total_damage) + damage
 
 	local average_dps = vars.total_damage / (now - first_hit_frame + 1) * 60
 
-	vars.this_frame_damage = (last_hit_frame == now and vars.this_frame_damage or 0) + damage
+	vars.last_frame_damage = (last_hit_frame == now and vars.last_frame_damage or 0) + damage
 
-	local child_id = EntityGetAllChildren( entity_id, "dummy_target_child" )[ 1 ]
+	local child_id = EntityGetAllChildren( entity_id, mod_id .. ".target_dummy_child" )[ 1 ]
 	if not EntityGetIsAlive( child_id ) then return end
 
 	set_text( child_id, "total_damage", vars.total_damage )
 	set_text( child_id, "average_dps", average_dps )
-	set_text( child_id, "last_frame_damage", vars.this_frame_damage )
+	set_text( child_id, "last_frame_damage", vars.last_frame_damage )
 
 	EntitySetComponentsWithTagEnabled( child_id, "invincible", true )
 end
