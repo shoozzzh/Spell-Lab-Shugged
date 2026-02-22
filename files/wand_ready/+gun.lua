@@ -16,7 +16,7 @@ function StartReload( reload_time )
 
 		reload_time = reload_time_fixed_to
 	end
-	
+
 	::skip::
 	_StartReload( reload_time )
 end
@@ -41,7 +41,7 @@ function register_action( ... )
 		fire_rate_wait_saved = c.fire_rate_wait
 		c.fire_rate_wait = cast_delay_fixed_to
 	end
-	
+
 	::skip::
 	_register_action( ... )
 
