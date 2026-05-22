@@ -98,6 +98,12 @@ zh_cn_languages = {
 	["汪体中文"] = true,
 	["完全汉化"] = true,
 }
+ko_languages = {
+	["한국어"] = true,
+}
+ja_languages = {
+	["日本語"] = true,
+}
 
 function separator( text )
 	return ( zh_cn_languages[ GameTextGetTranslatedOrNot( "$current_language" ) ]

@@ -178,6 +178,7 @@ shortcuts = {
 	confirm = { "Key_SHIFT" },
 	clear_action_history = { "Key_SHIFT", "Mouse_right" },
 	transform_mortal_into_dummy = { "Key_SHIFT" },
+	clear_projectile = {},
 }
 
 dofile_once( "mods/spell_lab_shugged/files/lib/shortcut_tostring.lua" )
@@ -391,8 +392,8 @@ function do_gui()
 				GuiImageButton( gui, next_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/shortcut_tips.png" )
 
 				GuiTooltip( gui, wrap_key( "shortcut_tips_title" ), edit_panel_shortcut_tips )
-
-				if GuiImageButton( gui, next_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/clear_projectiles.png" ) then
+				local left_click, _ = GuiImageButton( gui, next_id(), 0, 0, "", "mods/spell_lab_shugged/files/gui/buttons/clear_projectiles.png" )
+				if left_click or shortcut_check.check( shortcuts.clear_projectile, false, false ) then
 					sound_button_clicked()
 
 					local function silent_kill( proj_id )
@@ -416,7 +417,7 @@ function do_gui()
 						silent_kill( proj_id )
 					end
 				end
-				GuiTooltip( gui, wrap_key( "clear_projectiles" ), "" )
+				GuiTooltip( gui, wrap_key( "clear_projectiles" ), (shortcut_texts.clear_projectile ~= "") and text_get( "clear_projectiles_desc", shortcut_texts.clear_projectile ) or "" )
 
 				do
 					local raw_value_key = "spell_lab_shugged.wand_cast_delay_fixed_to_raw_value"
