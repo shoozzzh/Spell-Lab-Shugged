@@ -270,6 +270,7 @@ local metadata_to_show = {
 		{ wrap_key( "projectile_damage_poison" ), function( data ) if data.damage_poison ~= nil and tonumber( data.damage_poison ) ~= 0 then return format_value( data.damage_poison * 25, 3, false, FORMAT.Round ) end end },
 		{ wrap_key( "projectile_damage_healing" ), function( data ) if data.damage_healing ~= nil and tonumber( data.damage_healing ) ~= 0 then return format_value( data.damage_healing * 25, 3, false, FORMAT.Round ) end end },
 		{ wrap_key( "projectile_damage_radioactive" ), function( data ) if data.damage_radioactive ~= nil and tonumber( data.damage_radioactive ) ~= 0 then return format_value( data.damage_radioactive * 25, 3, false, FORMAT.Round ) end end },
+		{ wrap_key( "projectile_damage_holy" ), function( data ) if data.damage_holy ~= nil and tonumber( data.damage_holy ) ~= 0 then return format_value( data.damage_holy * 25, 3, false, FORMAT.Round ) end end },
 		{ wrap_key( "projectile_speed" ), function( data ) return format_range( data.speed_min, data.speed_max ) end },
 		{ wrap_key( "projectile_air_friction" ), function( data ) return data.air_friction end },
 		{ wrap_key( "projectile_innate_spread" ), function( data ) if data.direction_random_rad ~= nil and tonumber(data.direction_random_rad) ~= 0 then return GameTextGet( wrap_key( "degrees" ), format_value( data.direction_random_rad * 180 / math.pi, 1, false, FORMAT.Round ) ) end end },
