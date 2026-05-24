@@ -1,0 +1,610 @@
+---@meta
+
+---@class DrugEffectComponent.drug_fx_target
+---@field color_amount number Default: 0
+---@field distortion_amount number Default: 0
+---@field doublevision_amount number Default: 0
+---@field fractals_amount number Default: 0
+---@field fractals_size number Default: 0
+---@field nightvision_amount number Default: 0
+---@field set fun(self, fields: DrugEffectComponent.drug_fx_target.set)
+
+---@class ExplosionComponent.config_explosion
+---@field audio_enabled boolean Default: 1<br>Do we play an explosion sound?
+---@field audio_event_name string Default: """"<br>Name of audio event in 'explosion' audio bank. If not set, will default to 'explosion' or 'explosion_small' based on explosion radius.
+---@field audio_liquid_amount_normalized number Default: 0<br>value of the 'liquid_amount' parameter passed to the explosion's audio event
+---@field background_lightning_count integer Default: 0<br>Parallax background lightning count is set to this on explosion
+---@field camera_shake number Default: 7.5<br>camera shake - how much we shake the camera
+---@field cell_explosion_damage_required number Default: 100<br>how much fire damage is required before this explodes
+---@field cell_explosion_power number Default: 1<br>used when a solid cell explodes as the multiplier to how big the radius is going to be
+---@field cell_explosion_power_ragdoll_coeff number Default: 0.75<br>ragdoll cells destruction power is multiplied with this
+---@field cell_explosion_probability number Default: 0<br>this is used when there's a tiny contact that doesn't cause an explosion, in those cases this is used as a random to check if we should explode or not
+---@field cell_explosion_radius_max number Default: 150<br>when cell explodes, this is the minimum radius that explosion is made of
+---@field cell_explosion_radius_min number Default: 5<br>when cell explodes, this is the minimum radius that explosion is made of
+---@field cell_explosion_velocity_min number Default: 0<br>cell explodes only when body velocity is greater than this
+---@field crack_count integer Default: 10<br>How many crack entitities should we create?
+---@field create_cell_material string Default: "fire"<br>The material destroyed cells might turn into.
+---@field create_cell_probability integer Default: 5<br>The probability a destroyed cell is turned into 'create_cell_material'
+---@field damage number Default: 5<br>how much damage does this do to living entities
+---@field damage_mortals boolean Default: 1<br>Look for peasants and throw them into the air? Remember to enabled physics_throw as well if you want them to actually fly
+---@field delay range Default: {0,0}<br>if > 0, the explosion occurs with a delay chosen randomly from this range and is never buffered
+---@field destroy_non_platform_solid_enabled boolean Default: 1<br>Do we remove solid cells that aren't platforms?
+---@field dont_damage_this entity_id Default: 0<br>if set, this entity doesn't receive damage from the explosion
+---@field electricity_count integer Default: 0<br>How many electricity entitities should we create?
+---@field explosion_delay_id integer Default: -1<br>for delayed barrel explosions... this has to be set and has to be the same for the explosions for there to be a delay
+---@field explosion_radius number Default: 20<br>Explosion radius, used to find the peasants and physics bodies that are thrown into the air
+---@field explosion_sprite string Default: "data/particles/explosion_032.xml"<br>sprite animation of the explosion that we play
+---@field explosion_sprite_additive boolean Default: 0<br>if 1, sprite is additive
+---@field explosion_sprite_emissive boolean Default: 0<br>if 1, sprite is emissive
+---@field explosion_sprite_lifetime number Default: 0<br>if 0, finds the lifetime based on the rect animation currently playing. If not 0 it is seconds how long does the explosion sprite stay in the world
+---@field explosion_sprite_random_rotation boolean Default: 1<br>if true, rotates the sprite to random 90 degrees
+---@field gore_particle_count integer Default: 1<br>How many particles to create in case we do gore stuff?
+---@field hole_destroy_liquid boolean Default: 0<br>Do we destroy the liquid cells we ran into, or do we just throw them into to the air?
+---@field hole_destroy_physics_dynamic boolean Default: 1<br>Do we destroy the dynamic physics cells we encountered?
+---@field hole_enabled boolean Default: 1<br>Do we remove ground, creata a crater
+---@field impl_delay_frame integer Default: 0
+---@field impl_position vector Default: {0,0}
+---@field impl_send_message_to_this entity_id Default: 0
+---@field is_digger boolean Default: 0<br>if 1, we apply some special digger logic to this explosion
+---@field knockback_force number Default: 1<br>How far do entities get thrown if a knockback occurs? final_knocback = explosion_radius * knockback_force * target.inv_normalized_distance_from_explosion / target.mass
+---@field light_b integer Default: 180<br>Color blue 0-255
+---@field light_enabled boolean Default: 1<br>Should the explosion emit light to its surroundings?
+---@field light_fade_time number Default: 0.08<br>The time it takes for the light flash to fade out
+---@field light_g integer Default: 217<br>Color green 0-255
+---@field light_r integer Default: 255<br>Color red 0-255
+---@field light_radius_coeff number Default: 8<br>The radius of the light will be explosion_radius * light_radius_coeff
+---@field load_this_entity string Default: """"<br>if set, this entity is loaded when the explosion is queued
+---@field material_sparks_count_max integer Default: 20<br>How many sparks are we creating (rand max)
+---@field material_sparks_count_min integer Default: 7<br>How many sparks are we creating (rand min)
+---@field material_sparks_enabled boolean Default: 0<br>Should we create few fire particles around the explosion
+---@field material_sparks_min_hp integer Default: 10000<br>How many sparks are we creating (rand max)
+---@field material_sparks_probability integer Default: 5<br>How many sparks are we creating (rand max)
+---@field material_sparks_real boolean Default: 0<br>if the spark particles created are real or fake
+---@field material_sparks_scale_with_hp boolean Default: 0<br>if true, will create more sparks the harder the material
+---@field max_durability_to_destroy integer Default: 10<br>When destroying cells only cells with a durability <= max_durability_to_destroy will be affected
+---@field min_radius_for_cracks integer Default: 10<br>Cracks are created if explosion_radius is larger than this
+---@field never_cache boolean Default: 1<br>if set, won't ever cache and the explosion happens that frame. Used for projectiles
+---@field not_scaled_by_gamefx boolean Default: 0<br>If 1, DAMAGE_MULTIPLIER etc don't affect this explosion
+---@field null_damage boolean Default: 0<br>if set, will not call DamageModelSystem::TakeDamage()
+---@field particle_effect boolean Default: 1<br>Should we use the ParticleEffect::DoExplosion()
+---@field physics_explosion_power range Default: {0,0.20000000298023}<br>how hard do we throw physics objects
+---@field physics_multiplier_ragdoll_force number Default: 1<br>treat the ragdolls a bit differently from other physics objects, to get them to fly nicely
+---@field physics_throw_enabled boolean Default: 1<br>Should we throw physics objects into the air, also peasants
+---@field pixel_sprites_enabled boolean Default: 1<br>if enabled will carve out the pixel sprites
+---@field ray_energy integer Default: 20000<br>This is the energy we have per ray. Could be called 'penetration power' or something like that. If cells have a hp of 20 rays with 100 energy can penetrate 5 cells
+---@field shake_vegetation boolean Default: 1<br>Should we shake vegetation around the explosion (uses the area of stain_image to find vegetation)
+---@field spark_material string Default: "spark"<br>spark material, TODO moved these to use a special Serializer
+---@field sparks_count_max integer Default: 20<br>How many sparks are we creating (rand max)
+---@field sparks_count_min integer Default: 7<br>How many sparks are we creating (rand min)
+---@field sparks_enabled boolean Default: 1<br>Should we create few fire particles around the explosion
+---@field sparks_inner_radius_coeff number Default: 0.333<br>If 'sparks_enabled', Sparks are created in the area between circles defined by 'explosion_radius'*'sparks_inner_radius_coeff' and 'explosion_radius'
+---@field stains_enabled boolean Default: 1<br>Should we stain the ground and other particles
+---@field stains_radius number Default: 0<br>The distance from the edge of the hole to the edge of the stained area, 0.0f for default which is 0.3 * explosion_radius
+---@field who_is_responsible entity_id Default: 741<br>the entity that caused the explosion
+---@field set fun(self, fields: ExplosionComponent.config_explosion.set)
+
+---@class DrugEffectComponent.m_drug_fx_current
+---@field color_amount number Default: 0
+---@field distortion_amount number Default: 0
+---@field doublevision_amount number Default: 0
+---@field fractals_amount number Default: 0
+---@field fractals_size number Default: 0
+---@field nightvision_amount number Default: 0
+---@field set fun(self, fields: DrugEffectComponent.m_drug_fx_current.set)
+
+---@class LightningComponent.config_explosion
+---@field audio_enabled boolean Default: 1<br>Do we play an explosion sound?
+---@field audio_event_name string Default: """"<br>Name of audio event in 'explosion' audio bank. If not set, will default to 'explosion' or 'explosion_small' based on explosion radius.
+---@field audio_liquid_amount_normalized number Default: 0<br>value of the 'liquid_amount' parameter passed to the explosion's audio event
+---@field background_lightning_count integer Default: 0<br>Parallax background lightning count is set to this on explosion
+---@field camera_shake number Default: 7.5<br>camera shake - how much we shake the camera
+---@field cell_explosion_damage_required number Default: 100<br>how much fire damage is required before this explodes
+---@field cell_explosion_power number Default: 1<br>used when a solid cell explodes as the multiplier to how big the radius is going to be
+---@field cell_explosion_power_ragdoll_coeff number Default: 0.75<br>ragdoll cells destruction power is multiplied with this
+---@field cell_explosion_probability number Default: 0<br>this is used when there's a tiny contact that doesn't cause an explosion, in those cases this is used as a random to check if we should explode or not
+---@field cell_explosion_radius_max number Default: 150<br>when cell explodes, this is the minimum radius that explosion is made of
+---@field cell_explosion_radius_min number Default: 5<br>when cell explodes, this is the minimum radius that explosion is made of
+---@field cell_explosion_velocity_min number Default: 0<br>cell explodes only when body velocity is greater than this
+---@field crack_count integer Default: 10<br>How many crack entitities should we create?
+---@field create_cell_material string Default: "fire"<br>The material destroyed cells might turn into.
+---@field create_cell_probability integer Default: 5<br>The probability a destroyed cell is turned into 'create_cell_material'
+---@field damage number Default: 5<br>how much damage does this do to living entities
+---@field damage_mortals boolean Default: 1<br>Look for peasants and throw them into the air? Remember to enabled physics_throw as well if you want them to actually fly
+---@field delay range Default: {0,0}<br>if > 0, the explosion occurs with a delay chosen randomly from this range and is never buffered
+---@field destroy_non_platform_solid_enabled boolean Default: 1<br>Do we remove solid cells that aren't platforms?
+---@field dont_damage_this entity_id Default: 0<br>if set, this entity doesn't receive damage from the explosion
+---@field electricity_count integer Default: 0<br>How many electricity entitities should we create?
+---@field explosion_delay_id integer Default: -1<br>for delayed barrel explosions... this has to be set and has to be the same for the explosions for there to be a delay
+---@field explosion_radius number Default: 20<br>Explosion radius, used to find the peasants and physics bodies that are thrown into the air
+---@field explosion_sprite string Default: "data/particles/explosion_032.xml"<br>sprite animation of the explosion that we play
+---@field explosion_sprite_additive boolean Default: 0<br>if 1, sprite is additive
+---@field explosion_sprite_emissive boolean Default: 0<br>if 1, sprite is emissive
+---@field explosion_sprite_lifetime number Default: 0<br>if 0, finds the lifetime based on the rect animation currently playing. If not 0 it is seconds how long does the explosion sprite stay in the world
+---@field explosion_sprite_random_rotation boolean Default: 1<br>if true, rotates the sprite to random 90 degrees
+---@field gore_particle_count integer Default: 1<br>How many particles to create in case we do gore stuff?
+---@field hole_destroy_liquid boolean Default: 0<br>Do we destroy the liquid cells we ran into, or do we just throw them into to the air?
+---@field hole_destroy_physics_dynamic boolean Default: 1<br>Do we destroy the dynamic physics cells we encountered?
+---@field hole_enabled boolean Default: 1<br>Do we remove ground, creata a crater
+---@field impl_delay_frame integer Default: 0
+---@field impl_position vector Default: {0,0}
+---@field impl_send_message_to_this entity_id Default: 0
+---@field is_digger boolean Default: 0<br>if 1, we apply some special digger logic to this explosion
+---@field knockback_force number Default: 1<br>How far do entities get thrown if a knockback occurs? final_knocback = explosion_radius * knockback_force * target.inv_normalized_distance_from_explosion / target.mass
+---@field light_b integer Default: 180<br>Color blue 0-255
+---@field light_enabled boolean Default: 1<br>Should the explosion emit light to its surroundings?
+---@field light_fade_time number Default: 0.08<br>The time it takes for the light flash to fade out
+---@field light_g integer Default: 217<br>Color green 0-255
+---@field light_r integer Default: 255<br>Color red 0-255
+---@field light_radius_coeff number Default: 8<br>The radius of the light will be explosion_radius * light_radius_coeff
+---@field load_this_entity string Default: """"<br>if set, this entity is loaded when the explosion is queued
+---@field material_sparks_count_max integer Default: 20<br>How many sparks are we creating (rand max)
+---@field material_sparks_count_min integer Default: 7<br>How many sparks are we creating (rand min)
+---@field material_sparks_enabled boolean Default: 0<br>Should we create few fire particles around the explosion
+---@field material_sparks_min_hp integer Default: 10000<br>How many sparks are we creating (rand max)
+---@field material_sparks_probability integer Default: 5<br>How many sparks are we creating (rand max)
+---@field material_sparks_real boolean Default: 0<br>if the spark particles created are real or fake
+---@field material_sparks_scale_with_hp boolean Default: 0<br>if true, will create more sparks the harder the material
+---@field max_durability_to_destroy integer Default: 10<br>When destroying cells only cells with a durability <= max_durability_to_destroy will be affected
+---@field min_radius_for_cracks integer Default: 10<br>Cracks are created if explosion_radius is larger than this
+---@field never_cache boolean Default: 1<br>if set, won't ever cache and the explosion happens that frame. Used for projectiles
+---@field not_scaled_by_gamefx boolean Default: 0<br>If 1, DAMAGE_MULTIPLIER etc don't affect this explosion
+---@field null_damage boolean Default: 0<br>if set, will not call DamageModelSystem::TakeDamage()
+---@field particle_effect boolean Default: 1<br>Should we use the ParticleEffect::DoExplosion()
+---@field physics_explosion_power range Default: {0,0.20000000298023}<br>how hard do we throw physics objects
+---@field physics_multiplier_ragdoll_force number Default: 1<br>treat the ragdolls a bit differently from other physics objects, to get them to fly nicely
+---@field physics_throw_enabled boolean Default: 1<br>Should we throw physics objects into the air, also peasants
+---@field pixel_sprites_enabled boolean Default: 1<br>if enabled will carve out the pixel sprites
+---@field ray_energy integer Default: 20000<br>This is the energy we have per ray. Could be called 'penetration power' or something like that. If cells have a hp of 20 rays with 100 energy can penetrate 5 cells
+---@field shake_vegetation boolean Default: 1<br>Should we shake vegetation around the explosion (uses the area of stain_image to find vegetation)
+---@field spark_material string Default: "spark"<br>spark material, TODO moved these to use a special Serializer
+---@field sparks_count_max integer Default: 20<br>How many sparks are we creating (rand max)
+---@field sparks_count_min integer Default: 7<br>How many sparks are we creating (rand min)
+---@field sparks_enabled boolean Default: 1<br>Should we create few fire particles around the explosion
+---@field sparks_inner_radius_coeff number Default: 0.333<br>If 'sparks_enabled', Sparks are created in the area between circles defined by 'explosion_radius'*'sparks_inner_radius_coeff' and 'explosion_radius'
+---@field stains_enabled boolean Default: 1<br>Should we stain the ground and other particles
+---@field stains_radius number Default: 0<br>The distance from the edge of the hole to the edge of the stained area, 0.0f for default which is 0.3 * explosion_radius
+---@field who_is_responsible entity_id Default: 0<br>the entity that caused the explosion
+---@field set fun(self, fields: LightningComponent.config_explosion.set)
+
+---@class DrugEffectModifierComponent.fx_multiply
+---@field color_amount number Default: 0
+---@field distortion_amount number Default: 0
+---@field doublevision_amount number Default: 0
+---@field fractals_amount number Default: 0
+---@field fractals_size number Default: 0
+---@field nightvision_amount number Default: 0
+---@field set fun(self, fields: DrugEffectModifierComponent.fx_multiply.set)
+
+---@class LaserEmitterComponent.laser
+---@field audio_enabled boolean Default: 1
+---@field audio_hit_always_enabled boolean Default: 0
+---@field beam_particle_chance integer Default: 110
+---@field beam_particle_fade number Default: 1
+---@field beam_particle_fade_reverse boolean Default: 0
+---@field beam_particle_type integer Default: 0
+---@field beam_radius number Default: 2.5
+---@field damage_apply_hitbox_dmg_multiplier boolean Default: 0<br>NOTE( Petri ): 20.6.2023 - laser emitters have by default skipped the HitboxComponent's damage_multiplier. Added this as a way to enable that multiplier.
+---@field damage_to_cells integer Default: 5000
+---@field damage_to_entities number Default: 0.1
+---@field hit_particle_chance integer Default: 20
+---@field max_cell_durability_to_destroy integer Default: 12
+---@field max_length number Default: 512
+---@field root_entity_is_responsible_for_damage boolean Default: 0<br>If 1, damage from laser to entities will be treated as if it was caused by the laser emitter's root entity
+---@field set fun(self, fields: LaserEmitterComponent.laser.set)
+
+---@class ExplodeOnDamageComponent.config_explosion
+---@field audio_enabled boolean Default: 1<br>Do we play an explosion sound?
+---@field audio_event_name string Default: """"<br>Name of audio event in 'explosion' audio bank. If not set, will default to 'explosion' or 'explosion_small' based on explosion radius.
+---@field audio_liquid_amount_normalized number Default: 0<br>value of the 'liquid_amount' parameter passed to the explosion's audio event
+---@field background_lightning_count integer Default: 0<br>Parallax background lightning count is set to this on explosion
+---@field camera_shake number Default: 7.5<br>camera shake - how much we shake the camera
+---@field cell_explosion_damage_required number Default: 100<br>how much fire damage is required before this explodes
+---@field cell_explosion_power number Default: 1<br>used when a solid cell explodes as the multiplier to how big the radius is going to be
+---@field cell_explosion_power_ragdoll_coeff number Default: 0.75<br>ragdoll cells destruction power is multiplied with this
+---@field cell_explosion_probability number Default: 0<br>this is used when there's a tiny contact that doesn't cause an explosion, in those cases this is used as a random to check if we should explode or not
+---@field cell_explosion_radius_max number Default: 150<br>when cell explodes, this is the minimum radius that explosion is made of
+---@field cell_explosion_radius_min number Default: 5<br>when cell explodes, this is the minimum radius that explosion is made of
+---@field cell_explosion_velocity_min number Default: 0<br>cell explodes only when body velocity is greater than this
+---@field crack_count integer Default: 10<br>How many crack entitities should we create?
+---@field create_cell_material string Default: "fire"<br>The material destroyed cells might turn into.
+---@field create_cell_probability integer Default: 5<br>The probability a destroyed cell is turned into 'create_cell_material'
+---@field damage number Default: 5<br>how much damage does this do to living entities
+---@field damage_mortals boolean Default: 1<br>Look for peasants and throw them into the air? Remember to enabled physics_throw as well if you want them to actually fly
+---@field delay range Default: {0,0}<br>if > 0, the explosion occurs with a delay chosen randomly from this range and is never buffered
+---@field destroy_non_platform_solid_enabled boolean Default: 1<br>Do we remove solid cells that aren't platforms?
+---@field dont_damage_this entity_id Default: 0<br>if set, this entity doesn't receive damage from the explosion
+---@field electricity_count integer Default: 0<br>How many electricity entitities should we create?
+---@field explosion_delay_id integer Default: -1<br>for delayed barrel explosions... this has to be set and has to be the same for the explosions for there to be a delay
+---@field explosion_radius number Default: 20<br>Explosion radius, used to find the peasants and physics bodies that are thrown into the air
+---@field explosion_sprite string Default: "data/particles/explosion_032.xml"<br>sprite animation of the explosion that we play
+---@field explosion_sprite_additive boolean Default: 0<br>if 1, sprite is additive
+---@field explosion_sprite_emissive boolean Default: 0<br>if 1, sprite is emissive
+---@field explosion_sprite_lifetime number Default: 0<br>if 0, finds the lifetime based on the rect animation currently playing. If not 0 it is seconds how long does the explosion sprite stay in the world
+---@field explosion_sprite_random_rotation boolean Default: 1<br>if true, rotates the sprite to random 90 degrees
+---@field gore_particle_count integer Default: 1<br>How many particles to create in case we do gore stuff?
+---@field hole_destroy_liquid boolean Default: 0<br>Do we destroy the liquid cells we ran into, or do we just throw them into to the air?
+---@field hole_destroy_physics_dynamic boolean Default: 1<br>Do we destroy the dynamic physics cells we encountered?
+---@field hole_enabled boolean Default: 1<br>Do we remove ground, creata a crater
+---@field impl_delay_frame integer Default: 0
+---@field impl_position vector Default: {0,0}
+---@field impl_send_message_to_this entity_id Default: 0
+---@field is_digger boolean Default: 0<br>if 1, we apply some special digger logic to this explosion
+---@field knockback_force number Default: 1<br>How far do entities get thrown if a knockback occurs? final_knocback = explosion_radius * knockback_force * target.inv_normalized_distance_from_explosion / target.mass
+---@field light_b integer Default: 180<br>Color blue 0-255
+---@field light_enabled boolean Default: 1<br>Should the explosion emit light to its surroundings?
+---@field light_fade_time number Default: 0.08<br>The time it takes for the light flash to fade out
+---@field light_g integer Default: 217<br>Color green 0-255
+---@field light_r integer Default: 255<br>Color red 0-255
+---@field light_radius_coeff number Default: 8<br>The radius of the light will be explosion_radius * light_radius_coeff
+---@field load_this_entity string Default: """"<br>if set, this entity is loaded when the explosion is queued
+---@field material_sparks_count_max integer Default: 20<br>How many sparks are we creating (rand max)
+---@field material_sparks_count_min integer Default: 7<br>How many sparks are we creating (rand min)
+---@field material_sparks_enabled boolean Default: 0<br>Should we create few fire particles around the explosion
+---@field material_sparks_min_hp integer Default: 10000<br>How many sparks are we creating (rand max)
+---@field material_sparks_probability integer Default: 5<br>How many sparks are we creating (rand max)
+---@field material_sparks_real boolean Default: 0<br>if the spark particles created are real or fake
+---@field material_sparks_scale_with_hp boolean Default: 0<br>if true, will create more sparks the harder the material
+---@field max_durability_to_destroy integer Default: 10<br>When destroying cells only cells with a durability <= max_durability_to_destroy will be affected
+---@field min_radius_for_cracks integer Default: 10<br>Cracks are created if explosion_radius is larger than this
+---@field never_cache boolean Default: 1<br>if set, won't ever cache and the explosion happens that frame. Used for projectiles
+---@field not_scaled_by_gamefx boolean Default: 0<br>If 1, DAMAGE_MULTIPLIER etc don't affect this explosion
+---@field null_damage boolean Default: 0<br>if set, will not call DamageModelSystem::TakeDamage()
+---@field particle_effect boolean Default: 1<br>Should we use the ParticleEffect::DoExplosion()
+---@field physics_explosion_power range Default: {0,0.20000000298023}<br>how hard do we throw physics objects
+---@field physics_multiplier_ragdoll_force number Default: 1<br>treat the ragdolls a bit differently from other physics objects, to get them to fly nicely
+---@field physics_throw_enabled boolean Default: 1<br>Should we throw physics objects into the air, also peasants
+---@field pixel_sprites_enabled boolean Default: 1<br>if enabled will carve out the pixel sprites
+---@field ray_energy integer Default: 20000<br>This is the energy we have per ray. Could be called 'penetration power' or something like that. If cells have a hp of 20 rays with 100 energy can penetrate 5 cells
+---@field shake_vegetation boolean Default: 1<br>Should we shake vegetation around the explosion (uses the area of stain_image to find vegetation)
+---@field spark_material string Default: "spark"<br>spark material, TODO moved these to use a special Serializer
+---@field sparks_count_max integer Default: 20<br>How many sparks are we creating (rand max)
+---@field sparks_count_min integer Default: 7<br>How many sparks are we creating (rand min)
+---@field sparks_enabled boolean Default: 1<br>Should we create few fire particles around the explosion
+---@field sparks_inner_radius_coeff number Default: 0.333<br>If 'sparks_enabled', Sparks are created in the area between circles defined by 'explosion_radius'*'sparks_inner_radius_coeff' and 'explosion_radius'
+---@field stains_enabled boolean Default: 1<br>Should we stain the ground and other particles
+---@field stains_radius number Default: 0<br>The distance from the edge of the hole to the edge of the stained area, 0.0f for default which is 0.3 * explosion_radius
+---@field who_is_responsible entity_id Default: 0<br>the entity that caused the explosion
+---@field set fun(self, fields: ExplodeOnDamageComponent.config_explosion.set)
+
+---@class AbilityComponent.gunaction_config
+---@field action_ai_never_uses boolean Default: 0
+---@field action_description string Default: """"
+---@field action_draw_many_count integer Default: 0
+---@field action_id string Default: """"
+---@field action_is_dangerous_blast boolean Default: 0<br>TODO - is this used anywhere?
+---@field action_mana_drain number Default: 10<br>how much mana does this action drain?
+---@field action_max_uses integer Default: -1<br>-1 = infinite otherwise it's the amount specified
+---@field action_name string Default: """"
+---@field action_never_unlimited boolean Default: 0
+---@field action_spawn_level string Default: """"<br>comma separated values should match probabilities
+---@field action_spawn_manual_unlock boolean Default: 0<br>if true, will not automatically call AddFlagPersistent( action_spawn_requires_flag ) when this action is spawned. You must do it yourself!
+---@field action_spawn_probability string Default: """"<br>comma separated values should match levels
+---@field action_spawn_requires_flag string Default: """"<br>if set, requires that this persistent flag is set for spawn probablities to be something else than 0
+---@field action_sprite_filename string Default: """"
+---@field action_type integer Default: 0
+---@field action_unidentified_sprite_filename string Default: "data/ui_gfx/gun_actions/unidentified.png"
+---@field blood_count_multiplier number Default: 1<br>ProjectileComponent has blood_count_multiplier, it tells how much blood is generated when this hits an entity. These are multiplied together...
+---@field bounces integer Default: 0
+---@field child_speed_multiplier number Default: 1
+---@field custom_xml_file string Default: """"<br>if set, this will be used instead of 'action.xml'
+---@field damage_critical_chance integer Default: 0<br>the chance of a critical hit. ]0-100[
+---@field damage_critical_multiplier number Default: 0<br>multiplier that is applied to all damage types on a critical hit
+---@field damage_curse_add number Default: 0
+---@field damage_drill_add number Default: 0
+---@field damage_electricity_add number Default: 0
+---@field damage_explosion_add number Default: 0
+---@field damage_fire_add number Default: 0<br>TODO - is this used anywhere?
+---@field damage_healing_add number Default: 0
+---@field damage_ice_add number Default: 0
+---@field damage_melee_add number Default: 0<br>TODO - is this used anywhere?
+---@field damage_null_all number Default: 0<br>if > 0 then will set all damage to 0 and add a NullDamageComponent (that nullss the rest). The value is a percent (0.0-1.0) of what the chance is that everything will be nulled. 1 = always
+---@field damage_projectile_add number Default: 0<br>if change to mul - take into account that default is 0
+---@field damage_slice_add number Default: 0
+---@field dampening number Default: 1
+---@field explosion_damage_to_materials number Default: 0
+---@field explosion_radius number Default: 0
+---@field extra_entities string Default: """"<br>comma separated xml files, that are loaded into the projectile entity. Their components get added but nothing else from the xml files is loaded
+---@field fire_rate_wait integer Default: 0
+---@field friendly_fire boolean Default: 0<br>if 1, will set frily fire on to the bullet
+---@field game_effect_entities string Default: """"<br>comma separated xml files, that have the game effects when they hit the entity
+---@field gore_particles integer Default: 0<br>amount of blood particles generated by the explosion
+---@field gravity number Default: 0
+---@field knockback_force number Default: 0<br>how much knockback it does to enemies
+---@field lifetime_add integer Default: 0
+---@field light number Default: 0
+---@field lightning_count integer Default: 0
+---@field material string Default: """"
+---@field material_amount integer Default: 0
+---@field pattern_degrees number Default: 0<br>in 360 degrees, if != 0, distributes the bullets to an even pattern from -pattern_degrees to +pattern_degrees
+---@field physics_impulse_coeff number Default: 0<br>projectile applies an impulse to physics bodies it hits. Impulse = physics_impulse_coeff * velocity
+---@field projectile_file string Default: """"
+---@field ragdoll_fx integer Default: 0<br>ragdoll_fx of the projectile, selects the highest 1 = normal, 2 = gore
+---@field recoil number Default: 0
+---@field reload_time integer Default: 0
+---@field screenshake number Default: 0
+---@field sound_loop_tag string Default: """"<br>If wand has a SoundLoopComponent with this tag it will start playing when this is shot
+---@field speed_multiplier number Default: 1
+---@field spread_degrees number Default: 0<br>in 360 degrees, randomizes the direction of the bullet -spread_degrees to +spread_degrees
+---@field sprite string Default: """"
+---@field state_cards_drawn integer Default: 0
+---@field state_destroyed_action boolean Default: 0
+---@field state_discarded_action boolean Default: 0
+---@field state_shuffled boolean Default: 0
+---@field trail_material string Default: """"
+---@field trail_material_amount integer Default: 0
+---@field set fun(self, fields: AbilityComponent.gunaction_config.set)
+
+---@class ProjectileComponent.config_explosion
+---@field audio_enabled boolean Default: 1<br>Do we play an explosion sound?
+---@field audio_event_name string Default: """"<br>Name of audio event in 'explosion' audio bank. If not set, will default to 'explosion' or 'explosion_small' based on explosion radius.
+---@field audio_liquid_amount_normalized number Default: 0<br>value of the 'liquid_amount' parameter passed to the explosion's audio event
+---@field background_lightning_count integer Default: 0<br>Parallax background lightning count is set to this on explosion
+---@field camera_shake number Default: 7.5<br>camera shake - how much we shake the camera
+---@field cell_explosion_damage_required number Default: 100<br>how much fire damage is required before this explodes
+---@field cell_explosion_power number Default: 1<br>used when a solid cell explodes as the multiplier to how big the radius is going to be
+---@field cell_explosion_power_ragdoll_coeff number Default: 0.75<br>ragdoll cells destruction power is multiplied with this
+---@field cell_explosion_probability number Default: 0<br>this is used when there's a tiny contact that doesn't cause an explosion, in those cases this is used as a random to check if we should explode or not
+---@field cell_explosion_radius_max number Default: 150<br>when cell explodes, this is the minimum radius that explosion is made of
+---@field cell_explosion_radius_min number Default: 5<br>when cell explodes, this is the minimum radius that explosion is made of
+---@field cell_explosion_velocity_min number Default: 0<br>cell explodes only when body velocity is greater than this
+---@field crack_count integer Default: 10<br>How many crack entitities should we create?
+---@field create_cell_material string Default: "fire"<br>The material destroyed cells might turn into.
+---@field create_cell_probability integer Default: 5<br>The probability a destroyed cell is turned into 'create_cell_material'
+---@field damage number Default: 5<br>how much damage does this do to living entities
+---@field damage_mortals boolean Default: 1<br>Look for peasants and throw them into the air? Remember to enabled physics_throw as well if you want them to actually fly
+---@field delay range Default: {0,0}<br>if > 0, the explosion occurs with a delay chosen randomly from this range and is never buffered
+---@field destroy_non_platform_solid_enabled boolean Default: 1<br>Do we remove solid cells that aren't platforms?
+---@field dont_damage_this entity_id Default: 0<br>if set, this entity doesn't receive damage from the explosion
+---@field electricity_count integer Default: 0<br>How many electricity entitities should we create?
+---@field explosion_delay_id integer Default: -1<br>for delayed barrel explosions... this has to be set and has to be the same for the explosions for there to be a delay
+---@field explosion_radius number Default: 20<br>Explosion radius, used to find the peasants and physics bodies that are thrown into the air
+---@field explosion_sprite string Default: "data/particles/explosion_032.xml"<br>sprite animation of the explosion that we play
+---@field explosion_sprite_additive boolean Default: 0<br>if 1, sprite is additive
+---@field explosion_sprite_emissive boolean Default: 0<br>if 1, sprite is emissive
+---@field explosion_sprite_lifetime number Default: 0<br>if 0, finds the lifetime based on the rect animation currently playing. If not 0 it is seconds how long does the explosion sprite stay in the world
+---@field explosion_sprite_random_rotation boolean Default: 1<br>if true, rotates the sprite to random 90 degrees
+---@field gore_particle_count integer Default: 1<br>How many particles to create in case we do gore stuff?
+---@field hole_destroy_liquid boolean Default: 0<br>Do we destroy the liquid cells we ran into, or do we just throw them into to the air?
+---@field hole_destroy_physics_dynamic boolean Default: 1<br>Do we destroy the dynamic physics cells we encountered?
+---@field hole_enabled boolean Default: 1<br>Do we remove ground, creata a crater
+---@field impl_delay_frame integer Default: 0
+---@field impl_position vector Default: {0,0}
+---@field impl_send_message_to_this entity_id Default: 0
+---@field is_digger boolean Default: 0<br>if 1, we apply some special digger logic to this explosion
+---@field knockback_force number Default: 1<br>How far do entities get thrown if a knockback occurs? final_knocback = explosion_radius * knockback_force * target.inv_normalized_distance_from_explosion / target.mass
+---@field light_b integer Default: 180<br>Color blue 0-255
+---@field light_enabled boolean Default: 1<br>Should the explosion emit light to its surroundings?
+---@field light_fade_time number Default: 0.08<br>The time it takes for the light flash to fade out
+---@field light_g integer Default: 217<br>Color green 0-255
+---@field light_r integer Default: 255<br>Color red 0-255
+---@field light_radius_coeff number Default: 8<br>The radius of the light will be explosion_radius * light_radius_coeff
+---@field load_this_entity string Default: """"<br>if set, this entity is loaded when the explosion is queued
+---@field material_sparks_count_max integer Default: 20<br>How many sparks are we creating (rand max)
+---@field material_sparks_count_min integer Default: 7<br>How many sparks are we creating (rand min)
+---@field material_sparks_enabled boolean Default: 0<br>Should we create few fire particles around the explosion
+---@field material_sparks_min_hp integer Default: 10000<br>How many sparks are we creating (rand max)
+---@field material_sparks_probability integer Default: 5<br>How many sparks are we creating (rand max)
+---@field material_sparks_real boolean Default: 0<br>if the spark particles created are real or fake
+---@field material_sparks_scale_with_hp boolean Default: 0<br>if true, will create more sparks the harder the material
+---@field max_durability_to_destroy integer Default: 10<br>When destroying cells only cells with a durability <= max_durability_to_destroy will be affected
+---@field min_radius_for_cracks integer Default: 10<br>Cracks are created if explosion_radius is larger than this
+---@field never_cache boolean Default: 1<br>if set, won't ever cache and the explosion happens that frame. Used for projectiles
+---@field not_scaled_by_gamefx boolean Default: 0<br>If 1, DAMAGE_MULTIPLIER etc don't affect this explosion
+---@field null_damage boolean Default: 0<br>if set, will not call DamageModelSystem::TakeDamage()
+---@field particle_effect boolean Default: 1<br>Should we use the ParticleEffect::DoExplosion()
+---@field physics_explosion_power range Default: {0,0.20000000298023}<br>how hard do we throw physics objects
+---@field physics_multiplier_ragdoll_force number Default: 1<br>treat the ragdolls a bit differently from other physics objects, to get them to fly nicely
+---@field physics_throw_enabled boolean Default: 1<br>Should we throw physics objects into the air, also peasants
+---@field pixel_sprites_enabled boolean Default: 1<br>if enabled will carve out the pixel sprites
+---@field ray_energy integer Default: 20000<br>This is the energy we have per ray. Could be called 'penetration power' or something like that. If cells have a hp of 20 rays with 100 energy can penetrate 5 cells
+---@field shake_vegetation boolean Default: 1<br>Should we shake vegetation around the explosion (uses the area of stain_image to find vegetation)
+---@field spark_material string Default: "spark"<br>spark material, TODO moved these to use a special Serializer
+---@field sparks_count_max integer Default: 20<br>How many sparks are we creating (rand max)
+---@field sparks_count_min integer Default: 7<br>How many sparks are we creating (rand min)
+---@field sparks_enabled boolean Default: 1<br>Should we create few fire particles around the explosion
+---@field sparks_inner_radius_coeff number Default: 0.333<br>If 'sparks_enabled', Sparks are created in the area between circles defined by 'explosion_radius'*'sparks_inner_radius_coeff' and 'explosion_radius'
+---@field stains_enabled boolean Default: 1<br>Should we stain the ground and other particles
+---@field stains_radius number Default: 0<br>The distance from the edge of the hole to the edge of the stained area, 0.0f for default which is 0.3 * explosion_radius
+---@field who_is_responsible entity_id Default: 0<br>the entity that caused the explosion
+---@field set fun(self, fields: ProjectileComponent.config_explosion.set)
+
+---@class AnimalAIComponent.attack_melee_finish_config_explosion
+---@field audio_enabled boolean Default: 1<br>Do we play an explosion sound?
+---@field audio_event_name string Default: """"<br>Name of audio event in 'explosion' audio bank. If not set, will default to 'explosion' or 'explosion_small' based on explosion radius.
+---@field audio_liquid_amount_normalized number Default: 0<br>value of the 'liquid_amount' parameter passed to the explosion's audio event
+---@field background_lightning_count integer Default: 0<br>Parallax background lightning count is set to this on explosion
+---@field camera_shake number Default: 7.5<br>camera shake - how much we shake the camera
+---@field cell_explosion_damage_required number Default: 100<br>how much fire damage is required before this explodes
+---@field cell_explosion_power number Default: 1<br>used when a solid cell explodes as the multiplier to how big the radius is going to be
+---@field cell_explosion_power_ragdoll_coeff number Default: 0.75<br>ragdoll cells destruction power is multiplied with this
+---@field cell_explosion_probability number Default: 0<br>this is used when there's a tiny contact that doesn't cause an explosion, in those cases this is used as a random to check if we should explode or not
+---@field cell_explosion_radius_max number Default: 150<br>when cell explodes, this is the minimum radius that explosion is made of
+---@field cell_explosion_radius_min number Default: 5<br>when cell explodes, this is the minimum radius that explosion is made of
+---@field cell_explosion_velocity_min number Default: 0<br>cell explodes only when body velocity is greater than this
+---@field crack_count integer Default: 10<br>How many crack entitities should we create?
+---@field create_cell_material string Default: "fire"<br>The material destroyed cells might turn into.
+---@field create_cell_probability integer Default: 5<br>The probability a destroyed cell is turned into 'create_cell_material'
+---@field damage number Default: 5<br>how much damage does this do to living entities
+---@field damage_mortals boolean Default: 1<br>Look for peasants and throw them into the air? Remember to enabled physics_throw as well if you want them to actually fly
+---@field delay range Default: {0,0}<br>if > 0, the explosion occurs with a delay chosen randomly from this range and is never buffered
+---@field destroy_non_platform_solid_enabled boolean Default: 1<br>Do we remove solid cells that aren't platforms?
+---@field dont_damage_this entity_id Default: 0<br>if set, this entity doesn't receive damage from the explosion
+---@field electricity_count integer Default: 0<br>How many electricity entitities should we create?
+---@field explosion_delay_id integer Default: -1<br>for delayed barrel explosions... this has to be set and has to be the same for the explosions for there to be a delay
+---@field explosion_radius number Default: 20<br>Explosion radius, used to find the peasants and physics bodies that are thrown into the air
+---@field explosion_sprite string Default: "data/particles/explosion_032.xml"<br>sprite animation of the explosion that we play
+---@field explosion_sprite_additive boolean Default: 0<br>if 1, sprite is additive
+---@field explosion_sprite_emissive boolean Default: 0<br>if 1, sprite is emissive
+---@field explosion_sprite_lifetime number Default: 0<br>if 0, finds the lifetime based on the rect animation currently playing. If not 0 it is seconds how long does the explosion sprite stay in the world
+---@field explosion_sprite_random_rotation boolean Default: 1<br>if true, rotates the sprite to random 90 degrees
+---@field gore_particle_count integer Default: 1<br>How many particles to create in case we do gore stuff?
+---@field hole_destroy_liquid boolean Default: 0<br>Do we destroy the liquid cells we ran into, or do we just throw them into to the air?
+---@field hole_destroy_physics_dynamic boolean Default: 1<br>Do we destroy the dynamic physics cells we encountered?
+---@field hole_enabled boolean Default: 1<br>Do we remove ground, creata a crater
+---@field impl_delay_frame integer Default: 0
+---@field impl_position vector Default: {0,0}
+---@field impl_send_message_to_this entity_id Default: 0
+---@field is_digger boolean Default: 0<br>if 1, we apply some special digger logic to this explosion
+---@field knockback_force number Default: 1<br>How far do entities get thrown if a knockback occurs? final_knocback = explosion_radius * knockback_force * target.inv_normalized_distance_from_explosion / target.mass
+---@field light_b integer Default: 180<br>Color blue 0-255
+---@field light_enabled boolean Default: 1<br>Should the explosion emit light to its surroundings?
+---@field light_fade_time number Default: 0.08<br>The time it takes for the light flash to fade out
+---@field light_g integer Default: 217<br>Color green 0-255
+---@field light_r integer Default: 255<br>Color red 0-255
+---@field light_radius_coeff number Default: 8<br>The radius of the light will be explosion_radius * light_radius_coeff
+---@field load_this_entity string Default: """"<br>if set, this entity is loaded when the explosion is queued
+---@field material_sparks_count_max integer Default: 20<br>How many sparks are we creating (rand max)
+---@field material_sparks_count_min integer Default: 7<br>How many sparks are we creating (rand min)
+---@field material_sparks_enabled boolean Default: 0<br>Should we create few fire particles around the explosion
+---@field material_sparks_min_hp integer Default: 10000<br>How many sparks are we creating (rand max)
+---@field material_sparks_probability integer Default: 5<br>How many sparks are we creating (rand max)
+---@field material_sparks_real boolean Default: 0<br>if the spark particles created are real or fake
+---@field material_sparks_scale_with_hp boolean Default: 0<br>if true, will create more sparks the harder the material
+---@field max_durability_to_destroy integer Default: 10<br>When destroying cells only cells with a durability <= max_durability_to_destroy will be affected
+---@field min_radius_for_cracks integer Default: 10<br>Cracks are created if explosion_radius is larger than this
+---@field never_cache boolean Default: 1<br>if set, won't ever cache and the explosion happens that frame. Used for projectiles
+---@field not_scaled_by_gamefx boolean Default: 0<br>If 1, DAMAGE_MULTIPLIER etc don't affect this explosion
+---@field null_damage boolean Default: 0<br>if set, will not call DamageModelSystem::TakeDamage()
+---@field particle_effect boolean Default: 1<br>Should we use the ParticleEffect::DoExplosion()
+---@field physics_explosion_power range Default: {0,0.20000000298023}<br>how hard do we throw physics objects
+---@field physics_multiplier_ragdoll_force number Default: 1<br>treat the ragdolls a bit differently from other physics objects, to get them to fly nicely
+---@field physics_throw_enabled boolean Default: 1<br>Should we throw physics objects into the air, also peasants
+---@field pixel_sprites_enabled boolean Default: 1<br>if enabled will carve out the pixel sprites
+---@field ray_energy integer Default: 20000<br>This is the energy we have per ray. Could be called 'penetration power' or something like that. If cells have a hp of 20 rays with 100 energy can penetrate 5 cells
+---@field shake_vegetation boolean Default: 1<br>Should we shake vegetation around the explosion (uses the area of stain_image to find vegetation)
+---@field spark_material string Default: "spark"<br>spark material, TODO moved these to use a special Serializer
+---@field sparks_count_max integer Default: 20<br>How many sparks are we creating (rand max)
+---@field sparks_count_min integer Default: 7<br>How many sparks are we creating (rand min)
+---@field sparks_enabled boolean Default: 1<br>Should we create few fire particles around the explosion
+---@field sparks_inner_radius_coeff number Default: 0.333<br>If 'sparks_enabled', Sparks are created in the area between circles defined by 'explosion_radius'*'sparks_inner_radius_coeff' and 'explosion_radius'
+---@field stains_enabled boolean Default: 1<br>Should we stain the ground and other particles
+---@field stains_radius number Default: 0<br>The distance from the edge of the hole to the edge of the stained area, 0.0f for default which is 0.3 * explosion_radius
+---@field who_is_responsible entity_id Default: 0<br>the entity that caused the explosion
+---@field set fun(self, fields: AnimalAIComponent.attack_melee_finish_config_explosion.set)
+
+---@class ProjectileComponent.damage_by_type
+---@field curse number Default: 0
+---@field drill number Default: 0
+---@field electricity number Default: 0<br>electricity stun effect is rand[0-1] < electricity
+---@field explosion number Default: 0
+---@field fire number Default: 0
+---@field healing number Default: 0<br>healing aka negative damage. this should be given as a negative value.
+---@field holy number Default: 0<br>NOTE( Petri ): Added 18.7.2023. Just an extra type of damage
+---@field ice number Default: 0<br>freezing stun effect is rand[0-1] < ice
+---@field melee number Default: 0
+---@field overeating number Default: 0
+---@field physics_hit number Default: 0<br>damage from being hit with a physics object
+---@field poison number Default: 0
+---@field projectile number Default: 0
+---@field radioactive number Default: 0
+---@field slice number Default: 0
+---@field set fun(self, fields: ProjectileComponent.damage_by_type.set)
+
+---@class DamageModelComponent.damage_multipliers
+---@field curse number Default: 1
+---@field drill number Default: 1
+---@field electricity number Default: 1<br>electricity stun effect is rand[0-1] < electricity
+---@field explosion number Default: 1
+---@field fire number Default: 1
+---@field healing number Default: 1<br>healing aka negative damage. this should be given as a negative value.
+---@field holy number Default: 1<br>NOTE( Petri ): Added 18.7.2023. Just an extra type of damage
+---@field ice number Default: 1<br>freezing stun effect is rand[0-1] < ice
+---@field melee number Default: 1
+---@field overeating number Default: 1
+---@field physics_hit number Default: 1<br>damage from being hit with a physics object
+---@field poison number Default: 1
+---@field projectile number Default: 1
+---@field radioactive number Default: 1
+---@field slice number Default: 1
+---@field set fun(self, fields: DamageModelComponent.damage_multipliers.set)
+
+---@class ProjectileComponent.damage_critical
+---@field chance integer Default: 0<br>the chance of a critical hit. ]0-100[ - can be higher than 100% - then will multiply the multiplier by the extra
+---@field damage_multiplier number Default: 1<br>multiplier that is applied to all damage types on a critical hit
+---@field mSucceeded boolean Default: 0
+---@field set fun(self, fields: ProjectileComponent.damage_critical.set)
+
+---@class ProjectileComponent.config
+---@field action_ai_never_uses boolean Default: 0
+---@field action_description string Default: """"
+---@field action_draw_many_count integer Default: 0
+---@field action_id string Default: """"
+---@field action_is_dangerous_blast boolean Default: 0<br>TODO - is this used anywhere?
+---@field action_mana_drain number Default: 10<br>how much mana does this action drain?
+---@field action_max_uses integer Default: -1<br>-1 = infinite otherwise it's the amount specified
+---@field action_name string Default: """"
+---@field action_never_unlimited boolean Default: 0
+---@field action_spawn_level string Default: """"<br>comma separated values should match probabilities
+---@field action_spawn_manual_unlock boolean Default: 0<br>if true, will not automatically call AddFlagPersistent( action_spawn_requires_flag ) when this action is spawned. You must do it yourself!
+---@field action_spawn_probability string Default: """"<br>comma separated values should match levels
+---@field action_spawn_requires_flag string Default: """"<br>if set, requires that this persistent flag is set for spawn probablities to be something else than 0
+---@field action_sprite_filename string Default: """"
+---@field action_type integer Default: 0
+---@field action_unidentified_sprite_filename string Default: "data/ui_gfx/gun_actions/unidentified.png"
+---@field blood_count_multiplier number Default: 1<br>ProjectileComponent has blood_count_multiplier, it tells how much blood is generated when this hits an entity. These are multiplied together...
+---@field bounces integer Default: 0
+---@field child_speed_multiplier number Default: 1
+---@field custom_xml_file string Default: """"<br>if set, this will be used instead of 'action.xml'
+---@field damage_critical_chance integer Default: 0<br>the chance of a critical hit. ]0-100[
+---@field damage_critical_multiplier number Default: 0<br>multiplier that is applied to all damage types on a critical hit
+---@field damage_curse_add number Default: 0
+---@field damage_drill_add number Default: 0
+---@field damage_electricity_add number Default: 0
+---@field damage_explosion_add number Default: 0
+---@field damage_fire_add number Default: 0<br>TODO - is this used anywhere?
+---@field damage_healing_add number Default: 0
+---@field damage_ice_add number Default: 0
+---@field damage_melee_add number Default: 0<br>TODO - is this used anywhere?
+---@field damage_null_all number Default: 0<br>if > 0 then will set all damage to 0 and add a NullDamageComponent (that nullss the rest). The value is a percent (0.0-1.0) of what the chance is that everything will be nulled. 1 = always
+---@field damage_projectile_add number Default: 0<br>if change to mul - take into account that default is 0
+---@field damage_slice_add number Default: 0
+---@field dampening number Default: 1
+---@field explosion_damage_to_materials number Default: 0
+---@field explosion_radius number Default: 0
+---@field extra_entities string Default: """"<br>comma separated xml files, that are loaded into the projectile entity. Their components get added but nothing else from the xml files is loaded
+---@field fire_rate_wait integer Default: 0
+---@field friendly_fire boolean Default: 0<br>if 1, will set frily fire on to the bullet
+---@field game_effect_entities string Default: """"<br>comma separated xml files, that have the game effects when they hit the entity
+---@field gore_particles integer Default: 0<br>amount of blood particles generated by the explosion
+---@field gravity number Default: 0
+---@field knockback_force number Default: 0<br>how much knockback it does to enemies
+---@field lifetime_add integer Default: 0
+---@field light number Default: 0
+---@field lightning_count integer Default: 0
+---@field material string Default: """"
+---@field material_amount integer Default: 0
+---@field pattern_degrees number Default: 0<br>in 360 degrees, if != 0, distributes the bullets to an even pattern from -pattern_degrees to +pattern_degrees
+---@field physics_impulse_coeff number Default: 0<br>projectile applies an impulse to physics bodies it hits. Impulse = physics_impulse_coeff * velocity
+---@field projectile_file string Default: """"
+---@field ragdoll_fx integer Default: 0<br>ragdoll_fx of the projectile, selects the highest 1 = normal, 2 = gore
+---@field recoil number Default: 0
+---@field reload_time integer Default: 0
+---@field screenshake number Default: 0
+---@field sound_loop_tag string Default: """"<br>If wand has a SoundLoopComponent with this tag it will start playing when this is shot
+---@field speed_multiplier number Default: 1
+---@field spread_degrees number Default: 0<br>in 360 degrees, randomizes the direction of the bullet -spread_degrees to +spread_degrees
+---@field sprite string Default: """"
+---@field state_cards_drawn integer Default: 0
+---@field state_destroyed_action boolean Default: 0
+---@field state_discarded_action boolean Default: 0
+---@field state_shuffled boolean Default: 0
+---@field trail_material string Default: """"
+---@field trail_material_amount integer Default: 0
+---@field set fun(self, fields: ProjectileComponent.config.set)
+
+---@class AbilityComponent.gun_config
+---@field actions_per_round integer Default: 1
+---@field deck_capacity integer Default: 2<br>e.g. deck size, how many cards can be put into this gun
+---@field reload_time integer Default: 40
+---@field shuffle_deck_when_empty boolean Default: 0
+---@field set fun(self, fields: AbilityComponent.gun_config.set)
+
+---@class DrugEffectModifierComponent.fx_add
+---@field color_amount number Default: 0
+---@field distortion_amount number Default: 0
+---@field doublevision_amount number Default: 0
+---@field fractals_amount number Default: 0
+---@field fractals_size number Default: 0
+---@field nightvision_amount number Default: 0
+---@field set fun(self, fields: DrugEffectModifierComponent.fx_add.set)
+

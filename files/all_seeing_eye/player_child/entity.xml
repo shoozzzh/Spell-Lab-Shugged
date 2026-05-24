@@ -1,4 +1,4 @@
-<Entity name="spell_lab_shugged_better_all_seeing_eye">
+<Entity name="spell_lab_shugged.all_seeing_eye">
 	<InheritTransformComponent only_position="1" />
 	<_Transform scale.x="12" scale.y="12" />
 	<LightComponent
@@ -12,12 +12,12 @@
 		offset_x="540"
 		offset_y="540"
 		alpha="1.0"
-		image_file="mods/spell_lab_shugged/files/entities/fog_of_war_hole_ultimate.png"
+		image_file="mods/spell_lab_shugged/files/all_seeing_eye/player_child/fog_of_war_hole.png"
 		smooth_filtering="1"
 		fog_of_war_hole="1">
 	</SpriteComponent>
 	<LuaComponent
-		script_source_file="mods/spell_lab_shugged/files/entities/better_all_seeing_eye.lua"
+		script_source_file="mods/spell_lab_shugged/files/all_seeing_eye/player_child/update.lua"
 		execute_every_n_frame="1">
 	</LuaComponent>
 </Entity>
