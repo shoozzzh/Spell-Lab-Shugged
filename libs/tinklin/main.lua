@@ -75,6 +75,7 @@ entity_tag_mt.__newindex = function(t, k, v)
     end
 end
 
+entity_fields.tag = {}
 function entity_fields.tag:get()
     self.tag = setmetatable({ self.id }, entity_tag_mt)
     return self.tag
@@ -215,6 +216,7 @@ end
 
 local comp_fields = {}
 
+comp_fields.enabled = {}
 function comp_fields.enabled:get()
     return ComponentGetIsEnabled(self.id)
 end
@@ -225,6 +227,7 @@ end
 
 local comp_xform_fields = {}
 
+comp_xform_fields.pos = {}
 function comp_xform_fields.pos:get()
     local x, y, _, _, _ = ComponentGetValue2(self.comp_id, "Transform")
     return npair.new { x, y }
@@ -235,6 +238,7 @@ function comp_xform_fields.pos:set(value)
     ComponentSetValue2(self.comp_id, "Transform", value[1], value[2], scale_x, scale_y, rot)
 end
 
+comp_xform_fields.rot = {}
 function comp_xform_fields.rot:get()
     local _, _, _, _, rot = ComponentGetValue2(self.comp_id, "Transform")
     return rot
@@ -245,6 +249,7 @@ function comp_xform_fields.rot:set(value)
     ComponentSetValue2(self.comp_id, "Transform", x, y, scale_x, scale_y, value)
 end
 
+comp_xform_fields.scale = {}
 function comp_xform_fields.scale:get()
     local _, _, scale_x, scale_y, _ = ComponentGetValue2(self.comp_id, "Transform")
     return npair.new { scale_x, scale_y }
@@ -278,9 +283,12 @@ local comp_xform_mt = {
     end,
 }
 
+comp_fields.Transform = {}
 function comp_fields.Transform:get()
     return setmetatable({ comp_id = self.id }, comp_xform_mt)
 end
+
+comp_fields.tag = {}
 
 local comp_tag_mt = {}
 comp_tag_mt.__index = function(t, k)
@@ -301,10 +309,12 @@ function comp_fields.tag:get()
     return self.tag
 end
 
+comp_fields.tags = {}
 function comp_fields.tags:get()
     return ComponentGetTags(self.id)
 end
 
+comp_fields.type = {}
 function comp_fields.type:get()
     return ComponentGetTypeName(self.id)
 end
