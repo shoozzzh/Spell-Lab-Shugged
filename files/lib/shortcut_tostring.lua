@@ -60,6 +60,14 @@ local custom_keys_i18n = {
 		Mouse_left = "左键",
 		Mouse_right = "右键",
 	},
+	["한국어"] = {
+		Mouse_left = "왼쪽 클릭",
+		Mouse_right = "오른쪽 클릭",
+	},
+	["日本語"] = {
+		Mouse_left = "左クリック",
+		Mouse_right = "右クリック",
+	},
 	DEFAULT = {
 		Mouse_left = "Left-click",
 		Mouse_right = "Right-click",
