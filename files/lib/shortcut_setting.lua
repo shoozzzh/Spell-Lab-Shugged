@@ -3,10 +3,28 @@ dofile_once( "mods/spell_lab_shugged/files/lib/shortcut_tostring.lua" )
 dofile_once( "mods/spell_lab_shugged/files/gui/keyboard_listener.lua" )
 local KEYCODES_RAW = dofile_once( "mods/spell_lab_shugged/files/lib/keycodes_wrapped.lua" )[1]
 
+local warning_text = {
+	["简体中文"] = "编辑快捷键前请先进入游戏",
+	DEFAULT = "Please enter a run before editing shortcuts",
+}
+do
+	local other_zh_cn_languages = { "喵体中文", "汪体中文", "完全汉化" }
+	for _, v in ipairs( other_zh_cn_languages ) do
+		warning_text[ v ] = warning_text["简体中文"]
+	end
+end
+
 local current_key_detector
 function mod_setting_shortcut( mod_id, gui, in_main_menu, im_id, setting )
     GuiLayoutBeginHorizontal( gui, 0, 0, true, 2, 2 )
     GuiText( gui, mod_setting_group_x_offset, 0, setting.ui_name )
+
+	if not EntityGetIsAlive(1) then
+		local text = warning_text[GameTextGet( "$current_language" )] or warning_text.DEFAULT
+		GuiText( gui, mod_setting_group_x_offset - GuiGetTextDimensions( gui, setting.ui_name ) + 120, 0, text )
+		GuiLayoutEnd( gui )
+		return
+	end
 
     local changed = false
 	if current_key_detector == setting.id then
