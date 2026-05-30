@@ -1,8 +1,8 @@
-<Entity tags="___.target_dummy_child">
+<Entity tags="%%%.target_dummy_child">
 	<InheritTransformComponent only_position="1" />
 	<SpriteComponent 
-		_tags="enabled_in_world,___.current_dps"
-		image_file="__THIS_FOLDER__fonts/blue.xml"
+		_tags="enabled_in_world,%%%.current_dps"
+		image_file="%THIS_FOLDER%/fonts/blue.xml"
 		emissive="1"
 		is_text_sprite="1"
 		offset_x="7.5"
@@ -14,8 +14,8 @@
 		never_ragdollify_on_death="1"
 	></SpriteComponent>
 	<SpriteComponent 
-		_tags="enabled_in_world,___.highest_dps"
-		image_file="__THIS_FOLDER__fonts/grey.xml"
+		_tags="enabled_in_world,%%%.highest_dps"
+		image_file="%THIS_FOLDER%/fonts/grey.xml"
 		emissive="1"
 		is_text_sprite="1"
 		offset_x="7.5"
@@ -30,8 +30,8 @@
 		never_ragdollify_on_death="1"
 	></SpriteComponent>
 	<SpriteComponent 
-		_tags="enabled_in_world,___.average_dps"
-		image_file="__THIS_FOLDER__fonts/blue.xml"
+		_tags="enabled_in_world,%%%.average_dps"
+		image_file="%THIS_FOLDER%/fonts/blue.xml"
 		emissive="1"
 		is_text_sprite="1"
 		offset_x="7.5"
@@ -46,8 +46,8 @@
 		never_ragdollify_on_death="1"
 	></SpriteComponent>
 	<SpriteComponent 
-		_tags="enabled_in_world,___.last_frame_damage"
-		image_file="__THIS_FOLDER__fonts/green.xml"
+		_tags="enabled_in_world,%%%.last_frame_damage"
+		image_file="%THIS_FOLDER%/fonts/green.xml"
 		emissive="1"
 		is_text_sprite="1"
 		offset_x="7.5"
@@ -62,8 +62,8 @@
 		never_ragdollify_on_death="1"
 	></SpriteComponent>
 	<SpriteComponent 
-		_tags="enabled_in_world,___.total_damage"
-		image_file="__THIS_FOLDER__fonts/red.xml"
+		_tags="enabled_in_world,%%%.total_damage"
+		image_file="%THIS_FOLDER%/fonts/red.xml"
 		emissive="1"
 		is_text_sprite="1"
 		offset_x="7.5"
@@ -79,7 +79,7 @@
 	></SpriteComponent>
 	<LuaComponent
 		_tags="invincible"
-		script_source_file="__THIS_FOLDER__script_every_sec.lua"
+		script_source_file="%THIS_FOLDER%/script_every_sec.lua"
 		execute_every_n_frame="60">
 	</LuaComponent>
 </Entity>

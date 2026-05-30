@@ -1,5 +1,5 @@
-<Entity tags="prop,hittable,mortal,homing_target,enemy,teleportable_NOT,polymorphable_NOT,___.target_dummy" >
-	<Base file="__THIS_FOLDER__base.xml" />
+<Entity tags="prop,hittable,mortal,homing_target,enemy,teleportable_NOT,polymorphable_NOT,%%%.target_dummy" >
+	<Base file="%THIS_FOLDER%/base.xml" />
 <!-- 	<CharacterCollisionComponent/>
 	<CharacterDataComponent
 		collision_aabb_min_x="-10.5"
@@ -13,7 +13,7 @@
 	<StatusEffectDataComponent/>
 	<SpriteStainsComponent/>
 	<SpriteComponent
-		image_file="__THIS_FOLDER__sprite.png" offset_x="10.5" offset_y="14">
+		image_file="%THIS_FOLDER%/sprite.png" offset_x="10.5" offset_y="14">
 	</SpriteComponent>
 	<SpriteOffsetAnimatorComponent
 		y_amount="2"

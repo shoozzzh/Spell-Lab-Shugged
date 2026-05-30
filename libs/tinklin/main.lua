@@ -1,5 +1,3 @@
--- vesion 1.0.0
-
 local path = jit.util.funcinfo(setfenv(1, getfenv())).source:match "^.*/"
 local function require(module_name)
     return dofile_once(path .. module_name .. ".lua")
@@ -10,6 +8,10 @@ local npair = require "npair"
 local nquadra = require "nquadra"
 
 local tinklin = {}
+
+tinklin.fun = fun
+tinklin.npair = npair
+tinklin.nquadra = nquadra
 
 ---@class entity: entity_methods
 ---@field id entity_id
@@ -99,6 +101,10 @@ function entity_methods:is_alive()
     return EntityGetIsAlive(self.id)
 end
 
+function entity_methods:apply_xform()
+    EntityApplyTransform(self.id, EntityGetTransform(self.id))
+end
+
 ---@param child_entity entity
 function entity_methods:add_child(child_entity)
     EntityAddChild(self.id, child_entity.id)
@@ -123,7 +129,13 @@ end
 ---@return iterator<entity> iter_child_entity
 ---@nodiscard
 function entity_methods:get_children(tag)
-    return fun.iter(EntityGetAllChildren(self.id, tag)):map(tinklin.entity_wrap)
+    local children_ids
+    if tag == nil then
+        children_ids = EntityGetAllChildren(self.id)
+    else
+        children_ids = EntityGetAllChildren(self.id, tag)
+    end
+    return fun.iter(children_ids):map(tinklin.entity_wrap)
 end
 
 ---Returns the given entity if it has no parent, otherwise walks up the parent hierarchy to the topmost parent and returns it.
@@ -138,7 +150,13 @@ end
 ---@return component?
 ---@nodiscard
 function entity_methods:comp_first(comp_type, tag)
-    return tinklin.comp_wrap(EntityGetFirstComponentIncludingDisabled(self.id, comp_type, tag))
+    local comp_id
+    if tag == nil then
+        comp_id = EntityGetFirstComponentIncludingDisabled(self.id, comp_type)
+    else
+        comp_id = EntityGetFirstComponentIncludingDisabled(self.id, comp_type, tag)
+    end
+    return tinklin.comp_wrap(comp_id)
 end
 
 ---@param comp_type component_type
@@ -146,15 +164,29 @@ end
 ---@return component?
 ---@nodiscard
 function entity_methods:comp_first_enabled(comp_type, tag)
-    return tinklin.comp_wrap(EntityGetFirstComponent(self.id, comp_type, tag))
+    local comp_id
+    if tag == nil then
+        comp_id = EntityGetFirstComponent(self.id, comp_type)
+    else
+        comp_id = EntityGetFirstComponent(self.id, comp_type, tag)
+    end
+    return tinklin.comp_wrap(comp_id)
 end
 
+---@param comp_type component_type?
+---@param tag string?
 ---@nodiscard
 function entity_methods:comps(comp_type, tag)
     if comp_type == nil then
         return fun.iter(EntityGetAllComponents(self.id))
     end
-    return fun.iter(EntityGetComponent(self.id, comp_type, tag) or {}):map(tinklin.comp_wrap)
+    local comps
+    if tag == nil then
+        comps = EntityGetComponent(self.id, comp_type)
+    else
+        comps = EntityGetComponent(self.id, comp_type, tag)
+    end
+    return fun.iter(comps or {}):map(tinklin.comp_wrap)
 end
 
 ---@nodiscard
@@ -162,7 +194,13 @@ function entity_methods:comps_enabled(comp_type, tag)
     if comp_type == nil then
         return fun.iter(EntityGetAllComponents(self.id)):filter(function(c) return ComponentGetIsEnabled(c) end)
     end
-    return fun.iter(EntityGetComponentIncludingDisabled(self.id, comp_type, tag) or {}):map(tinklin.comp_wrap)
+    local comps
+    if tag == nil then
+        comps = EntityGetComponentIncludingDisabled(self.id, comp_type)
+    else
+        comps = EntityGetComponentIncludingDisabled(self.id, comp_type, tag)
+    end
+    return fun.iter(comps or {}):map(tinklin.comp_wrap)
 end
 
 function entity_methods:comp_new(comp_type)
@@ -187,7 +225,7 @@ local entity_mt = {
                 return getter(t)
             end
         end
-        return entity_methods(k)
+        return entity_methods[k]
     end,
     __newindex = function(t, k, v)
         local field = entity_fields[k]
@@ -364,7 +402,7 @@ local comp_mt = {
                 return getter(t)
             end
         end
-        local method = comp_methods(k)
+        local method = comp_methods[k]
         if method then
             return method
         end

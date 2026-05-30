@@ -1,26 +1,26 @@
 <Entity>
-	<LuaComponent script_damage_received="__THIS_FOLDER__script_damaged.lua" />
+	<LuaComponent script_damage_received="%THIS_FOLDER%/script_damaged.lua" />
 	<LuaComponent
-		script_source_file="__THIS_FOLDER__load_child.lua"
+		script_source_file="%THIS_FOLDER%/load_child.lua"
 		execute_on_added="1"
 		remove_after_executed="1">
 	</LuaComponent>
 
-	<VariableStorageComponent name="___.last_hit_frame" />
-	<VariableStorageComponent name="___.first_hit_frame" />
-	<VariableStorageComponent name="___.current_dps" />
-	<VariableStorageComponent name="___.highest_dps" />
-	<VariableStorageComponent name="___.total_damage" />
-	<VariableStorageComponent name="___.last_frame_damage" />
+	<VariableStorageComponent name="%%%.last_hit_frame" />
+	<VariableStorageComponent name="%%%.first_hit_frame" />
+	<VariableStorageComponent name="%%%.current_dps" />
+	<VariableStorageComponent name="%%%.highest_dps" />
+	<VariableStorageComponent name="%%%.total_damage" />
+	<VariableStorageComponent name="%%%.last_frame_damage" />
 	
 	<VariableStorageComponent name="gkbrkn_always_show_damage_numbers" />
 	<VariableStorageComponent name="gkbrkn_no_health_bar" />
 	<VariableStorageComponent name="gkbrkn_no_custom_damage_numbers" />
 
 	<InteractableComponent
-		ui_text="$____dummy_target_interact"
+		ui_text="$%%%_dummy_target_interact"
 		radius="20">
 	</InteractableComponent>
 
-	<LuaComponent script_interacting="__THIS_FOLDER__script_interacted.lua" />
+	<LuaComponent script_interacting="%THIS_FOLDER%/script_interacted.lua" />
 </Entity>

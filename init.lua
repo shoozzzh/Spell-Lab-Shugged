@@ -48,8 +48,8 @@ local function replace_placeholders(file, folder)
 		print_error(file)
 	end
 	local content = ModTextFileGetContent(file)
-	content = content:gsub("___", mod_id)
-	content = content:gsub("__THIS_FOLDER__", folder)
+	content = content:gsub("%%%", mod_id)
+	content = content:gsub("%THIS_FOLDER%/", folder)
 	ModTextFileSetContent(file, content)
 end
 

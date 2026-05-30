@@ -19,10 +19,24 @@ function npair.new(value_left, value_right)
     return new(value_left, value_right)
 end
 
+---@param x any
+---@param y any
 ---@return vector
-function npair.vec_from_polar(mag, arg)
+function npair.new_vector(x, y)
+    return new(x, y) --[[@as vector]]
+end
+
+---@return vector
+function npair.new_vector_from_polar(mag, arg)
     ---@diagnostic disable-next-line: undefined-field
     return new(1, 0):rotate(arg) * mag
+end
+
+---@param min any
+---@param max any
+---@return range
+function npair.new_range(min, max)
+    return new(min, max) --[[@as range]]
 end
 
 function npair_mt.__unm(a)
@@ -95,9 +109,22 @@ function npair_mt:flip()
     return new(self[2], self[1])
 end
 
+---@param with npair
+---@param weight number
+---@return npair
+function npair_mt:lerp(with, weight)
+    return new(self[1] * weight + with[1] * (1 - weight), self[2] * weight + with[2] * (1 - weight))
+end
+
 ---@class vector: npair
 ---@field [1] number x
 ---@field [2] number y
+---@operator unm(): vector
+---@operator add(vector|number): vector
+---@operator sub(vector|number): vector
+---@operator mul(vector|number): vector
+---@operator div(vector|number): vector
+---@field lerp fun(self:vector, with:vector, weight:number): vector
 local vector_mt = {}
 
 function vector_mt:dot(with)
@@ -133,6 +160,12 @@ end
 ---@class range
 ---@field [1] number min
 ---@field [2] number max
+---@operator unm(): range
+---@operator add(range|number): range
+---@operator sub(range|number): range
+---@operator mul(range|number): range
+---@operator div(range|number): range
+---@field lerp fun(self:vector, with:vector, weight:number): vector
 local range_mt = {}
 
 function range_mt:length()

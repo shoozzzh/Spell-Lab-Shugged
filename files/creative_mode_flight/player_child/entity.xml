@@ -1,5 +1,5 @@
 <Entity>
 	<InheritTransformComponent/>
 	<CharacterPlatformingComponent _enabled="0" />
-	<LuaComponent script_source_file="mods/spell_lab_shugged/files/creative_mode_flight/player_child/update.lua"/>
+	<LuaComponent script_source_file="%THIS_FOLDER%/update.lua"/>
 </Entity>
