@@ -1,21 +1,24 @@
 ---@type callbacks
 local callbacks = {}
 
-function OnPlayerSpawned( player_id )
-	local not_inited = true
-	for _, lua_comp in ipairs( EntityGetComponentIncludingDisabled( player_id, "LuaComponent" ) or {} ) do
-		if ComponentGetValue2( lua_comp, "script_source_file" ) == mod_path .. "files/scripts/player_update.lua" then
-			not_inited = false
-			break
-		end
-	end
-	if not_inited then
-		GlobalsSetValue( "spell_lab_shugged.refresh_player_state", "1" )
-		EntityAddComponent2( player_id, "LuaComponent", {
-			script_source_file = mod_path .. "files/scripts/player_update.lua",
+local module_path = this_folder()
+
+local script = module_path .. "player_update.lua"
+
+function callbacks.OnPlayerSpawned(player_id)
+	local player = tl.entity_wrap(player_id)
+	local inited = player:comps "LuaComponent":any(function(c)
+		return c.script_source_file == script
+	end)
+
+	if not inited then
+		GlobalsSetValue(mod_id .. ".refresh_player_state", "1")
+		player:comp_new "LuaComponent" {
+			script_source_file = script,
 			execute_on_added = true,
 			execute_every_n_frame = 1,
-		} )
-		EntityAddComponent2( player_id, "LuaComponent", { script_shot = mod_path .. "files/scripts/player_shot.lua" })
+		}
 	end
 end
+
+return callbacks

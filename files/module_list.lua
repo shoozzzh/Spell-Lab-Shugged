@@ -14,7 +14,7 @@ return {
 	"no_recoil",
 	"no_weather",
 	"terrain_spell_lab",
-	-- "player",
+	"player",
 	"protection_all",
 	"shortcuts",
 	"shot_effects",
