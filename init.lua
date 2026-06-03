@@ -42,25 +42,32 @@ for key, value in pairs(default_settings) do
 end
 
 local function replace_placeholders(file, folder)
-	file = folder .. file
+	file = folder .. "/" .. file
 	if not ModDoesFileExist(file) then
 		print_error "file does not exist at:"
 		print_error(file)
 	end
 	local content = ModTextFileGetContent(file)
-	content = content:gsub("%%%", mod_id)
-	content = content:gsub("%THIS_FOLDER%/", folder)
+	content = content:gsub("%%%%%%", mod_id)
+	content = content:gsub("%%THIS_FOLDER%%", folder)
 	ModTextFileSetContent(file, content)
 end
 
-function apply_placeholders(path, folder)
-	for key, value in pairs(path) do
+local function apply_placeholders_impl(subpathes, folder)
+	for key, value in pairs(subpathes) do
 		if type(key) == "number" then
 			replace_placeholders(value, folder)
 		elseif type(key) == "string" then
-			apply_placeholders(value, folder .. key .. "/")
+			apply_placeholders_impl(value, folder .. "/" .. key)
 		end
 	end
+end
+
+function apply_placeholders(subpathes, folder)
+	if folder:sub(-1, -1) == "/" then
+		folder = folder:sub(1, -2)
+	end
+	apply_placeholders_impl(subpathes, folder)
 end
 
 function OnPlayerSpawned(player_id)

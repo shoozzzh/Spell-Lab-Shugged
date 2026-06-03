@@ -1,4 +1,4 @@
-<Entity  tags="prop,hittable,mortal,homing_target,enemy,touchmagic_immunity,teleportable_NOT,polymorphable_NOT,%%%.target_dummy" >
+<Entity tags="prop,hittable,mortal,homing_target,enemy,touchmagic_immunity,teleportable_NOT,polymorphable_NOT,%%%.target_dummy" >
 	<Base file="%THIS_FOLDER%/base.xml" />
 	<!-- 	<CharacterCollisionComponent/>
 	<CharacterDataComponent
