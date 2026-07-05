@@ -3,9 +3,9 @@ local wsv = EntityGetInRadiusWithTag( x - 78, y - 50, 6, "workshop_spell_visuali
 for i = 1, #wsv - 1 do
 	EntityKill( wsv[ i ] )
 end
-local wsaabb = EntityGetInRadiusWithTag( x - 78, y - 50, 6, "workshop_aabb" )
-for i = 1, #wsaabb - 1 do
-	EntityKill( wsaabb[ i ] )
+local wsam = EntityGetInRadiusWithTag( x, y, 6, "workshop" )
+for i = 1, #wsam - 1 do
+	EntityKill( wsam[ i ] )
 end
 local reloader = EntityGetInRadiusWithTag( x, y, 6, "spell_lab_shugged_lab_reloader" )
 for i = 1, #reloader - 1 do

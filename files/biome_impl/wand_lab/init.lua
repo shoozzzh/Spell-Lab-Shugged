@@ -4,4 +4,4 @@ EntityLoad( "mods/spell_lab_shugged/files/biome_impl/wand_lab/reload_lab.xml", x
 EntityLoad( "mods/spell_lab_shugged/files/entities/dummy_target/dummy_target.xml", x - 100, y )
 EntityLoad( "mods/spell_lab_shugged/files/entities/dummy_target/dummy_target_final.xml", x + 100, y )
 EntityLoad( "data/entities/buildings/workshop_spell_visualizer.xml", x - 78, y - 50 )
-EntityLoad( "data/entities/buildings/workshop_aabb.xml", x - 78, y - 50 )
+EntityLoad( "mods/spell_lab_shugged/files/biome_impl/wand_lab/workshop.xml", x, y )
