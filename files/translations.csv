@@ -35,7 +35,7 @@ spell_lab_shugged_wand_raw_value,Raw value of wand,,,,,,,,法杖原始值,杖の
 spell_lab_shugged_hp_fixed_to,Your HP is fixed to $0 / $1\nRight-click to unfix it,,,,,,,,你的生命值已锁定为 $0 / $1\n右键取消锁定,固定されている体力：$0 / $1\n右クリックで固定解除,고정된 체력: $0 / $1\n오른쪽 클릭으로 고정 해제,,,,,,,,,,,,,,
 spell_lab_shugged_full_hp,Completely heal\nShift + Click to fix your hp,,,,,,,,完全回复生命值\nShift + 点击锁定生命值,全回復\nShift + クリックで体力を固定,완전 회복\nShift + 클릭해서 체력을 고정,,,,,,,,,,,,,,
 spell_lab_shugged_clear_held_wand,Clear Held Wand,,,,,,,,清空当前法杖,手持ちの杖を空にする,손에 든 완드 비우기,,,,,,,,,,,,,,
-spell_lab_shugged_edit_wands_perk_positive,TEWE,,,,,,,,随时编辑魔杖,どこ杖,어완개,,,,,,,,,,,,,,
+spell_lab_shugged_edit_wands_perk_positive,TWWE,,,,,,,,随时编辑魔杖,どこ杖,어완개,,,,,,,,,,,,,,
 spell_lab_shugged_edit_wands_perk_negative,NWT,,,,,,,,无法编辑魔杖,杖工作なし,완개없,,,,,,,,,,,,,,
 spell_lab_shugged_edit_wands_gain,Gain one $0 effect,,,,,,,,获得一层$0效果,$0効果を一つ獲得,$0 효과 하나 획득,,,,,,,,,,,,,,
 spell_lab_shugged_edit_wands_lose,Right-click to lose one $0 effect,,,,,,,,右键失去一层$0效果,右クリックで$0効果を一つ消去,오른쪽 클릭으로 $0 효과 하나 제거,,,,,,,,,,,,,,
