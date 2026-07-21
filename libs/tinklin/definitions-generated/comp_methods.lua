@@ -170,7 +170,7 @@ local entity_methods = {}
 ---@overload fun(self, comp_type: "WormPlayerComponent", tag: string?): WormPlayerComponent?
 ---@param comp_type component_type
 ---@param tag string
----@return component?
+---@return comp?
 function entity_methods:comp_first(comp_type, tag) end
 
 ---@overload fun(self, comp_type: "AIAttackComponent", tag: string?): AIAttackComponent?
@@ -340,7 +340,7 @@ function entity_methods:comp_first(comp_type, tag) end
 ---@overload fun(self, comp_type: "WormPlayerComponent", tag: string?): WormPlayerComponent?
 ---@param comp_type component_type
 ---@param tag string
----@return component?
+---@return comp?
 function entity_methods:comp_first_enabled(comp_type, tag) end
 
 ---@overload fun(self, comp_type: "AIAttackComponent", tag: string?): iterator<AIAttackComponent>
@@ -510,7 +510,7 @@ function entity_methods:comp_first_enabled(comp_type, tag) end
 ---@overload fun(self, comp_type: "WormPlayerComponent", tag: string?): iterator<WormPlayerComponent>
 ---@param comp_type nil
 ---@param tag string?
----@return iterator<component>
+---@return iterator<comp>
 function entity_methods:comps(comp_type, tag) end
 
 ---@overload fun(self, comp_type: "AIAttackComponent", tag: string?): iterator<AIAttackComponent>
@@ -680,7 +680,7 @@ function entity_methods:comps(comp_type, tag) end
 ---@overload fun(self, comp_type: "WormPlayerComponent", tag: string?): iterator<WormPlayerComponent>
 ---@param comp_type nil
 ---@param tag string?
----@return iterator<component>
+---@return iterator<comp>
 function entity_methods:comps_enabled(comp_type, tag) end
 
 ---@overload fun(self, comp_type: "AIAttackComponent"): fun(fields: AIAttackComponent.set): AIAttackComponent
@@ -849,5 +849,5 @@ function entity_methods:comps_enabled(comp_type, tag) end
 ---@overload fun(self, comp_type: "WormComponent"): fun(fields: WormComponent.set): WormComponent
 ---@overload fun(self, comp_type: "WormPlayerComponent"): fun(fields: WormPlayerComponent.set): WormPlayerComponent
 ---@param comp_type component_type
----@return component
+---@return comp
 function entity_methods:comp_new(comp_type) end

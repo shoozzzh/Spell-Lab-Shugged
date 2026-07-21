@@ -1,6 +1,6 @@
 ---@meta
 
----@class AIAttackComponent: component
+---@class AIAttackComponent: comp
 ---@field use_probability integer 100 [0, 100] The probability for using this attack if it's otherwise possible
 ---@field min_distance number 10 [0, 10000] The minimum distance from enemy at which we can perform this attack.
 ---@field max_distance number 160 [0, 10000] The maximum distance from enemy at which we can perform this attack.
@@ -31,14 +31,14 @@ local AIAttackComponent = {}
 ---@param fields AIAttackComponent.set
 function AIAttackComponent:set(fields) end
 
----@class AIComponent: component
+---@class AIComponent: comp
 ---@field TEMP_TEMP_TEMP number 0 [0, 3.5]
 local AIComponent = {}
 
 ---@param fields AIComponent.set
 function AIComponent:set(fields) end
 
----@class AbilityComponent: component
+---@class AbilityComponent: comp
 ---@field cooldown_frames integer 0 [0, 60000]
 ---@field entity_file string - the projectile entity file
 ---@field sprite_file string
@@ -101,7 +101,7 @@ function AbilityComponent:object(name) end
 ---@return AbilityComponent.gunaction_config
 function AbilityComponent:object(name) end
 
----@class AdvancedFishAIComponent: component
+---@class AdvancedFishAIComponent: comp
 ---@field move_check_range_min number 16 [0, 2]
 ---@field move_check_range_max number 64 [0, 2]
 ---@field flock boolean 1 [0, 1]
@@ -122,7 +122,7 @@ local AdvancedFishAIComponent = {}
 ---@param fields AdvancedFishAIComponent.set
 function AdvancedFishAIComponent:set(fields) end
 
----@class AltarComponent: component
+---@class AltarComponent: comp
 ---@field recognized_entity_tags string
 ---@field uses_remaining integer 3 [0, 1]
 ---@field good_fx_material integer 0 [0, 1] String name of material for particles emitted on successful sacrifice
@@ -134,7 +134,7 @@ local AltarComponent = {}
 ---@param fields AltarComponent.set
 function AltarComponent:set(fields) end
 
----@class AnimalAIComponent: component
+---@class AnimalAIComponent: comp
 ---@field ai_state integer 0 [0, 20] Current state of ai, defines what the animal is doing
 ---@field ai_state_timer integer 0 [0, 1000] If not 0, then we wait till this frame to pop current state from our state stack
 ---@field keep_state_alive_when_enabled boolean 0 [0, 1] if 1, will ensure state timer keeps current state alive for a while when Component is Enabled
@@ -263,7 +263,7 @@ function AnimalAIComponent:set(fields) end
 ---@return AnimalAIComponent.attack_melee_finish_config_explosion
 function AnimalAIComponent:object(name) end
 
----@class ArcComponent: component
+---@class ArcComponent: comp
 ---@field lifetime integer 60 [0, 1] remaining number of frames the arc exists
 ---@field type arc_type - which implementation the arc should use
 ---@field material integer 0 [0, 1] string name for the material the arc is made of
@@ -273,7 +273,7 @@ local ArcComponent = {}
 ---@param fields ArcComponent.set
 function ArcComponent:set(fields) end
 
----@class AreaDamageComponent: component
+---@class AreaDamageComponent: comp
 ---@field circle_radius number 0 [0, 1] if > 0, will only damage entities inside the aabb rectangle which are closer than 'circle_radius' to the aabb center.
 ---@field damage_per_frame number 10 [0, 256]
 ---@field update_every_n_frame integer 1 [0, 60]
@@ -288,13 +288,13 @@ local AreaDamageComponent = {}
 ---@param fields AreaDamageComponent.set
 function AreaDamageComponent:set(fields) end
 
----@class AttachToEntityComponent: component
+---@class AttachToEntityComponent: comp
 ---@field only_position boolean 0 [0, 1] if 1, we only inherit position. it is calculated as follows: target_position + target_offset * target_scale
 ---@field target_hotspot_tag string - if set, we apply the offset of target HotSpot with this tag
 ---@field target_sprite_id integer -1 [0, 1] if >= 0, the Nth sprite transform in target entity is inherited
 ---@field rotate_based_on_x_scale boolean 0 [0, 1] if 1, the rotation is set to 0 deg if scale >= 0 else to 180 deg
 ---@field destroy_component_when_target_is_gone boolean 1 [0, 1] should probably be on by default
----@field Transform comp_xform
+---@field Transform comp.xform
 ---@field target entity_id 0 [0, 1] EntityID of the entity we're attached to. This will fail after save/load, unfortunately
 ---@field mUpdateFrame integer -1 [0, 1]
 local AttachToEntityComponent = {}
@@ -302,7 +302,7 @@ local AttachToEntityComponent = {}
 ---@param fields AttachToEntityComponent.set
 function AttachToEntityComponent:set(fields) end
 
----@class AudioComponent: component
+---@class AudioComponent: comp
 ---@field file string
 ---@field event_root string
 ---@field audio_physics_material string
@@ -316,14 +316,14 @@ local AudioComponent = {}
 ---@param fields AudioComponent.set
 function AudioComponent:set(fields) end
 
----@class AudioListenerComponent: component
+---@class AudioListenerComponent: comp
 ---@field z number 0 [-500, 500]
 local AudioListenerComponent = {}
 
 ---@param fields AudioListenerComponent.set
 function AudioListenerComponent:set(fields) end
 
----@class AudioLoopComponent: component
+---@class AudioLoopComponent: comp
 ---@field file string
 ---@field event_name string
 ---@field auto_play boolean 0 [0, 1]
@@ -343,7 +343,7 @@ local AudioLoopComponent = {}
 ---@param fields AudioLoopComponent.set
 function AudioLoopComponent:set(fields) end
 
----@class BiomeTrackerComponent: component
+---@class BiomeTrackerComponent: comp
 ---@field limit_to_every_n_frame integer 0 [0, 1] if > 1, we will only check the biome every n frames
 ---@field current_biome_name string - used to track in which biome we are at
 local BiomeTrackerComponent = {}
@@ -351,7 +351,7 @@ local BiomeTrackerComponent = {}
 ---@param fields BiomeTrackerComponent.set
 function BiomeTrackerComponent:set(fields) end
 
----@class BlackHoleComponent: component
+---@class BlackHoleComponent: comp
 ---@field radius number 16 [0, 128]
 ---@field particle_attractor_force number 2 [0, 32]
 ---@field damage_probability number 0.25 [0, 1]
@@ -362,7 +362,7 @@ local BlackHoleComponent = {}
 ---@param fields BlackHoleComponent.set
 function BlackHoleComponent:set(fields) end
 
----@class BookComponent: component
+---@class BookComponent: comp
 ---@field TEMP_TEMPY number 0 [0, 3.5]
 ---@field TEMP_TEMP_TEMP number 0 [0, 3.5]
 local BookComponent = {}
@@ -370,7 +370,7 @@ local BookComponent = {}
 ---@param fields BookComponent.set
 function BookComponent:set(fields) end
 
----@class BossDragonComponent: component
+---@class BossDragonComponent: comp
 ---@field speed number 1 [0, 10000]
 ---@field speed_hunt number 3 [0, 10000]
 ---@field acceleration number 3 [0, 10000]
@@ -417,7 +417,7 @@ local BossDragonComponent = {}
 ---@param fields BossDragonComponent.set
 function BossDragonComponent:set(fields) end
 
----@class BossHealthBarComponent: component
+---@class BossHealthBarComponent: comp
 ---@field gui boolean 1 [0, 1]
 ---@field gui_special_final_boss boolean 0 [0, 1]
 ---@field in_world boolean 0 [0, 1]
@@ -428,7 +428,7 @@ local BossHealthBarComponent = {}
 ---@param fields BossHealthBarComponent.set
 function BossHealthBarComponent:set(fields) end
 
----@class CameraBoundComponent: component
+---@class CameraBoundComponent: comp
 ---@field enabled boolean 1 [0, 1] If enabled, kills this component if it's outside the camera distance
 ---@field distance number 250 [0, 1024] Distance in pixels from the center of camera, if outside this distance the entity is destroyed
 ---@field distance_border number 20 [0, 1024] Offset towards camera in pixels from 'distance' where the entity is respawned if it was frozen
@@ -440,7 +440,7 @@ local CameraBoundComponent = {}
 ---@param fields CameraBoundComponent.set
 function CameraBoundComponent:set(fields) end
 
----@class CardinalMovementComponent: component
+---@class CardinalMovementComponent: comp
 ---@field horizontal_movement boolean 1 [0, 1] allow horizontal movement
 ---@field vertical_movement boolean 1 [0, 1] allow vertical movement
 ---@field intercardinal_movement boolean 0 [0, 1] allow intercardinal movement
@@ -450,7 +450,7 @@ local CardinalMovementComponent = {}
 ---@param fields CardinalMovementComponent.set
 function CardinalMovementComponent:set(fields) end
 
----@class CellEaterComponent: component
+---@class CellEaterComponent: comp
 ---@field radius number 10 [0, 100]
 ---@field eat_probability integer 100 [0, 100]
 ---@field only_stain boolean 0 [0, 1]
@@ -464,7 +464,7 @@ local CellEaterComponent = {}
 ---@param fields CellEaterComponent.set
 function CellEaterComponent:set(fields) end
 
----@class CharacterCollisionComponent: component
+---@class CharacterCollisionComponent: comp
 ---@field getting_crushed_threshold integer 5 [0, 100]
 ---@field moving_up_before_getting_crushed_threshold integer 3 [0, 100]
 ---@field getting_crushed_counter integer 0 [0, 1] 1.12.2018 - Is this still used?
@@ -475,7 +475,7 @@ local CharacterCollisionComponent = {}
 ---@param fields CharacterCollisionComponent.set
 function CharacterCollisionComponent:set(fields) end
 
----@class CharacterDataComponent: component
+---@class CharacterDataComponent: comp
 ---@field platforming_type integer 0 [0, 3] 0 = oldest, 1 = newer, 2 = safest
 ---@field mass number 1 [0, 10] 1.0 = approx. mass of player
 ---@field buoyancy_check_offset_y integer -6 [-1000, 1000]
@@ -524,7 +524,7 @@ local CharacterDataComponent = {}
 ---@param fields CharacterDataComponent.set
 function CharacterDataComponent:set(fields) end
 
----@class CharacterPlatformingComponent: component
+---@class CharacterPlatformingComponent: comp
 ---@field jump_velocity_x number 0 [0, 500]
 ---@field jump_velocity_y number -175 [-500, 0]
 ---@field jump_keydown_buffer integer 2 [0, 10]
@@ -581,14 +581,14 @@ local CharacterPlatformingComponent = {}
 ---@param fields CharacterPlatformingComponent.set
 function CharacterPlatformingComponent:set(fields) end
 
----@class CharacterStatsComponent: component
+---@class CharacterStatsComponent: comp
 local CharacterStatsComponent = {}
 
 ---This component doesn't have anything to set
 ---@param fields unsupported
 function CharacterStatsComponent:set(fields) end
 
----@class CollisionTriggerComponent: component
+---@class CollisionTriggerComponent: comp
 ---@field width number 32 [0, 100]
 ---@field height number 32 [0, 100]
 ---@field radius number 32 [0, 100]
@@ -604,7 +604,7 @@ local CollisionTriggerComponent = {}
 ---@param fields CollisionTriggerComponent.set
 function CollisionTriggerComponent:set(fields) end
 
----@class ConsumableTeleportComponent: component
+---@class ConsumableTeleportComponent: comp
 ---@field create_other_end boolean 0 [0, 1]
 ---@field is_at_home boolean 0 [0, 1]
 ---@field collision_radius number 10 [0, 20]
@@ -618,7 +618,7 @@ local ConsumableTeleportComponent = {}
 ---@param fields ConsumableTeleportComponent.set
 function ConsumableTeleportComponent:set(fields) end
 
----@class ControllerGoombaAIComponent: component
+---@class ControllerGoombaAIComponent: comp
 ---@field auto_turn_around_enabled boolean 1 [0, 1] disable this if you don't want creature to 'look around', while standing still
 ---@field wait_to_turn_around integer 50 [0, 300]
 ---@field wall_hit_wait integer 10 [0, 300]
@@ -638,7 +638,7 @@ local ControllerGoombaAIComponent = {}
 ---@param fields ControllerGoombaAIComponent.set
 function ControllerGoombaAIComponent:set(fields) end
 
----@class ControlsComponent: component
+---@class ControlsComponent: comp
 ---@field polymorph_hax boolean 0 [0, 1]
 ---@field polymorph_next_attack_frame integer 0 [0, 1]
 ---@field enabled boolean 1 [0, 1]
@@ -730,7 +730,7 @@ local ControlsComponent = {}
 ---@param fields ControlsComponent.set
 function ControlsComponent:set(fields) end
 
----@class CrawlerAnimalComponent: component
+---@class CrawlerAnimalComponent: comp
 ---@field ray_length number 5 [0, 100]
 ---@field ray_count integer 16 [0, 64]
 ---@field gravity number 600 [0, 10000]
@@ -770,14 +770,14 @@ local CrawlerAnimalComponent = {}
 ---@param fields CrawlerAnimalComponent.set
 function CrawlerAnimalComponent:set(fields) end
 
----@class CutThroughWorldDoneHereComponent: component
+---@class CutThroughWorldDoneHereComponent: comp
 ---@field id_of_done_cut integer 0 [0, 1]
 local CutThroughWorldDoneHereComponent = {}
 
 ---@param fields CutThroughWorldDoneHereComponent.set
 function CutThroughWorldDoneHereComponent:set(fields) end
 
----@class DamageModelComponent: component
+---@class DamageModelComponent: comp
 ---@field hp number 1 [0, 4] hit points at the moment
 ---@field max_hp number 0 [0, 4] the maximum hp that this can have, we'll set this when loading
 ---@field max_hp_cap number 0 [0, 12] the maximum 'max_hp' that this can have, <= 0 means no limits. Used by perks such as GLASS_CANNON
@@ -878,7 +878,7 @@ function DamageModelComponent:set(fields) end
 ---@return DamageModelComponent.damage_multipliers
 function DamageModelComponent:object(name) end
 
----@class DamageNearbyEntitiesComponent: component
+---@class DamageNearbyEntitiesComponent: comp
 ---@field radius number 10 [0, 1]
 ---@field damage_min number 0.1 [0, 1]
 ---@field damage_max number 0.2 [0, 1]
@@ -896,14 +896,14 @@ local DamageNearbyEntitiesComponent = {}
 ---@param fields DamageNearbyEntitiesComponent.set
 function DamageNearbyEntitiesComponent:set(fields) end
 
----@class DebugFollowMouseComponent: component
+---@class DebugFollowMouseComponent: comp
 local DebugFollowMouseComponent = {}
 
 ---This component doesn't have anything to set
 ---@param fields unsupported
 function DebugFollowMouseComponent:set(fields) end
 
----@class DebugLogMessagesComponent: component
+---@class DebugLogMessagesComponent: comp
 ---@field TEMP_TEMPY number 0 [0, 3.5]
 ---@field TEMP_TEMP_TEMP number 0 [0, 3.5]
 local DebugLogMessagesComponent = {}
@@ -911,7 +911,7 @@ local DebugLogMessagesComponent = {}
 ---@param fields DebugLogMessagesComponent.set
 function DebugLogMessagesComponent:set(fields) end
 
----@class DebugSpatialVisualizerComponent: component
+---@class DebugSpatialVisualizerComponent: comp
 ---@field min_x number 0 [0, 1]
 ---@field min_y number 0 [0, 1]
 ---@field max_x number 0 [0, 1]
@@ -922,7 +922,7 @@ local DebugSpatialVisualizerComponent = {}
 ---@param fields DebugSpatialVisualizerComponent.set
 function DebugSpatialVisualizerComponent:set(fields) end
 
----@class DieIfSpeedBelowComponent: component
+---@class DieIfSpeedBelowComponent: comp
 ---@field min_speed number 1 [0, 1000] The entity that owns this component is killed if its speed (via VelocityComponent) falls below this value.
 ---@field mMinSpeedSquared number 0 [0, 1]
 local DieIfSpeedBelowComponent = {}
@@ -930,14 +930,14 @@ local DieIfSpeedBelowComponent = {}
 ---@param fields DieIfSpeedBelowComponent.set
 function DieIfSpeedBelowComponent:set(fields) end
 
----@class DroneLauncherComponent: component
+---@class DroneLauncherComponent: comp
 ---@field drone_entity_file string data/entities/misc/player_drone.xml [0, 1]
 local DroneLauncherComponent = {}
 
 ---@param fields DroneLauncherComponent.set
 function DroneLauncherComponent:set(fields) end
 
----@class DrugEffectComponent: component
+---@class DrugEffectComponent: comp
 local DrugEffectComponent = {}
 
 ---This component doesn't have anything to set
@@ -952,7 +952,7 @@ function DrugEffectComponent:object(name) end
 ---@return DrugEffectComponent.m_drug_fx_current
 function DrugEffectComponent:object(name) end
 
----@class DrugEffectModifierComponent: component
+---@class DrugEffectModifierComponent: comp
 local DrugEffectModifierComponent = {}
 
 ---This component doesn't have anything to set
@@ -967,7 +967,7 @@ function DrugEffectModifierComponent:object(name) end
 ---@return DrugEffectModifierComponent.fx_multiply
 function DrugEffectModifierComponent:object(name) end
 
----@class ElectricChargeComponent: component
+---@class ElectricChargeComponent: comp
 ---@field charge_time_frames integer 120 [0, 240]
 ---@field fx_velocity_max number 120 [0, 240]
 ---@field electricity_emission_interval_frames integer 5 [0, 10]
@@ -979,7 +979,7 @@ local ElectricChargeComponent = {}
 ---@param fields ElectricChargeComponent.set
 function ElectricChargeComponent:set(fields) end
 
----@class ElectricityComponent: component
+---@class ElectricityComponent: comp
 ---@field energy integer 1000 [0, 10000]
 ---@field probability_to_heat number 0 [0, 1]
 ---@field speed integer 32 [0, 10000]
@@ -1001,7 +1001,7 @@ local ElectricityComponent = {}
 ---@param fields ElectricityComponent.set
 function ElectricityComponent:set(fields) end
 
----@class ElectricityReceiverComponent: component
+---@class ElectricityReceiverComponent: comp
 ---@field offset_x integer 0 [1, 3]
 ---@field offset_y integer 0 [1, 3]
 ---@field radius integer 1 [1, 3]
@@ -1016,7 +1016,7 @@ local ElectricityReceiverComponent = {}
 ---@param fields ElectricityReceiverComponent.set
 function ElectricityReceiverComponent:set(fields) end
 
----@class ElectricitySourceComponent: component
+---@class ElectricitySourceComponent: comp
 ---@field radius integer 5 [1, 16]
 ---@field emission_interval_frames integer 15 [1, 10]
 ---@field mNextFrameEmitElectricity integer 0 [0, 1]
@@ -1025,7 +1025,7 @@ local ElectricitySourceComponent = {}
 ---@param fields ElectricitySourceComponent.set
 function ElectricitySourceComponent:set(fields) end
 
----@class EndingMcGuffinComponent: component
+---@class EndingMcGuffinComponent: comp
 ---@field TEMP_TEMPY number 0 [0, 3.5]
 ---@field TEMP_TEMP_TEMP number 0 [0, 3.5]
 local EndingMcGuffinComponent = {}
@@ -1033,7 +1033,7 @@ local EndingMcGuffinComponent = {}
 ---@param fields EndingMcGuffinComponent.set
 function EndingMcGuffinComponent:set(fields) end
 
----@class EnergyShieldComponent: component
+---@class EnergyShieldComponent: comp
 ---@field radius number 16 [0, 100]
 ---@field damage_multiplier number 1.5 [0, 10]
 ---@field max_energy number 1 [0, 10]
@@ -1047,7 +1047,7 @@ local EnergyShieldComponent = {}
 ---@param fields EnergyShieldComponent.set
 function EnergyShieldComponent:set(fields) end
 
----@class ExplodeOnDamageComponent: component
+---@class ExplodeOnDamageComponent: comp
 ---@field explode_on_death_percent number 1 [0, 1] rolls a dice (0 - 1) if we explode on death
 ---@field explode_on_damage_percent number 1 [0, 1] rolls a dice (0 - 1) if we explode on damage
 ---@field physics_body_modified_death_probability number 0 [0, 1] if we get message about the physics body being modified, do we explode on what percent
@@ -1063,7 +1063,7 @@ function ExplodeOnDamageComponent:set(fields) end
 ---@return ExplodeOnDamageComponent.config_explosion
 function ExplodeOnDamageComponent:object(name) end
 
----@class ExplosionComponent: component
+---@class ExplosionComponent: comp
 ---@field timeout_frames integer 0 [0, 180] for timer
 ---@field timeout_frames_random integer 0 [0, 180] a random value between 0 and 'timout_frames_random' is added to timer
 ---@field kill_entity boolean 1 [0, 1] if 1, we kill the entity when exploding
@@ -1079,7 +1079,7 @@ function ExplosionComponent:set(fields) end
 ---@return ExplosionComponent.config_explosion
 function ExplosionComponent:object(name) end
 
----@class FishAIComponent: component
+---@class FishAIComponent: comp
 ---@field direction integer 0 [-1, 1]
 ---@field speed number 100 [1, 1000]
 ---@field aabb_min vector
@@ -1092,7 +1092,7 @@ local FishAIComponent = {}
 ---@param fields FishAIComponent.set
 function FishAIComponent:set(fields) end
 
----@class FlyingComponent: component
+---@class FlyingComponent: comp
 ---@field type integer 0 [0, 1] type of flight, 1 = perlin noise
 ---@field perlin_freq number 0.2 [0, 1] frequency of the perlin noise sampling
 ---@field perlin_time_freq number 0.3 [0, 1] t *= perlin_time_freq
@@ -1103,21 +1103,21 @@ local FlyingComponent = {}
 ---@param fields FlyingComponent.set
 function FlyingComponent:set(fields) end
 
----@class FogOfWarRadiusComponent: component
+---@class FogOfWarRadiusComponent: comp
 ---@field radius number 256 [0, 1024] 256 is the default player has
 local FogOfWarRadiusComponent = {}
 
 ---@param fields FogOfWarRadiusComponent.set
 function FogOfWarRadiusComponent:set(fields) end
 
----@class FogOfWarRemoverComponent: component
+---@class FogOfWarRemoverComponent: comp
 ---@field radius number 140 [0, 2000]
 local FogOfWarRemoverComponent = {}
 
 ---@param fields FogOfWarRemoverComponent.set
 function FogOfWarRemoverComponent:set(fields) end
 
----@class GameAreaEffectComponent: component
+---@class GameAreaEffectComponent: comp
 ---@field radius number 0 [0, 3.5] what's the radius (in pixels) of the area effect
 ---@field collide_with_tag string hittable [0, 1] the tags we're looking for
 ---@field frame_length integer -1 [0, 1] if not 0 will reapply this effect after this many frames have gone by
@@ -1129,7 +1129,7 @@ local GameAreaEffectComponent = {}
 ---@param fields GameAreaEffectComponent.set
 function GameAreaEffectComponent:set(fields) end
 
----@class GameEffectComponent: component
+---@class GameEffectComponent: comp
 ---@field custom_effect_id string - if 'effect' is set to 'CUSTOM', this will define effect uniqueness.
 ---@field frames integer -1 [0, 1] how many frames does it affect -1 = forever
 ---@field exclusivity_group integer 0 [0, 1] if > 0, previous game effects with the same exclusivity group as new one will be removed when calling LoadGameEffectEntityTo
@@ -1164,7 +1164,7 @@ local GameEffectComponent = {}
 ---@param fields GameEffectComponent.set
 function GameEffectComponent:set(fields) end
 
----@class GameLogComponent: component
+---@class GameLogComponent: comp
 ---@field report_death boolean 1 [0, 1] switches on reporting things
 ---@field report_damage boolean 0 [0, 1] if set, will report when receiving damage
 ---@field report_new_biomes boolean 1 [0, 1] if false, won't report when player enters new biomes
@@ -1175,7 +1175,7 @@ local GameLogComponent = {}
 ---@param fields GameLogComponent.set
 function GameLogComponent:set(fields) end
 
----@class GameStatsComponent: component
+---@class GameStatsComponent: comp
 ---@field name string - no one uses the name variable on entity, so we have to do this to make it happen
 ---@field stats_filename string - also generated from the gunk
 ---@field is_player boolean 0 [0, 1] if true, will use the session file for loading stats
@@ -1187,7 +1187,7 @@ local GameStatsComponent = {}
 ---@param fields GameStatsComponent.set
 function GameStatsComponent:set(fields) end
 
----@class GasBubbleComponent: component
+---@class GasBubbleComponent: comp
 ---@field acceleration number -1 [-100, 0]
 ---@field max_speed number 20 [0, 20]
 ---@field mVelocity number 0 [0, 1]
@@ -1196,7 +1196,7 @@ local GasBubbleComponent = {}
 ---@param fields GasBubbleComponent.set
 function GasBubbleComponent:set(fields) end
 
----@class GenomeDataComponent: component
+---@class GenomeDataComponent: comp
 ---@field is_predator boolean 0 [0, 1] Predators are considered threats by other species and hunt for food.
 ---@field food_chain_rank number 0 [0, 200] 0 means king of the hill. Greater number = more likely to get eaten by other species.
 ---@field berserk_dont_attack_friends boolean 0 [0, 1] if 1, this animal will not try to attack player who would normally be its friend
@@ -1208,7 +1208,7 @@ local GenomeDataComponent = {}
 ---@param fields GenomeDataComponent.set
 function GenomeDataComponent:set(fields) end
 
----@class GhostComponent: component
+---@class GhostComponent: comp
 ---@field speed number 5 [0, 1] pixels per second
 ---@field new_hunt_target_check_every integer 0 [0, 1] how often do we look for targets
 ---@field hunt_box_radius number 512 [0, 1]
@@ -1228,7 +1228,7 @@ local GhostComponent = {}
 ---@param fields GhostComponent.set
 function GhostComponent:set(fields) end
 
----@class GodInfoComponent: component
+---@class GodInfoComponent: comp
 ---@field mana_current number 0 [0, 1000] How much mana the player now has to use
 ---@field mana_max number 500 [0, 1000] Max size of the mana pool
 ---@field gold number 0 [0, 1000] How much gold the player has
@@ -1237,21 +1237,21 @@ local GodInfoComponent = {}
 ---@param fields GodInfoComponent.set
 function GodInfoComponent:set(fields) end
 
----@class GunComponent: component
+---@class GunComponent: comp
 local GunComponent = {}
 
 ---This component doesn't have anything to set
 ---@param fields unsupported
 function GunComponent:set(fields) end
 
----@class HealthBarComponent: component
+---@class HealthBarComponent: comp
 local HealthBarComponent = {}
 
 ---This component doesn't have anything to set
 ---@param fields unsupported
 function HealthBarComponent:set(fields) end
 
----@class HitEffectComponent: component
+---@class HitEffectComponent: comp
 ---@field value integer 0 [0, 100] Usage depends on selected 'effect_hit'
 ---@field value_string string - Usage depends on selected 'effect_hit'
 ---@field condition_effect game_effect - Hit entity needs to have this 'GAME_EFFECT' for effects to apply. If both 'condition_effect' and 'condition_status' are set, they are combined with AND logic
@@ -1261,7 +1261,7 @@ local HitEffectComponent = {}
 ---@param fields HitEffectComponent.set
 function HitEffectComponent:set(fields) end
 
----@class HitboxComponent: component
+---@class HitboxComponent: comp
 ---@field is_player boolean 0 [0, 1]
 ---@field is_enemy boolean 1 [0, 1]
 ---@field is_item boolean 0 [0, 1]
@@ -1277,7 +1277,7 @@ local HitboxComponent = {}
 ---@param fields HitboxComponent.set
 function HitboxComponent:set(fields) end
 
----@class HomingComponent: component
+---@class HomingComponent: comp
 ---@field target_tag string homing_target [0, 1]
 ---@field target_who_shot boolean 0 [0, 1] If 1, targets who shot the projectile, ignores 'target_tag'.
 ---@field detect_distance number 150 [0, 1000]
@@ -1292,7 +1292,7 @@ local HomingComponent = {}
 ---@param fields HomingComponent.set
 function HomingComponent:set(fields) end
 
----@class HotspotComponent: component
+---@class HotspotComponent: comp
 ---@field transform_with_scale boolean 1 [0, 1]
 ---@field sprite_hotspot_name string
 ---@field offset vector
@@ -1301,7 +1301,7 @@ local HotspotComponent = {}
 ---@param fields HotspotComponent.set
 function HotspotComponent:set(fields) end
 
----@class IKLimbAttackerComponent: component
+---@class IKLimbAttackerComponent: comp
 ---@field radius number 54 [0, 1]
 ---@field leg_velocity_coeff number 15 [0, 1]
 ---@field targeting_radius number 120 [0, 1]
@@ -1315,7 +1315,7 @@ local IKLimbAttackerComponent = {}
 ---@param fields IKLimbAttackerComponent.set
 function IKLimbAttackerComponent:set(fields) end
 
----@class IKLimbComponent: component
+---@class IKLimbComponent: comp
 ---@field length number 40 [0, 1]
 ---@field thigh_extra_lenght number 2 [0, 1]
 ---@field mJointSideInterpolation number 0 [0, 1]
@@ -1331,7 +1331,7 @@ local IKLimbComponent = {}
 ---@param fields IKLimbComponent.set
 function IKLimbComponent:set(fields) end
 
----@class IKLimbWalkerComponent: component
+---@class IKLimbWalkerComponent: comp
 ---@field ground_attachment_min_spread number 16 [0, 1]
 ---@field ground_attachment_max_tries integer 10 [0, 1]
 ---@field ground_attachment_max_angle number 0.8 [0, 1]
@@ -1348,7 +1348,7 @@ local IKLimbWalkerComponent = {}
 ---@param fields IKLimbWalkerComponent.set
 function IKLimbWalkerComponent:set(fields) end
 
----@class IKLimbsAnimatorComponent: component
+---@class IKLimbsAnimatorComponent: comp
 ---@field future_state_samples integer 10 [0, 1] The number of future animation states evaluated to find the next state
 ---@field ground_attachment_ray_length_coeff number 1.15 [0, 1] Limb raycast length is (ground_attachment_ray_length_coeff * limb length)
 ---@field leg_velocity_coeff number 15 [0, 1] Limbs are moved towards target position at a pace affected by this value.
@@ -1364,7 +1364,7 @@ local IKLimbsAnimatorComponent = {}
 ---@param fields IKLimbsAnimatorComponent.set
 function IKLimbsAnimatorComponent:set(fields) end
 
----@class IngestionComponent: component
+---@class IngestionComponent: comp
 ---@field ingestion_size integer 0 [0, 1] How many units of material we currently store
 ---@field ingestion_capacity integer 7500 [0, 1] How many units of material we can store
 ---@field ingestion_cooldown_delay_frames integer 600 [0, 1] How many frames is ingestion_size retained after last time eating?
@@ -1381,21 +1381,21 @@ local IngestionComponent = {}
 ---@param fields IngestionComponent.set
 function IngestionComponent:set(fields) end
 
----@class InheritTransformComponent: component
+---@class InheritTransformComponent: comp
 ---@field use_root_parent boolean 0 [0, 1] if 1, we use the root of our entity hierarchy instead of the immediate parent
 ---@field only_position boolean 0 [0, 1] if 1, we only inherit position. it is calculated as follows: parent_position + parent_offset * parent_scale
 ---@field parent_hotspot_tag string - if set, we apply the offset of parent HotSpot with this tag
 ---@field parent_sprite_id integer -1 [0, 1] if >= 0, the Nth sprite transform in parent entity is inherited
 ---@field always_use_immediate_parent_rotation boolean 0 [0, 1] if 1, we use the immediate parent for rotation, no matter what other properties say
 ---@field rotate_based_on_x_scale boolean 0 [0, 1] if 1, the rotation is set to 0 deg if scale >= 0 else to 180 deg
----@field Transform comp_xform
+---@field Transform comp.xform
 ---@field mUpdateFrame integer -1 [0, 1]
 local InheritTransformComponent = {}
 
 ---@param fields InheritTransformComponent.set
 function InheritTransformComponent:set(fields) end
 
----@class InteractableComponent: component
+---@class InteractableComponent: comp
 ---@field radius number 10 [0, 1] Distance from entity position where interaction is possible
 ---@field ui_text string - key or string for the text to display
 ---@field name string - this name is called to the on_interacted function on LuaComponents
@@ -1405,7 +1405,7 @@ local InteractableComponent = {}
 ---@param fields InteractableComponent.set
 function InteractableComponent:set(fields) end
 
----@class Inventory2Component: component
+---@class Inventory2Component: comp
 ---@field quick_inventory_slots integer 10 [0, 30]
 ---@field full_inventory_slots_x integer 8 [0, 30]
 ---@field full_inventory_slots_y integer 8 [0, 30]
@@ -1427,7 +1427,7 @@ local Inventory2Component = {}
 ---@param fields Inventory2Component.set
 function Inventory2Component:set(fields) end
 
----@class InventoryComponent: component
+---@class InventoryComponent: comp
 ---@field ui_container_type integer 1 [0, 1] UI_CONTAINER_TYPES enum
 ---@field ui_element_sprite string data/ui_gfx/inventory/inventory_box.png [0, 1] ui back sprite
 ---@field actions string - list of actions, used for serialization
@@ -1439,7 +1439,7 @@ local InventoryComponent = {}
 ---@param fields InventoryComponent.set
 function InventoryComponent:set(fields) end
 
----@class InventoryGuiComponent: component
+---@class InventoryGuiComponent: comp
 ---@field has_opened_inventory_edit boolean 0 [0, 1]
 ---@field wallet_money_target integer 0 [0, 1]
 ---@field mDisplayFireRateWaitBar boolean 0 [0, 1] hax, don't touch!
@@ -1457,7 +1457,7 @@ local InventoryGuiComponent = {}
 ---@param fields InventoryGuiComponent.set
 function InventoryGuiComponent:set(fields) end
 
----@class ItemAIKnowledgeComponent: component
+---@class ItemAIKnowledgeComponent: comp
 ---@field is_ranged_weapon boolean 0 [0, 1]
 ---@field is_throwable_weapon boolean 0 [0, 1]
 ---@field is_melee_weapon boolean 0 [0, 1]
@@ -1476,14 +1476,14 @@ local ItemAIKnowledgeComponent = {}
 ---@param fields ItemAIKnowledgeComponent.set
 function ItemAIKnowledgeComponent:set(fields) end
 
----@class ItemActionComponent: component
+---@class ItemActionComponent: comp
 ---@field action_id string - the name ID of the action
 local ItemActionComponent = {}
 
 ---@param fields ItemActionComponent.set
 function ItemActionComponent:set(fields) end
 
----@class ItemAlchemyComponent: component
+---@class ItemAlchemyComponent: comp
 ---@field material_make_always_cast integer 0 [0, 1]
 ---@field material_remove_shuffle integer 0 [0, 1]
 ---@field material_animate_wand integer 0 [0, 1]
@@ -1495,7 +1495,7 @@ local ItemAlchemyComponent = {}
 ---@param fields ItemAlchemyComponent.set
 function ItemAlchemyComponent:set(fields) end
 
----@class ItemChestComponent: component
+---@class ItemChestComponent: comp
 ---@field item_count_min integer 0 [0, 1e+006]
 ---@field item_count_max integer 0 [0, 1e+006]
 ---@field level integer 0 [0, 1e+006]
@@ -1509,7 +1509,7 @@ local ItemChestComponent = {}
 ---@param fields ItemChestComponent.set
 function ItemChestComponent:set(fields) end
 
----@class ItemComponent: component
+---@class ItemComponent: comp
 ---@field item_name string - the name of the item
 ---@field is_stackable boolean 0 [0, 1] does this item stack on other items the same 'item_name' in the inventory?
 ---@field is_consumable boolean 0 [0, 1] if 1, using this item will reduce 'uses_remaining'. When it reaches zero the item is destroyed
@@ -1555,7 +1555,7 @@ local ItemComponent = {}
 ---@param fields ItemComponent.set
 function ItemComponent:set(fields) end
 
----@class ItemCostComponent: component
+---@class ItemCostComponent: comp
 ---@field cost integer 100 [0, 3500]
 ---@field stealable boolean 0 [0, 1] if set - will check that it's within an area called shop
 ---@field mExCost integer -1 [0, 1] used to change the text on the sprite
@@ -1564,7 +1564,7 @@ local ItemCostComponent = {}
 ---@param fields ItemCostComponent.set
 function ItemCostComponent:set(fields) end
 
----@class ItemPickUpperComponent: component
+---@class ItemPickUpperComponent: comp
 ---@field is_in_npc boolean 0 [0, 1]
 ---@field pick_up_any_item_buggy boolean 0 [0, 1] If true, will pick up _any_ item. Breaks all kinds of things, but maybe mods will find this fun to mess around with
 ---@field is_immune_to_kicks boolean 0 [0, 1] if set, won't drop the wand if kicked. Mainly used by wand ghosts.
@@ -1576,7 +1576,7 @@ local ItemPickUpperComponent = {}
 ---@param fields ItemPickUpperComponent.set
 function ItemPickUpperComponent:set(fields) end
 
----@class ItemRechargeNearGroundComponent: component
+---@class ItemRechargeNearGroundComponent: comp
 ---@field TEMP_TEMPY number 0 [0, 3.5]
 ---@field TEMP_TEMP_TEMP number 0 [0, 3.5]
 local ItemRechargeNearGroundComponent = {}
@@ -1584,7 +1584,7 @@ local ItemRechargeNearGroundComponent = {}
 ---@param fields ItemRechargeNearGroundComponent.set
 function ItemRechargeNearGroundComponent:set(fields) end
 
----@class ItemStashComponent: component
+---@class ItemStashComponent: comp
 ---@field throw_openable_cooldown_frames integer 30 [0, 180]
 ---@field init_children boolean 1 [0, 1]
 ---@field mNextFrameOpenable integer 0 [0, 1]
@@ -1594,7 +1594,7 @@ local ItemStashComponent = {}
 ---@param fields ItemStashComponent.set
 function ItemStashComponent:set(fields) end
 
----@class KickComponent: component
+---@class KickComponent: comp
 ---@field can_kick boolean 1 [0, 1] e.g. telekinetic kick disables this
 ---@field kick_radius number 3 [0, 3.5]
 ---@field telekinesis_throw_speed number 25 [0, 1] this is here, so that STRONG_KICK -perk can affect telekinetic kick as well
@@ -1608,7 +1608,7 @@ local KickComponent = {}
 ---@param fields KickComponent.set
 function KickComponent:set(fields) end
 
----@class LaserEmitterComponent: component
+---@class LaserEmitterComponent: comp
 ---@field is_emitting boolean 1 [0, 1] If 1, will emit all the time
 ---@field emit_until_frame integer -1 [0, 1] Can be used to activate a laser temporarily
 ---@field laser_angle_add_rad number 0 [0, 1] Beam angle = entity angle + laser_angle_add_rad
@@ -1621,7 +1621,7 @@ function LaserEmitterComponent:set(fields) end
 ---@return LaserEmitterComponent.laser
 function LaserEmitterComponent:object(name) end
 
----@class LevitationComponent: component
+---@class LevitationComponent: comp
 ---@field radius number 20 [1, 50] the radius in which we look for entities / bodies to float
 ---@field entity_force number 0.3 [0, 1] how much do we apply the mouse movements to the entitiy
 ---@field box2d_force number 0.3 [0, 1] how much do we apply the mouse movements to the entitiy
@@ -1631,7 +1631,7 @@ local LevitationComponent = {}
 ---@param fields LevitationComponent.set
 function LevitationComponent:set(fields) end
 
----@class LifetimeComponent: component
+---@class LifetimeComponent: comp
 ---@field lifetime integer -1 [0, 1] if anything else than -1 will kill this entity when this many frames have passed
 ---@field fade_sprites boolean 0 [0, 1] if 1, sprites will be faded as lifetime gets lower
 ---@field kill_parent boolean 0 [0, 1] if 1, will kill the parent entity
@@ -1639,7 +1639,7 @@ function LevitationComponent:set(fields) end
 ---@field serialize_duration boolean 0 [0, 1] if 1, will retain kill_frame and creation_frame over serialization
 ---@field kill_frame_serialized integer 0 [0, 1] frame that this is killed at
 ---@field creation_frame_serialized integer 0 [0, 1] frame that this is killed at
----@field randomize_lifetime range - this is added to the lifetime
+---@field randomize_lifetime interval - this is added to the lifetime
 ---@field creation_frame integer 0 [0, 1] we'll set this to GG.GetFrameNum() when this component is created
 ---@field kill_frame integer 0 [0, 1] frame that this is killed at
 local LifetimeComponent = {}
@@ -1647,7 +1647,7 @@ local LifetimeComponent = {}
 ---@param fields LifetimeComponent.set
 function LifetimeComponent:set(fields) end
 
----@class LightComponent: component
+---@class LightComponent: comp
 ---@field update_properties boolean 0 [0, 1] turn this on if you expect this to function like the other components
 ---@field radius number 0 [0, 3000] The radius of the light in world pixels.
 ---@field r integer 255 [0, 255] Color red 0-255
@@ -1663,7 +1663,7 @@ local LightComponent = {}
 ---@param fields LightComponent.set
 function LightComponent:set(fields) end
 
----@class LightningComponent: component
+---@class LightningComponent: comp
 ---@field sprite_lightning_file string data/particles/lightning_ray.png [0, 1] particle effect, from where the file is loaded that lightning is generated from
 ---@field is_projectile boolean 0 [0, 1] if this is true, it's a projectile lightning and looks for ProjectileComponent and uses the data from there to move it
 ---@field explosion_type integer 1 [0, 1] 1 = lightning trail
@@ -1679,7 +1679,7 @@ function LightningComponent:set(fields) end
 ---@return LightningComponent.config_explosion
 function LightningComponent:object(name) end
 
----@class LimbBossComponent: component
+---@class LimbBossComponent: comp
 ---@field state integer 0 [0, 1]
 ---@field mStatePrev integer -1 [0, 1]
 ---@field mMoveToPositionX number 0 [0, 1]
@@ -1689,7 +1689,7 @@ local LimbBossComponent = {}
 ---@param fields LimbBossComponent.set
 function LimbBossComponent:set(fields) end
 
----@class LiquidDisplacerComponent: component
+---@class LiquidDisplacerComponent: comp
 ---@field radius integer 1 [0, 20]
 ---@field velocity_x number 30 [0, 100]
 ---@field velocity_y number 30 [0, 100]
@@ -1700,25 +1700,25 @@ local LiquidDisplacerComponent = {}
 ---@param fields LiquidDisplacerComponent.set
 function LiquidDisplacerComponent:set(fields) end
 
----@class LoadEntitiesComponent: component
+---@class LoadEntitiesComponent: comp
 ---@field entity_file string - path to the entity file we should load
 ---@field kill_entity boolean 1 [0, 1] if 1, we kill our entity when it is created
 ---@field timeout_frames integer 0 [0, 180] for timer
 ---@field mTimerTriggerFrame integer -1 [0, 1]
----@field count range - how many entities should be loaded (random range)
+---@field count interval - how many entities should be loaded (random range)
 local LoadEntitiesComponent = {}
 
 ---@param fields LoadEntitiesComponent.set
 function LoadEntitiesComponent:set(fields) end
 
----@class LocationMarkerComponent: component
+---@class LocationMarkerComponent: comp
 ---@field id integer 0 [0, 3]
 local LocationMarkerComponent = {}
 
 ---@param fields LocationMarkerComponent.set
 function LocationMarkerComponent:set(fields) end
 
----@class LooseGroundComponent: component
+---@class LooseGroundComponent: comp
 ---@field probability number 0 [0, 1] how often do we do this... shoots a ray in random direction and does the loosening
 ---@field max_durability integer 2147483647 [0, 1] if material durability > max_durability, it is not loosened
 ---@field max_distance number 256 [0, 1] how far raytraces to find things to loosen up
@@ -1736,7 +1736,7 @@ local LooseGroundComponent = {}
 ---@param fields LooseGroundComponent.set
 function LooseGroundComponent:set(fields) end
 
----@class LuaComponent: component
+---@class LuaComponent: comp
 ---@field script_source_file string
 ---@field execute_on_added boolean 0 [0, 1]
 ---@field execute_on_removed boolean 0 [0, 1]
@@ -1783,7 +1783,7 @@ local LuaComponent = {}
 ---@param fields LuaComponent.set
 function LuaComponent:set(fields) end
 
----@class MagicConvertMaterialComponent: component
+---@class MagicConvertMaterialComponent: comp
 ---@field radius integer 256 [0, 512]
 ---@field min_radius integer 0 [0, 512] allows for convert to happen from x pixels from the center
 ---@field is_circle boolean 0 [0, 1]
@@ -1814,7 +1814,7 @@ local MagicConvertMaterialComponent = {}
 ---@param fields MagicConvertMaterialComponent.set
 function MagicConvertMaterialComponent:set(fields) end
 
----@class MagicXRayComponent: component
+---@class MagicXRayComponent: comp
 ---@field radius integer 256 [0, 512]
 ---@field steps_per_frame integer 10 [0, 512]
 ---@field mStep integer 0 [0, 1]
@@ -1824,14 +1824,14 @@ local MagicXRayComponent = {}
 ---@param fields MagicXRayComponent.set
 function MagicXRayComponent:set(fields) end
 
----@class ManaReloaderComponent: component
+---@class ManaReloaderComponent: comp
 local ManaReloaderComponent = {}
 
 ---This component doesn't have anything to set
 ---@param fields unsupported
 function ManaReloaderComponent:set(fields) end
 
----@class MaterialAreaCheckerComponent: component
+---@class MaterialAreaCheckerComponent: comp
 ---@field update_every_x_frame integer 0 [0, 1] if something other than 0 or 1, will only update_every_x_frames 
 ---@field look_for_failure boolean 1 [0, 1] if true, will send message Message_MaterialAreaCheckerFailed if the material doesn't exist. If false, will send a message Message_MaterialAreaCheckerSuccess if the aabb is full of material and material2
 ---@field count_min integer 0 [0, 1] If > 0, and look_for_failure=0, will send message if material count exceeds this number of cells
@@ -1847,7 +1847,7 @@ local MaterialAreaCheckerComponent = {}
 ---@param fields MaterialAreaCheckerComponent.set
 function MaterialAreaCheckerComponent:set(fields) end
 
----@class MaterialInventoryComponent: component
+---@class MaterialInventoryComponent: comp
 ---@field drop_as_item boolean 1 [0, 1] if true, drops a bag that the player can big up
 ---@field on_death_spill boolean 0 [0, 1] if true, on the death this will explode all the materials into air
 ---@field leak_gently boolean 1 [0, 1] NOTE( Petri ): 11.8.2023 - set this to false for old style leaky hidden piles situation.
@@ -1876,7 +1876,7 @@ local MaterialInventoryComponent = {}
 ---@param fields MaterialInventoryComponent.set
 function MaterialInventoryComponent:set(fields) end
 
----@class MaterialSeaSpawnerComponent: component
+---@class MaterialSeaSpawnerComponent: comp
 ---@field speed integer 10 [1, 100] How many pixels to cover per one direction per one frame
 ---@field sine_wavelength number 10 [0, 2] Parameters for sine wave that affects material spawn pattern
 ---@field sine_amplitude number 5 [0, 2] Parameters for sine wave that affects material spawn pattern
@@ -1892,7 +1892,7 @@ local MaterialSeaSpawnerComponent = {}
 ---@param fields MaterialSeaSpawnerComponent.set
 function MaterialSeaSpawnerComponent:set(fields) end
 
----@class MaterialSuckerComponent: component
+---@class MaterialSuckerComponent: comp
 ---@field material_type integer 0 [0, 3] 0 = liquid, 1 = sand, 2 = gas (arbitary order)
 ---@field barrel_size integer 50 [0, 1024] how many pixels can we suck up
 ---@field num_cells_sucked_per_frame integer 1 [0, 5] How many cells at max can we suck per frame?
@@ -1911,7 +1911,7 @@ local MaterialSuckerComponent = {}
 ---@param fields MaterialSuckerComponent.set
 function MaterialSuckerComponent:set(fields) end
 
----@class MoveToSurfaceOnCreateComponent: component
+---@class MoveToSurfaceOnCreateComponent: comp
 ---@field lookup_radius number 64 [0, 64]
 ---@field offset_from_surface number 2 [0, 10]
 ---@field ray_count integer 4 [0, 8]
@@ -1922,7 +1922,7 @@ local MoveToSurfaceOnCreateComponent = {}
 ---@param fields MoveToSurfaceOnCreateComponent.set
 function MoveToSurfaceOnCreateComponent:set(fields) end
 
----@class MusicEnergyAffectorComponent: component
+---@class MusicEnergyAffectorComponent: comp
 ---@field energy_target number 0.5 [0, 1] the energy this makes music go towards
 ---@field fade_range number 0 [0, 256] if > 0, fade between 0 and energy_target based on distance to this entity
 ---@field trigger_danger_music boolean 1 [0, 1] if 1, attempts to trigger danger music no matter what energy level is reached
@@ -1934,7 +1934,7 @@ local MusicEnergyAffectorComponent = {}
 ---@param fields MusicEnergyAffectorComponent.set
 function MusicEnergyAffectorComponent:set(fields) end
 
----@class NinjaRopeComponent: component
+---@class NinjaRopeComponent: comp
 ---@field max_length number 356 [0, 2000]
 ---@field mLength number 0 [0, 2000]
 local NinjaRopeComponent = {}
@@ -1942,21 +1942,21 @@ local NinjaRopeComponent = {}
 ---@param fields NinjaRopeComponent.set
 function NinjaRopeComponent:set(fields) end
 
----@class NullDamageComponent: component
+---@class NullDamageComponent: comp
 ---@field null_chance number 1 [0, 1] if less than 1, then will roll the die to see if it will NULL all damage. Stick this into your projectile entity
 local NullDamageComponent = {}
 
 ---@param fields NullDamageComponent.set
 function NullDamageComponent:set(fields) end
 
----@class OrbComponent: component
+---@class OrbComponent: comp
 ---@field orb_id integer 0 [0, 20] must be unique for every orb in the world
 local OrbComponent = {}
 
 ---@param fields OrbComponent.set
 function OrbComponent:set(fields) end
 
----@class ParticleEmitterComponent: component
+---@class ParticleEmitterComponent: comp
 ---@field emitted_material_name string blood [0, 1]
 ---@field create_real_particles boolean 0 [0, 1] used to be emit_real_particles - creates these particles in the grid, if that happens velocity and lifetime are ignored
 ---@field emit_real_particles boolean 0 [0, 1] this creates particles that will behave like particles, but work outside of the screen
@@ -2014,7 +2014,7 @@ function OrbComponent:set(fields) end
 ---@field ignore_transform_updated_msg boolean 0 [0, 1] if 1, mExPosition and m_last_emit_position will not be updated when receiving Message_TransformUpdated
 ---@field color integer 0 [0, 1]
 ---@field offset vector
----@field area_circle_radius range - If > 0, the particles will be emitted inside a circular area defined by the min and max bounds of 'area_circle_radius'.
+---@field area_circle_radius interval - If > 0, the particles will be emitted inside a circular area defined by the min and max bounds of 'area_circle_radius'.
 ---@field gravity vector
 ---@field count_min integer
 ---@field count_max integer
@@ -2032,7 +2032,7 @@ local ParticleEmitterComponent = {}
 ---@param fields ParticleEmitterComponent.set
 function ParticleEmitterComponent:set(fields) end
 
----@class PathFindingComponent: component
+---@class PathFindingComponent: comp
 ---@field search_depth_max_no_goal integer 20 [0, 1e+006] TODO: Comment
 ---@field iterations_max_no_goal integer 1500 [0, 1e+006] TODO: Comment
 ---@field search_depth_max_with_goal integer 2500 [0, 1e+006] TODO: Comment
@@ -2073,7 +2073,7 @@ local PathFindingComponent = {}
 ---@param fields PathFindingComponent.set
 function PathFindingComponent:set(fields) end
 
----@class PathFindingGridMarkerComponent: component
+---@class PathFindingGridMarkerComponent: comp
 ---@field marker_work_flag integer 0 [0, 255]
 ---@field marker_offset_x number 0 [-1000, 1000]
 ---@field marker_offset_y number 0 [-1000, 1000]
@@ -2083,7 +2083,7 @@ local PathFindingGridMarkerComponent = {}
 ---@param fields PathFindingGridMarkerComponent.set
 function PathFindingGridMarkerComponent:set(fields) end
 
----@class PhysicsAIComponent: component
+---@class PhysicsAIComponent: comp
 ---@field target_vec_max_len number 5 [0, 1]
 ---@field force_coeff number 30 [0, 1]
 ---@field force_balancing_coeff number 1.5 [0, 1]
@@ -2119,7 +2119,7 @@ local PhysicsAIComponent = {}
 ---@param fields PhysicsAIComponent.set
 function PhysicsAIComponent:set(fields) end
 
----@class PhysicsBody2Component: component
+---@class PhysicsBody2Component: comp
 ---@field linear_damping number 0 [0, 1]
 ---@field angular_damping number 0 [0, 1]
 ---@field allow_sleep boolean 1 [0, 1]
@@ -2153,7 +2153,7 @@ local PhysicsBody2Component = {}
 ---@param fields PhysicsBody2Component.set
 function PhysicsBody2Component:set(fields) end
 
----@class PhysicsBodyCollisionDamageComponent: component
+---@class PhysicsBodyCollisionDamageComponent: comp
 ---@field speed_threshold number 60 [0, 100]
 ---@field damage_multiplier number 0.016667 [0, 1]
 local PhysicsBodyCollisionDamageComponent = {}
@@ -2161,7 +2161,7 @@ local PhysicsBodyCollisionDamageComponent = {}
 ---@param fields PhysicsBodyCollisionDamageComponent.set
 function PhysicsBodyCollisionDamageComponent:set(fields) end
 
----@class PhysicsBodyComponent: component
+---@class PhysicsBodyComponent: comp
 ---@field is_external boolean 0 [0, 1] if mBody is set from outside, will ignore all the things
 ---@field hax_fix_going_through_ground boolean 0 [0, 1] if set will lift the body upwards if it is inside ground
 ---@field hax_fix_going_through_sand boolean 0 [0, 1] hax_fix_going_through_ground has to be set, if set will lift the body upwards if it is inside sand
@@ -2197,7 +2197,7 @@ local PhysicsBodyComponent = {}
 ---@param fields PhysicsBodyComponent.set
 function PhysicsBodyComponent:set(fields) end
 
----@class PhysicsImageShapeComponent: component
+---@class PhysicsImageShapeComponent: comp
 ---@field is_root boolean 0 [0, 1] if 1, PhysicsBody2Component will use this to figure out where the entity is located
 ---@field body_id integer 0 [0, 1000] used to figure out which bodies are attached to each other when creating joints
 ---@field use_sprite boolean 0 [0, 1] will try to find the SpriteComponent and use that
@@ -2213,7 +2213,7 @@ local PhysicsImageShapeComponent = {}
 ---@param fields PhysicsImageShapeComponent.set
 function PhysicsImageShapeComponent:set(fields) end
 
----@class PhysicsJoint2Component: component
+---@class PhysicsJoint2Component: comp
 ---@field joint_id integer 0 [0, 1000] Use this to create a relation between PhysicsJointMutator and a joint. The PhysicsJointMutator must exist when the physics objects are initialized for the first time. This id should be unique inside one entity. Defaults to 0
 ---@field break_force number 1.3 [0, 1] if > 0, will break if theres a force too strong.
 ---@field break_distance number 1.4142 [0, 1] if > 0, will break if the anchors on the bodies get further than this.
@@ -2233,7 +2233,7 @@ local PhysicsJoint2Component = {}
 ---@param fields PhysicsJoint2Component.set
 function PhysicsJoint2Component:set(fields) end
 
----@class PhysicsJoint2MutatorComponent: component
+---@class PhysicsJoint2MutatorComponent: comp
 ---@field joint_id integer 0 [0, 1000] Use this to create a relation between PhysicsJointMutator and a joint created by PhysicsJoint2Component. The PhysicsJoint2Mutator must exist when the physics objects are initialized for the first time.
 ---@field destroy boolean 0 [0, 1] if 1, the joint will break and this component will be destroyed.
 ---@field motor_speed number 0 [0, 1] if != 0 and this is linked to a revolute joint, the joint motor will be enabled at this speed
@@ -2246,7 +2246,7 @@ local PhysicsJoint2MutatorComponent = {}
 ---@param fields PhysicsJoint2MutatorComponent.set
 function PhysicsJoint2MutatorComponent:set(fields) end
 
----@class PhysicsJointComponent: component
+---@class PhysicsJointComponent: comp
 ---@field nail_to_wall boolean 0 [0, 1]
 ---@field grid_joint boolean 0 [0, 1] if 1, will do a grid joint that works correctly with a body when it is destroyed / chipped away
 ---@field breakable boolean 0 [0, 1] if 1, will break if theres a force too strong
@@ -2265,7 +2265,7 @@ local PhysicsJointComponent = {}
 ---@param fields PhysicsJointComponent.set
 function PhysicsJointComponent:set(fields) end
 
----@class PhysicsKeepInWorldComponent: component
+---@class PhysicsKeepInWorldComponent: comp
 ---@field check_whole_aabb boolean 0 [0, 1] All that is needed is to include one of the components with PhysicsBodyComponent or PhysicsBody2Component and it will be frozen when it hits outer edges of the world. NOTE! This will override the auto_clean variable, auto_clean will be set to false. If this is true, will check all the 4 corners of the bounding box
 ---@field predict_aabb boolean 0 [0, 1] Will add the velocity * 1.5 to the aabb to predict where the body will end up at. This will greatly help keep the body inside simulated world.
 ---@field keep_at_last_valid_pos boolean 0 [0, 1] Will try to keep the object at the latest valid position
@@ -2276,9 +2276,9 @@ local PhysicsKeepInWorldComponent = {}
 ---@param fields PhysicsKeepInWorldComponent.set
 function PhysicsKeepInWorldComponent:set(fields) end
 
----@class PhysicsPickUpComponent: component
+---@class PhysicsPickUpComponent: comp
 ---@field pick_up_strength number 200 [0, 1]
----@field transform comp_xform
+---@field transform comp.xform
 ---@field original_left_joint_pos vector
 ---@field original_right_joint_pos vector
 ---@field isBroken boolean 0 [0, 1]
@@ -2289,7 +2289,7 @@ local PhysicsPickUpComponent = {}
 ---@param fields PhysicsPickUpComponent.set
 function PhysicsPickUpComponent:set(fields) end
 
----@class PhysicsRagdollComponent: component
+---@class PhysicsRagdollComponent: comp
 ---@field filename string - file that should include just a list of other files, that have all the parts
 ---@field filenames string - a list of body parts as png images, separate the files by ','. e.g. 'data/temp/ragdoll/leg.png, data/temp/ragdoll/head.png,...'
 ---@field offset_x number 0 [0, 20] offset of where the ragdoll will be created
@@ -2299,7 +2299,7 @@ local PhysicsRagdollComponent = {}
 ---@param fields PhysicsRagdollComponent.set
 function PhysicsRagdollComponent:set(fields) end
 
----@class PhysicsShapeComponent: component
+---@class PhysicsShapeComponent: comp
 ---@field recreate boolean 0 [0, 1]
 ---@field is_circle boolean 0 [0, 1]
 ---@field is_box boolean 1 [0, 1]
@@ -2320,7 +2320,7 @@ local PhysicsShapeComponent = {}
 ---@param fields PhysicsShapeComponent.set
 function PhysicsShapeComponent:set(fields) end
 
----@class PhysicsThrowableComponent: component
+---@class PhysicsThrowableComponent: comp
 ---@field throw_force_coeff number 1 [0, 2]
 ---@field max_throw_speed number 180 [0, 256]
 ---@field min_torque number 0.5 [0, 20]
@@ -2337,7 +2337,7 @@ local PhysicsThrowableComponent = {}
 ---@param fields PhysicsThrowableComponent.set
 function PhysicsThrowableComponent:set(fields) end
 
----@class PixelSceneComponent: component
+---@class PixelSceneComponent: comp
 ---@field pixel_scene string - loads this pixel scene file
 ---@field pixel_scene_visual string - this is the colors that get used for the pixels, if empty will use material colors
 ---@field pixel_scene_background string - this is the background file that gets loaded, if empty won't do anything
@@ -2351,7 +2351,7 @@ local PixelSceneComponent = {}
 ---@param fields PixelSceneComponent.set
 function PixelSceneComponent:set(fields) end
 
----@class PixelSpriteComponent: component
+---@class PixelSpriteComponent: comp
 ---@field image_file string - loads pixelsprite based on this file
 ---@field anchor_x integer 0 [0, 3.5] the anchor and center_offset
 ---@field anchor_y integer 0 [0, 3.5] the anchor and center_offset
@@ -2365,7 +2365,7 @@ local PixelSpriteComponent = {}
 ---@param fields PixelSpriteComponent.set
 function PixelSpriteComponent:set(fields) end
 
----@class PlatformShooterPlayerComponent: component
+---@class PlatformShooterPlayerComponent: comp
 ---@field aiming_reticle_distance_from_character number 40 [0, 1000]
 ---@field camera_max_distance_from_character number 25 [0, 1000]
 ---@field alcohol_drunken_speed number 0.005 [0, 1000]
@@ -2407,7 +2407,7 @@ local PlatformShooterPlayerComponent = {}
 ---@param fields PlatformShooterPlayerComponent.set
 function PlatformShooterPlayerComponent:set(fields) end
 
----@class PlayerCollisionComponent: component
+---@class PlayerCollisionComponent: comp
 ---@field getting_crushed_threshold integer 5 [0, 100]
 ---@field moving_up_before_getting_crushed_threshold integer 3 [0, 100]
 ---@field getting_crushed_counter integer 0 [0, 1] 1.12.2018 - Is this still used?
@@ -2419,7 +2419,7 @@ local PlayerCollisionComponent = {}
 ---@param fields PlayerCollisionComponent.set
 function PlayerCollisionComponent:set(fields) end
 
----@class PlayerStatsComponent: component
+---@class PlayerStatsComponent: comp
 ---@field lives integer 1 [0, 1]
 ---@field max_hp number 4 [0, 1]
 ---@field speed number 1 [0, 1]
@@ -2428,7 +2428,7 @@ local PlayerStatsComponent = {}
 ---@param fields PlayerStatsComponent.set
 function PlayerStatsComponent:set(fields) end
 
----@class PositionSeedComponent: component
+---@class PositionSeedComponent: comp
 ---@field pos_x number 0 [0, 3.5]
 ---@field pos_y number 0 [0, 3.5]
 local PositionSeedComponent = {}
@@ -2436,7 +2436,7 @@ local PositionSeedComponent = {}
 ---@param fields PositionSeedComponent.set
 function PositionSeedComponent:set(fields) end
 
----@class PotionComponent: component
+---@class PotionComponent: comp
 ---@field spray_velocity_coeff number 1 [0, 2]
 ---@field spray_velocity_normalized_min number 0.5 [0, 1]
 ---@field body_colored boolean 0 [0, 1]
@@ -2451,7 +2451,7 @@ local PotionComponent = {}
 ---@param fields PotionComponent.set
 function PotionComponent:set(fields) end
 
----@class PressurePlateComponent: component
+---@class PressurePlateComponent: comp
 ---@field check_every_x_frames integer 30 [0, 1] how often do we check the world
 ---@field state integer 0 [0, 1] 0 is up, 1 is down
 ---@field material_percent number 0.75 [0, 1] how much material should there be in the aabbs that we go down 
@@ -2463,7 +2463,7 @@ local PressurePlateComponent = {}
 ---@param fields PressurePlateComponent.set
 function PressurePlateComponent:set(fields) end
 
----@class ProjectileComponent: component
+---@class ProjectileComponent: comp
 ---@field lifetime integer -1 [0, 1] lifetime, -1 means it's endless, otherwise it's the frame count
 ---@field lifetime_randomness integer 0 [0, 1] final lifetime will be lifetime + random(-lifetime_randomness,lifetime_randomness)
 ---@field on_lifetime_out_explode boolean 0 [0, 1] when lifetime runs out, should we explode?
@@ -2573,14 +2573,14 @@ function ProjectileComponent:object(name) end
 ---@return ProjectileComponent.damage_critical
 function ProjectileComponent:object(name) end
 
----@class RotateTowardsComponent: component
+---@class RotateTowardsComponent: comp
 ---@field entity_with_tag string player_unit [0, 1] will rotate this entity towards the closest entity with tag
 local RotateTowardsComponent = {}
 
 ---@param fields RotateTowardsComponent.set
 function RotateTowardsComponent:set(fields) end
 
----@class SetLightAlphaFromVelocityComponent: component
+---@class SetLightAlphaFromVelocityComponent: comp
 ---@field max_velocity number 50 [1, 150]
 ---@field mPrevPosition vector
 local SetLightAlphaFromVelocityComponent = {}
@@ -2588,16 +2588,16 @@ local SetLightAlphaFromVelocityComponent = {}
 ---@param fields SetLightAlphaFromVelocityComponent.set
 function SetLightAlphaFromVelocityComponent:set(fields) end
 
----@class SetStartVelocityComponent: component
+---@class SetStartVelocityComponent: comp
 ---@field velocity vector - This is added together with random velocity
----@field randomize_angle range - Random angle min max range in radians, clockwise. 0.0 points directly rightward.
----@field randomize_speed range - Random speed min max range
+---@field randomize_angle interval - Random angle min max range in radians, clockwise. 0.0 points directly rightward.
+---@field randomize_speed interval - Random speed min max range
 local SetStartVelocityComponent = {}
 
 ---@param fields SetStartVelocityComponent.set
 function SetStartVelocityComponent:set(fields) end
 
----@class ShotEffectComponent: component
+---@class ShotEffectComponent: comp
 ---@field extra_modifier string - name of modifier function executed per projectile from 'gun_extra_modifiers.lua'
 ---@field condition_effect game_effect - Shooting entity needs to have this 'GAME_EFFECT' for effects to apply. If both 'condition_effect' and 'condition_status' are set, they are combined with AND logic
 local ShotEffectComponent = {}
@@ -2605,7 +2605,7 @@ local ShotEffectComponent = {}
 ---@param fields ShotEffectComponent.set
 function ShotEffectComponent:set(fields) end
 
----@class SimplePhysicsComponent: component
+---@class SimplePhysicsComponent: comp
 ---@field can_go_up boolean 1 [0, 1] if set, will not try to move this upwards
 ---@field mOldPosition vector - used for box2d simple physics
 local SimplePhysicsComponent = {}
@@ -2613,7 +2613,7 @@ local SimplePhysicsComponent = {}
 ---@param fields SimplePhysicsComponent.set
 function SimplePhysicsComponent:set(fields) end
 
----@class SineWaveComponent: component
+---@class SineWaveComponent: comp
 ---@field sinewave_freq number 1 [0, 1] sinewave_m * sinf( sinewave_freq * lifetime++)
 ---@field sinewave_m number 0.6 [0, 1] sinewave_m * sinf( sinewave_freq * lifetime++)
 ---@field lifetime integer -1 [0, 1] -1 seems to fix some problems with this... sinewave_m * sinf( sinewave_freq * lifetime++)
@@ -2622,7 +2622,7 @@ local SineWaveComponent = {}
 ---@param fields SineWaveComponent.set
 function SineWaveComponent:set(fields) end
 
----@class SpriteAnimatorComponent: component
+---@class SpriteAnimatorComponent: comp
 ---@field target_sprite_comp_name string character [0, 1]
 ---@field rotate_to_surface_normal boolean 0 [0, 1]
 ---@field mSendOnFinishedMessageName string
@@ -2631,7 +2631,7 @@ local SpriteAnimatorComponent = {}
 ---@param fields SpriteAnimatorComponent.set
 function SpriteAnimatorComponent:set(fields) end
 
----@class SpriteComponent: component
+---@class SpriteComponent: comp
 ---@field image_file string data/temp/temp_gun.png [0, 1]
 ---@field ui_is_parent boolean 0 [0, 1] Adds this to the GG.GetUISprite() as a child, instead of the mSpriteContainer
 ---@field is_text_sprite boolean 0 [0, 1] if you want to load a text sprite, set this to true and image_file to a font file
@@ -2662,7 +2662,7 @@ local SpriteComponent = {}
 ---@param fields SpriteComponent.set
 function SpriteComponent:set(fields) end
 
----@class SpriteOffsetAnimatorComponent: component
+---@class SpriteOffsetAnimatorComponent: comp
 ---@field x_amount number 0 [0, 5]
 ---@field x_speed number 0 [0, 5]
 ---@field y_amount number 2 [0, 5]
@@ -2675,7 +2675,7 @@ local SpriteOffsetAnimatorComponent = {}
 ---@param fields SpriteOffsetAnimatorComponent.set
 function SpriteOffsetAnimatorComponent:set(fields) end
 
----@class SpriteParticleEmitterComponent: component
+---@class SpriteParticleEmitterComponent: comp
 ---@field sprite_file string - filepath to the sprite(s), supports the $[0-3] syntax
 ---@field sprite_centered boolean 0 [0, 1] sets the offset to the center of the image
 ---@field sprite_random_rotation boolean 0 [0, 1] rotates the sprite randomly in 90 degree angles
@@ -2702,20 +2702,20 @@ function SpriteOffsetAnimatorComponent:set(fields) end
 ---@field emission_interval_min_frames integer 5 [0, 200] how often do we emit particles
 ---@field emission_interval_max_frames integer 10 [0, 200] how often do we emit particles
 ---@field entity_file string - if set, this entity is loaded to the emission position by the emitter when it emits
----@field color color - original color
----@field color_change color - how much the color changes in a second
+---@field color rgba_percent - original color
+---@field color_change rgba_percent - how much the color changes in a second
 ---@field velocity vector - original velocity
 ---@field gravity vector - gravity"
 ---@field scale vector - original scale
 ---@field scale_velocity vector - scale velocity per second
----@field randomize_lifetime range - this is added to the lifetime
+---@field randomize_lifetime interval - this is added to the lifetime
 ---@field randomize_position aabb - random offset for pos
 ---@field randomize_velocity aabb - add this randomized velocity inside this o the velocity
 ---@field randomize_scale aabb - add this randomized vector2 to scale
----@field randomize_rotation range - this is added to the rotation 
----@field randomize_angular_velocity range - this is added to angular_velocity
----@field randomize_alpha range - this is added to the alpha
----@field randomize_animation_speed_coeff range - if set, animation speed is multiplied by a random value inside this range
+---@field randomize_rotation interval - this is added to the rotation 
+---@field randomize_angular_velocity interval - this is added to angular_velocity
+---@field randomize_alpha interval - this is added to the alpha
+---@field randomize_animation_speed_coeff interval - if set, animation speed is multiplied by a random value inside this range
 ---@field expand_randomize_position vector - will add dt*this to randomize_position_aabb every frame
 ---@field mNextEmitFrame integer 0 [0, 1]
 local SpriteParticleEmitterComponent = {}
@@ -2723,7 +2723,7 @@ local SpriteParticleEmitterComponent = {}
 ---@param fields SpriteParticleEmitterComponent.set
 function SpriteParticleEmitterComponent:set(fields) end
 
----@class SpriteStainsComponent: component
+---@class SpriteStainsComponent: comp
 ---@field sprite_id integer 0 [0, 10] which sprite (in the order in which they appear in the entity) are we going to stain?
 ---@field fade_stains_towards_srite_top boolean 1 [0, 1] if 1, shades get less opaque near the top of the sprite
 ---@field stain_shaken_drop_chance_multiplier integer - how quickly stains are dropped relative to normal drop speed
@@ -2732,7 +2732,7 @@ local SpriteStainsComponent = {}
 ---@param fields SpriteStainsComponent.set
 function SpriteStainsComponent:set(fields) end
 
----@class StatusEffectDataComponent: component
+---@class StatusEffectDataComponent: comp
 ---@field stain_effects number[] [Field is read-only]<br>
 ---@field stain_effect_cooldowns integer[] [Field is read-only]<br>
 ---@field effects_previous number[] [Field is read-only]<br>
@@ -2747,7 +2747,7 @@ local StatusEffectDataComponent = {}
 ---@param fields StatusEffectDataComponent.set
 function StatusEffectDataComponent:set(fields) end
 
----@class StreamingKeepAliveComponent: component
+---@class StreamingKeepAliveComponent: comp
 ---@field TEMP_TEMPY number 0 [0, 3.5]
 ---@field TEMP_TEMP_TEMP number 0 [0, 3.5]
 local StreamingKeepAliveComponent = {}
@@ -2755,7 +2755,7 @@ local StreamingKeepAliveComponent = {}
 ---@param fields StreamingKeepAliveComponent.set
 function StreamingKeepAliveComponent:set(fields) end
 
----@class TelekinesisComponent: component
+---@class TelekinesisComponent: comp
 ---@field min_size integer 7 [0, 1] Minimum size of physics body that can be grabbed, in cells/pixels
 ---@field max_size integer 1500 [0, 1] Maximum size of physics body that can be grabbed, in cells/pixels
 ---@field radius number 250 [0, 300] Maximum object search distance
@@ -2776,7 +2776,7 @@ local TelekinesisComponent = {}
 ---@param fields TelekinesisComponent.set
 function TelekinesisComponent:set(fields) end
 
----@class TeleportComponent: component
+---@class TeleportComponent: comp
 ---@field target_x_is_absolute_position boolean 0 [0, 1] If set, target position x is in world coordinates, otherwise it's an offset
 ---@field target_y_is_absolute_position boolean 0 [0, 1] If set, target position y is in world coordinates, otherwise it's an offset
 ---@field source_particle_fx_file string data/entities/particles/teleportation_source.xml [0, 1] This entity is loaded at the source position when teleportation occurs
@@ -2791,7 +2791,7 @@ local TeleportComponent = {}
 ---@param fields TeleportComponent.set
 function TeleportComponent:set(fields) end
 
----@class TeleportProjectileComponent: component
+---@class TeleportProjectileComponent: comp
 ---@field min_distance_from_wall number 16 [0, 16]
 ---@field actionable_lifetime integer 3 [0, 20]
 ---@field reset_shooter_y_vel boolean 1 [0, 1] If 1, will set shooter y velocity to 0 on teleport
@@ -2801,7 +2801,7 @@ local TeleportProjectileComponent = {}
 ---@param fields TeleportProjectileComponent.set
 function TeleportProjectileComponent:set(fields) end
 
----@class TextLogComponent: component
+---@class TextLogComponent: comp
 ---@field key string
 ---@field image_filename string
 ---@field mCachedName string
@@ -2810,7 +2810,7 @@ local TextLogComponent = {}
 ---@param fields TextLogComponent.set
 function TextLogComponent:set(fields) end
 
----@class TorchComponent: component
+---@class TorchComponent: comp
 ---@field probability_of_ignition_attempt integer 15 [0, 100] how likely are we to ignite colliding cells
 ---@field suffocation_check_offset_y number -2 [-10, 10] check offset in world coordinates from our position
 ---@field frames_suffocated_to_extinguish integer 5 [0, 30] how many frames the torch needs to be suffocated before it stops emitting fire
@@ -2825,7 +2825,7 @@ local TorchComponent = {}
 ---@param fields TorchComponent.set
 function TorchComponent:set(fields) end
 
----@class UIIconComponent: component
+---@class UIIconComponent: comp
 ---@field icon_sprite_file string
 ---@field name string
 ---@field description string
@@ -2837,14 +2837,14 @@ local UIIconComponent = {}
 ---@param fields UIIconComponent.set
 function UIIconComponent:set(fields) end
 
----@class UIInfoComponent: component
+---@class UIInfoComponent: comp
 ---@field name string
 local UIInfoComponent = {}
 
 ---@param fields UIInfoComponent.set
 function UIInfoComponent:set(fields) end
 
----@class VariableStorageComponent: component
+---@class VariableStorageComponent: comp
 ---@field name string
 ---@field value_string string
 ---@field value_int integer 0 [0, 1]
@@ -2855,7 +2855,7 @@ local VariableStorageComponent = {}
 ---@param fields VariableStorageComponent.set
 function VariableStorageComponent:set(fields) end
 
----@class VelocityComponent: component
+---@class VelocityComponent: comp
 ---@field gravity_x number 0 [0, 1]
 ---@field gravity_y number 400 [0, 1]
 ---@field mass number 0.05 [0, 10]
@@ -2878,7 +2878,7 @@ local VelocityComponent = {}
 ---@param fields VelocityComponent.set
 function VelocityComponent:set(fields) end
 
----@class VerletPhysicsComponent: component
+---@class VerletPhysicsComponent: comp
 ---@field num_points integer 2 [0, 1]
 ---@field num_links integer 2 [0, 1]
 ---@field width integer 1 [0, 1]
@@ -2919,7 +2919,7 @@ local VerletPhysicsComponent = {}
 ---@param fields VerletPhysicsComponent.set
 function VerletPhysicsComponent:set(fields) end
 
----@class VerletWeaponComponent: component
+---@class VerletWeaponComponent: comp
 ---@field damage_radius number 5 [0, 10]
 ---@field physics_force_radius number 3 [0, 10]
 ---@field damage_min_step number 0.01 [0, 3.5]
@@ -2934,7 +2934,7 @@ local VerletWeaponComponent = {}
 ---@param fields VerletWeaponComponent.set
 function VerletWeaponComponent:set(fields) end
 
----@class VerletWorldJointComponent: component
+---@class VerletWorldJointComponent: comp
 ---@field verlet_point_index integer 0 [0, 32] Index of the verlet point we attach
 ---@field world_position vector - Where we attach the verlet point
 ---@field mUpdated boolean 0 [0, 1]
@@ -2943,7 +2943,7 @@ local VerletWorldJointComponent = {}
 ---@param fields VerletWorldJointComponent.set
 function VerletWorldJointComponent:set(fields) end
 
----@class WalletComponent: component
+---@class WalletComponent: comp
 ---@field money integer 0 [0, 10000]
 ---@field money_spent integer 0 [0, 1] tracks how much money the player has spent
 ---@field mMoneyPrevFrame integer 0 [0, 1] HAX to give player towards infinite moneys
@@ -2953,14 +2953,14 @@ local WalletComponent = {}
 ---@param fields WalletComponent.set
 function WalletComponent:set(fields) end
 
----@class WalletValuableComponent: component
+---@class WalletValuableComponent: comp
 ---@field money_value integer 10 [0, 100]
 local WalletValuableComponent = {}
 
 ---@param fields WalletValuableComponent.set
 function WalletValuableComponent:set(fields) end
 
----@class WorldStateComponent: component
+---@class WorldStateComponent: comp
 ---@field is_initialized boolean 0 [0, 1]
 ---@field time number 0 [0, 1]
 ---@field time_total number 0 [0, 1000]
@@ -3024,7 +3024,7 @@ local WorldStateComponent = {}
 ---@param fields WorldStateComponent.set
 function WorldStateComponent:set(fields) end
 
----@class WormAIComponent: component
+---@class WormAIComponent: comp
 ---@field speed number 1 [0, 10000]
 ---@field speed_hunt number 3 [0, 10000]
 ---@field direction_adjust_speed number 1 [0, 10000]
@@ -3052,7 +3052,7 @@ local WormAIComponent = {}
 ---@param fields WormAIComponent.set
 function WormAIComponent:set(fields) end
 
----@class WormAttractorComponent: component
+---@class WormAttractorComponent: comp
 ---@field direction integer 1 [-1, 1] 1 = attracts worms, -1 detracts worms
 ---@field radius number 50 [0, 100] radius of detracting worms
 local WormAttractorComponent = {}
@@ -3060,7 +3060,7 @@ local WormAttractorComponent = {}
 ---@param fields WormAttractorComponent.set
 function WormAttractorComponent:set(fields) end
 
----@class WormComponent: component
+---@class WormComponent: comp
 ---@field speed number 1 [0, 10000]
 ---@field acceleration number 3 [0, 10000]
 ---@field gravity number 3 [0, 10000]
@@ -3092,7 +3092,7 @@ local WormComponent = {}
 ---@param fields WormComponent.set
 function WormComponent:set(fields) end
 
----@class WormPlayerComponent: component
+---@class WormPlayerComponent: comp
 ---@field mPrevPosition vector
 ---@field mDirection vector - if mDirection == 0,0 nothings works
 local WormPlayerComponent = {}

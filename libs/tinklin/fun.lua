@@ -30,8 +30,8 @@ THE SOFTWARE.
 --- Distributed under the MIT/X11 License. See COPYING.md for more details.
 ---
 
----@type luafun
----@diagnostic disable inject_field
+---@diagnostic disable
+
 local exports = {}
 local methods = {}
 
@@ -70,7 +70,6 @@ local function deepcopy(orig) -- used by cycle()
     return copy
 end
 
----@class iterator<T>
 local iterator_mt = {
     -- usually called by for-in loop
     __call = function(self, param, state)
@@ -159,6 +158,24 @@ local iter = function(obj, param, state)
     return wrap(rawiter(obj, param, state))
 end
 exports.iter = iter
+
+local entries = function(obj)
+    return wrap(map_gen, obj, nil)
+end
+exports.entries = entries
+
+local chars = function(obj)
+    if #obj == 0 then
+        return wrap(nil_gen, nil, nil)
+    end
+    return wrap(string_gen, obj, 0)
+end
+exports.chars = chars
+
+local elems = function(obj)
+    return ipairs(obj)
+end
+exports.elems = elems
 
 local method0 = function(fun)
     return function(self)
@@ -858,6 +875,8 @@ local map = function(fun, gen, param, state)
 end
 methods.map = method1(map)
 exports.map = export1(map)
+methods.map_multi = methods.map
+exports.map_multi = exports.map
 
 local enumerate_gen_call = function(state, i, state_x, ...)
     if state_x == nil then
@@ -1099,4 +1118,4 @@ setmetatable(exports, {
     end,
 })
 
-return exports
+return exports --[[@as luafun]]

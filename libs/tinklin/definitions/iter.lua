@@ -74,13 +74,6 @@ function iterator:drop(n_or_predicate) end
 ---@return iterator<T>
 function iterator:span(n_or_predicate) end
 
----@generic T
----@param self iterator<T>
----@param n_or_predicate integer|fun(t: T): boolean
----@return iterator<T>
----@return iterator<T>
-function iterator:span(n_or_predicate) end
-
 iterator.split = iterator.span
 
 ---@generic T
@@ -130,17 +123,17 @@ function iterator:grep(regexp_or_predicate) end
 ---@return iterator<T>
 function iterator:partition(predicate) end
 
----@generic T
+---@generic T, R
 ---@param self iterator<T>
----@param accfun fun(t1: T, t2: T): T
----@param initval T
----@return T
+---@param accfun fun(t1: R, t2: T): R
+---@param initval R
+---@return R
 function iterator:reduce(accfun, initval) end
 
----@generic T
----@param self iterator<T>
+iterator.foldl = iterator.reduce
+
 ---@return integer
-function iterator:reduce(accfun, initval) end
+function iterator:length() end
 
 ---@generic T
 ---@param self iterator<T>
@@ -167,7 +160,7 @@ iterator.every = iterator.all
 ---@return boolean
 function iterator:any(predicate) end
 
-iterator.some = iterator.all
+iterator.some = iterator.any
 
 ---@generic T
 ---@param self iterator<T>
@@ -217,6 +210,12 @@ function iterator:map(fun) end
 
 ---@generic T
 ---@param self iterator<T>
+---@param fun fun(t: T): any, any, any, any, any, any, any, any
+---@return multi_iterator
+function iterator:map_multi(fun) end
+
+---@generic T
+---@param self iterator<T>
 ---@return iterator<[integer,T]>
 function iterator:enumerate() end
 
@@ -226,10 +225,9 @@ function iterator:enumerate() end
 ---@return iterator<T>
 function iterator:intersperse(x) end
 
----@generic T,T2
----@param self iterator<T>
----@vararg iterator<T2>
----@return iterator<[T|T2]>
+---@param self iterator
+---@vararg iterator
+---@return multi_iterator
 function iterator:zip(...) end
 
 ---@generic T
@@ -242,42 +240,3 @@ function iterator:cycle() end
 ---@vararg iterator<T2>
 ---@return iterator<T|T2>
 function iterator:chain(...) end
-
----@class luafun
-local luafun = {}
-
----@param stop number
----@return iterator<number>
----@overload fun(start: number, stop: number, step: number?): iterator<number>
-function luafun.range(stop) end
-
----@generic T
----@vararg T
----@return iterator<T>
-function luafun.duplicate(...) end
-
-luafun.xrepeat = luafun.duplicate
-luafun.replicate = luafun.duplicate
-
----@generic T
----@param fun fun(n: integer): T
----@return iterator<T>
-function luafun.tabulate(fun) end
-
----@return iterator<number>
-function luafun.zeros() end
-
----@return iterator<number>
-function luafun.ones() end
-
----@param n number
----@param m number?
----@return iterator<number>
-function luafun.rands(n, m) end
-
----@generic T
----@param array T[]
----@return iterator<T>
-function luafun.iter(array) end
-
--- no we don't need its overloads

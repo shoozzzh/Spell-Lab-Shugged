@@ -245,7 +245,6 @@
 ---@field target_sprite_id integer? -1 [0, 1] if >= 0, the Nth sprite transform in target entity is inherited
 ---@field rotate_based_on_x_scale boolean? 0 [0, 1] if 1, the rotation is set to 0 deg if scale >= 0 else to 180 deg
 ---@field destroy_component_when_target_is_gone boolean? 1 [0, 1] should probably be on by default
----@field Transform comp_xform?
 ---@field target entity_id? 0 [0, 1] EntityID of the entity we're attached to. This will fail after save/load, unfortunately
 ---@field mUpdateFrame integer? -1 [0, 1]
 
@@ -1044,7 +1043,6 @@
 ---@field parent_sprite_id integer? -1 [0, 1] if >= 0, the Nth sprite transform in parent entity is inherited
 ---@field always_use_immediate_parent_rotation boolean? 0 [0, 1] if 1, we use the immediate parent for rotation, no matter what other properties say
 ---@field rotate_based_on_x_scale boolean? 0 [0, 1] if 1, the rotation is set to 0 deg if scale >= 0 else to 180 deg
----@field Transform comp_xform?
 ---@field mUpdateFrame integer? -1 [0, 1]
 
 ---@class InteractableComponent.set
@@ -1223,7 +1221,7 @@
 ---@field serialize_duration boolean? 0 [0, 1] if 1, will retain kill_frame and creation_frame over serialization
 ---@field kill_frame_serialized integer? 0 [0, 1] frame that this is killed at
 ---@field creation_frame_serialized integer? 0 [0, 1] frame that this is killed at
----@field randomize_lifetime range? - this is added to the lifetime
+---@field randomize_lifetime interval? - this is added to the lifetime
 ---@field creation_frame integer? 0 [0, 1] we'll set this to GG.GetFrameNum() when this component is created
 ---@field kill_frame integer? 0 [0, 1] frame that this is killed at
 
@@ -1265,7 +1263,7 @@
 ---@field kill_entity boolean? 1 [0, 1] if 1, we kill our entity when it is created
 ---@field timeout_frames integer? 0 [0, 180] for timer
 ---@field mTimerTriggerFrame integer? -1 [0, 1]
----@field count range? - how many entities should be loaded (random range)
+---@field count interval? - how many entities should be loaded (random range)
 
 ---@class LocationMarkerComponent.set
 ---@field id integer? 0 [0, 3]
@@ -1506,7 +1504,7 @@
 ---@field ignore_transform_updated_msg boolean? 0 [0, 1] if 1, mExPosition and m_last_emit_position will not be updated when receiving Message_TransformUpdated
 ---@field color integer? 0 [0, 1]
 ---@field offset vector?
----@field area_circle_radius range? - If > 0, the particles will be emitted inside a circular area defined by the min and max bounds of 'area_circle_radius'.
+---@field area_circle_radius interval? - If > 0, the particles will be emitted inside a circular area defined by the min and max bounds of 'area_circle_radius'.
 ---@field gravity vector?
 ---@field count_min integer?
 ---@field count_max integer?
@@ -1722,7 +1720,6 @@
 
 ---@class PhysicsPickUpComponent.set
 ---@field pick_up_strength number? 200 [0, 1]
----@field transform comp_xform?
 ---@field original_left_joint_pos vector?
 ---@field original_right_joint_pos vector?
 ---@field isBroken boolean? 0 [0, 1]
@@ -1953,8 +1950,8 @@
 
 ---@class SetStartVelocityComponent.set
 ---@field velocity vector? - This is added together with random velocity
----@field randomize_angle range? - Random angle min max range in radians, clockwise. 0.0 points directly rightward.
----@field randomize_speed range? - Random speed min max range
+---@field randomize_angle interval? - Random angle min max range in radians, clockwise. 0.0 points directly rightward.
+---@field randomize_speed interval? - Random speed min max range
 
 ---@class ShotEffectComponent.set
 ---@field extra_modifier string? - name of modifier function executed per projectile from 'gun_extra_modifiers.lua'
@@ -2037,20 +2034,20 @@
 ---@field emission_interval_min_frames integer? 5 [0, 200] how often do we emit particles
 ---@field emission_interval_max_frames integer? 10 [0, 200] how often do we emit particles
 ---@field entity_file string? - if set, this entity is loaded to the emission position by the emitter when it emits
----@field color color? - original color
----@field color_change color? - how much the color changes in a second
+---@field color rgba_percent? - original color
+---@field color_change rgba_percent? - how much the color changes in a second
 ---@field velocity vector? - original velocity
 ---@field gravity vector? - gravity"
 ---@field scale vector? - original scale
 ---@field scale_velocity vector? - scale velocity per second
----@field randomize_lifetime range? - this is added to the lifetime
+---@field randomize_lifetime interval? - this is added to the lifetime
 ---@field randomize_position aabb? - random offset for pos
 ---@field randomize_velocity aabb? - add this randomized velocity inside this o the velocity
 ---@field randomize_scale aabb? - add this randomized vector2 to scale
----@field randomize_rotation range? - this is added to the rotation 
----@field randomize_angular_velocity range? - this is added to angular_velocity
----@field randomize_alpha range? - this is added to the alpha
----@field randomize_animation_speed_coeff range? - if set, animation speed is multiplied by a random value inside this range
+---@field randomize_rotation interval? - this is added to the rotation 
+---@field randomize_angular_velocity interval? - this is added to angular_velocity
+---@field randomize_alpha interval? - this is added to the alpha
+---@field randomize_animation_speed_coeff interval? - if set, animation speed is multiplied by a random value inside this range
 ---@field expand_randomize_position vector? - will add dt*this to randomize_position_aabb every frame
 ---@field mNextEmitFrame integer? 0 [0, 1]
 
