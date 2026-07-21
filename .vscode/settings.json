@@ -1,0 +1,12 @@
+{
+    "Lua.diagnostics.disable": [
+        "deprecated"
+    ],
+    "Lua.runtime.plugin": "/.vscode/plugin.lua",
+    "Lua.runtime.path": [
+        "?.lua",
+        "spell_lab_shugged/libs/?.lua",
+        "spell_lab_shugged/libs/?/main.lua",
+        "spell_lab_shugged/files/?.lua"
+    ]
+}
