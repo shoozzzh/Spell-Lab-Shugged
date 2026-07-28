@@ -1,5 +1,91 @@
-dofile_once( "data/scripts/lib/utilities.lua" )
-dofile_once( "data/scripts/lib/mod_settings.lua" )
+dofile_once "data/scripts/lib/utilities.lua"
+dofile_once "data/scripts/lib/mod_settings.lua"
+
+-- mod_settings_version = 1
+mod_settings_version = 2
+
+do
+    ---@type fun()[]
+    local migrations = {}
+    migrations[1] = function()
+        local simple = {
+            ["action_button_click_sound"] = "general.action_button_click_sound",
+            ["action_history"] = "spell_picker.action_history",
+            ["action_history_limit"] = "spell_picker.action_history_limit",
+            ["all_seeing_eye_lighting"] = "all_seeing_eye.brightening",
+            ["all_seeing_eye_fog_of_war_removing"] = "all_seeing_eye.fog_of_war_removing",
+            ["better_all_seeing_eye"] = "all_seeing_eye.enabled",
+            ["button_click_sound"] = "general.button_click_sound",
+            ["creative_mode_flight"] = "creative_mode_flight.enabled",
+            ["creative_mode_flight_speed_faster"] = "creative_mode_flight.speed_faster",
+            ["creative_mode_flight_speed_no_clip"] = "creative_mode_flight.speed_no_clip",
+            ["creative_mode_flight_speed_normal"] = "creative_mode_flight.speed_normal",
+            ["disable_casting"] = "wand_no_shooting.enabled",
+            ["disable_death"] = "",
+            ["disable_toxic_statuses"] = "no_annoying_effects.enabled",
+            ["edit_wands_everywhere"] = "",
+            ["filter_buttons_trigger"] = "spell_picker.filter_buttons_trigger",
+            ["gif_mode"] = "wand_edit_panel.gif_mode",
+            ["invincible"] = "protection_all.enabled",
+            ["migrated_wand_box_data_from_spell_lab"] = "wand_box.auto_migrated_data_from.spell_lab",
+            ["migrated_wand_box_data_from_ecsgui"] = "wand_box.auto_migrated_data_from.ecsgui",
+            ["no_polymorphing"] = "no_polymorphing.enabled",
+            ["no_recoil"] = "no_recoil.enabled",
+            ["no_weather"] = "no_weather.enabled",
+            ["quick_spell_picker"] = "spell_picker.try_put_in_panel",
+            ["replace_mode"] = "spell_picker.replace_mode",
+            ["show_locked_spells"] = "spell_picker.show_locked_spells",
+            ["toggle_options"] = "toggle_options.showing",
+            ["show_wand_edit_panel"] = "wand_edit_panel.showing",
+            ["special_filter_button_align_to"] = "",
+            ["unlimited_spells"] = "unlimited_spells.enabled",
+            ["wand_box_page_max_index"] = "wand_box.last_page_index",
+            ["wand_edit_panel_history_limit"] = "wand_edit_panel.history_limit",
+            ["wand_edit_panel_max_actions_per_row"] = "wand_edit_panel.max_actions_per_row",
+            ["wand_edit_panel_max_rows"] = "wand_edit_panel.max_rows",
+            ["wand_listener_type"] = "wand_edit_panel.wand_listener_type",
+            ["wand_picker_precise_mode"] = "wand_picker.precise_mode",
+            ["zero_uses"] = "spell_picker.zero_uses",
+        }
+        local prefix = {
+            ["shortcut_"] = "shortcut.",
+            ["wand_box_page_"] = "wand_box.page_",
+        }
+        for old_key, new_key in pairs(simple) do
+            old_key = "spell_lab_shugged." .. old_key
+            local value = ModSettingGet(old_key)
+            if value == nil then goto continue end
+            ModSettingRemove(old_key)
+            if new_key ~= "" then
+                new_key = "spell_lab_shugged." .. new_key
+                ModSettingSetNextValue(new_key, value, false)
+            end
+            ::continue::
+        end
+        for old_key_prefix, new_key_prefix in pairs(prefix) do
+            old_key_prefix = "spell_lab_shugged." .. old_key_prefix
+            new_key_prefix = "spell_lab_shugged." .. new_key_prefix
+            local old_prefix_length = #old_key_prefix
+            for i = 0, ModSettingGetCount() - 1 do
+                local old_key, value = ModSettingGetAtIndex(i)
+                if old_key == nil or value == nil then goto continue end
+                if old_key:sub(1, old_prefix_length) ~= old_key_prefix then goto continue end
+
+                local new_key = new_key_prefix .. old_key:sub(old_prefix_length + 1, -1)
+                ModSettingRemove(old_key)
+                ModSettingSetNextValue(new_key, value, false)
+                ::continue::
+            end
+        end
+    end
+
+    local _version = ModSettingGet "spell_lab_shugged._version"
+    if _version < mod_settings_version then
+        for i = _version, mod_settings_version - 1 do
+            migrations[i]()
+        end
+    end
+end
 
 ---@format disable
 local cc = (function() -- clikclak.lua
@@ -27,8 +113,6 @@ function cc.shortcut( id )
 		end
 	end
 end
-
-mod_settings_version = 1
 
 mod_settings = {
 	cc.cat "wand_edit_panel" {
@@ -193,15 +277,15 @@ mod_settings = {
 		},
 	},
 	cc.cat "all_seeing_eye" {
-		cc.slider "all_seeing_eye_lighting" (0,0,1,format_percent) {
+		cc.slider "all_seeing_eye.brightening" (0,0,1,format_percent) {
 			zh_cn = {
 				name = "照明",
 			},
 			en = {
-				name = "Lighting",
+				name = "Brightening",
 			},
 		},
-		cc.slider "all_seeing_eye_fog_of_war_removing" (1,0,1,format_percent) {
+		cc.slider "all_seeing_eye.fog_of_war_removing" (1,0,1,format_percent) {
 			zh_cn = {
 				name = "移除战争迷雾",
 			},
