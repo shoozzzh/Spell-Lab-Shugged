@@ -7,6 +7,8 @@
         "?.lua",
         "spell_lab_shugged/libs/?.lua",
         "spell_lab_shugged/libs/?/main.lua",
-        "spell_lab_shugged/files/?.lua"
-    ]
+        "spell_lab_shugged/files/?.lua",
+        "spell_lab_shugged/files/?/main.lua"
+    ],
+    "editor.cursorBlinking": "solid"
 }

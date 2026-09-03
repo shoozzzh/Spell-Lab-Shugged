@@ -3,6 +3,7 @@ local MOD_PATH = "mods/" .. MOD_ID .. "/"
 
 local PKGPATH = {
     MOD_PATH .. "files/?.lua",
+    MOD_PATH .. "files/?/main.lua",
     MOD_PATH .. "libs/?.lua",
     MOD_PATH .. "libs/?/main.lua",
     MOD_PATH .. "libs/?/?.lua",

@@ -37,6 +37,7 @@ local placeholders_init_lua = {
     end },
 }
 
+local print = print
 local debugging = false
 if debugging then
     -- leave print() alone
