@@ -122,10 +122,6 @@ pop.z = {
 
 pop.pos = {
     stack = {},
-    next_value = nil,
-    next = function(x, y)
-        pop.pos.next_value = { x, y }
-    end,
     push = function(x, y)
         pop.pos.stack[#pop.pos.stack + 1] = { x, y }
         return true
@@ -138,21 +134,16 @@ pop.pos = {
         for _, offset in ipairs(pop.pos.stack) do
             x, y = x + offset[1], y + offset[2]
         end
-        local next_value = pop.pos.next_value
-        pop.pos.next_value = nil
-        if next_value then
-            x, y = x + next_value[1], y + next_value[2]
-        end
         return x, y
     end,
     layer = function(x, y)
         return function(content_fn)
-            local stack, next_value = pop.pos.stack, pop.pos.next_value
-            pop.pos.stack, pop.pos.next_value = {}, nil
+            local stack = pop.pos.stack
+            pop.pos.stack = {}
             pop.pos.push(x, y)
             content_fn()
             pop.pos.pop()
-            pop.pos.stack, pop.pos.next_value = stack, next_value
+            pop.pos.stack = stack
         end
     end,
 }
@@ -232,11 +223,14 @@ end
 -- TODO: impl bucket mechanic
 
 ---@param layer pop.layer
-function pop.layer(layer, content_fn)
-    local stored = pop.z.layer_cur
-    pop.z.layer_cur = layer
-    content_fn()
-    pop.z.layer_cur = stored
+function pop.layer(layer)
+    ---@param content_fn fun()
+    return function(content_fn)
+        local stored = pop.z.layer_cur
+        pop.z.layer_cur = layer
+        content_fn()
+        pop.z.layer_cur = stored
+    end
 end
 
 local function next_z_step()
@@ -393,16 +387,17 @@ end
 function pop.tooltip(...)
     local text = { ... }
 
+    -- don't need to care about ids here
     pop.tooltip_custom(2, 0, true)(function()
-        local line_num = 0
+        local layout = pop.layout_stack(pop.text_line_height, 0)
         for _, line in ipairs(text) do
             line = GameTextGetTranslatedOrNot(line)
             for t in string.gmatch(line or "", "[^\n]+") do
-                pop.pos.next(0, pop.text_line_height * line_num)
+                layout.next()
                 pop.text(t)
-                line_num = line_num + 1
             end
         end
+        layout.finish()
     end)
 end
 
@@ -444,7 +439,7 @@ local function show_tooltip_custom(callback, x_min, x_max, x_offset, y, animated
         y = pop.screen_size[2] - tooltip_height
     end
 
-    pop.layer("TOOLTIP", function()
+    pop.layer "TOOLTIP" (function()
         if animated then
             pop.animate_begin()
             pop.animate_fade_in(0.08, 0.1, false)
@@ -584,16 +579,16 @@ function pop.layout_stack(offset_x, offset_y)
     offset_y = offset_y or 0
     local x, y = 0, 0
 
-    local stack, next_value = pop.pos.stack, pop.pos.next_value
+    local stack = pop.pos.stack
 
     return {
         next = function()
-            pop.pos.stack, pop.pos.next_value = { unpack(stack) }, next_value and { unpack(next_value) }
+            pop.pos.stack = { unpack(stack) }
             x, y = x + offset_x, y + offset_y
             pop.pos.push(x, y)
         end,
         finish = function()
-            pop.pos.stack, pop.pos.next_value = stack, next_value
+            pop.pos.stack = stack
         end,
     }
 end
@@ -601,11 +596,11 @@ end
 function pop.layout_hwrap(offset_x, offset_y, line_size)
     local x, y = 0, 0
 
-    local stack, next_value = pop.pos.stack, pop.pos.next_value
+    local stack = pop.pos.stack
     local cur_line_size = 1
     return {
         next = function()
-            pop.pos.stack, pop.pos.next_value = { unpack(stack) }, { unpack(next_value) }
+            pop.pos.stack = { unpack(stack) }
             cur_line_size = cur_line_size + 1
             if cur_line_size <= line_size then
                 x = x + offset_x
@@ -616,7 +611,7 @@ function pop.layout_hwrap(offset_x, offset_y, line_size)
             pop.pos.push(x, y)
         end,
         finish = function()
-            pop.pos.stack, pop.pos.next_value = stack, next_value
+            pop.pos.stack = stack
         end,
     }
 end
