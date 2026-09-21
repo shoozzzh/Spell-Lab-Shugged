@@ -59,9 +59,6 @@ local pop = {
     screen_size = { 1260, 720 },
     options = const.options,
     playback_types = const.playback_types,
-    z = 0,
-    call_depth = 0,
-    call_depth_next = nil,
     ---@class prop_font
     ---@field next fun( font: font )
     ---@field push fun( font: font ): bool
@@ -122,22 +119,15 @@ pop.pos = {
     end,
 }
 
+pop.call_depth = 0
+
 local id_allocator = dofile(this_path .. "id_allocator.lua")
 local function get_id()
-    local extra_call_depth = 2 + pop.call_depth
-    if pop.call_depth_next then
-        extra_call_depth = extra_call_depth + pop.call_depth_next
-        pop.call_depth_next = nil
-    end
-    return id_allocator.get_id(extra_call_depth)
+    return id_allocator.get_id(2 + pop.call_depth)
 end
 
 function pop.call_depth_mod(mod)
     pop.call_depth = pop.call_depth + mod
-end
-
-function pop.next_call_depth_mod(mod)
-    pop.next_call_depth = mod
 end
 
 local option_list = {}
