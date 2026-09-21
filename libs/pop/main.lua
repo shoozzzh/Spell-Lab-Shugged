@@ -82,6 +82,44 @@ local pop = {
     dragging = nil,
 }
 
+---@alias pop.layer
+---| "BACKGROUND"
+---|>"MID"
+---| "FOREGROUND"
+---| "TOOLTIP"
+---| "DEBUG"
+
+pop.z = {
+    --TODO: Adjust these values with the depthes of vanilla gui in mind
+    ---@type table<pop.layer, number>
+    layer_base_z = {
+        BACKGROUND = 100,
+        MID = 0,
+        FOREGROUND = -100,
+        TOOLTIP = -200,
+        DEBUG = -2000,
+    },
+    step = 0.01,
+    ---@type table<pop.layer, number>
+    layer_next_z = {},
+    ---@type pop.layer
+    layer_cur = "MID",
+    new_frame = function(self)
+        self.layer_cur = "MID"
+
+        local t = {}
+        for k, v in pairs(self.layer_base_z) do
+            self.layer_next_z[k] = v
+        end
+        self.layer_next_z = t
+    end,
+    get = function(self)
+        local res = self.layer_next_z[self.layer_cur]
+        self.layer_next_z[self.layer_cur] = res + self.step
+        return res
+    end,
+}
+
 pop.pos = {
     stack = {},
     next_value = nil,
@@ -160,7 +198,7 @@ function pop.start_frame()
     GuiStartFrame(gui)
     id_allocator.new_frame()
     pop.screen_size = { GuiGetScreenDimensions(gui) }
-    pop.z = 0
+    pop.z:new_frame()
     pop.option_clear()
     _, pop.text_line_height = GuiGetTextDimensions(gui, "|")
 end
@@ -191,13 +229,20 @@ function pop.color_next(color)
     GuiColorSetForNextWidget(gui, h2d(color.r), h2d(color.g), h2d(color.b), h2d(color.a))
 end
 
-function pop.z_mod(modifier)
-    pop.z = pop.z + modifier
-    GuiZSet(gui, pop.z)
+-- TODO: impl bucket mechanic
+
+---@param layer pop.layer
+function pop.layer(layer, content_fn)
+    local stored = pop.z.layer_cur
+    pop.z.layer_cur = layer
+    pop.call_depth_mod(1)
+    content_fn()
+    pop.call_depth_mod(-1)
+    pop.z.layer_cur = stored
 end
 
-function pop.z_mod_next(modifier)
-    GuiZSetForNextWidget(gui, pop.z + modifier)
+local function next_z_step()
+    GuiZSetForNextWidget(gui, pop.z:get())
 end
 
 function pop.animate_begin()
@@ -227,10 +272,12 @@ function pop.text(text)
         font_file, is_pixel = unpack(font)
     end
 
+    next_z_step()
     -- scaling text is a lie in noita gui
     GuiText(gui, x, y, text, 1, font_file or "", is_pixel)
 end
 
+--TODO: de-prop-ize image_xform and image_animation
 ---@param sprite_filename string
 function pop.image(sprite_filename)
     local x, y = pop.pos.get()
@@ -247,6 +294,7 @@ function pop.image(sprite_filename)
         playback_type, animation_name = animation.playback_type, animation.name
     end
 
+    next_z_step()
     GuiImage(gui, get_id(), x, y, sprite_filename, alpha, scale, scale_y, rotation, playback_type, animation_name or "")
 end
 
@@ -255,6 +303,7 @@ end
 ---@param height number
 function pop.image_9piece(sprite_filename, width, height)
     local x, y = pop.pos.get()
+    next_z_step()
     GuiImageNinePiece(gui, get_id(), x, y, width, height, 1, sprite_filename, sprite_filename)
 end
 
@@ -270,6 +319,7 @@ function pop.text_button(text)
         font_file, is_pixel = unpack(font)
     end
 
+    next_z_step()
     return GuiButton(gui, get_id(), x, y, text, 1, font_file or "", is_pixel)
 end
 
@@ -278,6 +328,7 @@ end
 ---@return bool
 function pop.button(sprite_filename)
     local x, y = pop.pos.get()
+    next_z_step()
     return GuiImageButton(gui, get_id(), x, y, "", sprite_filename)
 end
 
@@ -286,22 +337,27 @@ end
 ---@return number
 function pop.slider(value, width)
     local x, y = pop.pos.get()
+    next_z_step()
     return GuiSlider(gui, get_id(), x, y, "", value, 0, 1, value, 0, "", width)
 end
 
+--TODO: check if these max_length's are really used anywhere
 function pop.input_text(value, width, max_length, allowed_chars)
     local x, y = pop.pos.get()
+    next_z_step()
     return GuiTextInput(gui, get_id(), x, y, value, width, max_length, allowed_chars)
 end
 
 function pop.input_any_text(value, width, max_length)
     local x, y = pop.pos.get()
+    next_z_step()
     return GuiTextInput(gui, get_id(), x, y, value, width, max_length, "")
 end
 
 function pop.input_int(value, width, max_length)
     local x, y = pop.pos.get()
     local old_text = ("%.0f"):format(value)
+    next_z_step()
     local new_text = GuiTextInput(gui, get_id(), x, y, old_text, width, max_length, "0123456789+-")
     return tonumber(new_text)
 end
@@ -309,31 +365,34 @@ end
 function pop.input_float(value, width, max_length)
     local x, y = pop.pos.get()
     local old_text = ("%.3f"):format(value)
+    next_z_step()
     local new_text = GuiTextInput(gui, get_id(), x, y, old_text, width, max_length, "0123456789+-.")
     return tonumber(new_text)
 end
 
-function pop.autobox_begin()
+function pop.autobox(sprite_filename, margin, min_width, min_height)
+    next_z_step()
     GuiBeginAutoBox(gui)
-    return true
-end
+    GuiEndAutoBoxNinePiece(gui, 0)
+    local x, y = pop.prev_pos()
+    local width, height = pop.prev_size()
 
-function pop.autobox_end(sprite_filename, margin, min_width, min_height)
-    GuiEndAutoBoxNinePiece(gui, margin, min_width, min_height, false, 0, sprite_filename, sprite_filename)
+    GuiImageNinePiece(gui, get_id(), x, y, width, height, 1, sprite_filename)
 end
 
 -- no we don't use vanilla tooltip function
 
 local function tooltip(content_fn, x, y)
     pop.call_depth_mod(1)
-    GuiLayoutBeginLayer(gui)
+
+    local z = pop.z:get()
     GuiBeginAutoBox(gui)
 
     pop.pos.layer(x, y)(content_fn)
 
-    pop.z_mod_next(1)
+    GuiZSetForNextWidget(gui, z)
     GuiEndAutoBoxNinePiece(gui)
-    GuiLayoutEndLayer(gui)
+
     pop.call_depth_mod(-1)
 end
 
@@ -391,21 +450,19 @@ local function show_tooltip_custom(callback, x_min, x_max, x_offset, y, animated
         y = pop.screen_size[2] - tooltip_height
     end
 
-    pop.z_mod(-1024)
+    pop.layer("TOOLTIP", function()
+        if animated then
+            pop.animate_begin()
+            pop.animate_fade_in(0.08, 0.1, false)
+            pop.animate_scale_in(0.08, false)
+        end
 
-    if animated then
-        pop.animate_begin()
-        pop.animate_fade_in(0.08, 0.1, false)
-        pop.animate_scale_in(0.08, false)
-    end
+        tooltip(callback, x, y)
 
-    tooltip(callback, x, y)
-
-    if animated then
-        pop.animate_end()
-    end
-
-    pop.z_mod(1024)
+        if animated then
+            pop.animate_end()
+        end
+    end)
 
     if align_left then
         pop.option.Align_Left = old_align_Left
