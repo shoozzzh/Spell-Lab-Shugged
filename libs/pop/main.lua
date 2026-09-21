@@ -235,9 +235,7 @@ end
 function pop.layer(layer, content_fn)
     local stored = pop.z.layer_cur
     pop.z.layer_cur = layer
-    pop.call_depth_mod(1)
     content_fn()
-    pop.call_depth_mod(-1)
     pop.z.layer_cur = stored
 end
 
@@ -383,8 +381,6 @@ end
 -- no we don't use vanilla tooltip function
 
 local function tooltip(content_fn, x, y)
-    pop.call_depth_mod(1)
-
     local z = pop.z:get()
     GuiBeginAutoBox(gui)
 
@@ -392,8 +388,6 @@ local function tooltip(content_fn, x, y)
 
     GuiZSetForNextWidget(gui, z)
     GuiEndAutoBoxNinePiece(gui)
-
-    pop.call_depth_mod(-1)
 end
 
 function pop.tooltip(...)
