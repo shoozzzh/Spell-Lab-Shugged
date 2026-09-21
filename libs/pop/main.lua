@@ -490,21 +490,25 @@ end
 
 -- dimension getters don't belong to a gui wrapper
 
+---@nodiscard
 function pop.prev_clicked()
     local left_clicked, right_clicked = GuiGetPreviousWidgetInfo(gui)
     return left_clicked, right_clicked
 end
 
+---@nodiscard
 function pop.prev_hovered()
     local _, _, hovered = GuiGetPreviousWidgetInfo(gui)
     return hovered
 end
 
+---@nodiscard
 function pop.prev_pos()
     local _, _, _, x, y = GuiGetPreviousWidgetInfo(gui)
     return x, y
 end
 
+---@nodiscard
 function pop.prev_size()
     local _, _, _, _, _, width, height = GuiGetPreviousWidgetInfo(gui)
     return width, height
@@ -512,6 +516,7 @@ end
 
 ---@param margin number?
 ---@return boolean
+---@nodiscard
 local function mouse_inside_area(x, y, width, height, margin)
     margin = margin or 0
     local mx, my = pc.world_to_screen(DEBUG_GetMouseWorld())
@@ -520,6 +525,7 @@ end
 
 ---@param margin number?
 ---@return boolean
+---@nodiscard
 function pop.prev_mouse_inside(margin)
     local x, y = pop.prev_pos()
     local width, height = pop.prev_size()
@@ -542,6 +548,7 @@ end
 ---@return number x
 ---@return number y
 ---@return bool dragging
+---@nodiscard
 function pop.draggable_space(width, height, use_right_click)
     local x, y = pop.pos.get()
     local id = get_id()
@@ -574,6 +581,15 @@ function pop.draggable_space(width, height, use_right_click)
     return x, y, false
 end
 
+---@param width number
+---@param height number
+---@return bool hovered
+---@nodiscard
+function pop.hoverable_space(width, height)
+    local x, y = pop.pos.get()
+    return mouse_inside_area(x, y, width, height)
+end
+
 ---@class pop.layout
 ---@field next fun()
 ---@field finish fun()
@@ -581,6 +597,7 @@ end
 ---@param offset_x number
 ---@param offset_y number
 ---@return pop.layout
+---@nodiscard
 function pop.layout_stack(offset_x, offset_y)
     offset_x = offset_x or 0
     offset_y = offset_y or 0
@@ -604,6 +621,7 @@ end
 ---@param offset_y number
 ---@param line_size integer
 ---@return pop.layout
+---@nodiscard
 function pop.layout_hwrap(offset_x, offset_y, line_size)
     local x, y = 0, 0
 
