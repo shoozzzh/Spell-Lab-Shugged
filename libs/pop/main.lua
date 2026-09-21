@@ -362,14 +362,19 @@ function pop.input_float(value, width, max_length)
     return tonumber(new_text)
 end
 
-function pop.autobox(sprite_filename, margin, min_width, min_height)
-    next_z_step()
+function pop.detect_bound(content_fn)
     GuiBeginAutoBox(gui)
-    GuiEndAutoBoxNinePiece(gui, 0)
+
+    content_fn()
+
+    if pop.invis_begin() then
+        GuiEndAutoBoxNinePiece(gui, 0)
+        pop.invis_end()
+    end
+
     local x, y = pop.prev_pos()
     local width, height = pop.prev_size()
-
-    GuiImageNinePiece(gui, get_id(), x, y, width, height, 1, sprite_filename)
+    return x, y, width, height
 end
 
 -- no we don't use vanilla tooltip function
@@ -401,20 +406,15 @@ function pop.tooltip(...)
     end)
 end
 
-local function autobox_size(content_fn)
+local function show_tooltip_custom(content_fn, x_min, x_max, x_offset, y, animated)
+    x_offset = x_offset or 0
+
     if pop.invis_begin() then
         tooltip(content_fn, 0, 0)
         pop.invis_end()
     end
 
-    return pop.prev_size()
-end
-
-local function show_tooltip_custom(callback, x_min, x_max, x_offset, y, animated)
-    if not callback then return end
-    x_offset = x_offset or 0
-
-    local _, tooltip_height = autobox_size(callback)
+    local _, tooltip_height = pop.prev_size()
 
     local x_mid = (x_min + x_max) / 2
 
@@ -446,7 +446,7 @@ local function show_tooltip_custom(callback, x_min, x_max, x_offset, y, animated
             pop.animate_scale_in(0.08, false)
         end
 
-        tooltip(callback, x, y)
+        tooltip(content_fn, x, y)
 
         if animated then
             pop.animate_end()
@@ -574,6 +574,13 @@ function pop.draggable_space(width, height, use_right_click)
     return x, y, false
 end
 
+---@class pop.layout
+---@field next fun()
+---@field finish fun()
+
+---@param offset_x number
+---@param offset_y number
+---@return pop.layout
 function pop.layout_stack(offset_x, offset_y)
     offset_x = offset_x or 0
     offset_y = offset_y or 0
@@ -593,6 +600,10 @@ function pop.layout_stack(offset_x, offset_y)
     }
 end
 
+---@param offset_x number
+---@param offset_y number
+---@param line_size integer
+---@return pop.layout
 function pop.layout_hwrap(offset_x, offset_y, line_size)
     local x, y = 0, 0
 
@@ -616,13 +627,15 @@ function pop.layout_hwrap(offset_x, offset_y, line_size)
     }
 end
 
+---@param offset_x number
+---@param offset_y number
 function pop.auto_layout_stack(offset_x, offset_y)
     offset_x = offset_x or 0
     offset_y = offset_y or 0
     local x, y = pop.pos.get()
-    ---@param content_fn fun( layout_options: auto_layout_stack_options )
+    ---@param content_fn fun( layout_options: pop.auto_layout_stack_options )
     return function(content_fn)
-        ---@class auto_layout_stack_options
+        ---@class pop.auto_layout_stack_options
         local options = {
             pause_after_next = false,
             paused_for_next = false,
