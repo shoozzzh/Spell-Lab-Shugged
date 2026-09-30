@@ -269,6 +269,22 @@ function pop.text(text)
     GuiText(gui, x, y, text, 1, font_file or "", is_pixel)
 end
 
+-- well maybe you can make sure you use xml fonts
+---@param text string
+---@param scale number
+function pop.text_scalable(text, scale)
+    local x, y = pop.pos.get()
+    local font_file, is_pixel
+
+    local font = pop.font:get()
+    if font then
+        font_file, is_pixel = unpack(font)
+    end
+
+    next_z_step()
+    GuiText(gui, x, y, text, scale, font_file or "", is_pixel)
+end
+
 --TODO: de-prop-ize image_xform and image_animation
 ---@param sprite_filename string
 function pop.image(sprite_filename)
