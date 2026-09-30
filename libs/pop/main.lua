@@ -474,7 +474,12 @@ local function show_tooltip_custom(content_fn, x_min, x_max, x_offset, y, animat
     end
 end
 
+---@param x_offset number
+---@param y_offset number
+---@param animated boolean?
+---@return fun(content_fn: fun())
 function pop.tooltip_custom(x_offset, y_offset, animated)
+    animated = animated ~= true
     return function(content_fn)
         if not pop.prev_hovered() then return end
         local x, y = pop.prev_pos()
