@@ -1,5 +1,3 @@
----@alias playback_type integer
-
 -- these come from data/scripts/lib/utilities.lua, and are modified
 -----------------------------------------------------
 
@@ -11,7 +9,7 @@
 
 -- volatile: must be kept in sync with the ImGuiWidgetOptions enum in imgui.h
 
----@alias gui_option
+---@alias pop.gui_option
 ---|>"None"
 ---| "IsDraggable"
 ---| "NonInteractive"
@@ -50,7 +48,7 @@
 ---| "_SnapToCenter"
 ---| "Disabled"
 
----@type table<gui_option,integer>
+---@type table<pop.gui_option,integer>
 local GUI_OPTION = {
     None = 0,
 
@@ -104,14 +102,19 @@ local GUI_OPTION = {
 }
 
 -- volatile: must be kept in sync with the ImGuiRectAnimationPlaybackType enum in imgui.h
----@class playback_types
+---@alias pop.playback_type
+---| "PlayToEndAndHide"
+---| "PlayToEndAndPause"
+---| "Loop"
+
+---@type table<pop.playback_type,integer>
 local GUI_RECT_ANIMATION_PLAYBACK = {
     PlayToEndAndHide = 0,
     PlayToEndAndPause = 1,
     Loop = 2,
 }
 
----@class gui_constants
+---@class pop.gui_constants
 return {
     options = GUI_OPTION,
     playback_types = GUI_RECT_ANIMATION_PLAYBACK,

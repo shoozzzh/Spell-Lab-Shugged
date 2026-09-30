@@ -43,40 +43,16 @@ end
 ---@field file string
 ---@field is_pixel bool
 
----@class image_xform
----@field alpha number?
----@field scale number?
----@field scale_y number?
----@field rotation number?
-
----@class image_animation
----@field playback_type playback_type?
----@field name string?
-
 ---@class pop
 local pop = {
     gui_obj = gui,
     screen_size = { 1260, 720 },
-    options = const.options,
-    playback_types = const.playback_types,
     ---@class prop_font
     ---@field next fun( font: font )
     ---@field push fun( font: font ): bool
     ---@field pop fun()
     ---@field get fun(): font?
     font = new_prop(),
-    ---@class prop_image_xform
-    ---@field next fun( image_xform: image_xform )
-    ---@field push fun( image_xform: image_xform ): bool
-    ---@field pop fun()
-    ---@field get fun(): image_xform?
-    image_xform = new_prop(),
-    ---@class prop_image_animation
-    ---@field next fun( image_animation: image_animation )
-    ---@field push fun( image_animation: image_animation ): bool
-    ---@field pop fun()
-    ---@field get fun(): image_animation?
-    image_animation = new_prop(),
     text_line_height = 6,
     ---@type dragging_data?
     dragging = nil,
@@ -160,7 +136,7 @@ function pop.call_depth_mod(mod)
 end
 
 local option_list = {}
----@type table<gui_option,bool>
+---@type table<pop.gui_option,bool>
 pop.option = setmetatable({}, {
     __newindex = function(t, k, v)
         local option = const.options[k]
@@ -194,7 +170,7 @@ function pop.start_frame()
     _, pop.text_line_height = GuiGetTextDimensions(gui, "|")
 end
 
----@param option gui_option
+---@param option pop.gui_option
 function pop.option_next(option)
     local option_val = const.options[option]
     if option_val then
@@ -285,25 +261,40 @@ function pop.text_scalable(text, scale)
     GuiText(gui, x, y, text, scale, font_file or "", is_pixel)
 end
 
---TODO: de-prop-ize image_xform and image_animation
+---@class pop.image.props
+---@field alpha number?
+---@field scale number?
+---@field scale_y number?
+---@field rotation number?
+---@field animation pop.image.props.animation?
+
+---@class pop.image.props.animation
+---@field playback_type pop.playback_type?
+---@field name string?
+
 ---@param sprite_filename string
-function pop.image(sprite_filename)
+---@param props pop.image.props?
+function pop.image(sprite_filename, props)
     local x, y = pop.pos.get()
-    local alpha, scale, scale_y, rotation = 1, 1, 0, nil
-    local playback_type, animation_name
+    local alpha, scale, scale_y, rotation = 1, 1, 0, 0
+    local playback_type, animation_name = 0, ""
 
-    local xform = pop.image_xform:get()
-    if xform then
-        alpha, scale, scale_y, rotation = xform.alpha, xform.scale, xform.scale_y, xform.rotation
-    end
+    if props then
+        alpha = props.alpha or alpha
+        scale = props.scale or scale
+        scale_y = props.scale_y or scale_y
+        rotation = props.rotation or rotation
 
-    local animation = pop.image_animation:get()
-    if animation then
-        playback_type, animation_name = animation.playback_type, animation.name
+        if props.animation then
+            if props.animation.playback_type then
+                playback_type = const.playback_types[props.animation.playback_type] or playback_type
+            end
+            animation_name = props.animation.name or animation_name
+        end
     end
 
     next_z_step()
-    GuiImage(gui, get_id(), x, y, sprite_filename, alpha, scale, scale_y, rotation, playback_type, animation_name or "")
+    GuiImage(gui, get_id(), x, y, sprite_filename, alpha, scale, scale_y, rotation, playback_type, animation_name)
 end
 
 ---@param sprite_filename string
