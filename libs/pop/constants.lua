@@ -1,6 +1,6 @@
 ---@alias playback_type integer
 
--- these come from data/scripts/lib/utilities.lua, and is modified
+-- these come from data/scripts/lib/utilities.lua, and are modified
 -----------------------------------------------------
 
 -- These options are exposed to the modding API due to public demand but are completely unsupported.
@@ -54,7 +54,7 @@
 local GUI_OPTION = {
     None = 0,
 
-    IsDraggable = 1, -- you might not want to use this, because there will be various corner cases and bugs, but feel free to try anyway.
+    IsDraggable = 1,    -- you might not want to use this, because there will be various corner cases and bugs, but feel free to try anyway.
     NonInteractive = 2, -- works with GuiButton
     AlwaysClickable = 3,
     ClickCancelsDoubleClick = 4,
