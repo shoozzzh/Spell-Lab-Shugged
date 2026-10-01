@@ -193,7 +193,6 @@ end
 ---@param props pop.text.props?
 function pop.text(text, props)
     local x, y = pop.pos.get()
-    local font_file, is_pixel
 
     if props then
         if props.color then
@@ -203,7 +202,7 @@ function pop.text(text, props)
 
     next_z_step()
     -- scaling text is a lie in noita gui
-    GuiText(gui, x, y, text, 1, font_file or "", is_pixel)
+    GuiText(gui, x, y, text)
 end
 
 ---@class pop.text_pixel.props
@@ -234,6 +233,7 @@ end
 ---@field color pop.general_props.color?
 
 ---@param text string
+---@param font string
 ---@param props pop.text_non_pixel.props?
 function pop.text_non_pixel(text, font, props)
     local x, y = pop.pos.get()
@@ -245,7 +245,8 @@ function pop.text_non_pixel(text, font, props)
     end
 
     next_z_step()
-    GuiText(gui, x, y, text, 1, font, true)
+    GuiText(gui, x, y, text, 1, font, false)
+end
 
 ---@class pop.button_text.props
 ---@field color pop.general_props.color?
@@ -436,11 +437,9 @@ function pop.tooltip(...)
         for _, line in ipairs(text) do
             line = GameTextGetTranslatedOrNot(line)
             for t in string.gmatch(line or "", "[^\n]+") do
-                layout.next()
-                pop.text(t)
+                layout:next(function() pop.text(t) end)
             end
         end
-        layout.finish()
     end)
 end
 
