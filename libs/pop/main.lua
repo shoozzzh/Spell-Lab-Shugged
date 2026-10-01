@@ -5,54 +5,10 @@ local gui = GuiCreate()
 local const = dofile_once(this_path .. "constants.lua")
 local pc = dofile_once(this_path .. "pos_convert.lua")
 
--- had given up on lsp-ing this
-local function new_prop()
-    local prop = {
-        stack = {},
-        next_value = nil,
-    }
-
-    function prop.next(p)
-        prop.next_value = p
-    end
-
-    function prop.push(p)
-        prop.stack[#prop.stack + 1] = p
-        return true
-    end
-
-    function prop.pop()
-        prop.stack[#prop.stack] = nil
-    end
-
-    function prop.get()
-        local result = prop.next_value
-        prop.next_value = nil
-
-        if result == nil then
-            result = prop.stack[#prop.stack]
-        end
-
-        return result
-    end
-
-    return prop
-end
-
----@class font
----@field file string
----@field is_pixel bool
-
 ---@class pop
 local pop = {
     gui_obj = gui,
     screen_size = { 1260, 720 },
-    ---@class prop_font
-    ---@field next fun( font: font )
-    ---@field push fun( font: font ): bool
-    ---@field pop fun()
-    ---@field get fun(): font?
-    font = new_prop(),
     text_line_height = 6,
     ---@type dragging_data?
     dragging = nil,
@@ -181,19 +137,19 @@ function pop.option_next(option)
     return pop.option_next
 end
 
----@class color
+---@class pop.general_props.color
 ---@field r integer
 ---@field g integer
 ---@field b integer
 ---@field a integer
 
-local function h2d(h)
+local function hex2dec(h)
     return (h + 1) / 256
 end
 
----@param color color
-function pop.color_next(color)
-    GuiColorSetForNextWidget(gui, h2d(color.r), h2d(color.g), h2d(color.b), h2d(color.a))
+---@param color pop.general_props.color
+local function next_color(color)
+    GuiColorSetForNextWidget(gui, hex2dec(color.r), hex2dec(color.g), hex2dec(color.b), hex2dec(color.a))
 end
 
 -- TODO: impl bucket mechanic
@@ -230,14 +186,19 @@ function pop.animate_scale_in(acceleration, reset)
     GuiAnimateScaleIn(gui, get_id(), acceleration, reset)
 end
 
+---@class pop.text.props
+---@field color pop.general_props.color?
+
 ---@param text string
-function pop.text(text)
+---@param props pop.text.props?
+function pop.text(text, props)
     local x, y = pop.pos.get()
     local font_file, is_pixel
 
-    local font = pop.font:get()
-    if font then
-        font_file, is_pixel = unpack(font)
+    if props then
+        if props.color then
+            next_color(props.color)
+        end
     end
 
     next_z_step()
@@ -245,20 +206,46 @@ function pop.text(text)
     GuiText(gui, x, y, text, 1, font_file or "", is_pixel)
 end
 
+---@class pop.text_pixel.props
+---@field font string?
+---@field scale number?
+---@field color pop.general_props.color?
+
 -- well maybe you can make sure you use xml fonts
 ---@param text string
----@param scale number
-function pop.text_scalable(text, scale)
+---@param props pop.text_pixel.props?
+function pop.text_pixel(text, props)
     local x, y = pop.pos.get()
-    local font_file, is_pixel
+    local font, scale = "data/fonts/font_pixel.xml", 1
 
-    local font = pop.font:get()
-    if font then
-        font_file, is_pixel = unpack(font)
+    if props then
+        font = props.font or font
+        scale = props.scale or scale
+        if props.color then
+            next_color(props.color)
+        end
     end
 
     next_z_step()
-    GuiText(gui, x, y, text, scale, font_file or "", is_pixel)
+    GuiText(gui, x, y, text, scale, font, true)
+end
+
+---@class pop.text_non_pixel.props
+---@field color pop.general_props.color?
+
+---@param text string
+---@param props pop.text_non_pixel.props?
+function pop.text_non_pixel(text, font, props)
+    local x, y = pop.pos.get()
+
+    if props then
+        if props.color then
+            next_color(props.color)
+        end
+    end
+
+    next_z_step()
+    GuiText(gui, x, y, text, 1, font, true)
 end
 
 ---@class pop.image.props
