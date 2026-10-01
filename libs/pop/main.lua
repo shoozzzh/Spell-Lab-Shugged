@@ -590,31 +590,54 @@ function pop.hoverable_space(width, height)
 end
 
 ---@class pop.layout
----@field next fun()
----@field finish fun()
+---@field next fun(self, content_fn)
+---@field shift fun(self, shift_x: number, shift_y: number)
+
+---@class pop.layout_stack: pop.layout
+local layout_stack_mt = {
+    next = function(self, content_fn)
+        pop.pos.push(x, y)
+        content_fn()
+        pop.pos.pop()
+
+        self.x = self.x + self.offset_x
+        self.y = self.y + self.offset_y
+    end,
+    shift = function(self, shift_x, shift_y)
+        self.x = self.x + shift_x
+        self.y = self.y + shift_y
+    end,
+}
 
 ---@param offset_x number
 ---@param offset_y number
 ---@return pop.layout
 ---@nodiscard
 function pop.layout_stack(offset_x, offset_y)
-    offset_x = offset_x or 0
-    offset_y = offset_y or 0
-    local x, y = 0, 0
-
-    local stack = pop.pos.stack
-
-    return {
-        next = function()
-            pop.pos.stack = { unpack(stack) }
-            x, y = x + offset_x, y + offset_y
-            pop.pos.push(x, y)
-        end,
-        finish = function()
-            pop.pos.stack = stack
-        end,
-    }
+    ---@type pop.layout_stack
+    return setmetatable({ x = 0, y = 0, offset_x = offset_x, offset_y = offset_y }, layout_stack_mt)
 end
+
+---@class pop.layout_hwrap: pop.layout
+local layout_hwrap_mt = {
+    next = function(self, content_fn)
+        pop.pos.push(x, y)
+        content_fn()
+        pop.pos.pop()
+
+        self.cur_line_size = self.cur_line_size + 1
+        if self.cur_line_size <= self.line_size then
+            self.x = self.x + self.offset_x
+        else
+            self.x = 0
+            self.y = self.y + self.offset_y
+        end
+    end,
+    shift = function(self, shift_x, shift_y)
+        self.x = self.x + shift_x
+        self.y = self.y + shift_y
+    end,
+}
 
 ---@param offset_x number
 ---@param offset_y number
@@ -622,26 +645,15 @@ end
 ---@return pop.layout
 ---@nodiscard
 function pop.layout_hwrap(offset_x, offset_y, line_size)
-    local x, y = 0, 0
-
-    local stack = pop.pos.stack
-    local cur_line_size = 1
-    return {
-        next = function()
-            pop.pos.stack = { unpack(stack) }
-            cur_line_size = cur_line_size + 1
-            if cur_line_size <= line_size then
-                x = x + offset_x
-            else
-                x = 0
-                y = y + offset_y
-            end
-            pop.pos.push(x, y)
-        end,
-        finish = function()
-            pop.pos.stack = stack
-        end,
-    }
+    ---@type pop.layout_hwrap
+    return setmetatable({
+        x = 0,
+        y = 0,
+        offset_x = offset_x,
+        offset_y = offset_y,
+        cur_line_size = 0,
+        line_size = line_size,
+    }, layout_hwrap_mt)
 end
 
 ---@param offset_x number
