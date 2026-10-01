@@ -246,6 +246,66 @@ function pop.text_non_pixel(text, font, props)
 
     next_z_step()
     GuiText(gui, x, y, text, 1, font, true)
+
+---@class pop.button_text.props
+---@field color pop.general_props.color?
+
+---@param text string
+---@param props pop.button_text.props?
+function pop.button_text(text, props)
+    local x, y = pop.pos.get()
+
+    if props then
+        if props.color then
+            next_color(props.color)
+        end
+    end
+
+    next_z_step()
+    -- scaling text is a lie in noita gui
+    return GuiButton(gui, get_id(), x, y, text)
+end
+
+---@class pop.button_text_pixel.props
+---@field font string?
+---@field scale number?
+---@field color pop.general_props.color?
+
+---@param text string
+---@param props pop.button_text_pixel.props?
+function pop.button_text_pixel(text, props)
+    local x, y = pop.pos.get()
+    local font, scale = "data/fonts/font_pixel.xml", 1
+
+    if props then
+        font = props.font or font
+        scale = props.scale or scale
+        if props.color then
+            next_color(props.color)
+        end
+    end
+
+    next_z_step()
+    return GuiButton(gui, get_id(), x, y, text, scale, font, true)
+end
+
+---@class pop.button_text_non_pixel.props
+---@field color pop.general_props.color?
+
+---@param text string
+---@param font string
+---@param props pop.button_text_non_pixel.props?
+function pop.button_text_non_pixel(text, font, props)
+    local x, y = pop.pos.get()
+
+    if props then
+        if props.color then
+            next_color(props.color)
+        end
+    end
+
+    next_z_step()
+    return GuiButton(gui, get_id(), x, y, text, 1, font, false)
 end
 
 ---@class pop.image.props
@@ -291,22 +351,6 @@ function pop.image_9piece(sprite_filename, width, height)
     local x, y = pop.pos.get()
     next_z_step()
     GuiImageNinePiece(gui, get_id(), x, y, width, height, 1, sprite_filename, sprite_filename)
-end
-
----@param text string
----@return bool
----@return bool
-function pop.text_button(text)
-    local x, y = pop.pos.get()
-    local font_file, is_pixel
-
-    local font = pop.font:get()
-    if font then
-        font_file, is_pixel = unpack(font)
-    end
-
-    next_z_step()
-    return GuiButton(gui, get_id(), x, y, text, 1, font_file or "", is_pixel)
 end
 
 ---@param sprite_filename string
