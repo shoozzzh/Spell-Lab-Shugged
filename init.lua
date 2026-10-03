@@ -1,16 +1,11 @@
-local MOD_ID = "spell_lab_shugged"
-local MOD_PATH = "mods/" .. MOD_ID .. "/"
+local mod_id = "spell_lab_shugged"
+local mod_path = "mods/" .. mod_id .. "/"
 
 MOD_VERSION = "Shugged v1.8.11"
 
 setmetatable(_G, { __index = { ModTextFileSetContent = ModTextFileSetContent } })
 
 dofile_once(mod_path .. "require.lua")
-
-local mod_setting = require "mod_setting"
-local format = require "format"
-
-local fun = require "tinklin".fun
 
 dofile(mod_path .. "libs/polytools/polytools_init.lua").init(mod_path .. "libs/polytools/")
 
@@ -24,9 +19,11 @@ do
     ModTextFileSetContent(main, main_content .. translations:gsub("^[^\n]*\n", "", 1))
 end
 
+local mod_setting = require "mod_setting"
+
 local default_settings = {
     ["quick_spell_picker"] = true,
-    ["spell_replacement"] = true,
+    ["replace_mode"] = true,
     ["show_toggle_options"] = true,
     ["show_locked_spells"] = true,
 }
@@ -41,9 +38,70 @@ function OnPlayerSpawned(player_id)
     dofile_once(mod_path .. "libs/controls_freezer.lua").unfreeze()
 end
 
-local module_list = dofile_once(mod_path .. "files/module_list.lua")
+local ph_const = {
+    ["%%MOD_ID%%"] = mod_id,
+    ["%%MOD_PATH%%"] = "mods/" .. mod_id,
+}
 
+local ph_module_pattern = {
+    ["%%MODULE_ID%%"] = "%s",
+    ["%%MODULE_PATH%%"] = "mods/" .. mod_id .. "/files/%s",
+    ["%%MODULE_FULL_ID%%"] = mod_id .. ".%s",
+}
+local function ph_module(module_id)
+    for k, v in pairs(ph_module_pattern) do
+        ph_module_pattern[k] = v:format(module_id)
+    end
+    return ph_module_pattern
+end
+
+local function ph_file(file)
+    return { ["%%THIS_PATH%%"] = file:match "^(.*)/[^/]+$" }
+end
+
+---@param file string
+---@param module_id string?
+local function apply_ph(file, module_id)
+    if not ModDoesFileExist(file) then
+        print_error "Cannot apply placeholders, because file does not exist at:"
+        print_error(file)
+    end
+
+    local content = ModTextFileGetContent(file)
+
+    for ph, value in ipairs(ph_const) do
+        content = content:gsub(ph, value)
+    end
+
+    for ph, value in ipairs(module_id and ph_module(module_id) or {}) do
+        content = content:gsub(ph, value)
+    end
+
+    for ph, value in ipairs(ph_file(file)) do
+        content = content:gsub(ph, value)
+    end
+
+    ModTextFileSetContent(file, content)
+end
+
+do
+    local files_used_ph, _ = dofile_once(mod_path .. "files/files_used_ph.lua")
+    for _, file in ipairs(files_used_ph or {}) do
+        apply_ph(mod_path .. "/files/" .. file)
+    end
+end
+
+local module_list = dofile_once(mod_path .. "files/module_list.lua")
 local module_path_pattern = mod_path .. "files/%s/"
+
+for _, module_id in ipairs(module_list) do
+    local module_path = module_path_pattern:format(module_id)
+    local files_used_ph, _ = dofile_once(module_path .. "files_used_ph.lua")
+
+    for _, file in ipairs(files_used_ph or {}) do
+        apply_ph(module_path .. file, module_id)
+    end
+end
 
 ---@class callbacks
 ---@field OnBiomeConfigLoaded fun()?
@@ -78,60 +136,9 @@ local callbacks = {
     OnWorldPreUpdate = {},
 }
 
-local ph_const = {
-    ["%%MOD_ID%%"] = MOD_ID,
-    ["%%MOD_PATH%%"] = "mods/" .. MOD_ID,
-}
-local function ph_module(module_id)
-    local result = {
-        ["%%MODULE_ID%%"] = "%s",
-        ["%%MODULE_PATH%%"] = "mods/" .. MOD_ID .. "/files/%s",
-        ["%%MODULE_FULL_ID%%"] = MOD_ID .. ".%s",
-    }
-    for k, v in pairs(result) do
-        result[k] = v:format(module_id)
-    end
-    return result
-end
-local function ph_file(file)
-    local result = {
-        ["%%THIS_PATH%%"] = function(file)
-            local folder = file:match "^(.*)/[^/]+$"
-        end,
-    }
-    for k, v in pairs(result) do
-        result[k] = v(file)
-    end
-    return result
-end
-
 for _, module_id in ipairs(module_list) do
-    local module_path   = module_path_pattern:format(module_id)
-
-    local files_used_ph = dofile_once(mod_path .. "files/files_used_ph.lua")
-
-    for _, file in ipairs(files_used_ph or {}) do
-        file = module_path .. file
-        if not ModDoesFileExist(file) then
-            print_error "File does not exist at:"
-            print_error(file)
-        end
-
-        local content = ModTextFileGetContent(file)
-
-        fun.entries(ph_const)
-            :chain(fun.entries(ph_module(module_id)))
-            :chain(fun.entries(ph_file(file)))
-            :each(function(ph, value)
-                ---@cast ph string
-                ---@cast value string
-                content = content:gsub(ph, value)
-            end)
-
-        ModTextFileSetContent(file, content)
-    end
-
-    local init_lua = module_path .. 'init.lua'
+    local module_path = module_path_pattern:format(module_id)
+    local init_lua    = module_path .. 'init.lua'
     if not ModDoesFileExist(init_lua) then goto continue end
 
     ---@type callbacks

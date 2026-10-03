@@ -20,6 +20,8 @@ if (clearAndExit) {
 
 const moduleMap = new Map()
 
+const top_level_fake_module = "__TOP_LEVEL__"
+
 let ready = false;
 
 function getModuleFileSet(moduleName) {
@@ -29,10 +31,15 @@ function getModuleFileSet(moduleName) {
     return moduleMap.get(moduleName)
 }
 
-function formatGenFile(list) {
+function formatGenFile(list, isTopLevel) {
     let result = "return {\n";
     list.forEach(element => {
-        let short = element.match(/files[\/\\]\w+[\/\\](.*)/)
+        let short
+        if (isTopLevel) {
+            short = element.match(/files[\/\\](.*)/)
+        } else {
+            short = element.match(/files[\/\\]\w+[\/\\](.*)/)
+        }
         if (short === null) {
             console.error(`Cannot extract short path from ${element}`)
             return
@@ -44,19 +51,29 @@ function formatGenFile(list) {
 }
 
 function updateModuleIfReady(moduleName) {
-    if (!ready) {return;}
-    let modulePath = path.join(watchedPath, moduleName);
-    fs.writeFileSync(path.join(modulePath, genFileName), formatGenFile(getModuleFileSet(moduleName)));
-    console.log(`writing into ${path.join(modulePath, genFileName) }`)
+    if (!ready) { return; }
+    let isTopLevel = moduleName === top_level_fake_module
+    let modulePath
+    if (isTopLevel) {
+        modulePath = watchedPath
+    } else {
+        modulePath = path.join(watchedPath, moduleName);
+    }
+    fs.writeFileSync(path.join(modulePath, genFileName), formatGenFile(getModuleFileSet(moduleName), isTopLevel));
+    console.log(`writing into ${path.join(modulePath, genFileName)}`)
 }
 
 function findModule(file) {
     let result = file.match(/files[\/\\](\w+)[\/\\]/)
-    if (result === null) {
-        return null
-    } else {
+    if (result !== null) {
         return result[1]
     }
+
+    if (/files[\/\\]\w+\.\w+$/.test(file)) {
+        return top_level_fake_module
+    }
+
+    return null
 }
 
 function checkFile(file) {
