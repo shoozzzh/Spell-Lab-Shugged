@@ -7,8 +7,6 @@ setmetatable(_G, { __index = { ModTextFileSetContent = ModTextFileSetContent } }
 
 dofile_once(mod_path .. "require.lua")
 
-dofile(mod_path .. "libs/polytools/polytools_init.lua").init(mod_path .. "libs/polytools/")
-
 do
     local translations = ModTextFileGetContent(mod_path .. "files/translations.csv")
     local main = "data/translations/common.csv"
