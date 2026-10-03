@@ -698,44 +698,4 @@ function pop.layout_hwrap(offset_x, offset_y, line_size)
     }, layout_hwrap_mt)
 end
 
----@param offset_x number
----@param offset_y number
-function pop.auto_layout_stack(offset_x, offset_y)
-    offset_x = offset_x or 0
-    offset_y = offset_y or 0
-    local x, y = pop.pos.get()
-    ---@param content_fn fun( layout_options: pop.auto_layout_stack_options )
-    return function(content_fn)
-        ---@class pop.auto_layout_stack_options
-        local options = {
-            pause_after_next = false,
-            paused_for_next = false,
-            paused = false,
-        }
-
-        local get = pop.pos.get
-        pop.pos.get = function()
-            local _x, _y = get()
-            if not options.paused then
-                if options.paused_for_next then
-                    options.paused_for_next = false
-                else
-                    pop.pos.push(offset_x, offset_y)
-                end
-            end
-            if options.pause_after_next then
-                options.pause_after_next = false
-                options.paused = true
-            end
-            return _x, _y
-        end
-
-        pop.pos.layer(x, y)(function()
-            content_fn(options)
-        end)
-
-        pop.pos.get = get
-    end
-end
-
 return pop
