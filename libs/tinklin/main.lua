@@ -164,7 +164,7 @@ function entity_methods:get_root()
 end
 
 ---@param comp_type component_type
----@param tag string
+---@param tag string?
 ---@return comp?
 ---@nodiscard
 function entity_methods:comp_first(comp_type, tag)
@@ -178,7 +178,7 @@ function entity_methods:comp_first(comp_type, tag)
 end
 
 ---@param comp_type component_type
----@param tag string
+---@param tag string?
 ---@return comp?
 ---@nodiscard
 function entity_methods:comp_first_enabled(comp_type, tag)
@@ -457,13 +457,13 @@ function tinklin.entity_new(name)
     return tinklin.entity_wrap(EntityCreateNew(name))
 end
 
----@param x number
----@param y number
+---@param center {[1]: number, [2]: number}
 ---@param radius number
 ---@param tag string?
 ---@return iterator<entity> entities
 ---@nodiscard
-function tinklin.entity_in_radius(x, y, radius, tag)
+function tinklin.entity_in_radius(center, radius, tag)
+    local x, y = unpack(center)
     local entity_ids
     if tag then
         entity_ids = EntityGetInRadiusWithTag(x, y, radius, tag)
@@ -473,12 +473,19 @@ function tinklin.entity_in_radius(x, y, radius, tag)
     return fun.elems(entity_ids):map(tinklin.entity_wrap)
 end
 
----@param x number
----@param y number
+---@param tag string
+---@return iterator<entity> entities
+---@nodiscard
+function tinklin.entity_tagged(tag)
+    return fun.elems(EntityGetWithTag(tag)):map(tinklin.entity_wrap)
+end
+
+---@param to {[1]: number, [2]: number}
 ---@param tag string?
 ---@return entity? entity
 ---@nodiscard
-function tinklin.entity_closest(x, y, tag)
+function tinklin.entity_closest(to, tag)
+    local x, y = unpack(to)
     local entity_id
     if tag then
         entity_id = EntityGetClosestWithTag(x, y, tag)
