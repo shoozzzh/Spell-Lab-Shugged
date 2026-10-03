@@ -1,4 +1,4 @@
-local gui_elem = {}
+local gui_elems = {}
 
 local pop = require "pop"
 local mod_setting = require "mod_setting"
@@ -10,15 +10,15 @@ local color_dim = { r = 127, g = 127, b = 127, a = 255 }
 local color_soft = { r = 207, g = 207, b = 207, a = 255 }
 local color_lavender = { r = 127, g = 127, b = 255, a = 255 }
 
-function gui_elem.text_dim(text)
+function gui_elems.text_dim(text)
     pop.text(text, { color = color_dim })
 end
 
-function gui_elem.text_soft(text)
+function gui_elems.text_soft(text)
     pop.text(text, { color = color_soft })
 end
 
-function gui_elem.text_lavender(text)
+function gui_elems.text_lavender(text)
     pop.text(text, { color = color_lavender })
 end
 
@@ -30,7 +30,7 @@ end
 ---@param row_size integer
 ---@return unknown
 ---@return unknown
-function gui_elem.scroll_table(cells, cell_gui_fn, cell_width, cell_height, row_size)
+function gui_elems.scroll_table(cells, cell_gui_fn, cell_width, cell_height, row_size)
     local width = cell_width * row_size - 2
     local height = math.min(math.floor(#cells / row_size) * cell_height)
 
@@ -54,7 +54,7 @@ end
 ---@param description string?
 ---@return boolean left_click
 ---@return boolean right_click
-function gui_elem.button_setting_toggle(sprite_filename, key, name, description)
+function gui_elems.button_setting_toggle(sprite_filename, key, name, description)
     local value = mod_setting.get(key) == true
     if not value then
         pop.option_next "DrawSemiTransparent"
@@ -62,7 +62,7 @@ function gui_elem.button_setting_toggle(sprite_filename, key, name, description)
 
     local left_click, right_click = pop.button(sprite_filename)
     if left_click then
-        gui_elem.sound_button_clicked()
+        gui_elems.sound_button_clicked()
         value = not value
         mod_setting.set(key, value)
     end
@@ -71,7 +71,7 @@ function gui_elem.button_setting_toggle(sprite_filename, key, name, description)
     return left_click, right_click
 end
 
-function gui_elem.button_action(selected, action_type, sprite_file)
+function gui_elems.button_action(selected, action_type, sprite_file)
     pop.pos.push(2, 2)
     local hovered = pop.hoverable_space(16, 16)
     pop.pos.pop()
@@ -87,7 +87,7 @@ function gui_elem.button_action(selected, action_type, sprite_file)
     pop.pos.pop()
 
     if left_click or right_click then
-        gui_elem.sound_action_button_clicked()
+        gui_elems.sound_action_button_clicked()
     end
 
     return left_click, right_click
@@ -110,7 +110,7 @@ end
 ---@param semi_transparent boolean
 ---@return boolean
 ---@return boolean
-function gui_elem.button_fake_action(data, semi_transparent)
+function gui_elems.button_fake_action(data, semi_transparent)
     pop.pos.push(2, 2)
     local hovered = pop.hoverable_space(16, 16)
     pop.pos.pop()
@@ -130,12 +130,12 @@ function gui_elem.button_fake_action(data, semi_transparent)
         layout:next(function() pop.text(data.name) end)
 
         if data.fake_id then
-            layout:next(function() gui_elem.text_dim(data.fake_id) end)
+            layout:next(function() gui_elems.text_dim(data.fake_id) end)
         end
 
         if data.type_text then
             layout:next(function()
-                gui_elem.text_lavender(data.type_text)
+                gui_elems.text_lavender(data.type_text)
             end)
         end
 
@@ -143,7 +143,7 @@ function gui_elem.button_fake_action(data, semi_transparent)
 
         if data.properties and #data.properties > 0 then
             layout:shift(0, 5)
-            gui_elem.metadata_lines(layout, data.properties)
+            gui_elems.metadata_lines(layout, data.properties)
         end
     end)
 
@@ -156,19 +156,19 @@ function gui_elem.button_fake_action(data, semi_transparent)
     pop.pos.pop()
 
     if data.uses_remaining then
-        gui_elem.text_uses(data.uses_remaining)
+        gui_elems.text_uses(data.uses_remaining)
     end
 
     return left_click, right_click
 end
 
-function gui_elem.icon_ac()
+function gui_elems.icon_ac()
     pop.image "data/ui_gfx/inventory/icon_gun_permanent_actions.png"
 end
 
 --TODO: take the pos shifting outta this
 ---@param flag string?
-function gui_elem.icon_unlock_status(x, y, flag)
+function gui_elems.icon_unlock_status(x, y, flag)
     pop.pos.push(14, -2)
     if not flag then
         return
@@ -184,7 +184,7 @@ end
 
 ---@param uses integer
 ---@param scale number?
-function gui_elem.text_uses(uses, scale)
+function gui_elems.text_uses(uses, scale)
     if tonumber(uses) < 0 then return end
 
     scale = scale or 1
@@ -193,7 +193,7 @@ end
 
 ---@param name string
 ---@param value any
-function gui_elem.attr_line(name, value)
+function gui_elems.attr_line(name, value)
     pop.text(name, { color = { r = 0.811 * 256 - 1, g = 0.811 * 256 - 1, b = 0.811 * 256 - 1, a = 255 } })
     pop.pos.push(72, 0)
     pop.text(tostring(value), { color = { r = 255, g = 191, b = 127, a = 255 } })
@@ -202,26 +202,26 @@ end
 
 ---@param layout pop.layout
 ---@param lines string[]
-function gui_elem.metadata_lines(layout, lines)
+function gui_elems.metadata_lines(layout, lines)
     for _, p in ipairs(lines) do
-        layout:next(function() gui_elem.attr_line(p[1], p[2]) end)
+        layout:next(function() gui_elems.attr_line(p[1], p[2]) end)
     end
 end
 
 ---@param layout pop.layout
 ---@param this_action_data any
 ---@param this_action_metadata any
-function gui_elem.action_info_least(layout, this_action_data, this_action_metadata)
-    layout:next(function() gui_elem.text_dim(this_action_data.id) end)
+function gui_elems.action_info_least(layout, this_action_data, this_action_metadata)
+    layout:next(function() gui_elems.text_dim(this_action_data.id) end)
     layout:next(function()
-        gui_elem.text_lavender(GameTextGetTranslatedOrNot(type_text[this_action_data.type]))
+        gui_elems.text_lavender(GameTextGetTranslatedOrNot(type_text[this_action_data.type]))
     end)
 end
 
 ---@param layout pop.layout
 ---@param this_action_data any
 ---@param this_action_metadata any
-function gui_elem.action_info_verbose(layout, this_action_data, this_action_metadata)
+function gui_elems.action_info_verbose(layout, this_action_data, this_action_metadata)
     local c_lines = c_metadata_to_lines(this_action_metadata.c)
     local projectiles_lines, num_proj_lines = proj_metadata_to_lines(this_action_metadata.projectiles)
 
@@ -230,10 +230,10 @@ function gui_elem.action_info_verbose(layout, this_action_data, this_action_meta
         title = title .. ("(" .. tostring(this_action_data.max_uses) .. ")")
     end
     layout:next(function() pop.text(title) end)
-    layout:next(function() gui_elem.text_dim(title) end)
+    layout:next(function() gui_elems.text_dim(title) end)
 
     layout:next(function()
-        gui_elem.text_lavender(GameTextGetTranslatedOrNot(type_text[this_action_data.type]))
+        gui_elems.text_lavender(GameTextGetTranslatedOrNot(type_text[this_action_data.type]))
     end)
     layout:next(function()
         pop.text(format.word_wrap(GameTextGetTranslatedOrNot(this_action_data.description)))
@@ -247,7 +247,7 @@ function gui_elem.action_info_verbose(layout, this_action_data, this_action_meta
         layout:next(function() pop.text(utils.tr_key "spell_data") end)
     end
 
-    gui_elem.metadata_lines(layout, c_lines)
+    gui_elems.metadata_lines(layout, c_lines)
 
     local only_one_proj = #projectiles_lines == 1
     for proj_index, proj_lines in ipairs(projectiles_lines) do
@@ -258,7 +258,7 @@ function gui_elem.action_info_verbose(layout, this_action_data, this_action_meta
                 pop.text(GameTextGet(utils.tr_key "projectile_nth_data", tostring(proj_index)))
             end
         end)
-        gui_elem.metadata_lines(layout, proj_lines)
+        gui_elems.metadata_lines(layout, proj_lines)
     end
 end
 
@@ -275,11 +275,11 @@ local function image_small_action(action_id, uses_remaining)
     end
 
     pop.pos.push(-1, -1)
-    gui_elem.text_uses(uses_remaining, 0.5)
+    gui_elems.text_uses(uses_remaining, 0.5)
     pop.pos.pop()
 end
 
-function gui_elem.wand_all_actions_preview(layout, all_actions)
+function gui_elems.wand_all_actions_preview(layout, all_actions)
     local common_actions = {}
     local permanent_actions = {}
     local max_x = 0
@@ -318,16 +318,16 @@ function gui_elem.wand_all_actions_preview(layout, all_actions)
     end
 end
 
-function gui_elem.sound_button_clicked()
+function gui_elems.sound_button_clicked()
     if mod_setting.get "button_click_sound" then
         GamePlaySound("data/audio/Desktop/ui.bank", "ui/button_click", GameGetCameraPos())
     end
 end
 
-function gui_elem.sound_action_button_clicked()
+function gui_elems.sound_action_button_clicked()
     if mod_setting.get "action_button_click_sound" then
         GamePlaySound("data/audio/Desktop/ui.bank", "ui/button_click", GameGetCameraPos())
     end
 end
 
-return gui_elem
+return gui_elems
