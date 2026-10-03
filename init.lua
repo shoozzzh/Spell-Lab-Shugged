@@ -17,7 +17,7 @@ do
     ModTextFileSetContent(main, main_content .. translations:gsub("^[^\n]*\n", "", 1))
 end
 
-local mod_setting = require "mod_setting"
+local settings = require "mod_settings"
 
 local default_settings = {
     ["quick_spell_picker"] = true,
@@ -27,8 +27,8 @@ local default_settings = {
 }
 
 for key, value in pairs(default_settings) do
-    if mod_setting.get(key) == nil then
-        mod_setting.set(key, value)
+    if settings.get(key) == nil then
+        settings.set(key, value)
     end
 end
 

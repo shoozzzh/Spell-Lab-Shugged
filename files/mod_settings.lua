@@ -1,6 +1,6 @@
 local key_prefix = "spell_lab_shugged."
 
-local mod_setting = {}
+local settings = {}
 
 local get = ModSettingGet
 
@@ -19,7 +19,7 @@ end
 local set = ModSettingSet
 
 ---@return boolean|string|number|nil
-function mod_setting.get(key)
+function settings.get(key)
     return get(key_prefix .. key)
 end
 
@@ -27,19 +27,19 @@ end
 ---@param key string
 ---@param value_default T
 ---@return T
-function mod_setting.get_or_default(key, value_default)
+function settings.get_or_default(key, value_default)
     return get_or_default(key_prefix .. key, value_default)
 end
 
 ---@param key string
 ---@param value boolean|string|number|nil
-function mod_setting.set(key, value)
+function settings.set(key, value)
     set(key_prefix .. key, value)
 end
 
 ---@param key string
 ---@param value boolean|string|number|nil
-function mod_setting.set_default(key, value)
+function settings.set_default(key, value)
     key = key_prefix .. key
     if get(key) == nil then
         set(key, value)
@@ -68,8 +68,8 @@ end
 
 ---@param key string
 ---@return mod_setting_item
-function mod_setting.item(key)
+function settings.item(key)
     return setmetatable({ key_prefix .. key }, item_mt)
 end
 
-return mod_setting
+return settings
