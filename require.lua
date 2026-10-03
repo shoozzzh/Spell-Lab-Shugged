@@ -19,7 +19,9 @@ function require(name)
     for _, path in ipairs(PKGPATH) do
         path = path:gsub("?", name)
         if ModDoesFileExist(path) then
-            return dofile_once(path)
+            local res = dofile_once(path)
+            cache[name] = res
+            return res
         end
     end
     print_error('Required module/library "' .. name .. '" does not exist')
