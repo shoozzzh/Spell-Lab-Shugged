@@ -435,7 +435,6 @@ function pop.tooltip(...)
     pop.tooltip_custom(2, 0, true)(function()
         local layout = pop.layout_stack(pop.text_line_height, 0)
         for _, line in ipairs(text) do
-            line = GameTextGetTranslatedOrNot(line)
             for t in string.gmatch(line or "", "[^\n]+") do
                 layout:next(function() pop.text(t) end)
             end
@@ -639,7 +638,7 @@ end
 ---@class pop.layout_stack: pop.layout
 local layout_stack_mt = {
     next = function(self, content_fn)
-        pop.pos.push(x, y)
+        pop.pos.push(self.x, self.y)
         content_fn()
         pop.pos.pop()
 
@@ -664,7 +663,7 @@ end
 ---@class pop.layout_hwrap: pop.layout
 local layout_hwrap_mt = {
     next = function(self, content_fn)
-        pop.pos.push(x, y)
+        pop.pos.push(self.x, self.y)
         content_fn()
         pop.pos.pop()
 
