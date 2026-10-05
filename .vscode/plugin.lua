@@ -38,7 +38,7 @@ local placeholders_init_lua = {
 }
 
 local print = print
-local debugging = false
+local debugging = true
 if debugging then
     -- leave print() alone
 else
@@ -65,6 +65,9 @@ function OnSetText(uri, text)
         for pos_start in string.gmatch(text, find) do
             if new_text == nil then
                 new_text = extract(uri)
+                if new_text == nil then
+                    break
+                end
             end
             diffs[#diffs + 1] = {
                 start = pos_start,
