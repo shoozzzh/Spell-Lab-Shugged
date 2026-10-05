@@ -169,7 +169,7 @@ local entity_methods = {}
 ---@overload fun(self, comp_type: "WormComponent", tag: string?): WormComponent?
 ---@overload fun(self, comp_type: "WormPlayerComponent", tag: string?): WormPlayerComponent?
 ---@param comp_type component_type
----@param tag string
+---@param tag string?
 ---@return comp?
 function entity_methods:comp_first(comp_type, tag) end
 
@@ -339,7 +339,7 @@ function entity_methods:comp_first(comp_type, tag) end
 ---@overload fun(self, comp_type: "WormComponent", tag: string?): WormComponent?
 ---@overload fun(self, comp_type: "WormPlayerComponent", tag: string?): WormPlayerComponent?
 ---@param comp_type component_type
----@param tag string
+---@param tag string?
 ---@return comp?
 function entity_methods:comp_first_enabled(comp_type, tag) end
 

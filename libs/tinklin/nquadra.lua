@@ -1,9 +1,9 @@
 local path = jit.util.funcinfo(setfenv(1, getfenv())).source:match "^.*/"
 local function require(module_name)
-    return dofile_once(path .. module_name .. ".lua")
+    return dofile_once(path .. module_name:sub(9) .. ".lua")
 end
 
-local npair = require "npair"
+local npair = require "tinklin.npair"
 
 local nquadra = {}
 
