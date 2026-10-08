@@ -59,7 +59,12 @@ function updateModuleIfReady(moduleName) {
     } else {
         modulePath = path.join(watchedPath, moduleName);
     }
-    fs.writeFileSync(path.join(modulePath, genFileName), formatGenFile(getModuleFileSet(moduleName), isTopLevel));
+    let fileSet = getModuleFileSet(moduleName)
+    if (fileSet.size > 0) {
+        fs.writeFileSync(path.join(modulePath, genFileName), formatGenFile(fileSet, isTopLevel));
+    } else {
+        fs.unlinkSync(path.join(modulePath, genFileName))
+    }
     console.log(`writing into ${path.join(modulePath, genFileName)}`)
 }
 
