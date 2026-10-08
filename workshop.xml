@@ -1,5 +1,6 @@
 <Mod
 	name="Spell Lab Shugged"
 	description=""
-	tags="gameplay,quality of life,spells,cheats">
+	tags="gameplay,quality of life,spells,cheats"
+    dont_upload_folders=".vscode">
 </Mod>
