@@ -60,10 +60,13 @@ function updateModuleIfReady(moduleName) {
         modulePath = path.join(watchedPath, moduleName);
     }
     let fileSet = getModuleFileSet(moduleName)
+    let genFile = path.join(modulePath, genFileName)
     if (fileSet.size > 0) {
-        fs.writeFileSync(path.join(modulePath, genFileName), formatGenFile(fileSet, isTopLevel));
+        fs.writeFileSync(genFile, formatGenFile(fileSet, isTopLevel));
     } else {
-        fs.unlinkSync(path.join(modulePath, genFileName))
+        if (fs.existsSync(genFile)) {
+            fs.unlinkSync(genFile);
+        }
     }
     console.log(`writing into ${path.join(modulePath, genFileName)}`)
 }
@@ -91,8 +94,10 @@ function updateFile(file) {
     if (moduleName === null) return;
     if (checkFile(file)) {
         getModuleFileSet(moduleName).add(file);
-        updateModuleIfReady(moduleName)
+    } else {
+        getModuleFileSet(moduleName).delete(file);
     }
+    updateModuleIfReady(moduleName)
 }
 
 let watcher = chokidar.watch(watchedPath, {

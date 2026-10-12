@@ -10,21 +10,21 @@
 
 ---@type ph_def[]
 local placeholders = {
-    -- { "()%%MOD_ID%%", #("%MOD_ID%"), function(input)
-    -- 	return input:match "mods/([^/]+)/"
-    -- end },
+    { "()%%MOD_ID%%", #("%MOD_ID%"), function(input)
+        return input:match "mods/([^/]+)/"
+    end },
     { "()%%MOD_PATH%%", #("%MOD_PATH%"), function(input)
         return input:match "(mods/[^/]+)/"
     end },
-    -- { "()%%MODULE_ID%%", #("%MODULE_ID%"), function(input)
-    -- 	return input:match "mods/[^/]+/files/([^/]+)/"
-    -- end },
+    { "()%%MODULE_ID%%", #("%MODULE_ID%"), function(input)
+        return input:match "mods/[^/]+/files/([^/]+)/"
+    end },
     { "()%%MODULE_PATH%%", #("%MODULE_PATH%"), function(input)
         return input:match "(mods/[^/]+/files/[^/]+)/"
     end },
-    -- { "()%%MODULE_FULL_ID%%", #("%MODULE_FULL_ID%"), function(input)
-    -- 	return table.concat({ input:match "mods/([^/]+)/files/([^/]+)/" }, ".")
-    -- end },
+    { "()%%MODULE_FULL_ID%%", #("%MODULE_FULL_ID%"), function(input)
+        return table.concat({ input:match "mods/([^/]+)/files/([^/]+)/" }, ".")
+    end },
     { "()%%THIS_PATH%%", #("%THIS_PATH%"), function(input)
         return input:match "(mods.*)/[^/]+%.[a-z]+$"
     end },
@@ -38,7 +38,7 @@ local placeholders_init_lua = {
 }
 
 local print = print
-local debugging = true
+local debugging = false
 if debugging then
     -- leave print() alone
 else
