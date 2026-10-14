@@ -14,6 +14,12 @@ local pop = {
     dragging = nil,
 }
 
+setmetatable(pop, {
+    __gc = function(t)
+        GuiDestroy(t.gui_obj)
+    end,
+})
+
 ---@alias pop.layer
 ---| "BACKGROUND"
 ---|>"MID"
