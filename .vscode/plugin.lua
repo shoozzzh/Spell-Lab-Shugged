@@ -16,7 +16,10 @@ local placeholders = {
     { "()%%MOD_PATH%%", #("%MOD_PATH%"), function(input)
         return input:match "(mods/[^/]+)/"
     end },
-    { "()%%MODULE_ID%%", #("%MODULE_ID%"), function(input)
+    { "()%[\"%%MODULE_ID%%\"%]", #("[\"%MODULE_ID%\"]"), function(input)
+        return "." .. input:match "mods/[^/]+/files/([^/]+)/"
+    end },
+    { "[^%[].()%%MODULE_ID%%", #("%MODULE_ID%"), function(input)
         return input:match "mods/[^/]+/files/([^/]+)/"
     end },
     { "()%%MODULE_PATH%%", #("%MODULE_PATH%"), function(input)

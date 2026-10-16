@@ -1,10 +1,11 @@
-local utils = {}
+---@class mutils
+local mutils = {}
 
 ---@generic T: fun()
 ---@param f T
 ---@return T
 ---@nodiscard
-function utils.memoize(f)
+function mutils.memoize(f)
     return setmetatable({}, {
         __call = function(self, arg)
             local cache = self[arg]
@@ -16,25 +17,10 @@ function utils.memoize(f)
     })
 end
 
-local key_prefix = "$%MOD_ID%_"
----@param key string
----@return string
----@nodiscard
-function utils.tr_key(key)
-    return key_prefix .. key
-end
-
----@param key string
----@return string
----@nodiscard
-function utils.tr_text(key)
-    return GameTextGetTranslatedOrNot(utils.tr_key(key))
-end
-
 ---@generic R
----@param f [fun( ... ): R]|nil
+---@param f (fun( ... ): R)?
 ---@return R?
-function utils.call_if_present(f, ...)
+function mutils.call_if_present(f, ...)
     if f then return f(...) end
 end
 
@@ -79,9 +65,9 @@ local function dofile_mask(env)
 end
 
 ---@param filepath string
----@param extra_globals table<string, any>
+---@param extra_globals table<string, any>?
 ---@return table<string, any>
-function utils.get_globals(filepath, extra_globals)
+function mutils.get_globals(filepath, extra_globals)
     local f, err = loadfile(filepath)
     if f == nil then
         print_error(err)
@@ -107,14 +93,14 @@ end
 ---@param a number
 ---@return pop.general_props.color
 ---@nodiscard
-function utils.rgba(r, g, b, a)
+function mutils.rgba(r, g, b, a)
     return { r = r, g = g, b = b, a = a }
 end
 
 ---@param t table<any>
 ---@return integer
 ---@nodiscard
-function utils.maxn(t)
+function mutils.maxn(t)
     local result = table.maxn(t)
     if result == 0 and t[0] == nil then return -1 end
     return result
@@ -127,18 +113,18 @@ local gui_measurer = GuiCreate()
 ---@param font string?
 ---@param is_pixel bool?
 ---@return number, number
-function utils.get_text_size(text, scale, font, is_pixel)
+function mutils.get_text_size(text, scale, font, is_pixel)
     return GuiGetTextDimensions(gui_measurer, text, scale, 2, font or "", is_pixel)
 end
 
 ---@param image_filename string
 ---@param scale number?
 ---@return number, number
-function utils.get_image_size(image_filename, scale)
+function mutils.get_image_size(image_filename, scale)
     return GuiGetImageDimensions(gui_measurer, image_filename, scale or 1)
 end
 
-function utils.is_cur_lang_cn()
+function mutils.is_cur_lang_cn()
     local cur_lang = GameTextGet "$current_language"
     if cur_lang:find "中文" or cur_lang:find "汉化" then
         return true
@@ -151,13 +137,13 @@ end
 ---@param b T
 ---@return boolean
 ---@nodiscard
-function utils.deep_equals(a, b)
+function mutils.deep_equals(a, b)
     local typ = type(a)
     if typ ~= type(b) then return false end
 
     if typ == "table" then
         for k, v in pairs(a) do
-            if not utils.deep_equals(v, b[k]) then
+            if not mutils.deep_equals(v, b[k]) then
                 return false
             end
         end
@@ -173,7 +159,7 @@ function utils.deep_equals(a, b)
 end
 
 ---@nodiscard
-function utils.new_prototype(parent)
+function mutils.new_prototype(parent)
     local t = {}
     t.__index = t
     if parent then
@@ -182,4 +168,4 @@ function utils.new_prototype(parent)
     return t
 end
 
-return utils
+return mutils
