@@ -360,13 +360,13 @@ function gui_elems.line_of_buttons(button_fns)
 end
 
 function gui_elems.sound_button_clicked()
-    if settings.get "button_click_sound" then
+    if settings.get "general.button_click_sound" then
         GamePlaySound("data/audio/Desktop/ui.bank", "ui/button_click", GameGetCameraPos())
     end
 end
 
 function gui_elems.sound_action_button_clicked()
-    if settings.get "action_button_click_sound" then
+    if settings.get "general.action_button_click_sound" then
         GamePlaySound("data/audio/Desktop/ui.bank", "ui/button_click", GameGetCameraPos())
     end
 end

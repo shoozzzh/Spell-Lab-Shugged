@@ -2,9 +2,10 @@ dofile_once "data/scripts/lib/utilities.lua"
 dofile_once "data/scripts/lib/mod_settings.lua"
 
 -- mod_settings_version = 1
+---@diagnostic disable-next-line: lowercase-global
 mod_settings_version = 2
 
-do
+do -- migrate from old version if needed
     ---@type fun()[]
     local upgrades = {}
     upgrades[1] = function()
@@ -23,6 +24,7 @@ do
             ["disable_casting"] = "wand_no_shooting.enabled",
             ["disable_death"] = "",
             ["disable_toxic_statuses"] = "no_annoying_effects.enabled",
+            ["dummy_target_show_full_damage_number"] = "target_dummy.always_show_full_damage_number",
             ["edit_wands_everywhere"] = "",
             ["filter_buttons_trigger"] = "spell_picker.filter_buttons_trigger",
             ["gif_mode"] = "wand_edit_panel.gif_mode",
@@ -34,7 +36,9 @@ do
             ["no_weather"] = "no_weather.enabled",
             ["quick_spell_picker"] = "spell_picker.try_put_in_panel",
             ["replace_mode"] = "spell_picker.replace_mode",
+            ["show_icon_unlocked"] = "spell_picker.show_icon_unlocked",
             ["show_locked_spells"] = "spell_picker.show_locked_spells",
+            ["show_screen_keyboard"] = "",
             ["toggle_options"] = "toggle_options.showing",
             ["show_wand_edit_panel"] = "wand_edit_panel.showing",
             ["special_filter_button_align_to"] = "",
@@ -43,6 +47,7 @@ do
             ["wand_edit_panel_history_limit"] = "wand_edit_panel.history_limit",
             ["wand_edit_panel_max_actions_per_row"] = "wand_edit_panel.max_actions_per_row",
             ["wand_edit_panel_max_rows"] = "wand_edit_panel.max_rows",
+            ["wand_force_compact"] = "",
             ["wand_listener_type"] = "wand_edit_panel.wand_listener_type",
             ["wand_picker_precise_mode"] = "wand_picker.precise_mode",
             ["zero_uses"] = "spell_picker.zero_uses",
@@ -87,12 +92,168 @@ do
     end
 end
 
+local lang = { -- you may wanna fold these
+    ["creative_mode_flight.speed"] = {
+        zh_cn = "超级飞行速度",
+        en = "Superflight Speed",
+        jp = "スーパー飛行速度",
+        ko = "슈퍼 비행 속도",
+    },
+    ["creative_mode_flight.speed_normal"] = {
+        zh_cn = "正常",
+        en = "Normal",
+        jp = "通常",
+        ko = "보통",
+    },
+    ["creative_mode_flight.speed_normal.desc"] = {
+        zh_cn = "默认：200",
+        en = "200 by default",
+        jp = "デフォルト：200",
+        ko = "기본값: 200",
+    },
+    ["creative_mode_flight.speed_faster"] = {
+        zh_cn = "加速",
+        en = "Faster",
+        jp = "高速",
+        ko = "더 빠름",
+    },
+    ["creative_mode_flight.speed_faster.desc"] = {
+        zh_cn = "默认：450",
+        en = "450 by default",
+        jp = "デフォルト：450",
+        ko = "기본값: 450",
+    },
+    ["creative_mode_flight.speed_no_clip"] = {
+        zh_cn = "穿墙",
+        en = "No Clip",
+        jp = "壁抜け",
+        ko = "벽 뚫기",
+    },
+    ["creative_mode_flight.speed_no_clip.desc"] = {
+        zh_cn = "默认：300",
+        en = "300 by default",
+        jp = "デフォルト：300",
+        ko = "기본값: 300",
+    },
+    ["all_seeing_eye"] = {
+        zh_cn = "全视之眼效果",
+        en = "Effect of All-seeing Eye",
+        jp = "お見通しの効果",
+        ko = "천리안 효과",
+    },
+    ["all_seeing_eye.brightening"] = {
+        zh_cn = "照明",
+        en = "Lighting",
+        jp = "照明",
+        ko = "조명",
+    },
+    ["all_seeing_eye.fog_of_war_removing"] = {
+        zh_cn = "移除战争迷雾",
+        en = "Fog of War Removing",
+        jp = "戦場の霧の除去",
+        ko = "전장의 안개 제거",
+    },
+    ["shortcut"] = {
+        zh_cn = "快捷键设置",
+        en = "Shortcuts Setting",
+        jp = "ショートカット設定",
+        ko = "단축키 설정",
+    },
+    ["shortcut.strict"] = {
+        zh_cn = "严格检测",
+        en = "Strict Detection",
+        jp = "厳密検出",
+        ko = "엄격한 감지",
+    },
+    ["shortcut.strict.desc"] = {
+        zh_cn = "没有包含在任何快捷键中的键是否应该影响快捷键检测？",
+        en = "Should keys that not used in any shortcut be considered in shortcut detection?",
+        jp = "どのショートカットにも使われていないキーを、ショートカット検出に含めるか",
+        ko = "어떤 단축키에도 사용되지 않는 키를 단축키 감지에 포함할 지 여부",
+    },
+    ["shortcut.click_to_save"] = {
+        zh_cn = "（点击以保存）",
+        en = "(click to save)",
+        jp = "（クリックで保存）",
+        ko = "(저장하려면 클릭)",
+    },
+    ["shortcut.click_here"] = {
+        zh_cn = "+（请点击）",
+        en = "+ (click here)",
+        jp = "+（ここをクリック）",
+        ko = "+ (여기를 클릭)",
+    },
+    ["shortcut.transform_mortal_into_dummy"] = {
+        zh_cn = "转化生物为靶标假人",
+        en = "Target dummy transformation",
+        jp = "ダミーへの変換",
+        ko = "더미 변환",
+    },
+    ["no_weather"] = {
+        zh_cn = "禁用天气",
+        en = "Disable Weather",
+        jp = "天候を無効化",
+        ko = "날씨 비활성화",
+    },
+    ["no_weather.desc"] = {
+        zh_cn = "开启时，天气将锁定为晴朗状态",
+        en = "Should we disable all kinds of rain or snow?",
+        jp = "すべての雨や雪を無効化するか",
+        ko = "모든 종류의 비나 눈을 비활성화할 지 여부",
+    },
+    ["dummy_target.always_show_full_damage_number"] = {
+        zh_cn = "靶标假人总是显示完整伤害数字",
+        en = "Show Full Damage Number For Dummy Targets",
+        jp = "ダミーへのダメージ数値をすべて表示",
+        ko = "더미의 대미지 모든 숫자 표시하기",
+    },
+    ["dummy_target.always_show_full_damage_number.desc"] = {
+        zh_cn = "开启时，将总是以完整形式显示伤害数字，不会在过大时使用科学计数法",
+        en = "Should dummy targets always has full-length damage numbers shown, no matter how big the number is?",
+        jp = "常にダミーへのダメージ数値をすべて表示するか",
+        ko = "더미에 항상 모든 숫자를 표시할 지 여부",
+    },
+    ["general.button_click_sound"] = {
+        zh_cn = "按钮点击音效",
+        en = "Button Click Sound",
+        jp = "ボタンのクリック音",
+        ko = "버튼 클릭 소리",
+    },
+    ["general.action_button_click_sound"] = {
+        zh_cn = "法术按钮点击音效",
+        en = "Spell Button Click Sound",
+        jp = "呪文ボタンのクリック音",
+        ko = "주문 버튼 클릭 소리",
+    },
+    ["general.spellbox_pack"] = {
+        zh_cn = "法术框贴图",
+        en = "Spell Box Sprites",
+        jp = "",
+        ko = "",
+    },
+    ["general.spellbox_pack.values.GOKIS"] = {
+        zh_cn = "Goki 经典方案",
+        en = "Goki's Classics",
+        jp = "",
+        ko = "",
+    },
+    ["general.spellbox_pack.values.VANILLA"] = {
+        zh_cn = "Noita 原版方案",
+        en = "Noita Vanilla",
+        jp = "",
+        ko = "",
+    },
+}
+local function get_text(key)
+    return lang[key] or (key .. " (missing text)")
+end
+
 local cc = (function() -- clikclak.lua, you may wanna fold these
     local clikclak = {}
 
     function clikclak.load_lang(settings, lang)
         local function get_text(key)
-            return lang[key] or ('Missing text for key "' .. key .. '"')
+            return lang[key] or (key .. " (missing text)")
         end
         local function recursive(setting)
             if setting.id then
@@ -120,6 +281,10 @@ local cc = (function() -- clikclak.lua, you may wanna fold these
         end
     end
 
+    ---@generic T
+    ---@param self T
+    ---@param extra_fields {[string]: any}
+    ---@return T self
     local function extra(self, extra_fields)
         for k, v in pairs(extra_fields) do
             self[k] = v
@@ -129,8 +294,9 @@ local cc = (function() -- clikclak.lua, you may wanna fold these
     clikclak.extra = extra -- for user extensions
 
     ---@param id string
-    ---@return fun(values: string[], value_default: string?): table
     function clikclak.enum(id)
+        ---@param values string[]
+        ---@param value_default string?
         return function(values, value_default)
             return {
                 id = id,
@@ -142,8 +308,8 @@ local cc = (function() -- clikclak.lua, you may wanna fold these
     end
 
     ---@param id string
-    ---@return fun(value_default: boolean): table
     function clikclak.checkbox(id)
+        ---@param value_default boolean
         return function(value_default)
             return {
                 id = id,
@@ -183,8 +349,11 @@ local cc = (function() -- clikclak.lua, you may wanna fold these
     end
 
     ---@param id string
-    ---@return fun(value_default: number, value_min: number, value_max: number, value_formatter: fun(value: number): string): table
     function clikclak.slider(id)
+        ---@param value_default number
+        ---@param value_min number
+        ---@param value_max number
+        ---@param value_formatter fun(value: number): string
         return function(value_default, value_min, value_max, value_formatter)
             return {
                 id = id,
@@ -199,8 +368,9 @@ local cc = (function() -- clikclak.lua, you may wanna fold these
     end
 
     ---@param id string
-    ---@return fun(value_default: integer|string, max_length: integer): table
     function clikclak.input_int(id)
+        ---@param value_default integer|string
+        ---@param max_length integer
         return function(value_default, max_length)
             return {
                 id = id,
@@ -212,9 +382,34 @@ local cc = (function() -- clikclak.lua, you may wanna fold these
         end
     end
 
+    ---@param settings table
+    ---@param prefix string
+    local function add_prefix_rec(settings, prefix)
+        if settings == nil then return end
+        for _, entry in ipairs(settings) do
+            entry.id = prefix .. "." .. entry.id
+            add_prefix_rec(entry.settings, prefix)
+        end
+    end
+
     ---@param id string
-    ---@return fun(settings: table[]): table
     function clikclak.cat(id)
+        ---@param settings table[]
+        return function(settings)
+            add_prefix_rec(settings, id)
+            return {
+                category_id = id,
+                settings = settings,
+                foldable = true,
+                _folded = true,
+                extra = extra,
+            }
+        end
+    end
+
+    ---@param id string
+    function clikclak.fold(id)
+        ---@param settings table[]
         return function(settings)
             return {
                 category_id = id,
@@ -229,263 +424,474 @@ local cc = (function() -- clikclak.lua, you may wanna fold these
     return clikclak
 end)()
 
-local _ = (function() -- shortcut_setting.lua
-    local function a(b)
-        if not b then return "{}" end
-        local c = { '{"' }
-        for d = 1, #b do c[d + 1] = b[d] end; c[#c + 1] = '"}'
-        return table.concat(c, '","')
-    end; local function e(b)
-        ModTextFileSetContent("mods/shortcut_set.lua", "return " .. b)
+local mod_setting_shortcut = (function() -- you may wanna fold these
+    ---@param shortcut shortcut
+    ---@return string
+    local function ser(shortcut)
+        local result = { '{"' }
+        for i = 1, #shortcut do
+            result[i + 1] = shortcut[i]
+        end
+        result[#result + 1] = '"}'
+        return table.concat(result, '","')
+    end
+
+    ---@param shortcut string
+    ---@return shortcut
+    local function deser(shortcut)
+        ModTextFileSetContent("mods/shortcut_set.lua", "return " .. shortcut)
         return loadfile "mods/shortcut_set.lua" ()
-    end; local f = (function()
-        local g = {
+    end
+
+    local shortcut_tostring = (function() -- files/shortcuts/to_string.lua
+        local special_chars = {
             MINUS = "-",
             EQUALS = "=",
             LEFTBRACKET = "[",
             RIGHTBRACKET = "]",
             BACKSLASH = "\\",
             NONUSHASH = "#",
-            SEMICOLON =
-            ";",
+            SEMICOLON = ";",
             APOSTROPHE = "'",
             GRAVE = "`",
             COMMA = ",",
             PERIOD = ".",
             SLASH = "/",
             NUMLOCKCLEAR = "NUMLOCK",
-            KP_DIVIDE =
-            "/",
+            KP_DIVIDE = "/",
             KP_MULTIPLY = "*",
             KP_MINUS = "-",
             KP_PLUS = "+",
             KP_PERIOD = ".",
             NONUSBACKSLASH = "\\",
-            APPLICATION =
-            "MENU",
+            APPLICATION = "MENU",
             POWER = "SHUTDOWN",
             KP_EQUALS = "=",
             KP_COMMA = ",",
             KP_EQUALSAS400 = "=",
             KP_LEFTPAREN = "(",
-            KP_RIGHTPAREN =
-            ")",
+            KP_RIGHTPAREN = ")",
             KP_LEFTBRACE = "{",
             KP_RIGHTBRACE = "}",
             KP_XOR = "^",
             KP_POWER = "SHUTDOWN",
             KP_PERCENT = "%",
-            KP_LESS =
-            "<",
+            KP_LESS = "<",
             KP_GREATER = ">",
             KP_AMPERSAND = "&",
             KP_DBLAMPERSAND = "&&",
             KP_VERTICALBAR = "|",
             KP_DBLVERTICALBAR = "||",
-            KP_COLON =
-            ":",
+            KP_COLON = ":",
             KP_HASH = "#",
             KP_AT = "@",
             KP_EXCLAM = "!",
             KP_PLUSMINUS = "+-",
             LGUI = "LEFT WINDOWS",
-            RGUI =
-            "RIGHT WINDOWS",
+            RGUI = "RIGHT WINDOWS",
         }
-        local h = {
+
+        local named_keys = {
             Key_CTRL = "Ctrl",
             Key_SHIFT = "Shift",
             Key_ALT = "Alt",
             JOY_BUTTON_0 = "$input_xboxbutton_a",
-            JOY_BUTTON_1 =
-            "$input_xboxbutton_b",
+            JOY_BUTTON_1 = "$input_xboxbutton_b",
             JOY_BUTTON_2 = "$input_xboxbutton_x",
             JOY_BUTTON_3 = "$input_xboxbutton_y",
-            Mouse_x1 =
-            "$input_mousebutton4",
+            Mouse_x1 = "$input_mousebutton4",
             Mouse_x2 = "$input_mousebutton5",
         }
-        local i = { ["简体中文"] = { Mouse_left = "左键", Mouse_right = "右键" }, DEFAULT = { Mouse_left = "Left-click", Mouse_right = "Right-click" } }
+
+        local custom_keys_i18n = {
+            ["简体中文"] = {
+                Mouse_left = "左键",
+                Mouse_right = "右键",
+            },
+            ["한국어"] = {
+                Mouse_left = "왼쪽 클릭",
+                Mouse_right = "오른쪽 클릭",
+            },
+            ["日本語"] = {
+                Mouse_left = "左クリック",
+                Mouse_right = "右クリック",
+            },
+            DEFAULT = {
+                Mouse_left = "Left-click",
+                Mouse_right = "Right-click",
+            },
+        }
+
         do
-            local j = { "喵体中文", "汪体中文", "完全汉化" }
-            for k, l in ipairs(j) do i[l] = i["简体中文"] end
-        end; local function m(n, d)
-            local o = h[n]
-            if o then return GameTextGetTranslatedOrNot(o) end; local p = i[d] or i.DEFAULT; o = p[n]
-            if o then return o end; if n:find "^Mouse_" then
-                return GameTextGet("$input_" .. n:gsub("_", ""):lower())
-                    :upper()
-            elseif n:find "^Key_" then
-                local q = n:sub(5):upper()
-                o = g[q]
-                if o then return o end; local r = 0; o, r = q:gsub("^KP_", "KEYPAD ")
-                if r > 0 then return o end; o, r = q:gsub("^AC_", "AC ")
-                if r > 0 then return o end; return q
-            elseif n:find "^JOY_BUTTON_" then
-                local o = GameTextGet("$input_xboxbutton_" .. n:sub(12):lower())
-                if n:find "%d%d_DOWN$" then
-                    o = o .. " DOWN"
-                elseif n:find "%d%d_MOVED$" then
-                    o = o .. " MOVED"
+            local other_zh_cn_languages = { "喵体中文", "汪体中文", "完全汉化" }
+            for _, v in ipairs(other_zh_cn_languages) do
+                custom_keys_i18n[v] = custom_keys_i18n["简体中文"]
+            end
+        end
+
+        local function keyname_to_text(keyname, lang)
+            local result = named_keys[keyname]
+            if result then return GameTextGetTranslatedOrNot(result) end
+
+            local i18n = custom_keys_i18n[lang] or custom_keys_i18n.DEFAULT
+            result = i18n[keyname]
+            if result then return result end
+
+            if keyname:find "^Mouse_" then
+                return GameTextGet("$input_" .. keyname:gsub("_", ""):lower()):upper()
+            elseif keyname:find "^Key_" then
+                local name = keyname:sub(5):upper()
+
+                result = special_chars[name]
+                if result then return result end
+
+                local did = 0
+                result, did = name:gsub("^KP_", "KEYPAD ")
+                if did > 0 then return result end
+                result, did = name:gsub("^AC_", "AC ")
+                if did > 0 then return result end
+
+                return name
+            elseif keyname:find "^JOY_BUTTON_" then
+                local result = GameTextGet("$input_xboxbutton_" .. keyname:sub(12):lower())
+                if keyname:find "%d%d_DOWN$" then
+                    result = result .. " DOWN"
+                elseif keyname:find "%d%d_MOVED$" then
+                    result = result .. " MOVED"
                 else
-                    o = ("(%s)")
-                        :format(o)
-                end; return o
-            end; return GameTextGet "$menuoptions_configurecontrols_keyname_unknown"
-        end; local s = { Key_CTRL = -100, Key_ALT = -99, Key_SHIFT = -98, DEFAULT = 0, Mouse_left = 99, Mouse_right = 100 }
-        local function t(u)
-            table.sort(u,
-                function(v, w)
-                    local x = s[v] or s.DEFAULT; local y = s[w] or s.DEFAULT; if x ~= y then return x < y end; local z = #
-                        v; local A = #w; if z ~= A then return z > A end; return v < w
-                end)
-        end; function shortcut_tostring(u, d)
-            local B = {}
-            for C, l in pairs(u) do B[C] = l end; local D = B[#B]
-            B[#B] = nil; t(B)
-            B[#B + 1] = D; local E = {}
-            for k, F in ipairs(B) do E[#E + 1] = m(F, d) end; return table.concat(E, " + ")
+                    result = ("(%s)"):format(result) -- to ensure they look different from keyboard keys e.g. (A) not A
+                end
+
+                return result
+            end
+            return GameTextGet "$menuoptions_configurecontrols_keyname_unknown"
+        end
+
+        local order = {
+            Key_CTRL = -100,
+            Key_ALT = -99,
+            Key_SHIFT = -98,
+            DEFAULT = 0,
+            Mouse_left = 99,
+            Mouse_right = 100,
+        }
+        local function shortcut_sort(shortcut)
+            table.sort(shortcut, function(a, b)
+                local order_a = order[a] or order.DEFAULT
+                local order_b = order[b] or order.DEFAULT
+                if order_a ~= order_b then return order_a < order_b end
+
+                local len_a = #a
+                local len_b = #b
+                if len_a ~= len_b then return len_a > len_b end
+
+                return a < b
+            end)
+        end
+
+        ---@param shortcut string[]
+        ---@param lang string
+        ---@return string
+        return function(shortcut, lang)
+            local copy = {}
+            for k, v in pairs(shortcut) do
+                copy[k] = v
+            end
+            local trigger_key = copy[#copy]
+            copy[#copy] = nil
+
+            shortcut_sort(copy)
+
+            copy[#copy + 1] = trigger_key
+
+            local strs_to_concat = {}
+            for _, key in ipairs(copy) do
+                strs_to_concat[#strs_to_concat + 1] = keyname_to_text(key, lang)
+            end
+            return table.concat(strs_to_concat, " + ")
         end
     end)()
-    local G = (function()
-        local g, h = unpack((function()
-            local i = loadfile "data/scripts/debug/keycodes.lua"
-            local j = {}
-            setfenv(i, j)()
-            local k = { Mouse = {}, Keyboard = {}, Joystick = {} }
-            for l, m in pairs(j) do
-                if l:find "^Mouse_" then
-                    k.Mouse[l] = m
-                elseif l:find "^Key_" then
-                    k.Keyboard[l] = m
-                elseif l:find "^JOY_BUTTON_" then
-                    k.Joystick[l] =
-                        m
+    local keystroke_listener = (function() -- keystroke_listener.lua
+        local function get_keycodes()
+            local f = loadfile "data/scripts/debug/keycodes.lua"
+            local raw = {}
+            setfenv(f, raw)()
+
+            local by_type = { Mouse = {}, Keyboard = {}, Joystick = {} }
+            for k, v in pairs(raw) do
+                if k:find "^Mouse_" then
+                    by_type.Mouse[k] = v
+                elseif k:find "^Key_" then
+                    by_type.Keyboard[k] = v
+                elseif k:find "^JOY_BUTTON_" then
+                    by_type.Joystick[k] = v
                 end
-            end; local n = { "JOY_BUTTON_0", "JOY_BUTTON_1", "JOY_BUTTON_2", "JOY_BUTTON_3" }
-            for d, o in ipairs { j, k.Mouse, k.Keyboard, k.Joystick } do for d, p in ipairs(n) do o[p] = nil end end; return {
-                j, k }
-        end)())
-        local q = {}
-        local r = {}
-        for s, t in pairs(h.Keyboard) do
-            r[s] = { function() return InputIsKeyDown(t) end, function()
-                return
-                    InputIsKeyJustDown(t)
-            end }
-        end; for s, t in pairs(h.Mouse) do
-            if s ~= "Mouse_left" or s ~= "Mouse_right" then
-                r[s] = { function()
-                    return
-                        InputIsMouseButtonDown(t)
-                end, function() return InputIsMouseButtonJustDown(t) end }
             end
-        end; do
-            local u = { Key_ALT = { "Key_LALT", "Key_RALT" }, Key_CTRL = { "Key_LCTRL", "Key_RCTRL" }, Key_SHIFT = { "Key_LSHIFT", "Key_RSHIFT" } }
-            local v = function(w) return function() for g, n in ipairs(w) do if n() then return true end end end end; for x, y in pairs(u) do
-                local z, A = {}, {}
-                for g, B in ipairs(y) do
-                    local C, D = unpack(r[B])
-                    z[#z + 1] = C; A[#A + 1] = D; r[B] = nil
-                end; r[x] = { v(z), v(A) }
+
+            local excluded_keys = { "JOY_BUTTON_0", "JOY_BUTTON_1", "JOY_BUTTON_2", "JOY_BUTTON_3" }
+
+            for _, t in ipairs { raw, by_type.Mouse, by_type.Keyboard, by_type.Joystick } do
+                for _, key in ipairs(excluded_keys) do
+                    t[key] = nil
+                end
             end
-        end; local E = {}
-        local F = { JOY_BUTTON_A = true, JOY_BUTTON_B = true, JOY_BUTTON_LEFT_STICK_LEFT = true, JOY_BUTTON_LEFT_STICK_RIGHT = true, JOY_BUTTON_LEFT_STICK_UP = true, JOY_BUTTON_LEFT_STICK_DOWN = true }
-        for H, I in pairs(h.Joystick) do
-            if F[H] then
-                local C = function()
-                    for J = 0, 7 do if E[J] and InputIsJoystickButtonDown(J, I) then return true end end; return false
-                end; r[H] = { C, nil }
+
+            return { raw, by_type }
+        end
+
+        local keycodes_by_type = get_keycodes()[2]
+
+        ---@class inlined_keystroke_listener
+        local keystroke_listener = {}
+
+        local listeners = {}
+
+        for k, v in pairs(keycodes_by_type.Keyboard) do
+            listeners[k] = {
+                function() return InputIsKeyDown(v) end,
+                function() return InputIsKeyJustDown(v) end,
+            }
+        end
+
+        for k, v in pairs(keycodes_by_type.Mouse) do
+            listeners[k] = {
+                function() return InputIsMouseButtonDown(v) end,
+                function() return InputIsMouseButtonJustDown(v) end,
+            }
+        end
+
+        do
+            local combined_keys = {
+                Key_ALT = { "Key_LALT", "Key_RALT" },
+                Key_CTRL = { "Key_LCTRL", "Key_RCTRL" },
+                Key_SHIFT = { "Key_LSHIFT", "Key_RSHIFT" },
+            }
+
+            local any_of = function(functions)
+                return function()
+                    for _, f in ipairs(functions) do
+                        if f() then return true end
+                    end
+                end
             end
-        end; do
-            local K = {}
-            for B, g in pairs(r) do K[#K + 1] = B end; for B, g in ipairs(h.Joystick) do K[#K + 1] = B end; q.listened_keys =
-                K
-        end; local L = {}
-        for B, g in pairs(r) do L[B] = 0 end; q.just_down = {}
-        q.down = {}
-        function q:update()
-            local M = self.just_down; local N = self.down; for p = 0, 7 do E[p] = InputIsJoystickConnected(p) end; for H, O in pairs(r) do
-                local C, D = unpack(O)
-                local P = L[H]
-                local Q = C()
-                if D then M[H] = D() else M[H] = not N[H] and Q end; if P > 30 then M[H] = true end; N[H] = Q; if N[H] then
-                    L[H] =
-                        P + 1
+
+            for combined, from_these_keys in pairs(combined_keys) do
+                local down_listeners, just_down_listeners = {}, {}
+
+                for _, key in ipairs(from_these_keys) do
+                    local down_listener, just_down_listener = unpack(listeners[key])
+                    down_listeners[#down_listeners + 1] = down_listener
+                    just_down_listeners[#just_down_listeners + 1] = just_down_listener
+
+                    listeners[key] = nil
+                end
+
+                listeners[combined] = { any_of(down_listeners), any_of(just_down_listeners) }
+            end
+        end
+
+        local joysticks_connected = {}
+
+        local ignored_joystick_keys = {
+            JOY_BUTTON_A = true,
+            JOY_BUTTON_B = true,
+            JOY_BUTTON_LEFT_STICK_LEFT = true,
+            JOY_BUTTON_LEFT_STICK_RIGHT = true,
+            JOY_BUTTON_LEFT_STICK_UP = true,
+            JOY_BUTTON_LEFT_STICK_DOWN = true,
+        }
+
+        for name, code in pairs(keycodes_by_type.Joystick) do
+            if ignored_joystick_keys[name] then
+                goto continue
+            end
+
+            local down_listener = function()
+                for index = 0, 7 do
+                    if joysticks_connected[index] and InputIsJoystickButtonDown(index, code) then
+                        return true
+                    end
+                end
+                return false
+            end
+
+            listeners[name] = { down_listener, nil }
+
+            ::continue::
+        end
+
+        do
+            local listened_keys = {}
+
+            for key, _ in pairs(listeners) do
+                listened_keys[#listened_keys + 1] = key
+            end
+
+            for key, _ in ipairs(keycodes_by_type.Joystick) do
+                listened_keys[#listened_keys + 1] = key
+            end
+
+            keystroke_listener.listened_keys = listened_keys
+        end
+
+        local frames_keys_held = {}
+        for key, _ in pairs(listeners) do
+            frames_keys_held[key] = 0
+        end
+
+        keystroke_listener.just_down = {}
+        keystroke_listener.down = {}
+
+        function keystroke_listener:update()
+            local just_down = self.just_down
+            local down = self.down
+
+            for i = 0, 7 do
+                joysticks_connected[i] = InputIsJoystickConnected(i)
+            end
+
+            for name, pair in pairs(listeners) do
+                local down_listener, just_down_listener = unpack(pair)
+
+                local current_frames_held = frames_keys_held[name]
+
+                local down_now = down_listener()
+
+                if just_down_listener then
+                    just_down[name] = just_down_listener()
                 else
-                    L[H] = 0
+                    just_down[name] = not down[name] and down_now
+                end
+
+                if current_frames_held > 30 then
+                    just_down[name] = true
+                end
+
+                down[name] = down_now
+
+                if down[name] then
+                    frames_keys_held[name] = current_frames_held + 1
+                else
+                    frames_keys_held[name] = 0
                 end
             end
-        end; return q
+        end
+
+        return keystroke_listener
     end)()
-    local R = { ["简体中文"] = { done = "[完成]", clear = "[清空]", cancel = "[取消]" }, DEFAULT = { done = "[Done]", clear = "[Clear]", cancel = "[Cancel]" } }
-    for f, S in ipairs { "喵体中文", "汪体中文", "完全汉化" } do R[S] = R["简体中文"] end; Shortcut_Type = { OneShot = 0, Sustained = 1 }
-    local T = nil; local U = nil; local function V(W)
-        local X = true; for f, Y in ipairs(U) do
-            if W == Y then
-                X = false; break
+
+    local warning_text = {
+        ["简体中文"] = "编辑快捷键前请先进入游戏",
+        DEFAULT = "Please enter a run before editing shortcuts",
+    }
+    do
+        local other_zh_cn_languages = { "喵体中文", "汪体中文", "完全汉化" }
+        for _, v in ipairs(other_zh_cn_languages) do
+            warning_text[v] = warning_text["简体中文"]
+        end
+    end
+
+    local current_key_detector
+    return function(mod_id, gui, in_main_menu, im_id, setting)
+        GuiLayoutBeginHorizontal(gui, 0, 0, true, 2, 2)
+        GuiText(gui, mod_setting_group_x_offset, 0, setting.ui_name)
+
+        if not EntityGetIsAlive(1) then
+            local text = warning_text[GameTextGet "$current_language"] or warning_text.DEFAULT
+            GuiText(gui, mod_setting_group_x_offset - GuiGetTextDimensions(gui, setting.ui_name) + 120, 0, text)
+            GuiLayoutEnd(gui)
+            return
+        end
+
+        local changed = false
+        if current_key_detector == setting.id then
+            keystroke_listener:update()
+            local shortcut = {}
+            for k, v in pairs(keystroke_listener.down) do
+                if v then
+                    shortcut[#shortcut + 1] = k
+                end
             end
-        end; if X then U[#U + 1] = W end
-    end; function mod_setting_shortcut(Z, _, a0, a1, a2)
-        GuiLayoutBeginHorizontal(_, 0, 0, true, 2, 2)
-        GuiButton(_, 4 * a1, mod_setting_group_x_offset, 0, a2.ui_name)
-        local a3 = GuiGetTextDimensions(_, a2.ui_name)
-        local f, f, f, C, D = GuiGetPreviousWidgetInfo(_)
-        local a4 = GameTextGet "$current_language"
-        GuiIdPushString(_, "spell_lab_shugged.shortcut_setting.extra_button")
-        local a5 = false; if T == a2.id then
-            G:update()
-            for W, a6 in pairs(G.just_down) do if a6 then V(W) end end; local a7; if #U > 0 then
-                a7 = shortcut_tostring(
-                    U, a4)
+
+            local str
+            if #shortcut > 0 then
+                str = shortcut_tostring(shortcut, GameTextGet "$current_language")
+                str = str ..
+                    (setting.click_required and get_text "shortcut.click_here" or get_text "shortcut.click_to_save")
             else
-                a7 = "$menuoptions_configurecontrols_pressakey"
-            end; GuiOptionsAddForNextWidget(_,
-                GUI_OPTION.Layout_NoLayouting)
-            GuiColorSetForNextWidget(_, 1, 1, 0.5, 1)
-            local a8, a9 = GuiButton(_, a1, C + 120, D, a7)
-            if a2.shortcut_type ~= Shortcut_Type.Sustained then
-                if a8 then
-                    V "Mouse_left"
-                elseif a9 then
-                    V
-                    "Mouse_right"
-                end
-            end; if a8 or a9 then
-                a5 = true; ModSettingSetNextValue(mod_setting_get_id(Z, a2), a(U), false)
-                T = nil; U = nil
-            end; mod_setting_tooltip(Z, _, a0, a2)
-            GuiLayoutEnd(_)
-            GuiLayoutBeginHorizontal(_, mod_setting_group_x_offset + 120, 0, true, 2, 2)
-            if GuiButton(_, 4 * a1 + 1, 0, 0, (R[a4] or R.DEFAULT).done) then
-                a5 = true; ModSettingSetNextValue(mod_setting_get_id(Z, a2), a(U), false)
-                T = nil; U = nil
-            end; if GuiButton(_, 4 * a1 + 2, 0, 0, (R[a4] or R.DEFAULT).clear) then U = {} end; if GuiButton(_, 4 * a1 + 3, 0, 0, (R[a4] or R.DEFAULT).cancel) then
-                T = nil; U = nil
-            end; GuiLayoutEnd(_)
-        else
-            local a7; do
-                local aa = ModSettingGetNextValue(mod_setting_get_id(Z, a2))
-                if type(aa) ~= "string" then aa = a2.value_default or "{}" end; local b; do
-                    local a6, f = pcall(function() b = e(aa) end)
-                    if not a6 then b = {} end
-                end; if #b == 0 then
-                    a7 = "$menuoptions_configurecontrols_action_unbound"
+                str = "$menuoptions_configurecontrols_pressakey"
+            end
+
+            GuiColorSetForNextWidget(gui, 1, 1, 0.5, 1)
+            local left_click, right_click =
+                GuiButton(gui, im_id, mod_setting_group_x_offset - GuiGetTextDimensions(gui, setting.ui_name) + 120, 0,
+                    str)
+
+            if left_click or right_click then
+                current_key_detector = nil
+                if setting.click_required then
+                    local click_given = false
+                    if left_click then
+                        shortcut[#shortcut + 1] = "Mouse_left"
+                        click_given = true
+                    end
+                    if right_click then
+                        shortcut[#shortcut + 1] = "Mouse_right"
+                        click_given = true
+                    end
+                    if click_given then
+                        ModSettingSetNextValue(mod_setting_get_id(mod_id, setting), ser(shortcut), false)
+                        changed = true
+                    end
                 else
-                    a7 = shortcut_tostring(b,
-                        GameTextGet "$current_language")
+                    ModSettingSetNextValue(mod_setting_get_id(mod_id, setting), ser(shortcut), false)
+                    changed = true
                 end
-            end; GuiOptionsAddForNextWidget(_, GUI_OPTION.Layout_NoLayouting)
-            local a8, a9 = GuiButton(_, a1, C + 120, D, a7)
-            if a8 and not a9 then
-                T = a2.id; U = {}
-            elseif not a8 and a9 then
-                ModSettingSetNextValue(mod_setting_get_id(Z, a2), a2.value_default, false)
-                a5 = true
-            end; mod_setting_tooltip(Z, _, a0, a2)
-            GuiLayoutEnd(_)
-        end; GuiIdPop(_)
-        if a5 then ModSettingSetNextValue(Z .. ".shortcut_changed", true, false) end
+            end
+        else
+            local str
+            do
+                local value = ModSettingGetNextValue(mod_setting_get_id(mod_id, setting))
+                if type(value) ~= "string" then
+                    value = setting.value_default or "{}"
+                end
+
+                local shortcut
+                do
+                    local status, _ = pcall(function()
+                        shortcut = deser(value)
+                    end)
+                    if not status then
+                        shortcut = {}
+                    end
+                end
+
+                if #shortcut == 0 then
+                    str = "$menuoptions_configurecontrols_action_unbound"
+                else
+                    str = shortcut_tostring(shortcut, GameTextGet "$current_language")
+                end
+            end
+
+            local left_click, right_click =
+                GuiButton(gui, im_id, mod_setting_group_x_offset - GuiGetTextDimensions(gui, setting.ui_name) + 120, 0,
+                    str)
+
+            if left_click and not right_click then
+                current_key_detector = setting.id
+                ModSettingSetNextValue(mod_setting_get_id(mod_id, setting), "{}", false)
+                changed = true
+            elseif not left_click and right_click then
+                ModSettingSetNextValue(mod_setting_get_id(mod_id, setting), "{}", false)
+                changed = true
+            end
+        end
+
+        if changed then ModSettingSet(mod_id .. ".shortcut_changed", true) end
+
+        mod_setting_tooltip(mod_id, gui, in_main_menu, setting)
+
+        GuiLayoutEnd(gui)
     end
 end)()
 
@@ -493,357 +899,79 @@ local function format_percent(value)
     return (" %.0f%%"):format(value * 100)
 end
 
-local lang = { -- you may wanna fold these
-    en = {
-        wand_edit_panel = "Wand Edit Panel",
-        wand_edit_panel_max_num_rows = "Max Rows",
-        wand_edit_panel_max_num_rows_description =
-        "How many rows should the wand edit panel show at most at the same time?\n5 by default",
-        wand_edit_panel_max_actions_per_row = "Max Slots In One Row Limit",
-        wand_edit_panel_max_actions_per_row_description =
-        "How many slots should one row of the wand edit panel contain at most?\nNote: That is calculated with your virtual resolution magic numbers\n0 = No extra limit to it",
-        wand_edit_panel_history_limit = "Max Histories",
-        wand_edit_panel_history_limit_description =
-        "How many recent operations should the wand edit panel remember?\n30 by default",
-        wand_listener_type = "Wand Listening",
-        wand_listener_type_description =
-        "From which wand(s) should be listened to track any external options?\nValue doesn't change the way you edit wand, but changes how many histories will be created",
-        wand_listener_type_values_INV = "All Wands in Inventory",
-        wand_listener_type_values_HAND = "Held Wand",
-        wand_listener_type_values_PANEL = "Held Wand(Only when the wand edit panel is shown)",
-        spell_picker = "Spell Picker",
-        filter_buttons_trigger = "Switch between types",
-        filter_buttons_trigger_description = "How to trigger the spell type buttons?",
-        filter_buttons_trigger_values_HOVER = "Hover",
-        filter_buttons_trigger_values_CLICK = "Click",
-        action_history_limit = "Recently Used Spells Limit",
-        action_history_limit_description =
-        "How many recently used spells should the spell picker menu remember?\n96 by default",
-        show_icon_unlocked = "Mark Out Unlocked Spells",
-        show_icon_unlocked_description = "Should we mark out unlocked spells with a small icon in the top right corner?",
-        include_spells_in_non_inv_wand = "Include Spells In Nearby Wands",
-        include_spells_in_non_inv_wand_description =
-        "Should spells in nearby wands be shown in Inv/Nearby page of the spell picker?",
-        show_screen_keyboard = "Show Screen Keyboard In Spell Search Page",
-        creative_mode_flight_speed = "Superflight Speed",
-        creative_mode_flight_speed_normal = "Normal",
-        creative_mode_flight_speed_normal_description = "200 by default",
-        creative_mode_flight_speed_faster = "Faster",
-        creative_mode_flight_speed_faster_description = "450 by default",
-        creative_mode_flight_speed_no_clip = "No Clip",
-        creative_mode_flight_speed_no_clip_description = "300 by default",
-        all_seeing_eye = "Effect of All-seeing Eye",
-        all_seeing_eye_lighting = "Lighting",
-        all_seeing_eye_fog_of_war_removing = "Fog of War Removing",
-        shortcut = "Shortcuts Setting",
-        shortcut_strict = "Strict Detection",
-        shortcut_strict_description = "Should keys that not used in any shortcut be considered in shortcut detection?",
-        shortcut_click_to_save = " (click to save)",
-        shortcut_click_here = " + (click here)",
-        shortcut_general = "Wand Edit Panel, Wand Box & Spell Group Box",
-        shortcut_multi_selectable = "Wand Edit Panel & Wand Box",
-        shortcut_select = "Select",
-        shortcut_deselect = "Deselect",
-        shortcut_multi_select = "Multiple selection",
-        shortcut_expand_selection_left = "Expand selection on the left side",
-        shortcut_expand_selection_right = "Expand selection on the right side",
-        shortcut_swap = "Swap/Cycle",
-        shortcut_override = "Move",
-        shortcut_wand_edit_panel = "Wand Edit Panel",
-        shortcut_duplicate = "Duplicate spell(s)",
-        shortcut_delete_action = "Delete spell",
-        shortcut_delete_slot = "Delete slot",
-        shortcut_always_cast = "Promote/Demote always-cast",
-        shortcut_undo = "Undo",
-        shortcut_redo = "Redo",
-        shortcut_left_delete = "Delete to the left",
-        shortcut_right_delete = "Delete to the right",
-        shortcut_spell_picker = "Spell Picker",
-        shortcut_relock = "Relock unlocked spell",
-        shortcut_replace_switch_temp = "Invert replace mode",
-        shortcut_clear_action_history = "Clear spell history",
-        shortcut_wand_box = "Wand Box",
-        shortcut_show_wand_stats = "Show wand stats",
-        shortcut_confirm = "Confirm (deletions, etc.)",
-        shortcut_transform_mortal_into_dummy = "Target dummy transformation",
-        no_weather = "Disable Weather",
-        no_weather_description = "Should we disable all kinds of rain or snow?",
-        dummy_target_show_full_damage_number = "Show Full Damage Number For Dummy Targets",
-        dummy_target_show_full_damage_number_description =
-        "Should dummy targets always has full-length damage numbers shown?",
-        button_click_sound = "Button Click Sound",
-        action_button_click_sound = "Spell Button Click sound",
-    },
-    zh_cn = {
-        wand_edit_panel = "法杖编辑面板",
-        wand_edit_panel_max_num_rows = "最大行数",
-        wand_edit_panel_max_num_rows_description = "法杖编辑面板最多可以同时显示的行数，默认为 5",
-        wand_edit_panel_max_actions_per_row = "单行格数限制",
-        wand_edit_panel_max_actions_per_row_description =
-        "限制法杖编辑面板单行最多可以显示的格数\n单行最多能容纳的格数自动由虚拟分辨率计算得出，然后应用此限制\n0 = 不进行限制",
-        wand_edit_panel_history_limit = "历史记录最大条数",
-        wand_edit_panel_history_limit_description = "法杖编辑面板保留最近操作的数量，默认为 30",
-        wand_listener_type = "法杖监听",
-        wand_listener_type_description = "法杖编辑面板应该从哪些法杖监听外部操作？\n该设置不影响编辑，但会影响历史记录的产生数量",
-        wand_listener_type_values_INV = "背包中所有法杖",
-        wand_listener_type_values_HAND = "手持法杖",
-        wand_listener_type_values_PANEL = "手持法杖（仅法杖编辑面板显示时）",
-        spell_picker = "法术选取菜单",
-        filter_buttons_trigger = "法术类别切换方式",
-        filter_buttons_trigger_description = "法术类别按钮应该如何触发？",
-        filter_buttons_trigger_values_HOVER = "悬浮",
-        filter_buttons_trigger_values_CLICK = "点击",
-        action_history_limit = "法术使用记录最大条数",
-        action_history_limit_description = "法术选取菜单保留的法术使用记录条数，默认为 96",
-        show_icon_unlocked = "标记已解锁法术",
-        show_icon_unlocked_description = "开启时，将在已解锁法术右上角显示图标，以便重新锁定它们",
-        include_spells_in_non_inv_wand = "背包/附近页面显示附近法杖中法术",
-        include_spells_in_non_inv_wand_description = "开启时，法术选取菜单的背包/附近页面将显示附近法杖中法术",
-        show_screen_keyboard = "法术搜索页面显示软键盘",
-        creative_mode_flight_speed = "超级飞行速度",
-        creative_mode_flight_speed_normal = "正常",
-        creative_mode_flight_speed_normal_description = "默认：200",
-        creative_mode_flight_speed_faster = "加速",
-        creative_mode_flight_speed_faster_description = "默认：450",
-        creative_mode_flight_speed_no_clip = "穿墙",
-        creative_mode_flight_speed_no_clip_description = "默认：300",
-        all_seeing_eye = "全视之眼效果",
-        all_seeing_eye_lighting = "照明",
-        all_seeing_eye_fog_of_war_removing = "移除战争迷雾",
-        shortcut = "快捷键设置",
-        shortcut_strict = "严格检测",
-        shortcut_strict_description = "没有包含在任何快捷键中的键是否应该影响快捷键检测？",
-        shortcut_click_to_save = "（点击以保存）",
-        shortcut_click_here = " +（请点击）",
-        shortcut_general = "法杖编辑面板、法杖仓库 & 法术组合仓库",
-        shortcut_multi_selectable = "法杖编辑面板 & 法杖仓库",
-        shortcut_select = "选择",
-        shortcut_deselect = "取消选择",
-        shortcut_multi_select = "选择多个",
-        shortcut_expand_selection_left = "扩展左边选区",
-        shortcut_expand_selection_right = "扩展右边选区",
-        shortcut_swap = "交换/轮换",
-        shortcut_override = "移动",
-        shortcut_wand_edit_panel = "法杖编辑面板",
-        shortcut_duplicate = "复制选中法术至此处",
-        shortcut_delete_action = "删除法术",
-        shortcut_delete_slot = "删除法术及其槽位",
-        shortcut_always_cast = "设置/取消始终施放",
-        shortcut_undo = "撤销",
-        shortcut_redo = "恢复",
-        shortcut_left_delete = "向左删除",
-        shortcut_right_delete = "向右删除",
-        shortcut_spell_picker = "法术选取菜单",
-        shortcut_relock = "重新锁定已解锁法术",
-        shortcut_replace_switch_temp = "临时开启/关闭法术替换模式",
-        shortcut_clear_action_history = "清除法术历史",
-        shortcut_wand_box = "法杖仓库",
-        shortcut_show_wand_stats = "显示法杖信息",
-        shortcut_confirm = "确认（删除等）",
-        shortcut_transform_mortal_into_dummy = "转化生物为伤害测试假人",
-        no_weather = "禁用天气",
-        no_weather_description = "开启时，天气将锁定为晴朗状态",
-        dummy_target_show_full_damage_number = "伤害测试假人显示完整伤害数字",
-        dummy_target_show_full_damage_number_description = "开启时，将以完整形式而不是科学计数法显示伤害数字",
-        button_click_sound = "按钮点击音效",
-        action_button_click_sound = "法术按钮点击音效",
-    },
-    ja = {
-        wand_edit_panel = "杖編集パネル",
-        wand_edit_panel_max_num_rows = "最大行数",
-        wand_edit_panel_max_num_rows_description = "杖編集パネルに同時に表示する最大行数をいくつにするか\nデフォルト：5",
-        wand_edit_panel_max_actions_per_row = "1行あたりの最大スロット数制限",
-        wand_edit_panel_max_actions_per_row_description =
-        "杖編集パネルの1行に含める最大スロット数をいくつにするか\n注意：仮想解像度に基づいて自動で計算されます\n0 = 追加制限なし",
-        wand_edit_panel_history_limit = "最大履歴数",
-        wand_edit_panel_history_limit_description = "杖編集パネルが記憶する最近の操作数をいくつにするか\nデフォルト：30",
-        wand_listener_type = "杖の監視",
-        wand_listener_type_description = "外部操作を追跡するためにどの杖を監視するか\nこの値は杖の編集方法には影響しませんが、作成される履歴数が変わります",
-        wand_listener_type_values_INV = "インベントリ内のすべての杖",
-        wand_listener_type_values_HAND = "手持ちの杖",
-        wand_listener_type_values_PANEL = "手持ちの杖（杖編集パネルが表示されているときのみ）",
-        spell_picker = "呪文セレクター",
-        filter_buttons_trigger = "タイプ間の切り替え",
-        filter_buttons_trigger_description = "呪文タイプのボタンをどうトリガーするか",
-        filter_buttons_trigger_values_HOVER = "ホバー",
-        filter_buttons_trigger_values_CLICK = "クリック",
-        action_history_limit = "最近使用した呪文の上限",
-        action_history_limit_description = "呪文セレクターメニューが記憶する最近使用した呪文数をいくつにするか\nデフォルト：96",
-        show_icon_unlocked = "解禁済み呪文をマーク",
-        show_icon_unlocked_description = "解禁済み呪文を右上の小さなアイコンでマークするか",
-        include_spells_in_non_inv_wand = "近くの杖の呪文を含める",
-        include_spells_in_non_inv_wand_description = "呪文セレクターの所持&付近のページで近くの杖の呪文を表示するか",
-        show_screen_keyboard = "呪文検索ページでスクリーンキーボードを表示",
-        creative_mode_flight_speed = "スーパー飛行速度",
-        creative_mode_flight_speed_normal = "通常",
-        creative_mode_flight_speed_normal_description = "デフォルト：200",
-        creative_mode_flight_speed_faster = "高速",
-        creative_mode_flight_speed_faster_description = "デフォルト：450",
-        creative_mode_flight_speed_no_clip = "壁抜け",
-        creative_mode_flight_speed_no_clip_description = "デフォルト：300",
-        all_seeing_eye = "お見通しの効果",
-        all_seeing_eye_lighting = "照明",
-        all_seeing_eye_fog_of_war_removing = "戦場の霧の除去",
-        shortcut = "ショートカット設定",
-        shortcut_strict = "厳密検出",
-        shortcut_strict_description = "どのショートカットにも使われていないキーを、ショートカット検出に含めるか",
-        shortcut_click_to_save = "（クリックで保存）",
-        shortcut_click_here = "#NAME?",
-        shortcut_general = "杖編集パネル、杖ボックス、呪文グループボックス",
-        shortcut_multi_selectable = "杖編集パネル、杖ボックス",
-        shortcut_select = "選択",
-        shortcut_deselect = "選択解除",
-        shortcut_multi_select = "複数選択",
-        shortcut_expand_selection_left = "左へ選択範囲を拡張",
-        shortcut_expand_selection_right = "右へ選択範囲を拡張",
-        shortcut_swap = "入れ替え/循環",
-        shortcut_override = "移動",
-        shortcut_wand_edit_panel = "杖編集パネル",
-        shortcut_duplicate = "呪文複製",
-        shortcut_delete_action = "呪文削除",
-        shortcut_delete_slot = "スロット削除",
-        shortcut_always_cast = "常時詠唱を昇格/降格",
-        shortcut_undo = "取り消し",
-        shortcut_redo = "やり直し",
-        shortcut_left_delete = "左を削除",
-        shortcut_right_delete = "右を削除",
-        shortcut_spell_picker = "呪文セレクター",
-        shortcut_relock = "解禁済み呪文を再封印",
-        shortcut_replace_switch_temp = "入れ替えモードを反転",
-        shortcut_clear_action_history = "呪文履歴を消去",
-        shortcut_wand_box = "杖ボックス",
-        shortcut_show_wand_stats = "杖の能力値を表示",
-        shortcut_confirm = "確認（削除など）",
-        shortcut_transform_mortal_into_dummy = "ダミーへの変換",
-        no_weather = "天候を無効化",
-        no_weather_description = "すべての雨や雪を無効化するか",
-        dummy_target_show_full_damage_number = "ダミーへのダメージ数値をすべて表示",
-        dummy_target_show_full_damage_number_description = "常にダミーへのダメージ数値をすべて表示するか",
-        button_click_sound = "ボタンのクリック音",
-        action_button_click_sound = "呪文ボタンのクリック音",
-    },
-    ko = {
-        wand_edit_panel = "완드 편집 패널",
-        wand_edit_panel_max_num_rows = "최대 줄 수",
-        wand_edit_panel_max_num_rows_description = "완드 편집 패널에 동시에 최대 몇 개의 줄을 표시할 지\n기본값: 5",
-        wand_edit_panel_max_actions_per_row = "한 줄의 최대 슬롯 수 제한",
-        wand_edit_panel_max_actions_per_row_description =
-        "완드 편집 패널의 한 줄에 최대 몇 개의 슬롯을 포함할 지\n참고: 가상 해상도에 기반해 자동 계산됩니다\n0 = 추가 제한 없음",
-        wand_edit_panel_history_limit = "최대 기록 수",
-        wand_edit_panel_history_limit_description = "완드 편집 패널이 최근 작업을 몇 개까지 기억할 지\n기본값: 30",
-        wand_listener_type = "완드 감지",
-        wand_listener_type_description = "외부 옵션을 추적하기 위해 어떤 완드를 감지할 지\n값은 완드를 편집하는 방식에는 영향을 주지 않지만, 생성되는 기록 수를 바꿈",
-        wand_listener_type_values_INV = "인벤토리의 모든 완드",
-        wand_listener_type_values_HAND = "들고 있는 완드",
-        wand_listener_type_values_PANEL = "들고 있는 완드(완드 편집 패널이 표시될 때만)",
-        spell_picker = "주문 선택기",
-        filter_buttons_trigger = "유형 간 전환",
-        filter_buttons_trigger_description = "주문 유형 버튼을 어떻게 트리거할 지",
-        filter_buttons_trigger_values_HOVER = "호버",
-        filter_buttons_trigger_values_CLICK = "클릭",
-        action_history_limit = "최근 사용 주문 제한",
-        action_history_limit_description = "주문 선택기 메뉴가 최근 사용한 주문을 몇 개까지 기억할 지\n기본값: 96",
-        show_icon_unlocked = "잠금 해제된 주문 표시",
-        show_icon_unlocked_description = "잠금 해제된 주문을 오른쪽 위 모서리에 작은 아이콘으로 표시할 지 여부",
-        include_spells_in_non_inv_wand = "근처 완드의 주문 포함",
-        include_spells_in_non_inv_wand_description = "주문 선택기의 인벤&주변 페이지에 근처 완드의 주문을 표시할 지 여부",
-        show_screen_keyboard = "주문 검색 페이지에 화면 키보드 표시",
-        creative_mode_flight_speed = "슈퍼 비행 속도",
-        creative_mode_flight_speed_normal = "보통",
-        creative_mode_flight_speed_normal_description = "기본값: 200",
-        creative_mode_flight_speed_faster = "더 빠름",
-        creative_mode_flight_speed_faster_description = "기본값: 450",
-        creative_mode_flight_speed_no_clip = "벽 뚫기",
-        creative_mode_flight_speed_no_clip_description = "기본값: 300",
-        all_seeing_eye = "천리안 효과",
-        all_seeing_eye_lighting = "",
-        all_seeing_eye_fog_of_war_removing = "전장의 안개 제거",
-        shortcut = "단축키 설정",
-        shortcut_strict = "엄격한 감지",
-        shortcut_strict_description = "어떤 단축키에도 사용되지 않는 키를 단축키 감지에 포함할 지 여부",
-        shortcut_click_to_save = "(저장하려면 클릭)",
-        shortcut_click_here = "#NAME?",
-        shortcut_general = "완드 편집 패널, 완드 박스 & 주문 그룹 박스",
-        shortcut_multi_selectable = "완드 편집 패널 & 완드 박스",
-        shortcut_select = "선택",
-        shortcut_deselect = "선택 해제",
-        shortcut_multi_select = "다중 선택",
-        shortcut_expand_selection_left = "왼쪽으로 선택 영역 확장",
-        shortcut_expand_selection_right = "오른쪽으로 선택 영역 확장",
-        shortcut_swap = "교환/순환",
-        shortcut_override = "이동",
-        shortcut_wand_edit_panel = "완드 편집 패널",
-        shortcut_duplicate = "주문 복제",
-        shortcut_delete_action = "주문 삭제",
-        shortcut_delete_slot = "슬롯 삭제",
-        shortcut_always_cast = "항상 시전 승격/강등",
-        shortcut_undo = "실행 취소",
-        shortcut_redo = "다시 실행",
-        shortcut_left_delete = "왼쪽 삭제",
-        shortcut_right_delete = "오른쪽 삭제",
-        shortcut_spell_picker = "주문 선택기",
-        shortcut_relock = "잠금 해제된 주문 다시 잠그기",
-        shortcut_replace_switch_temp = "교체 모드 반전",
-        shortcut_clear_action_history = "주문 기록 지우기",
-        shortcut_wand_box = "완드 박스",
-        shortcut_show_wand_stats = "완드 능력치 표시",
-        shortcut_confirm = "확인(삭제 등)",
-        shortcut_transform_mortal_into_dummy = "더미 변환",
-        no_weather = "날씨 비활성화",
-        no_weather_description = "모든 종류의 비나 눈을 비활성화할 지 여부",
-        dummy_target_show_full_damage_number = "더미의 대미지 모든 숫자 표시하기",
-        dummy_target_show_full_damage_number_description = "더미에 항상 모든 숫자를 표시할 지 여부",
-        button_click_sound = "버튼 클릭 소리",
-        action_button_click_sound = "주문 버튼 클릭 소리",
-    },
-}
-
 ---@param id string
----@return fun(value_default: string): table
+---@return fun(value_default: string[]): table
 function cc.shortcut(id)
     return function(value_default)
+        local click_required = false
+        for _, key_name in value_default do
+            if key_name == "Mouse_left" or key_name == "Mouse_right" then
+                click_required = true
+            end
+        end
         return {
             id = id,
             ui_fn = mod_setting_shortcut,
+            click_required = click_required,
             extra = cc.extra,
         }
     end
 end
 
-mod_settings = {
-    cc.cat "wand_edit_panel" {
-        cc.input_int "wand_edit_panel.max_rows" (5, 3),
-        cc.input_int "wand_edit_panel.max_actions_per_row" (0, 3),
-        cc.input_int "wand_edit_panel.history_limit" (30, 3),
-        cc.enum "wand_listener_type" { "INV", "HAND", "PANEL" },
-    },
-    cc.cat "spell_picker" {
-        cc.enum "spell_picker.filter_buttons_trigger" { "HOVER", "CLICK" },
-        cc.checkbox "show_icon_unlocked" (false),
-        cc.input_int "spell_picker.action_history_limit" (96, 3),
-        cc.checkbox "include_spells_in_non_inv_wand" (false),
-        cc.checkbox "show_screen_keyboard" (false),
-    },
-    cc.cat "creative_mode_flight_speed" {
-        cc.input_int "creative_mode_flight.speed_normal" (200, 6),
-        cc.input_int "creative_mode_flight.speed_faster" (450, 6),
-        cc.input_int "creative_mode_flight.speed_no_clip" (300, 6),
+local mod_settings = {
+    -- cc.cat "wand_edit_panel" {
+    --     cc.input_int "max_rows" (5, 3),
+    --     cc.input_int "max_actions_per_row" (0, 3),
+    --     cc.input_int "history_limit" (30, 3),
+    --     cc.enum "wand_listener_type" { "INV", "HAND", "PANEL" },
+    -- },
+    -- cc.cat "spell_picker" {
+    --     cc.enum "filter_buttons_trigger" { "HOVER", "CLICK" },
+    --     cc.checkbox "show_icon_unlocked" (false),
+    --     cc.input_int "action_history_limit" (96, 3),
+    --     cc.checkbox "include_spells_in_non_inv_wand" (false),
+    --     cc.checkbox "show_screen_keyboard" (false),
+    -- },
+    cc.cat "creative_mode_flight" {
+        cc.input_int "speed_normal" (200, 6),
+        cc.input_int "speed_faster" (450, 6),
+        cc.input_int "speed_no_clip" (300, 6),
     },
     cc.cat "all_seeing_eye" {
-        cc.slider "all_seeing_eye.brightening" (0, 0, 1, format_percent),
-        cc.slider "all_seeing_eye.fog_of_war_removing" (1, 0, 1, format_percent),
+        cc.slider "brightening" (0, 0, 1, format_percent),
+        cc.slider "fog_of_war_removing" (1, 0, 1, format_percent),
     },
+    cc.cat "shortcut" {
+        cc.checkbox "strict" (false),
+        cc.shortcut "modifier_key_1" { "Key_CTRL" },
+        cc.shortcut "modifier_key_2" { "Key_SHIFT" },
+        cc.shortcut "modifier_key_3" { "Key_ALT" },
+        cc.shortcut "dummy_transform" { "Key_SHIFT" },
+    },
+    cc.checkbox "target_dummy.always_show_full_damage_number" (false),
     cc.checkbox "no_weather.enabled" (false):extra { scope = MOD_SETTING_SCOPE_RUNTIME_RESTART },
-    cc.checkbox "dummy_target_show_full_damage_number" (false),
     cc.checkbox "general.button_click_sound" (true),
     cc.checkbox "general.action_button_click_sound" (true),
     cc.enum "spellbox_pack" { "GOKIS", "VANILLA" },
 }
 
+local lang_id_map = {
+    ["한국어"] = "ko",
+    ["日本語"] = "jp",
+    ["русский"] = "ru",
+    ["Português (Brasil)"] = "pt_br",
+    ["Español"] = "es-es",
+    ["Deutsch"] = "de",
+    ["Français"] = "fr-fr",
+    ["Italiano"] = "it",
+    ["Polska"] = "pl",
+}
 local function load_mod_settings(cur_lang)
     local lang_id = "en"
     if cur_lang:find "中文" or cur_lang:find "汉化" then
         lang_id = "zh_cn"
+    else
+        lang_id = lang_id_map[lang_id] or lang_id
     end
     cc.load_lang(mod_settings, lang_id)
 end

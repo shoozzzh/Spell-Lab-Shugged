@@ -26,16 +26,16 @@ local up, down, left, right = unpack {
     ctrl_comp.mButtonDownRight,
 }
 
-local speed = settings.get_or_default("creative_mode_flight_speed_normal", 200)
+local speed = settings.get_or_default("creative_mode_flight.speed_normal", 200)
 
 local ctrl = InputIsKeyDown(keycodes.Key_LCTRL) or InputIsKeyDown(keycodes.Key_RCTRL)
 local shift = InputIsKeyDown(keycodes.Key_LSHIFT) or InputIsKeyDown(keycodes.Key_RSHIFT)
 if ctrl then
-    speed = settings.get_or_default("creative_mode_flight_speed_faster", 450)
+    speed = settings.get_or_default("creative_mode_flight.speed_faster", 450)
 end
 
 if shift then
-    local dist = settings.get_or_default("creative_mode_flight_speed_no_clip", 300) / 60
+    local dist = settings.get_or_default("creative_mode_flight.speed_no_clip", 300) / 60
     local pos = player.pos
 
     if up and down then

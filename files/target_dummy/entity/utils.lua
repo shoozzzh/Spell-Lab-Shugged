@@ -36,7 +36,7 @@ end
 function utils.set_text(entity_id, tag_sprite, value)
     local sprite_comp = EntityGetFirstComponent(entity_id, "SpriteComponent", "%MOD_ID%." .. tag_sprite)
     if not sprite_comp then return end
-    local text = format.damage_dummy(value, settings.get_or_default("dummy_target_show_full_damage_number", false), "i")
+    local text = format.damage_dummy(value, settings.get_or_default("dummy_target.show_full_damage_number", false), "i")
     ComponentSetValue2(sprite_comp, "offset_x", utils.center_text(text))
     ComponentSetValue2(sprite_comp, "text", text)
     EntityRefreshSprite(entity_id, sprite_comp)

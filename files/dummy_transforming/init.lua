@@ -5,7 +5,7 @@ local dt = require "dummy_transforming"
 local callbacks = {}
 
 callbacks.OnWorldPreUpdate = function()
-    if sc.detector.is_fired(sc.table.transform_mortal_into_dummy) then
+    if sc.detector.is_fired(sc.table.dummy_transform) then
         dt.execute_if_armed()
     end
 end

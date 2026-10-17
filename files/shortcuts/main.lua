@@ -8,28 +8,28 @@ local sc = {}
 sc.detector = require "shortcuts.detector"
 
 sc.table = {
-    select = { "Mouse_left" },
-    deselect = { "Mouse_right" },
-    multi_select = { "Key_CTRL", "Mouse_left" },
-    expand_selection_left = { "Key_CTRL", "Key_ALT", "Mouse_left" },
-    expand_selection_right = { "Key_CTRL", "Key_ALT", "Mouse_right" },
-    swap = { "Key_ALT", "Mouse_left" },
-    override = { "Key_ALT", "Mouse_right" },
-    duplicate = { "Key_ALT", "Key_SHIFT", "Mouse_left" },
-    delete_action = { "Key_SHIFT", "Mouse_left" },
-    delete_slot = { "Key_SHIFT", "Mouse_right" },
-    always_cast = { "Key_CTRL", "Key_SHIFT", "Mouse_left" },
-    left_delete = { "Key_BACKSPACE" },
-    right_delete = { "Key_DELETE" },
-    undo = { "Key_CTRL", "Key_z" },
-    redo = { "Key_CTRL", "Key_y" },
-    relock = { "Key_CTRL", "Key_SHIFT", "Mouse_left" },
-    show_wand_stats = { "Key_CTRL" },
-    replace_switch_temp = { "Key_SHIFT" },
-    replace_switch = {},
-    confirm = { "Key_SHIFT" },
-    clear_action_history = { "Key_SHIFT", "Mouse_right" },
-    transform_mortal_into_dummy = { "Key_SHIFT" },
+    -- select = { "Mouse_left" },
+    -- deselect = { "Mouse_right" },
+    -- multi_select = { "Key_CTRL", "Mouse_left" },
+    -- expand_selection_left = { "Key_CTRL", "Key_ALT", "Mouse_left" },
+    -- expand_selection_right = { "Key_CTRL", "Key_ALT", "Mouse_right" },
+    -- swap = { "Key_ALT", "Mouse_left" },
+    -- override = { "Key_ALT", "Mouse_right" },
+    -- duplicate = { "Key_ALT", "Key_SHIFT", "Mouse_left" },
+    -- delete_action = { "Key_SHIFT", "Mouse_left" },
+    -- delete_slot = { "Key_SHIFT", "Mouse_right" },
+    -- always_cast = { "Key_CTRL", "Key_SHIFT", "Mouse_left" },
+    -- left_delete = { "Key_BACKSPACE" },
+    -- right_delete = { "Key_DELETE" },
+    -- undo = { "Key_CTRL", "Key_z" },
+    -- redo = { "Key_CTRL", "Key_y" },
+    -- relock = { "Key_CTRL", "Key_SHIFT", "Mouse_left" },
+    -- show_wand_stats = { "Key_CTRL" },
+    -- replace_switch_temp = { "Key_SHIFT" },
+    -- replace_switch = {},
+    -- confirm = { "Key_SHIFT" },
+    -- clear_action_history = { "Key_SHIFT", "Mouse_right" },
+    dummy_transform = { "Key_SHIFT" },
     modifier_key_1 = { "Key_CTRL" },
     modifier_key_2 = { "Key_SHIFT" },
     modifier_key_3 = { "Key_ALT" },
@@ -62,7 +62,7 @@ end
 
 local function reload()
     for name, _ in pairs(sc.table) do
-        local value = settings.get("shortcut_" .. name)
+        local value = settings.get("shortcut." .. name)
         if value == nil then goto continue end
 
         local status, value = pcall(deser, value)
