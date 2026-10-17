@@ -1,5 +1,5 @@
-local module_path = module_path()
+local gui_elems = require "gui.elems"
 
 return function()
-    gui_elements.button_setting_toggle( module_path .. "button.png", "invincible", "$status_protection_all" )
+    gui_elems.button_setting_toggle("%MODULE_PATH%/button.png", "%MODULE_ID%", "$status_protection_all")
 end
