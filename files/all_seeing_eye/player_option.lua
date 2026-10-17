@@ -1,22 +1,22 @@
+local tl = require "tinklin"
+
 ---@type player_opt
 local player_option = {}
 
-local module_path = module_path()
+player_option.mod_setting_key = "%MODULE_ID%.enabled"
 
-player_option.mod_setting_key = module_name()
-
-local player_child_name = mod_id .. ".all_seeing_eye"
+local player_child_name = "%MODULE_FULL_ID%.player_child"
 
 function player_option.value_initiator()
-    return EntityGetWithName(player_child_name) ~= 0
+    return tl.entity_with_name(player_child_name) ~= nil
 end
 
-function player_option.on_enable(player_id)
-    EntityAddChild(player_id, EntityLoad(module_path .. "player_child/entity.xml"))
+function player_option.on_enable(player)
+    player:add_child(tl.entity_load "%MODULE_PATH%/player_child/entity.xml")
 end
 
 function player_option.on_disable()
-    EntityKill(EntityGetWithName(player_child_name))
+    tl.entity_with_name(player_child_name):kill()
 end
 
 return player_option

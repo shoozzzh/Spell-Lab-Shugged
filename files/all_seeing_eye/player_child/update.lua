@@ -1,7 +1,8 @@
-local entity_id = GetUpdatedEntityID()
+dofile_once "%MOD_PATH%/require.lua"
+local tl = require "tinklin"
+local settings = require "mod_settings"
 
-local lighting = ModSettingGet( "spell_lab_shugged.all_seeing_eye_lighting" )
-local fog_of_war_removing = ModSettingGet( "spell_lab_shugged.all_seeing_eye_fog_of_war_removing" )
+local entity = tl.entity_cur()
 
-ComponentSetValue2( EntityGetFirstComponent( entity_id, "LightComponent" ), "mAlpha", lighting )
-ComponentSetValue2( EntityGetFirstComponent( entity_id, "SpriteComponent" ), "alpha", fog_of_war_removing )
+entity:comp_first "LightComponent".mAlpha = settings.get_or_default("all_seeing_eye_lighting", 1)
+entity:comp_first "SpriteComponent".alpha = settings.get_or_default("all_seeing_eye_fog_of_war_removing", 1)
