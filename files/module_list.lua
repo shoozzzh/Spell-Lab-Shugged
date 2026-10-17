@@ -1,5 +1,6 @@
 return {
     "gui_main",
+    "spell_data",
     "all_seeing_eye",
     "clear_projectiles",
     "convenient_wand",
