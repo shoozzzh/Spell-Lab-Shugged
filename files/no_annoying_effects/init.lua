@@ -14,7 +14,9 @@ function callbacks.OnModPostInit()
     fun.iter(protect_from_these_entities)
         :filter(ModDoesFileExist)
         :each(function(entity_path)
-            for content in nxml.edit_file(entity_path) do
+            local success, editing_file = pcall(nxml.edit_file, entity_path)
+            if not success then return end
+            for content in editing_file do
                 table.insert(content.children, 1, nxml.new_element("LuaComponent", {
                     script_source_file = "%MODULE_PATH%/entity_self_remove.lua",
                     execute_on_added = "1",
