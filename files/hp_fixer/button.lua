@@ -1,35 +1,53 @@
-local module_path = module_path()
+local pop = require "pop"
+local tl = require "tinklin"
+local gui_elems = require "gui.elems"
+local tr = require "tr"
+local module_tr = tr.as_prefix(tr.hp_fixer)
+local format = require "format"
+local var = require "var"
+local common_val = require "common_values"
 
-return function()
-	local hp_fixer = EntityGetWithName "spell_lab_shugged_hp_fixer"
-	if hp_fixer ~= 0 then
-		local hp_comp = get_variable_storage_component( hp_fixer, "hp" )
-		local max_hp_comp = get_variable_storage_component( hp_fixer, "max_hp" )
-		local hp_fixed_to = ComponentGetValue2( hp_comp, "value_float" )
-		local max_hp_fixed_to = ComponentGetValue2( max_hp_comp, "value_float" )
-		local _, right_click = pop.button( module_path .. "button.png" )
-		if right_click then
-			sound_button_clicked()
-			EntityKill( hp_fixer )
-		end
-		pop.tooltip( GameTextGet( wrap_key "hp_fixed_to",
-			format.damage( hp_fixed_to ), format.damage( max_hp_fixed_to ) ), "" )
-		pop.z_mod_next( -1 )
-		pop.pos.next( -2, -2 )
-		pop.image( mod_path .. "files/gui_main/locked.png" )
-	else
-		if pop.button( module_path .. "button.png" ) then
-			sound_button_clicked()
-			if shift then
-				EntityAddChild( player, EntityLoad( module_path .. "hp_fixer.xml" ) )
-			else
-				local damage_model = EntityGetFirstComponentIncludingDisabled( player, "DamageModelComponent" )
-				if damage_model then
-					local max_hp = ComponentGetValue2( damage_model, "max_hp" )
-					ComponentSetValue2( damage_model, "hp", max_hp )
-				end
-			end
-		end
-		pop.tooltip( wrap_key "full_hp" )
-	end
+local player_child_name = "%MODULE_FULL_ID%.player_child"
+
+local var_map = {
+    hp_fixed_to = "value_float",
+    max_hp_fixed_to = "value_float",
+}
+
+---@class hp_fixer_vars
+---@field hp_fixed_to number
+---@field max_hp_fixed_to number
+
+---@param mb_utils mb_utils
+return function(mb_utils)
+    local player_child = tl.entity_with_name(player_child_name)
+    if player_child then
+        local _, right_click = mb_utils.button()
+        if right_click then
+            gui_elems.sound_button_clicked()
+            player_child:kill()
+        end
+
+        local vars = var.access(player_child.id, var_map, "") --[[@as hp_fixer_vars]]
+        pop.tooltip(module_tr.fixed_to:text(format.decimal(vars.hp_fixed_to, 2),
+            format.decimal(vars.max_hp_fixed_to, 2)))
+
+        pop.pos.next(-2, -2)
+        pop.image "%MOD_PATH%/files/gui_main/locked.png"
+    else
+        if pop.button "%MODULE_PATH%/button.png" then
+            gui_elems.sound_button_clicked()
+            if common_val.shift then
+                player_child = tl.entity_load_child("%MODULE_PATH%/hp_fixer.xml", common_val.player)
+                player_child.name = player_child_name
+            else
+                local dm_comp = common_val.player:comp_first "DamageModelComponent"
+                if dm_comp then
+                    local max_hp = dm_comp.max_hp
+                    dm_comp.hp = max_hp
+                end
+            end
+        end
+        pop.tooltip(module_tr:key())
+    end
 end
