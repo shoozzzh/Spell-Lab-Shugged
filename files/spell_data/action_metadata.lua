@@ -261,7 +261,8 @@ for _, action in pairs(gun_globals.actions) do
     action_metadata[action.id] = get_action_metadata(action)
 end
 
-local extra_modifiers_supported = mutils.get_globals "extra_modifiers_supported.lua".extra_modifiers_supported
+local extra_modifiers_supported = mutils.get_globals "%MOD_PATH%/files/shot_effects/extra_modifiers_supported.lua"
+    .extra_modifiers_supported
 local extra_modifier_metadata = {}
 for _, id in pairs(extra_modifiers_supported) do
     local fake_action = {
