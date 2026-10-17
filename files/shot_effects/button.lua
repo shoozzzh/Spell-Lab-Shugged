@@ -1,5 +1,4 @@
-local module_path = module_path()
-
-return function()
-    menus:toggle_button( "shot_effects", module_path .. "button.png" )
+---@param mb_utils mb_utils
+return function(mb_utils)
+    mb_utils.button_menus()
 end
