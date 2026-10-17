@@ -1,6 +1,7 @@
 const chokidar = require("chokidar");
 const fs = require("fs");
 const path = require("path");
+const BTree = require("sorted-btree")
 
 const watchedPath = "./files"
 const genFileName = "files_used_ph.lua"
@@ -18,6 +19,8 @@ if (clearAndExit) {
     }
 }
 
+let debugging = false;
+
 const moduleMap = new Map()
 
 const top_level_fake_module = "__TOP_LEVEL__"
@@ -26,14 +29,17 @@ let ready = false;
 
 function getModuleFileSet(moduleName) {
     if (!moduleMap.has(moduleName)) {
-        moduleMap.set(moduleName, new Set())
+        moduleMap.set(moduleName, BTree.asSet(new BTree.default()))
     }
     return moduleMap.get(moduleName)
 }
 
-function formatGenFile(list, isTopLevel) {
+function formatGenFile(fileSet, isTopLevel) {
     let result = "return {\n";
-    list.forEach(element => {
+    for (element of fileSet.keys()) {
+        if (debugging) {
+            console.log(element)
+        }
         let short
         if (isTopLevel) {
             short = element.match(/files[\/\\](.*)/)
@@ -45,7 +51,7 @@ function formatGenFile(list, isTopLevel) {
             return
         }
         result += '    "' + short[1].replaceAll("\\", "/") + '",\r\n';
-    });
+    }
     result += "}\r\n";
     return result
 }
@@ -68,7 +74,9 @@ function updateModuleIfReady(moduleName) {
             fs.unlinkSync(genFile);
         }
     }
-    console.log(`writing into ${path.join(modulePath, genFileName)}`)
+    if (debugging) {
+        console.log(`writing into ${path.join(modulePath, genFileName)}`)
+    }
 }
 
 function findModule(file) {
@@ -107,13 +115,24 @@ let watcher = chokidar.watch(watchedPath, {
 
 watcher
     .on('add', (file, stat) => {
-        console.log(`adding ${file}`)
+        if (file.endsWith(genFileName)) { return; }
+        if (debugging) {
+            console.log(`adding ${file}`)
+        }
         updateFile(file);
     })
     .on('change', (file, stat) => {
+        if (file.endsWith(genFileName)) { return; }
+        if (debugging) {
+            console.log(`changing ${file}`)
+        }
         updateFile(file);
     })
     .on('unlink', (file, stat) => {
+        if (file.endsWith(genFileName)) { return; }
+        if (debugging) {
+            console.log(`unlinking ${file}`)
+        }
         const moduleName = findModule(file);
         if (getModuleFileSet(moduleName).delete(file)) {
             updateModuleIfReady(moduleName)
@@ -121,10 +140,14 @@ watcher
     })
     .on('ready', () => {
         ready = true
-        console.log(`${moduleMap.size} modules found`)
+        if (debugging) {
+            console.log(`${moduleMap.size} modules found`)
+        }
         for (let [moduleName, fileSet] of moduleMap) {
-            console.log(`${moduleName}:`)
-            console.log(fileSet)
+            if (debugging) {
+                console.log(`${moduleName}:`)
+                console.log(fileSet)
+            }
             if (fileSet.size > 0) {
                 updateModuleIfReady(moduleName)
             }

@@ -6,10 +6,10 @@ return {
     "entity/entity_final.xml",
     "entity/load_child.lua",
     "entity/script_damaged.lua",
+    "entity/script_every_sec.lua",
+    "entity/utils.lua",
     "fonts/blue.xml",
     "fonts/green.xml",
     "fonts/grey.xml",
     "fonts/red.xml",
-    "entity/script_every_sec.lua",
-    "entity/utils.lua",
 }
