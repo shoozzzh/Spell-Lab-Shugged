@@ -1,5 +1,4 @@
-local module_path = module_path()
-
-return function()
-    gui_elements.button_setting_toggle( module_path .. "button.png", "no_recoil" )
+---@param mb_utils mb_utils
+return function(mb_utils)
+    mb_utils.button_toggle()
 end
