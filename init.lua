@@ -17,7 +17,7 @@ do
     ModTextFileSetContent(main, main_content .. translations:gsub("^[^\n]*\n", "", 1))
 end
 
-local settings = require "mod_settings"
+-- local settings = require "mod_settings"
 
 -- local default_settings = {
 --     ["spell_picker.quick_spell_picker"] = true,
