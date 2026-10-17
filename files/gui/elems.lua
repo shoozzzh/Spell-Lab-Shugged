@@ -1,14 +1,17 @@
 local gui_elems = {}
 
 local pop = require "pop"
-local mod_setting = require "mod_setting"
+local settings = require "mod_settings"
 local spell_box = require "spell_box"
-local utils = require "misc_utils"
+local mutils = require "misc_utils"
+local tr = require "tr"
+local tr_utils = require "tr_utils"
 local format = require "format"
+local spell_data = require "spell_data"
 
 local color_dim = { r = 127, g = 127, b = 127, a = 255 }
 local color_soft = { r = 207, g = 207, b = 207, a = 255 }
-local color_lavender = { r = 127, g = 127, b = 255, a = 255 }
+local color_lav_blue = { r = 127, g = 127, b = 255, a = 255 }
 
 function gui_elems.text_dim(text)
     pop.text(text, { color = color_dim })
@@ -18,8 +21,40 @@ function gui_elems.text_soft(text)
     pop.text(text, { color = color_soft })
 end
 
-function gui_elems.text_lavender(text)
-    pop.text(text, { color = color_lavender })
+function gui_elems.text_lav_blue(text)
+    pop.text(text, { color = color_lav_blue })
+end
+
+gui_elems.lhs_table_width = 174
+gui_elems.lhs_table_max_height = 160
+gui_elems.lhs_table_min_height = 20
+gui_elems.lhs_table_row_size = 8
+gui_elems.lhs_table_cell_size = { 20, 20 }
+
+---@generic C
+---@param cells C[]
+---@param cell_gui_fn fun(cell: C)
+---@param height number?
+---@return number
+---@return number
+function gui_elems.lhs_table(cells, cell_gui_fn, height)
+    local row_size = gui_elems.lhs_table_row_size
+    local cell_width, cell_height = unpack(gui_elems.lhs_table_cell_size)
+    local width = gui_elems.lhs_table_width
+    height = height or math.floor(#cells / row_size) * cell_height
+    height = math.min(height, gui_elems.lhs_table_max_height)
+    height = math.max(height, gui_elems.lhs_table_min_height)
+
+    pop.scroll_box_begin(width, height)
+    if pop.prev_mouse_inside(2) then
+        pop.block_mousewheel()
+    end
+
+    gui_elems.grid_cells(cells, cell_gui_fn, cell_width, cell_height, row_size)
+
+    pop.scroll_box_end()
+
+    return width, height
 end
 
 ---@generic C
@@ -28,34 +63,26 @@ end
 ---@param cell_width number
 ---@param cell_height number
 ---@param row_size integer
----@return unknown
----@return unknown
-function gui_elems.scroll_table(cells, cell_gui_fn, cell_width, cell_height, row_size)
-    local width = cell_width * row_size - 2
-    local height = math.min(math.floor(#cells / row_size) * cell_height)
-
-    pop.scroll_box_begin(width, height)
+function gui_elems.grid_cells(cells, cell_gui_fn, cell_width, cell_height, row_size)
+    if #cells == 0 then
+        pop.text(tr.general.scroll_table_nothing:key())
+        return
+    end
 
     local layout = pop.layout_hwrap(cell_width, cell_height, row_size)
     for _, cell in ipairs(cells) do
-        layout:next(function()
-            cell_gui_fn(cell)
-        end)
+        layout:next(function() cell_gui_fn(cell) end)
     end
-
-    pop.scroll_box_end()
-
-    return width, height
 end
 
 ---@param sprite_filename string
 ---@param key string
----@param name string?
----@param description string?
+---@param name string
+---@vararg string desc_lines
 ---@return boolean left_click
 ---@return boolean right_click
-function gui_elems.button_setting_toggle(sprite_filename, key, name, description)
-    local value = mod_setting.get(key) == true
+function gui_elems.button_setting_toggle(sprite_filename, key, name, ...)
+    local value = settings.get(key) == true
     if not value then
         pop.option_next "DrawSemiTransparent"
     end
@@ -64,13 +91,18 @@ function gui_elems.button_setting_toggle(sprite_filename, key, name, description
     if left_click then
         gui_elems.sound_button_clicked()
         value = not value
-        mod_setting.set(key, value)
+        settings.set(key, value)
     end
-    pop.tooltip(utils.tr_text(value and "enable" or "disable") .. GameTextGetTranslatedOrNot(name or utils.tr_key(key)),
-        description)
+
+    pop.tooltip((value and tr.general.option_enable or tr.general.option_disable):text(name), ...)
     return left_click, right_click
 end
 
+---@param selected boolean
+---@param action_type integer
+---@param sprite_file string
+---@return boolean left_click
+---@return boolean right_click
 function gui_elems.button_action(selected, action_type, sprite_file)
     pop.pos.push(2, 2)
     local hovered = pop.hoverable_space(16, 16)
@@ -78,7 +110,7 @@ function gui_elems.button_action(selected, action_type, sprite_file)
 
     spell_box.show(action_type, selected, hovered)
 
-    local width, height = utils.get_image_size(sprite_file)
+    local width, height = mutils.get_image_size(sprite_file)
     pop.pos.next(20 / 2 - width / 2, 20 / 2 - height / 2)
     pop.image(sprite_file)
 
@@ -94,9 +126,9 @@ function gui_elems.button_action(selected, action_type, sprite_file)
 end
 
 ---@class fake_action_data
+---@field id string
 ---@field sprite string
 ---@field name string
----@field fake_id string
 ---@field desc string
 ---@field type_text string
 ---@field type_spellbox integer
@@ -107,7 +139,7 @@ end
 --                                      properties)
 
 ---@param data fake_action_data
----@param semi_transparent boolean
+---@param semi_transparent boolean?
 ---@return boolean
 ---@return boolean
 function gui_elems.button_fake_action(data, semi_transparent)
@@ -129,13 +161,13 @@ function gui_elems.button_fake_action(data, semi_transparent)
 
         layout:next(function() pop.text(data.name) end)
 
-        if data.fake_id then
-            layout:next(function() gui_elems.text_dim(data.fake_id) end)
+        if data.id then
+            layout:next(function() gui_elems.text_dim(data.id) end)
         end
 
         if data.type_text then
             layout:next(function()
-                gui_elems.text_lavender(data.type_text)
+                gui_elems.text_lav_blue(data.type_text)
             end)
         end
 
@@ -150,7 +182,7 @@ function gui_elems.button_fake_action(data, semi_transparent)
     if semi_transparent then
         pop.option_next "DrawSemiTransparent"
     end
-    local sprite_width, sprite_height = utils.get_image_size(data.sprite)
+    local sprite_width, sprite_height = mutils.get_image_size(data.sprite)
     pop.pos.push((20 - sprite_width) / 2, (20 - sprite_height) / 2)
     pop.image(data.sprite)
     pop.pos.pop()
@@ -173,7 +205,7 @@ function gui_elems.icon_unlock_status(x, y, flag)
     if not flag then
         return
     elseif HasFlagPersistent(flag) then
-        if mod_setting.get "show_icon_unlocked" then
+        if settings.get "show_icon_unlocked" then
             pop.image("%MODULE_PATH%/unlocked.png", { alpha = 0.3 })
         end
     else
@@ -209,42 +241,42 @@ function gui_elems.metadata_lines(layout, lines)
 end
 
 ---@param layout pop.layout
----@param this_action_data any
----@param this_action_metadata any
-function gui_elems.action_info_least(layout, this_action_data, this_action_metadata)
-    layout:next(function() gui_elems.text_dim(this_action_data.id) end)
+---@param action action
+---@param metadata action_metadata
+function gui_elems.action_info_least(layout, action, metadata)
+    layout:next(function() gui_elems.text_dim(action.id) end)
     layout:next(function()
-        gui_elems.text_lavender(GameTextGetTranslatedOrNot(type_text[this_action_data.type]))
+        gui_elems.text_lav_blue(tr_utils.get(spell_data.type_text[action.type]))
     end)
 end
 
 ---@param layout pop.layout
----@param this_action_data any
----@param this_action_metadata any
-function gui_elems.action_info_verbose(layout, this_action_data, this_action_metadata)
-    local c_lines = c_metadata_to_lines(this_action_metadata.c)
-    local projectiles_lines, num_proj_lines = proj_metadata_to_lines(this_action_metadata.projectiles)
+---@param action action
+---@param metadata action_metadata
+function gui_elems.action_info_verbose(layout, action, metadata)
+    local c_lines = spell_data.metadata.shot_state_lines(metadata.c)
+    local projectiles_lines, num_proj_lines = spell_data.metadata.proj_lines(metadata.projectiles)
 
-    local title = GameTextGetTranslatedOrNot(this_action_data.name)
-    if this_action_data.max_uses then
-        title = title .. ("(" .. tostring(this_action_data.max_uses) .. ")")
+    local title = tr_utils.maybe(action.name)
+    if action.max_uses then
+        title = title .. ("(" .. tostring(action.max_uses) .. ")")
     end
     layout:next(function() pop.text(title) end)
     layout:next(function() gui_elems.text_dim(title) end)
 
     layout:next(function()
-        gui_elems.text_lavender(GameTextGetTranslatedOrNot(type_text[this_action_data.type]))
+        gui_elems.text_lav_blue(tr_utils.get(spell_data.type_text[action.type]))
     end)
     layout:next(function()
-        pop.text(format.word_wrap(GameTextGetTranslatedOrNot(this_action_data.description)))
+        pop.text(format.word_wrap(tr_utils.get(action.description)))
     end)
 
-    if not this_action_metadata then return end
+    if not metadata then return end
 
     layout:shift(5, 0)
 
-    if this_action_metadata.projectiles then
-        layout:next(function() pop.text(utils.tr_key "spell_data") end)
+    if metadata.projectiles then
+        layout:next(function() pop.text(tr.action_metadata.spell_data:key()) end)
     end
 
     gui_elems.metadata_lines(layout, c_lines)
@@ -253,22 +285,22 @@ function gui_elems.action_info_verbose(layout, this_action_data, this_action_met
     for proj_index, proj_lines in ipairs(projectiles_lines) do
         layout:next(function()
             if only_one_proj then
-                pop.text(utils.tr_key "projectile_data")
+                pop.text(tr.action_metadata.proj_data:key())
             else
-                pop.text(GameTextGet(utils.tr_key "projectile_nth_data", tostring(proj_index)))
+                pop.text(tr.action_metadata.proj_nth_data:text(proj_index))
             end
         end)
         gui_elems.metadata_lines(layout, proj_lines)
     end
 end
 
-local function image_small_action(action_id, uses_remaining)
+local function image_small_action(id, uses_remaining)
     pop.pos.push(-1, -1)
     pop.image("mods/spell_lab_shugged/files/spell_box/goki/spell_box_0.png", { scale = 0.5 })
     pop.pos.pop()
 
-    if action_id and action_id ~= "" then
-        local this_action_data = action_data[action_id]
+    if id and id ~= "" then
+        local this_action_data = spell_data.action_data[id]
         local sprite = (this_action_data and this_action_data.sprite) and this_action_data.sprite or
             "data/ui_gfx/gun_actions/_unidentified.png"
         pop.image(sprite, { scale = 0.5 })
@@ -318,14 +350,23 @@ function gui_elems.wand_all_actions_preview(layout, all_actions)
     end
 end
 
+function gui_elems.line_of_buttons(button_fns)
+    pop.pos.push(-22 * #button_fns / 2 + 2, 0)
+    local layout = pop.layout_stack(22, 0)
+    for _, f in ipairs(button_fns) do
+        layout:next(function() f() end)
+    end
+    pop.pos.pop()
+end
+
 function gui_elems.sound_button_clicked()
-    if mod_setting.get "button_click_sound" then
+    if settings.get "button_click_sound" then
         GamePlaySound("data/audio/Desktop/ui.bank", "ui/button_click", GameGetCameraPos())
     end
 end
 
 function gui_elems.sound_action_button_clicked()
-    if mod_setting.get "action_button_click_sound" then
+    if settings.get "action_button_click_sound" then
         GamePlaySound("data/audio/Desktop/ui.bank", "ui/button_click", GameGetCameraPos())
     end
 end
