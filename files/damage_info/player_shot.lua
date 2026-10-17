@@ -1,3 +1,3 @@
-function shot( proj_id )
-	EntityAddTag( proj_id, "spell_lab_shugged.player_projectile" )
+function shot(proj_id)
+    EntityAddTag(proj_id, "%MOD_ID%.player_projectile")
 end
