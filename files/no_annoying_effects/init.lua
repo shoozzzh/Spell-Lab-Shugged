@@ -11,7 +11,7 @@ function callbacks.OnModPostInit()
     local protect_from_these_entities =
         mutils.get_globals "%MODULE_PATH%/entities_protected_from.lua".protect_from_these_entities
 
-    fun.elems(protect_from_these_entities)
+    fun.iter(protect_from_these_entities)
         :filter(ModDoesFileExist)
         :each(function(entity_path)
             for content in nxml.edit_file(entity_path) do

@@ -204,16 +204,16 @@ local function add_shot_effect(player, shot_effect)
 
     entity:comp_new "VariableStorageComponent" { value_string = shot_effect.id }
 
-    tl.fun.elems(shot_effect.extra_modifier or {}):each(function(extra_modifier)
+    tl.fun.iter(shot_effect.extra_modifier or {}):each(function(extra_modifier)
         entity:comp_new "ShotEffectComponent" { extra_modifier = extra_modifier }
     end)
-    tl.fun.elems(shot_effect.shot_script or {}):each(function(shot_script)
+    tl.fun.iter(shot_effect.shot_script or {}):each(function(shot_script)
         entity:comp_new "LuaComponent" { script_shot = shot_script }
     end)
-    tl.fun.elems(shot_effect.game_effect or {}):each(function(game_effect)
+    tl.fun.iter(shot_effect.game_effect or {}):each(function(game_effect)
         entity:comp_new "GameEffectComponent" { effect = game_effect }
     end)
-    tl.fun.elems(shot_effect.custom_child_entity or {}):each(function(custom_child_entity)
+    tl.fun.iter(shot_effect.custom_child_entity or {}):each(function(custom_child_entity)
         tl.entity_load_child(custom_child_entity, player)
     end)
 end

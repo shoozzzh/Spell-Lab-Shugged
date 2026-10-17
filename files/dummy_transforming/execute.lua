@@ -52,7 +52,7 @@ local comp_names_to_disable = {
     "BossHealthBarComponent",
     "CameraBoundComponent",
 }
-tl.fun.elems(comp_names_to_disable):each(function(comp_name)
+tl.fun.iter(comp_names_to_disable):each(function(comp_name)
     target:comps_enabled(comp_name):each(function(comp)
         comp.meta.enabled = false
     end)

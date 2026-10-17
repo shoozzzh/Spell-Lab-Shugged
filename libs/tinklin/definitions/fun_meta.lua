@@ -35,7 +35,7 @@ function luafun.rands(n, m) end
 ---@generic T
 ---@param array T[]
 ---@return iterator<T>
-function luafun.elems(array) end
+function luafun.iter(array) end
 
 ---@generic K, V
 ---@param map {[K]: V}
