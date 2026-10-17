@@ -14,6 +14,11 @@ local projectile_adders = {
     "add_projectile_trigger_death",
 }
 
+local adjustment_type = {
+    Add = 1,
+    Set = 2,
+}
+
 ---@param action action
 ---@param metadata table
 local function new_parsing_env(action, metadata)
@@ -195,12 +200,12 @@ local function get_action_metadata(action)
         if rawget(shot_effects, "spell_lab_shugged_count_recoil_get") == 1 then
             c.spell_lab_shugged_recoil = {
                 value = shot_effects.spell_lab_shugged_recoil_knockback,
-                type = Type_Adjustment.Add,
+                type = adjustment_type.Add,
             }
         elseif rawget(shot_effects, "spell_lab_shugged_count_recoil_get") == 0 then
             c.spell_lab_shugged_recoil = {
                 value = shot_effects.spell_lab_shugged_recoil_knockback,
-                type = Type_Adjustment.Set,
+                type = adjustment_type.Set,
             }
         end
     end
@@ -345,7 +350,7 @@ local c_display = {
         return format.decimal(value, 0, true)
     end },
     { "spell_lab_shugged_recoil", md_tr.recoil:key(), nil, function(value)
-        if value.type == Type_Adjustment.Set then
+        if value.type == adjustment_type.Set then
             return GameTextGet(md_tr.value_set_to:key(), format.decimal(value.value, 0))
         else
             if value.value ~= 0 then
