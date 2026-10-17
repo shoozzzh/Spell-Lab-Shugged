@@ -1,26 +1,34 @@
-local module_path = module_path()
+local pop = require "pop"
+local tr = require "tr"
+local tr_utils = require "tr_utils"
+local gui_elems = require "gui.elems"
+local settings = require "mod_settings"
+local common_val = require "common_values"
 
-return function()
-	if not world_state_unlimited_spells then
-		pop.option_next "DrawSemiTransparent"
-	end
-	if pop.button( module_path .. "button.png" ) then
-		sound_button_clicked()
-		if EntityGetIsAlive( world_state ) then
-			local comp_worldstate = EntityGetFirstComponent( world_state, "WorldStateComponent" )
-			ComponentSetValue2( comp_worldstate, "perk_infinite_spells", not world_state_unlimited_spells )
-		end
-		if not world_state_unlimited_spells then
-			if not mod_setting.get "zero_uses" then
-				GameRegenItemActionsInPlayer( player )
-			end
-			local inventory2 = EntityGetFirstComponent( player, "Inventory2Component" )
-			if inventory2 ~= nil then
-				ComponentSetValue2( inventory2, "mForceRefresh", true )
-				ComponentSetValue2( inventory2, "mActualActiveItem", 0 )
-			end
-		end
-	end
-	pop.tooltip(
-		get_text( world_state_unlimited_spells and "disable" or "enable" ) .. GameTextGet  "$perk_unlimited_spells"  )
+---@param mb_utils mb_utils
+return function(mb_utils)
+    if not common_val.unlimited_spells then
+        pop.option_next "DrawSemiTransparent"
+    end
+    if mb_utils.button() then
+        gui_elems.sound_button_clicked()
+
+        if not common_val.unlimited_spells then
+            if not settings.get "zero_uses" then
+                GameRegenItemActionsInPlayer(common_val.player.id)
+            end
+            local inv2_comp = common_val.player:comp_first "Inventory2Component"
+            if inv2_comp then
+                inv2_comp.mForceRefresh = true
+                inv2_comp.mActualActiveItem = 0
+            end
+        end
+
+        local ws_comp = common_val.world_state:comp_first "WorldStateComponent"
+        if ws_comp then
+            ws_comp.perk_infinite_spells = not common_val.unlimited_spells
+        end
+    end
+    pop.tooltip((common_val.unlimited_spells and tr.general.option_disable or tr.general.option_enable)
+        :text(tr_utils.get "$perk_unlimited_spells"))
 end
