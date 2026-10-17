@@ -1,6 +1,6 @@
-local module_path = module_path()
-local module_name = module_name()
+local gui_elems = require "gui.elems"
 
 return function()
-	gui_elements.button_setting_toggle(module_path .. "button.png", module_name, "$status_protection_polymorph")
+    gui_elems.button_setting_toggle("%MODULE_PATH%/button.png", "%MODULE_ID%.enabled",
+        "$status_protection_polymorph")
 end
