@@ -1,15 +1,17 @@
-local module_path = module_path()
+local pop = require "pop"
+local gui_elems = require "gui.elems"
+local tr = require "tr"
+local sc = require "shortcuts"
+local dt = require "dummy_transforming"
 
-return function()
-	if not selecting_mortal_to_transform then
-		pop.option_next "DrawSemiTransparent"
-	end
-	if pop.button( module_path .. "button.png" ) then
-		sound_button_clicked()
-		selecting_mortal_to_transform = not selecting_mortal_to_transform
-	end
-	pop.tooltip( wrap_key "transform_mortal_into_target_dummy",
-		GameTextGet( wrap_key "transform_mortal_into_target_dummy_description",
-			shortcut_texts.transform_mortal_into_dummy )
-	)
+---@param mb_utils mb_utils
+return function(mb_utils)
+    if not dt.armed then
+        pop.option_next "DrawSemiTransparent"
+    end
+    if mb_utils.button() then
+        gui_elems.sound_button_clicked()
+        dt.armed = not dt.armed
+    end
+    pop.tooltip(tr["%MODULE_ID%"]:text(sc.text.transform_mortal_into_dummy))
 end
