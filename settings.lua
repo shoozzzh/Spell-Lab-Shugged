@@ -900,11 +900,11 @@ local function format_percent(value)
 end
 
 ---@param id string
----@return fun(value_default: string[]): table
 function cc.shortcut(id)
+    ---@param value_default string[]
     return function(value_default)
         local click_required = false
-        for _, key_name in value_default do
+        for _, key_name in ipairs(value_default) do
             if key_name == "Mouse_left" or key_name == "Mouse_right" then
                 click_required = true
             end
