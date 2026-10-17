@@ -1,4 +1,5 @@
 local mutils = require "misc_utils"
+local tr = require "tr"
 
 local format = {}
 
@@ -79,7 +80,7 @@ end
 ---@nodiscard
 function format.frames(time, digits)
     digits = digits or 2
-    return format.decimal(time / 60, digits, true) .. " s (" .. mutils.tr("frames", format.int(time)) .. ")"
+    return format.decimal(time / 60, digits, true) .. " s (" .. tr.general.frames:text(format.int(time)) .. ")"
 end
 
 ---@param min number
@@ -100,7 +101,7 @@ end
 ---@return string
 ---@nodiscard
 function format.word_wrap(str, wrap_size)
-    if mutils.tr "$current_language" ~= "English" then
+    if GameTextGet "$current_language" ~= "English" then
         return str
     end
     if wrap_size == nil then wrap_size = 60 end
