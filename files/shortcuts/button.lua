@@ -1,6 +1,9 @@
-local module_path = module_path()
+local tr = require "tr"
+local pop = require "pop"
+local sc = require "shortcuts"
 
-return function()
-    pop.button( module_path .. "button.png" )
-    pop.tooltip( wrap_key "shortcut_tips_title", edit_panel_shortcut_tips )
+---@param mb_utils mb_utils
+return function(mb_utils)
+    mb_utils.button()
+    pop.tooltip(tr.shortcut_tips_title:key(), sc.edit_panel_shortcut_tips)
 end

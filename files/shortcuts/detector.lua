@@ -1,82 +1,74 @@
----@param keystroke_listener keystroke_listener
----@param shortcuts table<string,shortcut>
-return function( keystroke_listener, shortcuts )
-	---@class shortcut_detector
-	local shortcut_detector = {}
+---@alias shortcut string[]
 
-	local cache = {}
+local keystroke_listener = require "shortcuts.keystroke_listener"
 
-	local xor = function( a, b ) return (a and not b) or (not a and b) end
+local detector = {
+    ---@type string[]?
+    detection_range = nil,
+}
 
-	---@param shortcut shortcut
-	---@param dont_cache bool
-	---@return table<string,bool>
-	local function get_inverted( shortcut, dont_cache )
-		local inverted = cache[ shortcut ]
-		if inverted == nil then
-			inverted = {}
-			if type( shortcut ) == "table" then
-				for _, key in ipairs( shortcut ) do
-					inverted[ key ] = true
-				end
-			elseif type( shortcut ) == "string" then
-				inverted[ shortcut ] = true
-			end
-			if not dont_cache then
-				cache[ shortcut ] = inverted
-			end
-		end
-		return inverted
-	end
+local cache = {}
 
-	---@param shortcut_name string
-	---@param left_click bool
-	---@param right_click bool
-	---@param detection_range table<integer,integer>
-	---@param dont_cache bool
-	---@return boolean
-	function shortcut_detector.is_fired( shortcut_name, left_click, right_click, detection_range, dont_cache )
-		local shortcut = shortcuts[ shortcut_name ]
-		if #shortcut == 0 then return false end
+local xor = function(a, b) return (a and not b) or (not a and b) end
 
-		detection_range = detection_range or keystroke_listener.listened_keys
-
-		local inverted_shortcut = get_inverted( shortcut, dont_cache )
-
-		local trigger_key = shortcut[ #shortcut ]
-		if trigger_key == "Mouse_left" then
-			if xor( left_click, inverted_shortcut.Mouse_left ) then return false end
-		elseif trigger_key == "Mouse_right" then
-			if xor( right_click, inverted_shortcut.Mouse_right ) then return false end
-		else
-			if not keystroke_listener.just_down[ trigger_key ] then return false end
-		end
-
-		for _, key in pairs( detection_range ) do
-			if xor( keystroke_listener.down[ key ], inverted_shortcut[ key ] ) then return false end
-		end
-
-		return true
-	end
-
-	---@param shortcut_name string
-	---@param detection_range table<integer,integer>
-	---@param dont_cache bool
-	---@return boolean
-	function shortcut_detector.is_held( shortcut_name, detection_range, dont_cache )
-		local shortcut = shortcuts[ shortcut_name ]
-		if #shortcut == 0 then return false end
-
-		detection_range = detection_range or keystroke_listener.listened_keys
-
-		local inverted_shortcut = get_inverted( shortcut, dont_cache )
-
-		for _, key in pairs( detection_range ) do
-			if xor( keystroke_listener.down[ key ], inverted_shortcut[ key ] ) then return false end
-		end
-
-		return true
-	end
-
-	return shortcut_detector
+---@param shortcut shortcut
+---@param dont_cache bool
+---@return table<string,bool>
+local function get_inverted(shortcut, dont_cache)
+    local inverted = cache[shortcut]
+    if inverted == nil then
+        inverted = {}
+        if type(shortcut) == "table" then
+            for _, key in ipairs(shortcut) do
+                inverted[key] = true
+            end
+        end
+        if not dont_cache then
+            cache[shortcut] = inverted
+        end
+    end
+    return inverted
 end
+
+---@param shortcut shortcut
+---@param left_click bool?
+---@param right_click bool?
+---@param dont_cache bool?
+---@return boolean
+function detector.is_fired(shortcut, left_click, right_click, dont_cache)
+    if #shortcut == 0 then return false end
+
+    local inverted_shortcut = get_inverted(shortcut, dont_cache)
+
+    local trigger_key = shortcut[#shortcut]
+    if trigger_key == "Mouse_left" then
+        if (left_click ~= true) ~= inverted_shortcut.Mouse_left then return false end
+    elseif trigger_key == "Mouse_right" then
+        if (right_click ~= true) ~= inverted_shortcut.Mouse_right then return false end
+    else
+        if not keystroke_listener.just_down[trigger_key] then return false end
+    end
+
+    for _, key in pairs(detector.detection_range or keystroke_listener.listened_keys) do
+        if keystroke_listener.down[key] ~= inverted_shortcut[key] then return false end
+    end
+
+    return true
+end
+
+---@param shortcut shortcut
+---@param dont_cache bool?
+---@return boolean
+function detector.is_held(shortcut, dont_cache)
+    if #shortcut == 0 then return false end
+
+    local inverted_shortcut = get_inverted(shortcut, dont_cache)
+
+    for _, key in pairs(detector.detection_range or keystroke_listener.listened_keys) do
+        if keystroke_listener.down[key] ~= inverted_shortcut[key] then return false end
+    end
+
+    return true
+end
+
+return detector

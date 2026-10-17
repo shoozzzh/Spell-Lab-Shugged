@@ -1,51 +1,57 @@
+local mutils = require "misc_utils"
+local settings = require "mod_settings"
+local common_val = require "common_values"
+
+local shortcut_detector = require "shortcuts.detector"
+
 local keyboard_focus = {}
 
 keyboard_focus.focusables = {}
 
-local on = "player_controls"
-function keyboard_focus:change_to( focusable )
-	local new = focusable
+local cur_focus = "player_controls"
+function keyboard_focus:change_to(focusable)
+    local new = focusable
 
-	if on == new then return false end
+    if cur_focus == new then return false end
 
-	local from, to = self.focusables[ on ], self.focusables[ new ]
-	optional_call( from.on_unfocused )
-	optional_call( to.on_focused )
+    local old_data, new_data = self.focusables[cur_focus], self.focusables[new]
+    mutils.call_if_present(old_data.on_unfocused)
+    mutils.call_if_present(new_data.on_focused)
 
-	on = new
-	return true
+    cur_focus = new
+    return true
 end
 
-function keyboard_focus.is_on( focusable )
-	return on == focusable
+---@class keyboard_focusable
+---@field id string
+---@field on_focused nil|fun()
+---@field on_unfocused nil|fun()
+---@field update nil|fun()
+
+function keyboard_focus.is_on(focusable)
+    return cur_focus == focusable
 end
 
 function keyboard_focus.update()
-	local on = keyboard_focus.focusables[ on ]
-	optional_call( on.update )
+    local cur_data = keyboard_focus.focusables[cur_focus]
+    mutils.call_if_present(cur_data.update)
 end
 
-local controls_freezer = dofile_once( "mods/spell_lab_shugged/files/lib/controls_freezer.lua" )
-local edit_panel_api = dofile_once( "mods/spell_lab_shugged/files/gui/edit_panel_api.lua" )
+local controls_freezer = dofile_once "mods/spell_lab_shugged/files/lib/controls_freezer.lua"
+-- local edit_panel_api = dofile_once "mods/spell_lab_shugged/files/gui/edit_panel_api.lua"
 keyboard_focus.focusables.player_controls = {
-	on_focused = function()
-		controls_freezer.unfreeze_controls()
-	end,
-	on_unfocused = function()
-		controls_freezer.freeze_controls()
-	end,
-	update = function()
-		if shortcut_detector.is_fired( shortcuts.transform_mortal_into_dummy ) then
-			if selecting_mortal_to_transform then
-				dofile( "mods/spell_lab_shugged/files/scripts/transform_mortal_into_dummy.lua" )
-				selecting_mortal_to_transform = false
-			end
-		end
+    id = "player_controls",
+    on_focused = function()
+        controls_freezer.unfreeze_controls()
+    end,
+    on_unfocused = function()
+        controls_freezer.freeze_controls()
+    end,
+    update = function()
+        if not common_val.held_wand or not settings.get "show_wand_edit_panel" then return end
 
-		if not held_wand or not mod_setting_get( "show_wand_edit_panel" ) then return end
-
-		local data = edit_panel_api.access_data( held_wand )
---[[		if shortcut_detector.is_fired( shortcuts.left_delete, shortcut_used_keys ) then
+        -- local data = edit_panel_api.access_data(held_wand)
+        --[[		if shortcut_detector.is_fired( shortcuts.left_delete, shortcut_used_keys ) then
 			local current_actions = {}
 			local did = false
 			for s, a, u in state_str_iter_actions( edit_panel_state.get() ) do
@@ -87,13 +93,13 @@ keyboard_focus.focusables.player_controls = {
 				edit_panel_state.set( table_to_state_str( current_actions ), wrap_key( "operation_delete_action" ) )
 			end
 		end]]
-		if shortcut_detector.is_fired( shortcuts.undo, shortcut_used_keys ) then
-			data:undo()
-		end
-		if shortcut_detector.is_fired( shortcuts.redo, shortcut_used_keys ) then
-			data:redo()
-		end
-	end,
+        -- if shortcut_detector.is_fired(shortcuts.undo, shortcut_used_keys) then
+        --     data:undo()
+        -- end
+        -- if shortcut_detector.is_fired(shortcuts.redo, shortcut_used_keys) then
+        --     data:redo()
+        -- end
+    end,
 }
 
 return keyboard_focus
