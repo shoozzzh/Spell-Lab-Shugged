@@ -85,7 +85,7 @@ end
 do
     local files_used_ph, _ = dofile_once(mod_path .. "files/files_used_ph.lua")
     for _, file in ipairs(files_used_ph or {}) do
-        apply_ph(mod_path .. "/files/" .. file)
+        apply_ph(mod_path .. "files/" .. file)
     end
 end
 
