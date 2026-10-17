@@ -1,9 +1,11 @@
-local module_path = module_path()
+local tr = require "tr"
+local module_tr = tr.as_prefix(tr["%MODULE_ID%"])
 
-return function()
-	local desc = wrap_key "creative_mode_flight_description"
-	if DebugGetIsDevBuild() then
-		desc = GameTextGetTranslatedOrNot( desc ) .. "\n" .. get_text "creative_mode_flight_note_dev_exe"
-	end
-	gui_elements.button_setting_toggle( module_path .. "button.png", "creative_mode_flight", nil, desc )
+---@param mb_utils mb_utils
+return function(mb_utils)
+    if DebugGetIsDevBuild() then
+        mb_utils.button_toggle(nil, module_tr.desc:key(), module_tr.note_dev_exe:key())
+    else
+        mb_utils.button_toggle(nil, module_tr.desc:key())
+    end
 end

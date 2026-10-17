@@ -1,11 +1,11 @@
+local tl = require "tinklin"
+
 ---@type player_opt
 local player_option = {}
 
-local module_path = module_path()
+player_option.mod_setting_key = "%MODULE_ID%.enabled"
 
-player_option.mod_setting_key = module_name()
-
-local player_child_name = mod_id .. ".creative_mode_flight.player_child"
+local player_child_name = "%MODULE_FULL_ID%.player_child"
 
 function player_option.value_initiator()
     return tl.entity_with_name(player_child_name) ~= nil
@@ -30,11 +30,9 @@ local flight_overwritten_fields = {
     swim_extra_horizontal_drag = 1,
 }
 
-function player_option.on_enable(player_id)
-    local player = tl.entity_wrap(player_id)
-    local player_child = tl.entity_load(module_path .. "player_child/entity.xml")
+function player_option.on_enable(player)
+    local player_child = tl.entity_load_child("%MODULE_PATH%/player_child/entity.xml", player)
     player_child.name = player_child_name
-    EntityAddChild(player_id, player_child.id)
 
     local cp_comp = player:comp_first "CharacterPlatformingComponent"
     if not cp_comp then return end
@@ -46,8 +44,7 @@ function player_option.on_enable(player_id)
     end
 end
 
-function player_option.on_disable(player_id)
-    local player = tl.entity_wrap(player_id)
+function player_option.on_disable(player)
     local player_child = tl.entity_with_name(player_child_name)
     if not player_child then return end
 
