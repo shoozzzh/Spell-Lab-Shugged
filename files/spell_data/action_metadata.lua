@@ -75,10 +75,10 @@ local function new_parsing_env(action, metadata)
                 local randomize_max = tonumber(lifetime_comp.attr["randomize_lifetime.max"]) or 0
                 local lifetime2 = lifetime + randomize_max
                 lifetime = lifetime + randomize_min
-                if not properties.lifetime_cap or lifetime < properties.lifetime_cap then
+                if not properties.lifetime_cap or lifetime < tonumber(properties.lifetime_cap) then
                     properties.lifetime_cap = tostring(lifetime)
                 end
-                if not properties.lifetime_cap2 or lifetime2 < properties.lifetime_cap2 then
+                if not properties.lifetime_cap2 or lifetime2 < tonumber(properties.lifetime_cap2) then
                     properties.lifetime_cap2 = tostring(lifetime2)
                 end
             end
