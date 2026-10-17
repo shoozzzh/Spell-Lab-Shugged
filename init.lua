@@ -94,9 +94,9 @@ local module_path_pattern = mod_path .. "files/%s/"
 
 for _, module_id in ipairs(module_list) do
     local module_path = module_path_pattern:format(module_id)
-    local files_used_ph, _ = dofile_once(module_path .. "files_used_ph.lua")
+    local files_used_ph = module_path .. "files_used_ph.lua"
 
-    for _, file in ipairs(files_used_ph or {}) do
+    for _, file in ipairs(ModDoesFileExist(files_used_ph) and dofile_once(files_used_ph) or {}) do
         apply_ph(module_path .. file, module_id)
     end
 end
