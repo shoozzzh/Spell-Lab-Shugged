@@ -1,2 +1,4 @@
-weather_init = function( ... ) end
+---@diagnostic disable: lowercase-global
+
+weather_init = function(...) end
 weather_update = function() end

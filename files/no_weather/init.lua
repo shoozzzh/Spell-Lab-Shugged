@@ -1,7 +1,7 @@
-local module_path = module_path()
+local settings = require "mod_settings"
 
-if mod_setting.get "no_weather" then
-	local init_lua_path = "data/scripts/init.lua"
-	ModLuaFileAppend( init_lua_path, module_path .. "+init.lua" )
-	ModTextFileSetContent( init_lua_path, ModTextFileGetContent( init_lua_path ) ) -- refresh it
+if settings.get "no_weather" then
+    local init_lua_path = "data/scripts/init.lua"
+    ModLuaFileAppend(init_lua_path, "%MODULE_PATH%/+init.lua")
+    ModTextFileSetContent(init_lua_path, ModTextFileGetContent(init_lua_path))  -- refresh it
 end
