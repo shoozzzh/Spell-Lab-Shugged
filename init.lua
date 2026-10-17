@@ -19,22 +19,22 @@ end
 
 local settings = require "mod_settings"
 
-local default_settings = {
-    ["quick_spell_picker"] = true,
-    ["replace_mode"] = true,
-    ["show_toggle_options"] = true,
-    ["show_locked_spells"] = true,
-}
+-- local default_settings = {
+--     ["spell_picker.quick_spell_picker"] = true,
+--     ["replace_mode"] = true,
+--     ["show_toggle_options"] = true,
+--     ["show_locked_spells"] = true,
+-- }
 
-for key, value in pairs(default_settings) do
-    if settings.get(key) == nil then
-        settings.set(key, value)
-    end
-end
+-- for key, value in pairs(default_settings) do
+--     if settings.get(key) == nil then
+--         settings.set(key, value)
+--     end
+-- end
 
-function OnPlayerSpawned(player_id)
-    dofile_once(mod_path .. "libs/controls_freezer.lua").unfreeze()
-end
+-- function OnPlayerSpawned(player_id)
+--     dofile_once(mod_path .. "libs/controls_freezer.lua").unfreeze()
+-- end
 
 local ph_const = {
     ["%%MOD_ID%%"] = mod_id,
