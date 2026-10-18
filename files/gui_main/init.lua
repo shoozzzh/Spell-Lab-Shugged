@@ -74,7 +74,7 @@ local menus_line = module_button_fns {
 }
 
 local functions_line = module_button_fns {
-    "shortcuts", "clear_projectiles", "wand_ready", "wand_clear", "twwe_effect",
+    "shortcuts", "clear_projectiles", "wand_ready", "wand_clear", "twwe_and_nwt",
     "hp_fixer", "target_dummy", "dummy_transforming", "convenient_wand",
 }
 
