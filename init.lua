@@ -47,10 +47,11 @@ local ph_module_pattern = {
     ["%%MODULE_FULL_ID%%"] = mod_id .. ".%s",
 }
 local function ph_module(module_id)
+    local ph = {}
     for k, v in pairs(ph_module_pattern) do
-        ph_module_pattern[k] = v:format(module_id)
+        ph[k] = v:format(module_id)
     end
-    return ph_module_pattern
+    return ph
 end
 
 local function ph_file(file)
