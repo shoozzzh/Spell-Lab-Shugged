@@ -1,12 +1,9 @@
-local mutils = require "misc_utils"
 local tl = require "tinklin"
 local sc = require "shortcuts"
+local get_player = require "get_player"
 
 ---@class common_values
 local common_val = {}
-
----@type fun(): entity_id?
-local get_player = mutils.get_globals "%MOD_PATH%/files/gui/get_player.lua".get_player
 
 local function get_held_wand(player)
     if not player then return end
