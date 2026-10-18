@@ -7,7 +7,7 @@ local mutils = require "misc_utils"
 local tr_utils = require "tr_utils"
 local common_val = require "common_values"
 
-dofile_once "%MOD_PATH%/files/wand_spell_utils.lua"
+-- dofile_once "%MOD_PATH%/files/wand_spell_utils.lua"
 WANDS = dofile_once "%MOD_PATH%/libs/wands.lua"
 
 local entry_point = dofile_once "%MODULE_PATH%/entry_point/button.lua"
