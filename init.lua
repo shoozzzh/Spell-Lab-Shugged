@@ -67,15 +67,15 @@ local function apply_ph(file, module_id)
 
     local content = ModTextFileGetContent(file)
 
-    for ph, value in ipairs(ph_const) do
+    for ph, value in pairs(ph_const) do
         content = content:gsub(ph, value)
     end
 
-    for ph, value in ipairs(module_id and ph_module(module_id) or {}) do
+    for ph, value in pairs(module_id and ph_module(module_id) or {}) do
         content = content:gsub(ph, value)
     end
 
-    for ph, value in ipairs(ph_file(file)) do
+    for ph, value in pairs(ph_file(file)) do
         content = content:gsub(ph, value)
     end
 
