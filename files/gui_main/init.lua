@@ -44,6 +44,7 @@ local function gen_module_button_utils(module_name)
             return menus:button(module_name, button_sprite)
         end,
     }
+    return button_utils
 end
 
 gen_module_button_utils = mutils.memoize(gen_module_button_utils)
