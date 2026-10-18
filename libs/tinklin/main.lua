@@ -174,7 +174,7 @@ function entity_methods:comp_first(comp_type, tag)
     else
         comp_id = EntityGetFirstComponentIncludingDisabled(self.id, comp_type, tag)
     end
-    return tinklin.comp_wrap(comp_id)
+    return comp_id and tinklin.comp_wrap(comp_id)
 end
 
 ---@param comp_type component_type
@@ -188,7 +188,7 @@ function entity_methods:comp_first_enabled(comp_type, tag)
     else
         comp_id = EntityGetFirstComponent(self.id, comp_type, tag)
     end
-    return tinklin.comp_wrap(comp_id)
+    return comp_id and tinklin.comp_wrap(comp_id)
 end
 
 ---@param comp_type component_type?
