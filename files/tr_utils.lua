@@ -1,7 +1,7 @@
 ---@class tr_utils
 local tr_utils = {}
 
-local key_prefix = "$%MOD_ID%"
+local key_prefix = "$%MOD_ID%."
 
 ---@param key string
 ---@return string
