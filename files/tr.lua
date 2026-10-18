@@ -25,13 +25,22 @@ local tr_methods = {
     end,
 }
 
-local tr_mt = {
+local tr_key_mt = {
     __index = function(t, k)
         local m = tr_methods[k]
         if m then return m end
 
         t[#t + 1] = k
         return t
+    end,
+}
+
+local tr_mt = {
+    __index = function(t, k)
+        local m = tr_methods[k]
+        if m then return m end
+
+        return setmetatable({ t[1], k }, tr_key_mt)
     end,
 }
 
