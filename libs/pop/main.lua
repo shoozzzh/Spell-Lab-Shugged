@@ -48,7 +48,7 @@ pop.z = {
 
         local t = {}
         for k, v in pairs(self.layer_base_z) do
-            self.layer_next_z[k] = v
+            t[k] = v
         end
         self.layer_next_z = t
     end,
@@ -58,6 +58,7 @@ pop.z = {
         return res
     end,
 }
+pop.z:new_frame() -- initialize pop.z.layer_next_z
 
 ---@class pop.pos
 pop.pos = {
