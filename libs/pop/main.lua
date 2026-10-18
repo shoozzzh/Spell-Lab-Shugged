@@ -480,7 +480,7 @@ function pop.tooltip(...)
 
     -- don't need to care about ids here
     pop.tooltip_custom(2, 0, true)(function()
-        local layout = pop.layout_stack(pop.text_line_height, 0)
+        local layout = pop.layout_stack(0, pop.text_line_height)
         for _, line in ipairs(text) do
             for t in string.gmatch(line or "", "[^\n]+") do
                 layout:next(function() pop.text(t) end)
