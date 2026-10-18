@@ -93,6 +93,8 @@ local function reload()
     reload_text()
 end
 
+reload()
+
 function sc.update()
     if GameGetFrameNum() % 60 ~= 0 then return end
     if settings.get "shortcut_changed" then

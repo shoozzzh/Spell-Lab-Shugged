@@ -13,5 +13,5 @@ return function(mb_utils)
         gui_elems.sound_button_clicked()
         dt.armed = not dt.armed
     end
-    pop.tooltip(tr["%MODULE_ID%"]:text(sc.text.transform_mortal_into_dummy))
+    pop.tooltip(tr["%MODULE_ID%"]:text(sc.text.dummy_transform))
 end
