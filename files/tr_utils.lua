@@ -11,25 +11,11 @@ function tr_utils.key(key)
     return key_prefix .. key
 end
 
----@param maybe_key string
+---@param key_or_text string
 ---@return string
 ---@nodiscard
-function tr_utils.maybe(maybe_key)
-    local _maybe_key = tr_utils.key(maybe_key)
-    local res = GameTextGetTranslatedOrNot(_maybe_key)
-    return res == _maybe_key and maybe_key or res
-end
-
----@param maybe_key string
----@return string?
----@nodiscard
-function tr_utils.try(maybe_key)
-    maybe_key = tr_utils.key(maybe_key)
-    local res = GameTextGetTranslatedOrNot(maybe_key)
-    if res == maybe_key then
-        return nil
-    end
-    return res
+function tr_utils.maybe(key_or_text)
+    return GameTextGetTranslatedOrNot(key_or_text)
 end
 
 ---@param key string

@@ -28,14 +28,14 @@ local function gen_module_button_utils(module_name)
     ---@class mb_utils
     local button_utils = {
         ---@param name string?
-        ---@param desc string?
+        ---@param no_desc boolean?
         ---@vararg string desc_lines
         ---@return boolean left_click
         ---@return boolean right_click
-        button_toggle = function(name, desc, ...)
+        button_toggle = function(name, no_desc, ...)
             name = name or tr_utils.get(module_name)
-            desc = desc or tr_utils.try(module_name .. ".desc")
-            if desc then
+            if not no_desc then
+                local desc = tr_utils.get(module_name .. ".desc")
                 return gui_elems.button_setting_toggle(button_sprite, setting_item, name, desc, ...)
             else
                 return gui_elems.button_setting_toggle(button_sprite, setting_item, name, ...)
