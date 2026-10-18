@@ -35,7 +35,11 @@ return function(mb_utils)
     end
     pop.tooltip_custom(3, 0, true)(function()
         local layout = pop.layout_stack(0, pop.text_line_height)
-        layout:next(function() pop.text(module_tr.tooltip:key()) end)
+        for line in module_tr.tooltip:text():gmatch "[^\n]+" do
+            layout:next(function()
+                pop.text(line)
+            end)
+        end
 
         layout:shift(0, 6)
 
