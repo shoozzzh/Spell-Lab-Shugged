@@ -32,8 +32,9 @@ return function(mb_utils)
         pop.tooltip(module_tr.fixed_to:text(format.decimal(vars.hp_fixed_to, 2),
             format.decimal(vars.max_hp_fixed_to, 2)))
 
-        pop.pos.next(-2, -2)
+        pop.pos.push(-2, -2)
         pop.image "%MOD_PATH%/files/gui_main/locked.png"
+        pop.pos.pop()
     else
         if pop.button "%MODULE_PATH%/button.png" then
             gui_elems.sound_button_clicked()

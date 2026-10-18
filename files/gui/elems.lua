@@ -111,8 +111,9 @@ function gui_elems.button_action(selected, action_type, sprite_file)
     spell_box.show(action_type, selected, hovered)
 
     local width, height = mutils.get_image_size(sprite_file)
-    pop.pos.next(20 / 2 - width / 2, 20 / 2 - height / 2)
+    pop.pos.push(20 / 2 - width / 2, 20 / 2 - height / 2)
     pop.image(sprite_file)
+    pop.pos.pop()
 
     pop.pos.push(2, 2)
     local left_click, right_click = pop.button "%MODULE_PATH%/transparent_16x16.png"

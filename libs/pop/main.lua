@@ -27,6 +27,7 @@ setmetatable(pop, {
 ---| "TOOLTIP"
 ---| "DEBUG"
 
+---@class pop.z
 pop.z = {
     --TODO: Adjust these values with the depthes of vanilla gui in mind
     ---@type table<pop.layer, number>
@@ -58,6 +59,7 @@ pop.z = {
     end,
 }
 
+---@class pop.pos
 pop.pos = {
     stack = {},
     push = function(x, y)

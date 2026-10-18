@@ -19,7 +19,6 @@ return function()
 
     pop.pos.push(button_x, button_y)
     button_x, button_y, dragging = pop.draggable_space(button_width, button_height, true)
-    pop.pos.pop()
 
     if last_dragging and not dragging then
         settings.set("gui_entry_point_x", button_x)
@@ -27,11 +26,11 @@ return function()
     end
     last_dragging = dragging
 
-    pop.pos.next(button_x, button_y)
     if pop.button(button_image) and not dragging then
         gui_elems.sound_button_clicked()
         is_panel_open = not is_panel_open
     end
+    pop.pos.pop()
 
     if not dragging then
         pop.tooltip_custom(3, 10, true)(function()
