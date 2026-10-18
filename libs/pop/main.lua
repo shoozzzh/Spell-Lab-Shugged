@@ -38,7 +38,7 @@ pop.z = {
         TOOLTIP = -200,
         DEBUG = -2000,
     },
-    step = 0.01,
+    step = -0.01,
     ---@type table<pop.layer, number>
     layer_next_z = {},
     ---@type pop.layer
