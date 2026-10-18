@@ -22,8 +22,10 @@ local function get_world_dest_pos()
     if player_id then
         local x, y = EntityGetTransform(player_id)
         return x, y
-    else
+    elseif EntityGetIsAlive(GameGetWorldStateEntity()) then -- GameGetCameraPos() crashes during init-ing
         return GameGetCameraPos()
+    else
+        return 0, 0
     end
 end
 
