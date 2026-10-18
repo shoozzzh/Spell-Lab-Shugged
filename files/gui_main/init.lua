@@ -91,7 +91,7 @@ local function show_gui()
 
     layout:next(function() gui_elems.line_of_buttons(functions_line) end)
 
-    if settings.get "show_toggle_options" then
+    if settings.get "toggles_toggle.enabled" then
         layout:next(function() gui_elems.line_of_buttons(toggles_line) end)
     end
 
