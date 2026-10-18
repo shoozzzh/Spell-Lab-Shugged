@@ -678,11 +678,20 @@ function pop.hoverable_space(width, height)
     return mouse_inside_area(x, y, width, height)
 end
 
----@class pop.layout
----@field next fun(self, content_fn)
----@field shift fun(self, shift_x: number, shift_y: number)
+if false then
+    ---@class pop.layout
+    local layout = {}
+
+    ---@param content_fn fun()
+    function layout:next(content_fn) end
+
+    ---@param shift_x number
+    ---@param shift_y number
+    function layout:shift(shift_x, shift_y) end
+end
 
 ---@class pop.layout_stack: pop.layout
+
 local layout_stack_mt = new_prototype {
     next = function(self, content_fn)
         pop.pos.push(self.x, self.y)
@@ -708,6 +717,7 @@ function pop.layout_stack(offset_x, offset_y)
 end
 
 ---@class pop.layout_hwrap: pop.layout
+
 local layout_hwrap_mt = new_prototype {
     next = function(self, content_fn)
         pop.pos.push(self.x, self.y)
