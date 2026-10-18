@@ -30,9 +30,9 @@ end
 ---@type player_option[]
 player_options = player_options or (function()
     local result = {}
-    local module_list = dofile_once "%MOD_PATH/files/module_list.lua"
+    local module_list = dofile_once "%MOD_PATH%/files/module_list.lua"
     for _, module_name in ipairs(module_list) do
-        local path = "%MOD_PATH/files/" .. module_name .. "/player_option.lua"
+        local path = "%MOD_PATH%/files/" .. module_name .. "/player_option.lua"
         if not ModDoesFileExist(path) then goto continue end
 
         ---@type player_option
