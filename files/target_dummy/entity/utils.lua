@@ -41,3 +41,5 @@ function utils.set_text(entity_id, tag_sprite, value)
     ComponentSetValue2(sprite_comp, "text", text)
     EntityRefreshSprite(entity_id, sprite_comp)
 end
+
+return utils
