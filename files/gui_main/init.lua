@@ -34,8 +34,12 @@ local function gen_module_button_utils(module_name)
         ---@return boolean right_click
         button_toggle = function(name, desc, ...)
             name = name or tr_utils.get(module_name)
-            desc = desc or tr_utils.get(module_name .. ".desc")
-            return gui_elems.button_setting_toggle(button_sprite, setting_item, name, desc, ...)
+            desc = desc or tr_utils.try(module_name .. ".desc")
+            if desc then
+                return gui_elems.button_setting_toggle(button_sprite, setting_item, name, desc, ...)
+            else
+                return gui_elems.button_setting_toggle(button_sprite, setting_item, name, ...)
+            end
         end,
         button = function()
             return pop.button(button_sprite)
