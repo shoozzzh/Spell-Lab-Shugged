@@ -444,7 +444,7 @@ local keys = {
     },
     --<span style="color:#6699CC;">English</span>: Toggle Options<br><span style="color:#6699CC;">简体中文</span>: 开关类选项<br><span style="color:#6699CC;">日本語</span>: オプションを切り替え<br><span style="color:#6699CC;">한국어</span>: 옵션 전환<br>
     ---@type tr.key
-    toggle_toggles = {},
+    toggles_toggle = {},
     ---@class twwe_and_nwt: tr.key_prefix
     twwe_and_nwt = {
         --<span style="color:#6699CC;">English</span>: Gain one %s effect<br><span style="color:#6699CC;">简体中文</span>: 获得一层%s效果<br><span style="color:#6699CC;">日本語</span>: %s効果を一つ獲得<br><span style="color:#6699CC;">한국어</span>: %s 효과 하나 획득<br>
