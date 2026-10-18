@@ -5,7 +5,7 @@ local gui_elems = require "gui.elems"
 local tr = require "tr"
 local this_tr = tr.as_prefix(tr.main_gui.entry_point)
 
-local button_image = "%MODULE_PATH%/button.png"
+local button_image = "%THIS_PATH%/button.png"
 local button_width, button_height = mutils.get_image_size(button_image)
 local button_x, button_y, dragging, last_dragging
 
