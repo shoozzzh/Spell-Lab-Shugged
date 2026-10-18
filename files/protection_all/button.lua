@@ -1,5 +1,4 @@
-local gui_elems = require "gui.elems"
-
-return function()
-    gui_elems.button_setting_toggle("%MODULE_PATH%/button.png", "%MODULE_ID%", "$status_protection_all")
+---@param mb_utils mb_utils
+return function(mb_utils)
+    mb_utils.button_toggle("$status_protection_all", true)
 end
