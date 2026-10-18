@@ -82,6 +82,7 @@ end
 ---@return boolean left_click
 ---@return boolean right_click
 function gui_elems.button_setting_toggle(sprite_filename, key, name, ...)
+    name = tr_utils.maybe(name)
     local value = settings.get(key) == true
     if not value then
         pop.option_next "DrawSemiTransparent"
