@@ -3,6 +3,7 @@ local tr = require "tr"
 local tr_utils = require "tr_utils"
 local gui_elems = require "gui.elems"
 
+---@class menus
 local menus = {
     active = "",
 }
@@ -14,7 +15,7 @@ end
 function menus:set_active(picker)
     local result = picker == self.active
     if result then picker = "" end
-    self.current = picker
+    self.active = picker
     return result
 end
 
