@@ -100,6 +100,11 @@ function pop.call_depth_mod(mod)
     pop.call_depth = pop.call_depth + mod
 end
 
+local function new_prototype(metatable)
+    metatable.__index = metatable
+    return metatable
+end
+
 local option_list = {}
 ---@type table<pop.gui_option,bool>
 pop.option = setmetatable({}, {
@@ -678,7 +683,7 @@ end
 ---@field shift fun(self, shift_x: number, shift_y: number)
 
 ---@class pop.layout_stack: pop.layout
-local layout_stack_mt = {
+local layout_stack_mt = new_prototype {
     next = function(self, content_fn)
         pop.pos.push(self.x, self.y)
         content_fn()
@@ -703,7 +708,7 @@ function pop.layout_stack(offset_x, offset_y)
 end
 
 ---@class pop.layout_hwrap: pop.layout
-local layout_hwrap_mt = {
+local layout_hwrap_mt = new_prototype {
     next = function(self, content_fn)
         pop.pos.push(self.x, self.y)
         content_fn()
