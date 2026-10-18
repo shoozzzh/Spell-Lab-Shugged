@@ -133,7 +133,7 @@ spell_lab_shugged.terrain_spell_lab.desc,Right-click to fix spell lab,,,,,,,,右
 spell_lab_shugged.terrain_spell_lab.enter,Enter the Spell Lab,,,,,,,,进入法术实验室,スペルラボ入場,스펠 랩 입장하기,,,
 spell_lab_shugged.terrain_spell_lab.leave,Leave the Spell Lab\nShift + Left-click to return to the mines intrance,,,,,,,,离开法术实验室\nShift + 左键返回矿井入口,スペルラボ退場\nShift + 左クリックで鉱山の入り口に戻る,스펠 랩 떠나기\nShift + 왼쪽 클릭으로 광산 입구로 돌아가기,,,
 spell_lab_shugged.terrain_spell_lab.reloader_interact,Press [E] to fix spell lab,,,,,,,,按 [E] 修复法术实验室,[E]を押してスペルラボを修理,[E]를 눌러 스펠 랩을 수리,,,
-spell_lab_shugged.toggle_options,Toggle Options,,,,,,,,开关类选项,オプションを切り替え,옵션 전환,,,
+spell_lab_shugged.toggles_toggle,Toggle Options,,,,,,,,开关类选项,オプションを切り替え,옵션 전환,,,
 spell_lab_shugged.twwe_and_nwt.gain,Gain one %s effect,,,,,,,,获得一层%s效果,%s効果を一つ獲得,%s 효과 하나 획득,,,
 spell_lab_shugged.twwe_and_nwt.level,Your current wand editing level is %s,,,,,,,,你当前的法杖编辑等级为 %s,現在の杖編集レベルは %s,현재 완드 편집 레벨은 %s,,,
 spell_lab_shugged.twwe_and_nwt.lose,Right-click to lose one %s effect,,,,,,,,右键失去一层%s效果,右クリックで%s効果を一つ消去,오른쪽 클릭으로 %s 효과 하나 제거,,,
