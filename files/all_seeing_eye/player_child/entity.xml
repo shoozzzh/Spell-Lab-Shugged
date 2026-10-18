@@ -12,12 +12,12 @@
 		offset_x="540"
 		offset_y="540"
 		alpha="1.0"
-		image_file="%THIS_FOLDER%/fog_of_war_hole.png"
+		image_file="%THIS_PATH%/fog_of_war_hole.png"
 		smooth_filtering="1"
 		fog_of_war_hole="1">
 	</SpriteComponent>
 	<LuaComponent
-        script_source_file="%THIS_FOLDER%/update.lua"
+        script_source_file="%THIS_PATH%/update.lua"
         execute_every_n_frame="1">
 	</LuaComponent>
 </Entity>

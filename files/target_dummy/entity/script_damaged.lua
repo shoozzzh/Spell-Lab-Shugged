@@ -1,4 +1,4 @@
-local utils = dofile_once "%THIS_FOLDER%/utils.lua"
+local utils = dofile_once "%THIS_PATH%/utils.lua"
 
 function damage_received(damage, message, entity_thats_responsible, is_fatal)
     local entity_id = GetUpdatedEntityID()

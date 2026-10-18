@@ -1,10 +1,10 @@
 <Entity>
 	<LuaComponent
-		script_source_file="%THIS_FOLDER%/update.lua"
+		script_source_file="%THIS_PATH%/update.lua"
 		execute_every_n_frame="1">
 	</LuaComponent>
 	<LuaComponent
-        script_source_file="%THIS_FOLDER%/removed.lua"
+        script_source_file="%THIS_PATH%/removed.lua"
         execute_on_removed="1"
         execute_every_n_frame="-1">
 	</LuaComponent>

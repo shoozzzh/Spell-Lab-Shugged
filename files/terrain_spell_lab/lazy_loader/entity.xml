@@ -1,11 +1,11 @@
-<Entity name="%%%.terrain_spell_lab_lazy_loader" >
+<Entity name="%MODULE_FULL_ID%.lazy_loader" >
   	<LuaComponent
 		execute_every_n_frame="1"
-		script_source_file="%THIS_FOLDER%/load.lua">
+		script_source_file="%THIS_PATH%/load.lua">
 	</LuaComponent>
   	<LuaComponent
 		execute_on_added="1"
 		remove_after_executed="1"
-		script_source_file="%THIS_FOLDER%/dup_check.lua">
+		script_source_file="%THIS_PATH%/dup_check.lua">
 	</LuaComponent>
 </Entity>

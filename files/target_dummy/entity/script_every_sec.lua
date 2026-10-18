@@ -1,4 +1,4 @@
-local utils = dofile_once "%THIS_FOLDER%/utils.lua"
+local utils = dofile_once "%THIS_PATH%/utils.lua"
 
 local entity_id = GetUpdatedEntityID()
 local parent_id = EntityGetParent(entity_id)
