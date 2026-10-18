@@ -37,7 +37,7 @@ function menus:button(module_name, filepath, option_text)
     if module_name ~= self.active then
         pop.option_next "DrawSemiTransparent"
     end
-    option_text = tr_utils.maybe(option_text or module_name)
+    option_text = tr_utils.maybe(option_text or tr_utils.key(module_name))
     local changed = false
     if module_name == self.active then
         if pop.button(filepath) then
