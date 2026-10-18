@@ -27,16 +27,16 @@ return function(mb_utils)
     local d = GameGetGameEffectCount(player_id, "NO_WAND_EDITING") - b
     local level = a + c - b - d
     local tooltip = {
-        module_tr.gain:text(module_tr.twwe:key()),
-        module_tr.lose:text(module_tr.nwt:key()),
+        module_tr.gain:text(module_tr.twwe:text()),
+        module_tr.lose:text(module_tr.nwt:text()),
     }
 
     if num_effects_positive > 0 then
-        tooltip[#tooltip + 1] = module_tr.num:text(module_tr.twwe:key(),
+        tooltip[#tooltip + 1] = module_tr.num:text(module_tr.twwe:text(),
             format.decimal(a, 0), format.decimal(c, 0))
     end
     if num_effects_negative > 0 then
-        tooltip[#tooltip + 1] = module_tr.num:text(module_tr.nwt:key(),
+        tooltip[#tooltip + 1] = module_tr.num:text(module_tr.nwt:text(),
             format.decimal(b, 0), format.decimal(d, 0))
     end
 

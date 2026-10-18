@@ -456,7 +456,7 @@ local keys = {
         --<span style="color:#6699CC;">English</span>: Right-click to lose one %s effect<br><span style="color:#6699CC;">简体中文</span>: 右键失去一层%s效果<br><span style="color:#6699CC;">日本語</span>: 右クリックで%s効果を一つ消去<br><span style="color:#6699CC;">한국어</span>: 오른쪽 클릭으로 %s 효과 하나 제거<br>
         ---@type tr.key
         lose = {},
-        --<span style="color:#6699CC;">English</span>: You have %s(from this mod) + %s(external) %s effect(s)<br><span style="color:#6699CC;">简体中文</span>: 当前你拥有 %s(来自此功能) + %2(其他来源) 层%s效果<br><span style="color:#6699CC;">日本語</span>: 現在 %s(このmod由来) + %2(その他) %s効果を所持中<br><span style="color:#6699CC;">한국어</span>: 현재 %s(이 모드로부터) + %2(그 외) %s 효과 보유 중<br>
+        --<span style="color:#6699CC;">English</span>: You have %s(from this mod) + %s(external) %s effect(s)<br><span style="color:#6699CC;">简体中文</span>: 当前你拥有 %s(来自此功能) + %s(其他来源) 层%s效果<br><span style="color:#6699CC;">日本語</span>: 現在 %s(このmod由来) + %s(その他) %s効果を所持中<br><span style="color:#6699CC;">한국어</span>: 현재 %s(이 모드로부터) + %s(그 외) %s 효과 보유 중<br>
         ---@type tr.key
         num = {},
         --<span style="color:#6699CC;">English</span>: NWT<br><span style="color:#6699CC;">简体中文</span>: 无法编辑魔杖<br><span style="color:#6699CC;">日本語</span>: 杖工作なし<br><span style="color:#6699CC;">한국어</span>: 완개없<br>

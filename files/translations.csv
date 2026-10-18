@@ -137,7 +137,7 @@ spell_lab_shugged.toggles_toggle,Toggle Options,,,,,,,,开关类选项,オプシ
 spell_lab_shugged.twwe_and_nwt.gain,Gain one %s effect,,,,,,,,获得一层%s效果,%s効果を一つ獲得,%s 효과 하나 획득,,,
 spell_lab_shugged.twwe_and_nwt.level,Your current wand editing level is %s,,,,,,,,你当前的法杖编辑等级为 %s,現在の杖編集レベルは %s,현재 완드 편집 레벨은 %s,,,
 spell_lab_shugged.twwe_and_nwt.lose,Right-click to lose one %s effect,,,,,,,,右键失去一层%s效果,右クリックで%s効果を一つ消去,오른쪽 클릭으로 %s 효과 하나 제거,,,
-spell_lab_shugged.twwe_and_nwt.num,You have %s(from this mod) + %s(external) %s effect(s),,,,,,,,当前你拥有 %s(来自此功能) + %2(其他来源) 层%s效果,現在 %s(このmod由来) + %2(その他) %s効果を所持中,현재 %s(이 모드로부터) + %2(그 외) %s 효과 보유 중,,,
+spell_lab_shugged.twwe_and_nwt.num,You have %s(from this mod) + %s(external) %s effect(s),,,,,,,,当前你拥有 %s(来自此功能) + %s(其他来源) 层%s效果,現在 %s(このmod由来) + %s(その他) %s効果を所持中,현재 %s(이 모드로부터) + %s(그 외) %s 효과 보유 중,,,
 spell_lab_shugged.twwe_and_nwt.nwt,NWT,,,,,,,,无法编辑魔杖,杖工作なし,완개없,,,
 spell_lab_shugged.twwe_and_nwt.result.everywhere,You can edit wands everywhere,,,,,,,,你可以随时编辑魔杖,どこにいても杖を編集できます,어디서나 완드를 편집할 수 있습니다,,,
 spell_lab_shugged.twwe_and_nwt.result.unable,You can't edit wands,,,,,,,,你无法编辑魔杖,杖を編集できません,완드를 편집할 수 없습니다,,,
