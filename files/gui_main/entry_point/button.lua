@@ -9,22 +9,25 @@ local button_image = "%THIS_PATH%/button.png"
 local button_width, button_height = mutils.get_image_size(button_image)
 local button_x, button_y, dragging, last_dragging
 
+local setting_x = "%MODULE_ID%.entry_point.x"
+local setting_y = "%MODULE_ID%.entry_point.y"
+
 local is_panel_open = false
 
 return function()
     if not button_x then
-        button_x = settings.get_or_default("gui_entry_point_x", pop.screen_size[1] - button_width - 3)
-        button_y = settings.get_or_default("gui_entry_point_y", 3)
+        button_x = settings.get_or_default(setting_x, pop.screen_size[1] - button_width - 3)
+        button_y = settings.get_or_default(setting_y, 3)
     end
 
+    last_dragging = dragging
     pop.pos.push(button_x, button_y)
     button_x, button_y, dragging = pop.draggable_space(button_width, button_height, true)
 
     if last_dragging and not dragging then
-        settings.set("gui_entry_point_x", button_x)
-        settings.set("gui_entry_point_y", button_y)
+        settings.set(setting_x, button_x)
+        settings.set(setting_y, button_y)
     end
-    last_dragging = dragging
 
     if pop.button(button_image) and not dragging then
         gui_elems.sound_button_clicked()

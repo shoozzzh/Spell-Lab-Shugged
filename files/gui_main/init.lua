@@ -137,8 +137,6 @@ function callbacks.OnWorldPreUpdate()
 
     -- keyboard_focus.update()
 
-    dofile_once "%MODULE_PATH%/entry_point/button.lua" ()
-
     if is_panel_open and not GameIsInventoryOpen() and common_val.player and not GameHasFlagRun "gkbrkn_config_menu_open" then
         show_gui()
     else
