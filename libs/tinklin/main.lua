@@ -401,7 +401,7 @@ do
     }
 
     function comp_methods:object(name)
-        return setmetatable({ comp_id = self.id, name = name }, object_mt)
+        return setmetatable({ comp_id = self._id, name = name }, object_mt)
     end
 end
 
