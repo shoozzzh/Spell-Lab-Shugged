@@ -588,7 +588,7 @@ local keys = {
     wand_no_shooting = {
         --<span style="color:#6699CC;">English</span>: Please disable No Shooting option before using wands<br><span style="color:#6699CC;">简体中文</span>: 使用法杖前请先关闭禁止法杖射击选项<br><span style="color:#6699CC;">日本語</span>: 杖を使用する前に射撃無効を無効にしてください<br><span style="color:#6699CC;">한국어</span>: 완드를 사용하기 전에 사격 무효를 꺼 주세요<br>
         ---@type tr.key
-        cast_is_blocked = {},
+        info = {},
     },
     --<span style="color:#6699CC;">English</span>: Wand Picker<br><span style="color:#6699CC;">简体中文</span>: 法杖生成器<br><span style="color:#6699CC;">日本語</span>: 杖セレクター<br><span style="color:#6699CC;">한국어</span>: 완드 선택기<br>
     ---@class tr.keys.wand_picker: tr.key, tr.key_prefix

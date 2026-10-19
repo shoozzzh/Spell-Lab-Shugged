@@ -177,7 +177,7 @@ spell_lab_shugged.wand_edit_panel.spell_box_commmon_tips_selected,%s to deselect
 spell_lab_shugged.wand_edit_panel.spell_box_permanent_tips,%s to demote this spell,,,,,,,,%s以取消始终施放,%sを押してこの呪文を降格,이 주문을 강등시키려면 %s,,,
 spell_lab_shugged.wand_edit_panel.undo,Undo,,,,,,,,撤销,取り消し：,실행 취소: ,,,
 spell_lab_shugged.wand_no_shooting,No Shooting,,,,,,,,禁止法杖射击,射撃無効,사격 무효,,,
-spell_lab_shugged.wand_no_shooting.cast_is_blocked,Please disable No Shooting option before using wands,,,,,,,,使用法杖前请先关闭禁止法杖射击选项,杖を使用する前に射撃無効を無効にしてください,완드를 사용하기 전에 사격 무효를 꺼 주세요,,,
+spell_lab_shugged.wand_no_shooting.info,Please disable No Shooting option before using wands,,,,,,,,使用法杖前请先关闭禁止法杖射击选项,杖を使用する前に射撃無効を無効にしてください,완드를 사용하기 전에 사격 무효를 꺼 주세요,,,
 spell_lab_shugged.wand_picker,Wand Picker,,,,,,,,法杖生成器,杖セレクター,완드 선택기,,,
 spell_lab_shugged.wand_picker.copy_held_wand,[Copy Held Wand],,,,,,,,[复制手持法杖],[手持ちの杖をコピー],[손에 든 완드 복사],,,
 spell_lab_shugged.wand_picker.exploding_actions,The capacity you are setting for your wand is not enough for holding the spells in it. Hold %s and click again to confirm.,,,,,,,,当前设置的法杖容量不足以容纳法杖中法术，若仍要继续，请按住 %s 并再次点击,設定しようとしている杖の容量が、中にある呪文の数を下回ります。%sを押したままもう一度クリックして確定します。,설정하려는 완드 용량은 주문을 담기에 충분하지 않습니다. 확인하려면 %s 키를 누르고 다시 클릭하세요.,,,
