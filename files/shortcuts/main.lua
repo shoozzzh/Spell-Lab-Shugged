@@ -75,15 +75,15 @@ local function reload()
     if not settings.get "shortcut_strict" then
         sc.used_keys = {}
 
-        local inverted = {}
+        local set = {}
         for _, shortcut in pairs(sc.table) do
             for _, key in ipairs(shortcut) do
-                inverted[key] = true
+                set[key] = true
             end
         end
-        inverted.Mouse_left = nil
-        inverted.Mouse_right = nil
-        for key, _ in pairs(inverted) do
+        set.Mouse_left = nil
+        set.Mouse_right = nil
+        for key, _ in pairs(set) do
             sc.used_keys[#sc.used_keys + 1] = key
         end
     else

@@ -59,9 +59,9 @@ function common_val.update()
     local ws_comp = common_val.world_state:comp_first "WorldStateComponent"
     common_val.unlimited_spells = (ws_comp ~= nil) and ws_comp.perk_infinite_spells
 
-    common_val.ctrl = sc.detector.is_held(sc.table.modifier_key_1)
-    common_val.shift = sc.detector.is_held(sc.table.modifier_key_2)
-    common_val.alt = sc.detector.is_held(sc.table.modifier_key_3)
+    common_val.ctrl = sc.detector.is_held(sc.table.modifier_key_1, sc.table.modifier_key_1)
+    common_val.shift = sc.detector.is_held(sc.table.modifier_key_2, sc.table.modifier_key_2)
+    common_val.alt = sc.detector.is_held(sc.table.modifier_key_3, sc.table.modifier_key_3)
 end
 
 common_val.update()
