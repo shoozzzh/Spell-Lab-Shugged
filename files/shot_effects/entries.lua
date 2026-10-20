@@ -1,18 +1,17 @@
-local function tr_key(key)
-    return "$spell_lab_shugged." .. key
-end
+local tr = require "tr"
+local module_tr = tr.as_prefix(tr["%MODULE_ID%"])
 
 ---@type shot_effect[]
 shot_effect_entries = {
     {
         related_status = "BLOODY",
         extra_modifier = "critical_hit_boost",
-        desc = tr_key "shot_effect.desc_bloody",
+        desc = module_tr.desc.bloody:key(),
     },
     {
         related_perk = "RISKY_CRITICAL",
         extra_modifier = "critical_plus_small",
-        desc = tr_key "shot_effect.desc_risky_critical",
+        desc = module_tr.desc.risky_critical:key(),
     },
     {
         related_perk = "PROJECTILE_HOMING",
@@ -25,7 +24,7 @@ shot_effect_entries = {
     {
         related_perk = "FOOD_CLOCK",
         extra_modifier = "food_clock",
-        desc = tr_key "shot_effect.desc_food_clock",
+        desc = module_tr.desc.food_clock:key(),
     },
     {
         related_custom_effect = "data/entities/misc/effect_damage_plus_small.xml",
@@ -48,15 +47,15 @@ shot_effect_entries = {
     {
         related_perk = "LASER_AIM",
         extra_modifier = "laser_aim",
-        desc = tr_key "shot_effect.desc_laser_aim",
+        desc = module_tr.desc.laser_aim:key(),
     },
     {
         related_perk = "LOW_RECOIL",
         extra_modifier = "low_recoil",
         dont_use_fetched_metadata = true,
         properties = {
-            { "speed_multiplier", "x 0.8" },
-            { tr_key "recoil",    "x 0.5 - 16" },
+            { "speed_multiplier",              "x 0.8" },
+            { tr.action_metadata.recoil:key(), "x 0.5 - 16" },
         },
     },
     {
@@ -66,7 +65,7 @@ shot_effect_entries = {
     {
         related_custom_effect = "data/entities/misc/effect_homing_shooter.xml",
         extra_modifier = "projectile_homing_shooter_wizard",
-        desc = tr_key "shot_effect.desc_homing_shooter_wizard",
+        desc = module_tr.desc.homing_shooter_wizard:key(),
     },
     {
         id = "essence_alcohol",
@@ -80,7 +79,7 @@ shot_effect_entries = {
         related_perk = "DUPLICATE_PROJECTILE",
         extra_modifier = "duplicate_projectile",
         equivalent_action_type = ACTION_TYPE_UTILITY,
-        desc = tr_key "shot_effect.desc_duplicate_projectile",
+        desc = module_tr.desc.duplicate_projectile:key(),
     },
     {
         related_perk = "FAST_PROJECTILES",
@@ -89,13 +88,13 @@ shot_effect_entries = {
     {
         related_perk = "PERSONAL_LASER",
         extra_modifier = "slow_firing",
-        desc = tr_key "shot_effect.desc_personal_laser",
+        desc = module_tr.desc.personal_laser:key(),
     },
     {
         related_perk = "GLASS_CANNON",
         game_effect = "DAMAGE_MULTIPLIER",
         max_count = 2,
-        desc = tr_key "shot_effect.desc_glass_cannon",
+        desc = module_tr.desc.glass_cannon:key(),
     },
     {
         related_perk = "LOW_HP_DAMAGE_BOOST",
@@ -113,9 +112,9 @@ shot_effect_entries = {
         shot_script = "data/scripts/status_effects/twitchy_shot.lua",
         max_count = 1,
         properties = {
-            { "friendly_fire", tr_key "action_metadata.enables" },
+            { "friendly_fire", tr.action_metadata.enables:key() },
         },
-        desc = tr_key "shot_effect.desc_twitchy",
+        desc = module_tr.desc.twitchy:key(),
     },
     {
         related_custom_effect = "data/entities/misc/neutralized.xml",
