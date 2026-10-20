@@ -454,7 +454,11 @@ end
 ---@return entity entity
 ---@nodiscard
 function tinklin.entity_new(name)
-    return tinklin.entity_wrap(EntityCreateNew(name))
+    if name then
+        return tinklin.entity_wrap(EntityCreateNew(name))
+    else
+        return tinklin.entity_wrap(EntityCreateNew())
+    end
 end
 
 ---@param center {[1]: number, [2]: number}
