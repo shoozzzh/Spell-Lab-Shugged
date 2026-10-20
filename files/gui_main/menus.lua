@@ -40,8 +40,8 @@ end
 ---@param module_id string
 ---@param filepath string
 ---@param option_text string?
----@return boolean
----@return boolean
+---@return boolean changed
+---@return boolean is_now_active
 function menus:button(module_id, filepath, option_text)
     if module_id ~= self.active then
         pop.option_next "DrawSemiTransparent"
@@ -51,7 +51,7 @@ function menus:button(module_id, filepath, option_text)
     if module_id == self.active then
         if pop.button(filepath) then
             gui_elems.sound_button_clicked()
-            self:set_active ""
+            self:set_active(module_id)
             changed = true
         end
         pop.tooltip(tr.general.option_disable:text(option_text))
