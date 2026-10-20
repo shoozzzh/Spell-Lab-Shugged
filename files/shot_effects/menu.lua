@@ -38,9 +38,9 @@ local SHOT_EFFECT_TYPE = {
     game_effect    = module_tr.type.game_effect:key(),
 }
 local SHOT_EFFECT_SOURCE_TYPE = {
-    Perk         = module_tr.source_type.perk,
-    Status       = module_tr.source_type.status,
-    CustomEffect = module_tr.source_type.custom_effect,
+    Perk         = module_tr.source_type.perk:key(),
+    Status       = module_tr.source_type.status:key(),
+    CustomEffect = module_tr.source_type.custom_effect:key(),
 }
 
 ---@class shot_effect
@@ -235,8 +235,8 @@ local function remove_shot_effect(player, shot_effect)
     end)
 end
 
-local picker = {}
-picker.menu = function()
+local menu = {}
+menu.menu = function()
     local player = tl.entity_wrap(get_player())
 
     local count_table = {}
@@ -292,10 +292,11 @@ picker.menu = function()
     pop.pos.push()
 end
 
-picker.buttons = function()
+menu.buttons = function()
     gui_elems.line_of_buttons { function()
-        gui_elems.flag_toggle_button("%MODULE_PATH%/unsafe_values.png", "%MODULE_ID%.unsafe_count_allowed")
+        gui_elems.button_setting_toggle("%MODULE_PATH%/unsafe_values.png", "%MODULE_ID%.unsafe_count_allowed",
+            module_tr.unsafe_count_allowed:key())
     end }
 end
 
-return picker
+return menu
