@@ -1,4 +1,4 @@
-<Entity tags="prop,hittable,mortal,homing_target,enemy,teleportable_NOT,polymorphable_NOT,%MODULE_FULL_ID%.target_dummy" >
+<Entity tags="prop,hittable,mortal,homing_target,enemy,teleportable_NOT,polymorphable_NOT,%MOD_ID%.target_dummy" >
 	<Base file="%THIS_PATH%/base.xml" />
 <!-- 	<CharacterCollisionComponent/>
 	<CharacterDataComponent

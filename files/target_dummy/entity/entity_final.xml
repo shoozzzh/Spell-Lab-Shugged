@@ -1,6 +1,6 @@
-<Entity tags="prop,hittable,mortal,homing_target,enemy,touchmagic_immunity,teleportable_NOT,polymorphable_NOT,%MODULE_FULL_ID%.target_dummy" >
+<Entity tags="prop,hittable,mortal,homing_target,enemy,touchmagic_immunity,teleportable_NOT,polymorphable_NOT,%MOD_ID%.target_dummy">
 	<Base file="%THIS_PATH%/base.xml" />
-	<!-- 	<CharacterCollisionComponent/>
+    <!-- 	<CharacterCollisionComponent/>
 	<CharacterDataComponent
 		collision_aabb_min_x="-25"
 		collision_aabb_max_x="25"

@@ -104,6 +104,6 @@ target:comp_new "LuaComponent" {
 }
 
 target:load_extra_entity "%MOD_PATH%/files/dummy_target/base_dummy_target.xml"
-target.tag.spell_lab_shugged_target_dummy = true
+target.tag["%MOD_ID%.target_dummy"] = true
 
 GamePrint(module_tr.done:text(tr_utils.maybe(target.name)))
