@@ -2,7 +2,7 @@ local tl = require "tinklin"
 local pop = require "pop"
 local gui_elems = require "gui.elems"
 local mutils = require "misc_utils"
-local get_player = require "get_player"
+local common_val = require "common_values"
 local settings = require "mod_settings"
 local parse_entity_xml = require "parse_entity_xml"
 local tr = require "tr"
@@ -237,7 +237,8 @@ end
 
 local menu = {}
 menu.menu = function()
-    local player = tl.entity_wrap(get_player())
+    local player = common_val.player
+    if not player then return end -- TODO: show something when no player
 
     local count_table = {}
     player:get_children(tag_created):each(function(shot_effect_entity)
