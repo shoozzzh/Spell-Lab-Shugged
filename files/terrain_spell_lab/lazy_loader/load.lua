@@ -13,7 +13,7 @@ EntityLoad("%MOD_PATH%/files/target_dummy/entity/entity_final.xml", x + 100, y)
 EntityLoad("data/entities/buildings/workshop_spell_visualizer.xml", x - 78, y - 50)
 EntityLoad("data/entities/buildings/workshop_aabb.xml", x - 78, y - 50)
 
-local flag_terrain_init = "%MOD_ID%.terrain_init"
+local flag_terrain_init = "%MODULE_FULL_ID%.init"
 GameAddFlagRun(flag_terrain_init)
 
 local wsv = EntityGetInRadiusWithTag(x - 78, y - 50, 6, "workshop_spell_visualizer")
