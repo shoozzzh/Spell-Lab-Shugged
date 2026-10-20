@@ -476,12 +476,14 @@ end
 
 local function tooltip(content_fn, x, y)
     local z = pop.z:get()
+    GuiLayoutBeginLayer(gui)
     GuiBeginAutoBox(gui)
 
     pop.pos.layer(x, y)(content_fn)
 
     GuiZSetForNextWidget(gui, z)
     GuiEndAutoBoxNinePiece(gui)
+    GuiLayoutEndLayer(gui)
 end
 
 ---@vararg string
