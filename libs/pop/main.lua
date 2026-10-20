@@ -572,9 +572,12 @@ end
 function pop.scroll_box_begin(width, height, margin_x, margin_y)
     local x, y = pop.pos.get()
     GuiBeginScrollContainer(gui, get_id(), x, y, width, height, true, margin_x, margin_y)
+    GuiLayoutEnd(gui)
+    return true
 end
 
 function pop.scroll_box_end()
+    GuiLayoutBeginVertical(gui, 0, 0)
     GuiEndScrollContainer(gui)
 end
 
