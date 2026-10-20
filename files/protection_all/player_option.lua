@@ -3,7 +3,7 @@ local player_option = {}
 
 player_option.mod_setting_key = "%MODULE_ID%.enabled"
 
-local player_child_name = "%MOD_ID%.invincible"
+local player_child_name = "%MODULE_FULL_ID%.player_child"
 
 function player_option.value_initiator()
     return EntityGetWithName(player_child_name) ~= 0
