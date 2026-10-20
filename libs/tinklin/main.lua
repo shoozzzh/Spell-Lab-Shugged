@@ -200,9 +200,9 @@ function entity_methods:comps(comp_type, tag)
     end
     local comps
     if tag == nil then
-        comps = EntityGetComponent(self.id, comp_type)
+        comps = EntityGetComponentIncludingDisabled(self.id, comp_type)
     else
-        comps = EntityGetComponent(self.id, comp_type, tag)
+        comps = EntityGetComponentIncludingDisabled(self.id, comp_type, tag)
     end
     return fun.iter(comps or {}):map(tinklin.comp_wrap)
 end
@@ -214,9 +214,9 @@ function entity_methods:comps_enabled(comp_type, tag)
     end
     local comps
     if tag == nil then
-        comps = EntityGetComponentIncludingDisabled(self.id, comp_type)
+        comps = EntityGetComponent(self.id, comp_type)
     else
-        comps = EntityGetComponentIncludingDisabled(self.id, comp_type, tag)
+        comps = EntityGetComponent(self.id, comp_type, tag)
     end
     return fun.iter(comps or {}):map(tinklin.comp_wrap)
 end
