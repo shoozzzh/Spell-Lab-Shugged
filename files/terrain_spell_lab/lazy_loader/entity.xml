@@ -8,4 +8,9 @@
 		remove_after_executed="1"
 		script_source_file="%THIS_PATH%/dup_check.lua">
 	</LuaComponent>
+    <!-- guarantee being saved by unloading the chunk after 60 frames -->
+    <Entity>
+        <StreamingKeepAliveComponent/>
+        <LifetimeComponent lifetime="60"/>
+    </Entity>
 </Entity>
