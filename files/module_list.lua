@@ -1,4 +1,5 @@
 return {
+    "gui",
     "gui_main",
     "spell_data",
     "all_seeing_eye",
