@@ -571,12 +571,25 @@ end
 ---@param margin_y number? 2
 function pop.scroll_box_begin(width, height, margin_x, margin_y)
     local x, y = pop.pos.get()
+    margin_x = margin_x or 2
+    margin_y = margin_y or 2
     GuiBeginScrollContainer(gui, get_id(), x, y, width, height, true, margin_x, margin_y)
+
+    pop.pos.layer(0, 0)(function()
+        -- pop.image "data/ui_gfx/decorations/9piece0_gray.png"
+        pop.invis_begin()
+        pop.text_pixel "|"
+        pop.invis_end()
+    end)
+    local _, test_y = pop.prev_pos()
+    pop.pos.push(0, test_y - y)
+
     GuiLayoutEnd(gui)
     return true
 end
 
 function pop.scroll_box_end()
+    pop.pos.pop()
     GuiLayoutBeginVertical(gui, 0, 0)
     GuiEndScrollContainer(gui)
 end
