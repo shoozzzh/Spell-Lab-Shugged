@@ -1,11 +1,8 @@
 <Entity tags="%MODULE_FULL_ID%.lab_reloader" >
-    <ItemComponent
-        _enabled="1"
-        custom_pickup_string="$%MODULE_FULL_ID%.reloader_interact"
-        item_pickup_radius="20"
-        is_pickable="1"
-        play_spinning_animation="0">
-	</ItemComponent>
+    <InteractableComponent
+        ui_text="$%MODULE_FULL_ID%.reloader_interact"
+        radius="20">
+    </InteractableComponent>
 	<SpriteComponent
 		image_file="data/ui_gfx/gun_actions/recharge.png"
 		offset_x="8"
