@@ -30,7 +30,7 @@ gui_elems.lhs_table_width = 174
 gui_elems.lhs_table_max_height = 160
 gui_elems.lhs_table_min_height = 20
 gui_elems.lhs_table_row_size = 8
-gui_elems.lhs_table_cell_size = { 22, 22 }
+gui_elems.lhs_table_cell_size = { 20 + 1 + 1, 20 }
 gui_elems.lhs_table_pos = { 640 * 0.05, 360 * 0.16 }
 
 ---@generic C
@@ -43,12 +43,12 @@ function gui_elems.lhs_table(cells, cell_gui_fn, height)
     local row_size = gui_elems.lhs_table_row_size
     local cell_width, cell_height = unpack(gui_elems.lhs_table_cell_size)
     local width = gui_elems.lhs_table_width
-    height = height or math.floor(#cells / row_size) * cell_height
+    height = height or math.ceil(#cells / row_size) * cell_height
     height = math.min(height, gui_elems.lhs_table_max_height)
     height = math.max(height, gui_elems.lhs_table_min_height)
 
     pop.pos.push(unpack(gui_elems.lhs_table_pos))
-    pop.scroll_box_begin(width, height)
+    pop.scroll_box_begin(width, height, 0, 0)
     if pop.prev_mouse_inside(2) then
         pop.block_mousewheel()
     end
