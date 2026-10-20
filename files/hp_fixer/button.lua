@@ -10,13 +10,15 @@ local common_val = require "common_values"
 local player_child_name = "%MODULE_FULL_ID%.player_child"
 
 local var_map = {
-    hp_fixed_to = "value_float",
-    max_hp_fixed_to = "value_float",
+    hp = "value_float",
+    max_hp = "value_float",
+    wait_for_kill_flag_on_death = "value_bool",
 }
 
 ---@class hp_fixer_vars
----@field hp_fixed_to number
----@field max_hp_fixed_to number
+---@field hp number
+---@field max_hp number
+---@field wait_for_kill_flag_on_death boolean
 
 ---@param mb_utils mb_utils
 return function(mb_utils)
@@ -29,17 +31,16 @@ return function(mb_utils)
         end
 
         local vars = var.access(player_child.id, var_map, "") --[[@as hp_fixer_vars]]
-        pop.tooltip(module_tr.fixed_to:text(format.decimal(vars.hp_fixed_to, 2),
-            format.decimal(vars.max_hp_fixed_to, 2)))
+        pop.tooltip(module_tr.fixed_to:text(format.damage(vars.hp), format.damage(vars.max_hp)))
 
         pop.pos.push(-2, -2)
-        pop.image "%MOD_PATH%/files/gui_main/locked.png"
+        pop.image "%MOD_PATH%/files/gui/locked.png"
         pop.pos.pop()
     else
         if pop.button "%MODULE_PATH%/button.png" then
             gui_elems.sound_button_clicked()
             if common_val.shift then
-                player_child = tl.entity_load_child("%MODULE_PATH%/hp_fixer.xml", common_val.player)
+                player_child = tl.entity_load_child("%MODULE_PATH%/player_child/entity.xml", common_val.player)
                 player_child.name = player_child_name
             else
                 local dm_comp = common_val.player:comp_first "DamageModelComponent"

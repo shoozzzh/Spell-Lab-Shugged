@@ -27,11 +27,11 @@ local inf = 1 / 0
 local threshold = 10 ^ 10
 
 ---@param value number
----@param never_use_scientific_notation boolean
+---@param never_use_scientific_notation boolean?
 ---@param result_inf string?
 ---@return string
 ---@nodiscard
-function format.damage_dummy(value, never_use_scientific_notation, result_inf)
+function format.damage(value, never_use_scientific_notation, result_inf)
     if value == inf then
         return result_inf or "∞"
     end
@@ -62,15 +62,11 @@ end
 ---@nodiscard
 function format.decimal(value, places, show_sign)
     local text = ""
-    if value ~= nil then
-        if show_sign and value > 0 then
-            text = "+"
-        end
-        local power = math.pow(10, places)
-        text = text .. tostring(math.floor(value * power + 0.5) / power)
-    else
-        return "missing"
+    if show_sign and value > 0 then
+        text = "+"
     end
+    local power = math.pow(10, places)
+    text = text .. tostring(math.floor(value * power + 0.5) / power)
     return text
 end
 
@@ -83,16 +79,16 @@ function format.frames(time, digits)
     return format.decimal(time / 60, digits, true) .. " s (" .. tr.general.frames:text(format.int(time)) .. ")"
 end
 
----@param min number
----@param max number
+---@param from number
+---@param to number
 ---@return string
 ---@nodiscard
-function format.range(min, max)
-    if not min or not max then return nil end
-    if min ~= max then
-        return ("%s - %s"):format(min, max)
+function format.range(from, to)
+    if not from or not to then return nil end
+    if from ~= to then
+        return ("%s - %s"):format(from, to)
     else
-        return tostring(min)
+        return tostring(from)
     end
 end
 

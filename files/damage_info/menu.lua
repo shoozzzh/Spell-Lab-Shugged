@@ -24,7 +24,7 @@ return function()
 
     local layout = pop.layout_stack(0, pop.text_line_height)
     layout:next(function()
-        pop.text(module_tr.total_proj_dmg:text(format.damage_dummy(total_projectile_damage, false, "inf")))
+        pop.text(module_tr.total_proj_dmg:text(format.damage(total_projectile_damage, false, "inf")))
     end)
     layout:next(function()
         pop.text(module_tr.total_projectiles_num:text(total_projectiles))
