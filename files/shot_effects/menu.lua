@@ -248,7 +248,6 @@ menu.menu = function()
         count_table[id] = (count_table[id] or 0) + 1
     end)
 
-    pop.pos.push(640 * 0.05, 360 * 0.16)
     gui_elems.lhs_table(shot_effect_data, function(shot_effect)
         local count = count_table[shot_effect.id] or 0
         local max_count = shot_effect.max_count
@@ -290,7 +289,6 @@ menu.menu = function()
             end
         end
     end)
-    pop.pos.push()
 end
 
 menu.buttons = function()
