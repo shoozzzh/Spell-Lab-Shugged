@@ -18,8 +18,8 @@
 	<VariableStorageComponent name="gkbrkn_no_custom_damage_numbers" />
 
 	<InteractableComponent
-		ui_text="$%MODULE_FULL_ID%_dummy_target_interact"
-		radius="20">
+        ui_text="$%MODULE_FULL_ID%.entity_interact"
+        radius="20">
 	</InteractableComponent>
 
 	<LuaComponent script_interacting="%THIS_PATH%/script_interacted.lua" />
