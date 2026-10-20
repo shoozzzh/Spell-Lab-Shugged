@@ -2,7 +2,7 @@ local settings = require "mod_settings"
 local pop = require "pop"
 
 local gokis = function(action_type, selected, hovered)
-    local spell_box = { "%MODULE_PATH%/goki/" }
+    local spell_box = { "%MODULE_PATH%/goki/spell_box" }
     if action_type then
         spell_box[#spell_box + 1] = "_"
         spell_box[#spell_box + 1] = tostring(action_type)
