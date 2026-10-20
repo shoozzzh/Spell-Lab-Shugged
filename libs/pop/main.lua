@@ -52,6 +52,7 @@ pop.z = {
         end
         self.layer_next_z = t
     end,
+    ---@return number z
     get = function(self)
         local res = self.layer_next_z[self.layer_cur]
         self.layer_next_z[self.layer_cur] = res + self.step
@@ -63,6 +64,9 @@ pop.z:new_frame() -- initialize pop.z.layer_next_z
 ---@class pop.pos
 pop.pos = {
     stack = {},
+    ---@param x number
+    ---@param y number
+    ---@return boolean
     push = function(x, y)
         pop.pos.stack[#pop.pos.stack + 1] = { x, y }
         return true
@@ -70,6 +74,8 @@ pop.pos = {
     pop = function()
         pop.pos.stack[#pop.pos.stack] = nil
     end,
+    ---@return number x
+    ---@return number y
     get = function()
         local x, y = 0, 0
         for _, offset in ipairs(pop.pos.stack) do
@@ -77,7 +83,10 @@ pop.pos = {
         end
         return x, y
     end,
+    ---@param x number
+    ---@param y number
     layer = function(x, y)
+        ---@param content_fn fun()
         return function(content_fn)
             local stack = pop.pos.stack
             pop.pos.stack = {}
@@ -96,6 +105,7 @@ local function get_id()
     return id_allocator.get_id(2 + pop.call_depth)
 end
 
+---@param mod integer
 function pop.call_depth_mod(mod)
     pop.call_depth = pop.call_depth + mod
 end
