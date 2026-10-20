@@ -1,4 +1,4 @@
-<Entity tags="%MODULE_FULL_ID%.target_dummy_child">
+<Entity tags="%MOD_ID%.target_dummy_child">
 	<InheritTransformComponent only_position="1" />
 	<SpriteComponent 
 		_tags="enabled_in_world,%MODULE_FULL_ID%.current_dps"

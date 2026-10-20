@@ -26,17 +26,17 @@ local var_map = {
 
 function utils.access_vars(entity_id)
     ---@type target_dummy_vars
-    return var.access(entity_id, var_map, "%MOD_ID%.")
+    return var.access(entity_id, var_map, "%MODULE_FULL_ID%.")
 end
 
 function utils.center_text(text)
-    return mutils.get_text_size(text, 1, "%MODULE_PATH%/fonts/blue.xml", true) / 2
+    return mutils.get_text_size(text, 1, "%THIS_PATH%/fonts/blue.xml", true) / 2
 end
 
 function utils.set_text(entity_id, tag_sprite, value)
-    local sprite_comp = EntityGetFirstComponent(entity_id, "SpriteComponent", "%MOD_ID%." .. tag_sprite)
+    local sprite_comp = EntityGetFirstComponent(entity_id, "SpriteComponent", "%MODULE_FULL_ID%." .. tag_sprite)
     if not sprite_comp then return end
-    local text = format.damage_dummy(value, settings.get_or_default("dummy_target.show_full_damage_number", false), "i")
+    local text = format.damage_dummy(value, settings.get_or_default("%MODULE_ID%.show_full_damage_number", false), "i")
     ComponentSetValue2(sprite_comp, "offset_x", utils.center_text(text))
     ComponentSetValue2(sprite_comp, "text", text)
     EntityRefreshSprite(entity_id, sprite_comp)
