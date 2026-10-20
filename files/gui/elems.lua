@@ -1,3 +1,4 @@
+---@class gui.elems
 local gui_elems = {}
 
 local pop = require "pop"
