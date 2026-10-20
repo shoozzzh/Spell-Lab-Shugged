@@ -740,9 +740,10 @@ local layout_hwrap_mt = new_prototype {
         pop.pos.pop()
 
         self.cur_line_size = self.cur_line_size + 1
-        if self.cur_line_size <= self.line_size then
+        if self.cur_line_size < self.line_size then
             self.x = self.x + self.offset_x
         else
+            self.cur_line_size = 0
             self.x = 0
             self.y = self.y + self.offset_y
         end
