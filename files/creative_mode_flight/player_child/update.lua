@@ -1,6 +1,6 @@
 dofile_once "%MOD_PATH%/require.lua"
 
-local settings = require "mod_setting"
+local settings = require "mod_settings"
 local tl = require "tinklin"
 
 ---@type table<string, integer>
