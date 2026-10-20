@@ -21,9 +21,9 @@ local entry_point = dofile_once "%MODULE_PATH%/entry_point/button.lua"
 local menus = require "gui_main.menus"
 -- dofile_once( "mods/spell_lab_shugged/files/gui/edit_panel_utils.lua" )
 
-local function gen_module_button_utils(module_name)
-    local button_sprite = "%MOD_PATH%/files/" .. module_name .. "/button.png"
-    local setting_item = module_name .. ".enabled"
+local function gen_module_button_utils(module_id)
+    local button_sprite = "%MOD_PATH%/files/" .. module_id .. "/button.png"
+    local setting_item = module_id .. ".enabled"
 
     ---@class mb_utils
     local button_utils = {
@@ -33,9 +33,9 @@ local function gen_module_button_utils(module_name)
         ---@return boolean left_click
         ---@return boolean right_click
         button_toggle = function(name, no_desc, ...)
-            name = name or tr_utils.get(module_name)
+            name = name or tr_utils.get(module_id)
             if not no_desc then
-                local desc = tr_utils.get(module_name .. ".desc")
+                local desc = tr_utils.get(module_id .. ".desc")
                 return gui_elems.button_setting_toggle(button_sprite, setting_item, name, desc, ...)
             else
                 return gui_elems.button_setting_toggle(button_sprite, setting_item, name, ...)
@@ -45,7 +45,7 @@ local function gen_module_button_utils(module_name)
             return pop.button(button_sprite)
         end,
         button_menus = function()
-            return menus:button(module_name, button_sprite)
+            return menus:button(module_id, button_sprite)
         end,
     }
     return button_utils
@@ -54,15 +54,15 @@ end
 gen_module_button_utils = mutils.memoize(gen_module_button_utils)
 
 local module_button_path = "%MOD_PATH%/files/%s/button.lua"
-local function module_button(module_name)
-    dofile_once(module_button_path:format(module_name))(gen_module_button_utils(module_name))
+local function module_button(module_id)
+    dofile_once(module_button_path:format(module_id))(gen_module_button_utils(module_id))
 end
 
 local function module_button_fns(modules)
     local button_fns = {}
-    for _, module_name in ipairs(modules) do
+    for _, module_id in ipairs(modules) do
         button_fns[#button_fns + 1] = function()
-            module_button(module_name)
+            module_button(module_id)
         end
     end
     return button_fns

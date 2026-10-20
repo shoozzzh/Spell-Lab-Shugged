@@ -37,18 +37,18 @@ function menus:buttons()
     dofile_once(pattern_menu_gui_path:format(self.active)).buttons()
 end
 
----@param module_name string
+---@param module_id string
 ---@param filepath string
 ---@param option_text string?
 ---@return boolean
 ---@return boolean
-function menus:button(module_name, filepath, option_text)
-    if module_name ~= self.active then
+function menus:button(module_id, filepath, option_text)
+    if module_id ~= self.active then
         pop.option_next "DrawSemiTransparent"
     end
-    option_text = tr_utils.maybe(option_text or tr_utils.key(module_name))
+    option_text = tr_utils.maybe(option_text or tr_utils.key(module_id))
     local changed = false
-    if module_name == self.active then
+    if module_id == self.active then
         if pop.button(filepath) then
             gui_elems.sound_button_clicked()
             self:set_active ""
@@ -58,12 +58,12 @@ function menus:button(module_name, filepath, option_text)
     else
         if pop.button(filepath) then
             gui_elems.sound_button_clicked()
-            self:set_active(module_name)
+            self:set_active(module_id)
             changed = true
         end
         pop.tooltip(tr.general.option_enable:text(option_text))
     end
-    return changed, module_name == self.active
+    return changed, module_id == self.active
 end
 
 return menus
