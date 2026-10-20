@@ -4,29 +4,37 @@ local tr_utils = require "tr_utils"
 local gui_elems = require "gui.elems"
 
 ---@class menus
-local menus = {
-    active = "",
-}
+---@field private active string?
+local menus = {}
 
-function menus:is_active(picker)
-    return picker == self.active
+---@param menu string
+---@return boolean
+function menus:is_active(menu)
+    return menu == self.active
 end
 
-function menus:set_active(picker)
-    local result = picker == self.active
-    if result then picker = "" end
-    self.active = picker
-    return result
+---@param menu string
+---@return boolean is_now_active
+function menus:set_active(menu)
+    if self:is_active(menu) then
+        self.active = nil
+        return false
+    else
+        self.active = menu
+        return true
+    end
 end
 
-local menu_path = "%MOD_PATH%/files/%s/menu.lua"
+local pattern_menu_gui_path = "%MOD_PATH%/files/%s/menu.lua"
+
 function menus:menu()
-    dofile_once(menu_path:format(self.active))()
+    if self.active == nil then return end
+    dofile_once(pattern_menu_gui_path:format(self.active)).menu()
 end
 
-local buttons_path = "%MOD_PATH%/files/%s/buttons.lua"
 function menus:buttons()
-    dofile_once(buttons_path:format(self.active))()
+    if self.active == nil then return end
+    dofile_once(pattern_menu_gui_path:format(self.active)).buttons()
 end
 
 ---@param module_name string
