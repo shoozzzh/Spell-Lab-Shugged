@@ -40,10 +40,14 @@ for k, v in pairs(keycodes_by_type.Keyboard) do
 end
 
 for k, v in pairs(keycodes_by_type.Mouse) do
+    if k == "Mouse_left" or k == "Mouse_right" then goto continue end
+
     listeners[k] = {
         function() return InputIsMouseButtonDown(v) end,
         function() return InputIsMouseButtonJustDown(v) end,
     }
+
+    ::continue::
 end
 
 do
