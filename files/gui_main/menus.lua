@@ -43,27 +43,22 @@ end
 ---@return boolean changed
 ---@return boolean is_now_active
 function menus:button(module_id, filepath, option_text)
-    if module_id ~= self.active then
-        pop.option_next "DrawSemiTransparent"
-    end
     option_text = tr_utils.maybe(option_text or tr_utils.key(module_id))
     local changed = false
-    if module_id == self.active then
-        if pop.button(filepath) then
-            gui_elems.sound_button_clicked()
-            self:set_active(module_id)
-            changed = true
-        end
+    if self:is_active(module_id) then
+        pop.option_next "DrawSemiTransparent"
+    end
+    if pop.button(filepath) then
+        gui_elems.sound_button_clicked()
+        self:set_active(module_id)
+        changed = true
+    end
+    if self:is_active(module_id) then
         pop.tooltip(tr.general.option_disable:text(option_text))
     else
-        if pop.button(filepath) then
-            gui_elems.sound_button_clicked()
-            self:set_active(module_id)
-            changed = true
-        end
         pop.tooltip(tr.general.option_enable:text(option_text))
     end
-    return changed, module_id == self.active
+    return changed, self:is_active(module_id)
 end
 
 return menus
