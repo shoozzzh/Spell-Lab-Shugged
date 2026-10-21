@@ -10,7 +10,7 @@ if ModDoesFileExist(twitchy_effect_path) and twitchy_effect then
     if ModDoesFileExist(twitchy_lua_path) then
         local twitchy_lua = get_content(twitchy_lua_path)
         set_content(stored_path .. "twitchy.lua",
-            [[if EntityHasTag( EntityGetRootEntity( GetUpdatedEntityID() ), "player_unit" ) and ModSettingGet( "spell_lab_shugged.disable_toxic_statuses" ) then
+            [[if EntityHasTag( EntityGetRootEntity( GetUpdatedEntityID() ), "player_unit" ) and ModSettingGet( "%MODULE_FULL_ID%.enabled" ) then
 				if EntityGetParent( GetUpdatedEntityID() ) ~= 0 then
 					EntityKill( GetUpdatedEntityID() )
 				else
@@ -29,7 +29,7 @@ if ModDoesFileExist(twitchy_effect_path) and twitchy_effect then
             twitchy_lua2 .. [[
 			local old_shot = shot
 			function shot( projectile_id )
-				if EntityHasTag( EntityGetRootEntity( GetUpdatedEntityID() ), "player_unit" ) and ModSettingGet( "spell_lab_shugged.disable_toxic_statuses" ) then
+				if EntityHasTag( EntityGetRootEntity( GetUpdatedEntityID() ), "player_unit" ) and ModSettingGet( "%MODULE_FULL_ID%.enabled" ) then
 					if EntityGetParent( GetUpdatedEntityID() ) ~= 0 then
 						EntityKill( GetUpdatedEntityID() )
 					else
@@ -39,7 +39,7 @@ if ModDoesFileExist(twitchy_effect_path) and twitchy_effect then
 				end
 				old_shot( projectile_id )
 			end]])
-        twitchy_effect = twitchy_effect:gsub(twitchy_lua_path:gsub("%.", "%."),
+        twitchy_effect = twitchy_effect:gsub(twitchy_lua2_path:gsub("%.", "%."),
             stored_path .. "twitchy_shot.lua")
     end
 
@@ -56,7 +56,7 @@ if ModDoesFileExist(neutralized_effect_path) and neutralized_effect then
             neutralized_lua .. [[
 			local old_shot = shot
 			function shot( projectile_id )
-				if EntityHasTag( EntityGetRootEntity( GetUpdatedEntityID() ), "player_unit" ) and ModSettingGet( "spell_lab_shugged.disable_toxic_statuses" ) then
+				if EntityHasTag( EntityGetRootEntity( GetUpdatedEntityID() ), "player_unit" ) and ModSettingGet( "%MODULE_FULL_ID%.enabled" ) then
 					EntityKill( GetUpdatedEntityID() )
 					return
 				end
@@ -73,6 +73,6 @@ local glue_lua_path = "data/scripts/projectiles/glue_init.lua"
 local glue_lua = get_content(glue_lua_path)
 if ModDoesFileExist(glue_lua_path) and glue_lua then
     set_content(glue_lua_path, glue_lua:gsub("if target2 ~= target then",
-        [[if EntityHasTag( target2, "player_unit" ) and ModSettingGet( "spell_lab_shugged.disable_toxic_statuses" ) then return end
+        [[if EntityHasTag( target2, "player_unit" ) and ModSettingGet( "%MODULE_FULL_ID%.enabled" ) then return end
 		if target2 ~= target then]]))
 end
