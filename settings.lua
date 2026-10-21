@@ -466,31 +466,31 @@ local cc = (function() -- clikclak.lua, you may wanna fold these
     return clikclak
 end)()
 
-local mod_setting_shortcut = (function() -- you may wanna fold these
-    ---@param shortcut shortcut
-    ---@return string
-    local function ser(shortcut)
-        local result = {}
-        for _, key in ipairs(shortcut) do
-            result[#result + 1] = '"' .. key .. '"'
-        end
-        return "{" .. table.concat(result, '","') .. "}"
+---@param shortcut shortcut
+---@return string
+local function ser(shortcut)
+    local result = {}
+    for _, key in ipairs(shortcut) do
+        result[#result + 1] = '"' .. key .. '"'
     end
+    return "{" .. table.concat(result, '","') .. "}"
+end
 
-    ---@param shortcut string
-    ---@return shortcut
-    local function deser(shortcut)
-        if EntityGetIsAlive(1) then
-            ModTextFileSetContent("mods/shortcut_set.lua", "return " .. shortcut)
-            return loadfile "mods/shortcut_set.lua" ()
-        end
-        local res = {}
-        for key in string.gmatch(shortcut, "\"([^\",]*)\"") do
-            res[#res + 1] = key
-        end
-        return res
+---@param shortcut string
+---@return shortcut
+local function deser(shortcut)
+    if EntityGetIsAlive(1) then
+        ModTextFileSetContent("mods/shortcut_set.lua", "return " .. shortcut)
+        return loadfile "mods/shortcut_set.lua" ()
     end
+    local res = {}
+    for key in string.gmatch(shortcut, "\"([^\",]*)\"") do
+        res[#res + 1] = key
+    end
+    return res
+end
 
+local mod_setting_shortcut = (function()  -- you may wanna fold these
     local shortcut_tostring = (function() -- files/shortcuts/to_string.lua
         local special_chars = {
             MINUS = "-",
@@ -942,6 +942,7 @@ function cc.shortcut(id)
             id = id,
             ui_fn = mod_setting_shortcut,
             click_required = click_required,
+            value_default = ser(value_default),
             extra = cc.extra,
         }
     end
