@@ -103,17 +103,18 @@ function gui_elems.button_setting_toggle(sprite_filename, key, name, ...)
     return left_click, right_click
 end
 
----@param selected boolean
----@param action_type integer
 ---@param sprite_file string
+---@param action_type integer
+---@param selected boolean
+---@param alpha number
 ---@return boolean left_click
 ---@return boolean right_click
-function gui_elems.button_action(selected, action_type, sprite_file)
+function gui_elems.button_action(sprite_file, action_type, selected, alpha)
     pop.pos.push(2, 2)
     local hovered = pop.hoverable_space(16, 16)
     pop.pos.pop()
 
-    spell_box.show(action_type, selected, hovered)
+    spell_box.show(action_type, selected, hovered, alpha)
 
     local width, height = mutils.get_image_size(sprite_file)
     pop.pos.push(20 / 2 - width / 2, 20 / 2 - height / 2)
@@ -153,10 +154,7 @@ function gui_elems.button_fake_action(data, semi_transparent)
     local hovered = pop.hoverable_space(16, 16)
     pop.pos.pop()
 
-    if semi_transparent then
-        pop.option_next "DrawSemiTransparent"
-    end
-    spell_box.show(data.type_spellbox, false, hovered)
+    spell_box.show(data.type_spellbox, false, hovered, semi_transparent and 0.5 or 1)
 
     pop.pos.push(2, 2)
     local left_click, right_click = pop.button "%MODULE_PATH%/transparent_16x16.png"
@@ -185,12 +183,13 @@ function gui_elems.button_fake_action(data, semi_transparent)
         end
     end)
 
-    if semi_transparent then
-        pop.option_next "DrawSemiTransparent"
-    end
     local sprite_width, sprite_height = mutils.get_image_size(data.sprite)
     pop.pos.push((20 - sprite_width) / 2, (20 - sprite_height) / 2)
-    pop.image(data.sprite)
+    if semi_transparent then
+        pop.image(data.sprite, { alpha = 0.5 })
+    else
+        pop.image(data.sprite)
+    end
     pop.pos.pop()
 
     if data.uses_remaining then

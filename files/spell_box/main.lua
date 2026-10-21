@@ -1,7 +1,7 @@
 local settings = require "mod_settings"
 local pop = require "pop"
 
-local gokis = function(action_type, selected, hovered)
+local gokis = function(action_type, selected, hovered, alpha)
     local spell_box = { "%MODULE_PATH%/goki/spell_box" }
     if action_type then
         spell_box[#spell_box + 1] = "_"
@@ -14,7 +14,7 @@ local gokis = function(action_type, selected, hovered)
     end
     spell_box[#spell_box + 1] = ".png"
 
-    pop.image(table.concat(spell_box))
+    pop.image(table.concat(spell_box), { alpha = alpha })
 end
 
 local vanilla_bgs = {
@@ -43,7 +43,7 @@ end
 ---@type table<string,spellbox_pack>
 local spellbox_packs = {
     ---@class spellbox_pack
-    ---@field func fun(action_type: int, selected: bool, hovered: bool)
+    ---@field func fun(action_type: int, selected: bool, hovered: bool, alpha: number)
     ---@field ui_name table<string, string>
     GOKIS = {
         func = gokis,
@@ -79,8 +79,9 @@ end
 ---@param action_type int
 ---@param selected bool
 ---@param hovered bool
-function spell_box.show(action_type, selected, hovered)
-    current_pack(action_type, selected, hovered)
+---@param alpha number
+function spell_box.show(action_type, selected, hovered, alpha)
+    current_pack(action_type, selected, hovered, alpha)
 end
 
 return spell_box
