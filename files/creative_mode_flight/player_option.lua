@@ -56,9 +56,11 @@ function player_option.on_disable(player)
     local values_comp = player_child:comp_first "CharacterPlatformingComponent"
     if not values_comp then return end
 
-    for _, field_name in ipairs(flight_overwritten_fields) do
+    for field_name, _ in pairs(flight_overwritten_fields) do
         cp_comp[field_name] = values_comp[field_name]
     end
+
+    player_child:kill()
 end
 
 return player_option

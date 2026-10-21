@@ -4,14 +4,15 @@ local settings = require "mod_settings"
 local tl = require "tinklin"
 
 ---@type table<string, integer>
-local keycodes = (function()
+KEYCODES = KEYCODES or (function()
     local f = loadfile "data/scripts/debug/keycodes.lua"
     local raw = {}
     setfenv(f, raw)()
     return raw
 end)()
 
-local player = tl.entity_cur()
+local player = tl.entity_cur():get_parent()
+if not player then return end
 
 local lerp_speed = 0.60
 
@@ -28,8 +29,8 @@ local up, down, left, right = unpack {
 
 local speed = settings.get_or_default("creative_mode_flight.speed_normal", 200)
 
-local ctrl = InputIsKeyDown(keycodes.Key_LCTRL) or InputIsKeyDown(keycodes.Key_RCTRL)
-local shift = InputIsKeyDown(keycodes.Key_LSHIFT) or InputIsKeyDown(keycodes.Key_RSHIFT)
+local ctrl = InputIsKeyDown(KEYCODES.Key_LCTRL) or InputIsKeyDown(KEYCODES.Key_RCTRL)
+local shift = InputIsKeyDown(KEYCODES.Key_LSHIFT) or InputIsKeyDown(KEYCODES.Key_RSHIFT)
 if ctrl then
     speed = settings.get_or_default("creative_mode_flight.speed_faster", 450)
 end
