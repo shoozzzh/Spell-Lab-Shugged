@@ -315,7 +315,7 @@ local c_display = {
     end },
     { "reload_time",    "$inventory_rechargetime", 0, function(value) return format.frames(value, 3) end },
     { "spread_degrees", "$inventory_spread", 0, function(value)
-        return md_tr.degrees:key():format(format.decimal(value, 3, true))
+        return md_tr.degrees:text(format.decimal(value, 3, true))
     end },
     { "damage_critical_chance", "$inventory_mod_critchance", 0, function(value)
         return format.decimal(value, 0, true) .. "%"
