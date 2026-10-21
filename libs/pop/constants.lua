@@ -113,8 +113,6 @@ local GUI_RECT_ANIMATION_PLAYBACK = {
     PlayToEndAndPause = 1,
     Loop = 2,
 }
-
----@class pop.gui_constants
 return {
     options = GUI_OPTION,
     playback_types = GUI_RECT_ANIMATION_PLAYBACK,

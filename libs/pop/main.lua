@@ -1,9 +1,12 @@
-local this_path = jit.util.funcinfo(setfenv(1, getfenv())).source:match "^.*/"
-
+local path = jit.util.funcinfo(setfenv(1, getfenv())).source:match "^.*/"
+local function require(module_name)
+    return dofile_once(path .. module_name:sub(5) .. ".lua")
+end
 local gui = GuiCreate()
 
-local const = dofile_once(this_path .. "constants.lua")
-local pc = dofile_once(this_path .. "pos_convert.lua")
+local const = require "pop.constants"
+local pc = require "pop.pos_convert"
+local id_allocator = require "pop.id_allocator"
 
 ---@class pop
 local pop = {
@@ -100,7 +103,6 @@ pop.pos = {
 
 pop.call_depth = 0
 
-local id_allocator = dofile(this_path .. "id_allocator.lua")
 local function get_id()
     return id_allocator.get_id(2 + pop.call_depth)
 end
