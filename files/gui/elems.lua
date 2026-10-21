@@ -99,7 +99,7 @@ function gui_elems.button_setting_toggle(sprite_filename, key, name, ...)
         settings.set(key, value)
     end
 
-    pop.tooltip((value and tr.general.option_enable or tr.general.option_disable):text(name), ...)
+    pop.tooltip((value and tr.general.option_disable or tr.general.option_enable):text(name), ...)
     return left_click, right_click
 end
 
