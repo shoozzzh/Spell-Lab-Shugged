@@ -876,19 +876,14 @@ local mod_setting_shortcut = (function() -- you may wanna fold these
             if left_click or right_click then
                 current_key_detector = nil
                 if setting.click_required then
-                    local click_given = false
                     if left_click then
                         shortcut[#shortcut + 1] = "Mouse_left"
-                        click_given = true
                     end
                     if right_click then
                         shortcut[#shortcut + 1] = "Mouse_right"
-                        click_given = true
                     end
-                    if click_given then
-                        ModSettingSetNextValue(mod_setting_get_id(mod_id, setting), ser(shortcut), false)
-                        changed = true
-                    end
+                    ModSettingSetNextValue(mod_setting_get_id(mod_id, setting), ser(shortcut), false)
+                    changed = true
                 else
                     ModSettingSetNextValue(mod_setting_get_id(mod_id, setting), ser(shortcut), false)
                     changed = true
