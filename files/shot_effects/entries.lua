@@ -1,5 +1,6 @@
 local tr = require "tr"
 local module_tr = tr.as_prefix(tr["%MODULE_ID%"])
+local metadata_tr = tr.as_prefix(tr.action_metadata)
 
 ---@type shot_effect[]
 shot_effect_entries = {
@@ -54,8 +55,8 @@ shot_effect_entries = {
         extra_modifier = "low_recoil",
         dont_use_fetched_metadata = true,
         properties = {
-            { "speed_multiplier",              "x 0.8" },
-            { tr.action_metadata.recoil:key(), "x 0.5 - 16" },
+            { metadata_tr.speed_multiplier:key(), "x 0.8" },
+            { metadata_tr.recoil:key(),           "x 0.5 - 16" },
         },
     },
     {
@@ -112,7 +113,7 @@ shot_effect_entries = {
         shot_script = "data/scripts/status_effects/twitchy_shot.lua",
         max_count = 1,
         properties = {
-            { "friendly_fire", tr.action_metadata.enables:key() },
+            { metadata_tr.friendly_fire:key(), metadata_tr.enables:key() },
         },
         desc = module_tr.desc.twitchy:key(),
     },
