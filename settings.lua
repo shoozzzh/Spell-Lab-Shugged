@@ -107,11 +107,10 @@ local lang_id_map = {
 }
 
 local function get_lang_id(lang)
-    local lang_id = "en"
-    if cur_lang:find "中文" or cur_lang:find "汉化" then
+    if lang:find "中文" or lang:find "汉化" then
         return "zh_cn"
     else
-        return lang_id_map[lang_id] or lang_id
+        return lang_id_map[lang] or "en"
     end
 end
 local cur_lang_id = get_lang_id(cur_lang)
