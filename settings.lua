@@ -470,19 +470,25 @@ local mod_setting_shortcut = (function() -- you may wanna fold these
     ---@param shortcut shortcut
     ---@return string
     local function ser(shortcut)
-        local result = { '{"' }
-        for i = 1, #shortcut do
-            result[i + 1] = shortcut[i]
+        local result = {}
+        for _, key in ipairs(shortcut) do
+            result[#result + 1] = '"' .. key .. '"'
         end
-        result[#result + 1] = '"}'
-        return table.concat(result, '","')
+        return "{" .. table.concat(result, '","') .. "}"
     end
 
     ---@param shortcut string
     ---@return shortcut
     local function deser(shortcut)
-        ModTextFileSetContent("mods/shortcut_set.lua", "return " .. shortcut)
-        return loadfile "mods/shortcut_set.lua" ()
+        if EntityGetIsAlive(1) then
+            ModTextFileSetContent("mods/shortcut_set.lua", "return " .. shortcut)
+            return loadfile "mods/shortcut_set.lua" ()
+        end
+        local res = {}
+        for key in string.gmatch(shortcut, "\"([^\",]*)\"") do
+            res[#res + 1] = key
+        end
+        return res
     end
 
     local shortcut_tostring = (function() -- files/shortcuts/to_string.lua
