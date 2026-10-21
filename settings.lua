@@ -92,8 +92,32 @@ do -- migrate from old version if needed
     end
 end
 
+local cur_lang = GameTextGet "$current_language"
+
+local lang_id_map = {
+    ["한국어"] = "ko",
+    ["日本語"] = "jp",
+    ["русский"] = "ru",
+    ["Português (Brasil)"] = "pt_br",
+    ["Español"] = "es-es",
+    ["Deutsch"] = "de",
+    ["Français"] = "fr-fr",
+    ["Italiano"] = "it",
+    ["Polska"] = "pl",
+}
+
+local function get_lang_id(lang)
+    local lang_id = "en"
+    if cur_lang:find "中文" or cur_lang:find "汉化" then
+        return "zh_cn"
+    else
+        return lang_id_map[lang_id] or lang_id
+    end
+end
+local cur_lang_id = get_lang_id(cur_lang)
+
 local lang = { -- you may wanna fold these
-    ["creative_mode_flight.speed"] = {
+    ["creative_mode_flight"] = {
         zh_cn = "超级飞行速度",
         en = "Superflight Speed",
         jp = "スーパー飛行速度",
@@ -178,36 +202,54 @@ local lang = { -- you may wanna fold these
         ko = "(저장하려면 클릭)",
     },
     ["shortcut.click_here"] = {
-        zh_cn = "+（请点击）",
-        en = "+ (click here)",
-        jp = "+（ここをクリック）",
-        ko = "+ (여기를 클릭)",
+        zh_cn = " +（请点击）",
+        en = " + (click here)",
+        jp = "+(ここをクリック)",
+        ko = "+(여기를 클릭)",
     },
-    ["shortcut.transform_mortal_into_dummy"] = {
+    ["shortcut.modifier_key_1"] = {
+        zh_cn = "辅助键 1",
+        en = "Modifier key 1",
+        jp = "",
+        ko = "",
+    },
+    ["shortcut.modifier_key_2"] = {
+        zh_cn = "辅助键 2",
+        en = "Modifier key 2",
+        jp = "",
+        ko = "",
+    },
+    ["shortcut.modifier_key_3"] = {
+        zh_cn = "辅助键 3",
+        en = "Modifier key 3",
+        jp = "",
+        ko = "",
+    },
+    ["shortcut.dummy_transform"] = {
         zh_cn = "转化生物为靶标假人",
         en = "Target dummy transformation",
         jp = "ダミーへの変換",
         ko = "더미 변환",
     },
-    ["no_weather"] = {
+    ["no_weather.enabled"] = {
         zh_cn = "禁用天气",
         en = "Disable Weather",
         jp = "天候を無効化",
         ko = "날씨 비활성화",
     },
-    ["no_weather.desc"] = {
+    ["no_weather.enabled.desc"] = {
         zh_cn = "开启时，天气将锁定为晴朗状态",
         en = "Should we disable all kinds of rain or snow?",
         jp = "すべての雨や雪を無効化するか",
         ko = "모든 종류의 비나 눈을 비활성화할 지 여부",
     },
-    ["dummy_target.always_show_full_damage_number"] = {
+    ["target_dummy.always_show_full_damage_number"] = {
         zh_cn = "靶标假人总是显示完整伤害数字",
         en = "Show Full Damage Number For Dummy Targets",
         jp = "ダミーへのダメージ数値をすべて表示",
         ko = "더미의 대미지 모든 숫자 표시하기",
     },
-    ["dummy_target.always_show_full_damage_number.desc"] = {
+    ["target_dummy.always_show_full_damage_number.desc"] = {
         zh_cn = "开启时，将总是以完整形式显示伤害数字，不会在过大时使用科学计数法",
         en = "Should dummy targets always has full-length damage numbers shown, no matter how big the number is?",
         jp = "常にダミーへのダメージ数値をすべて表示するか",
@@ -244,17 +286,17 @@ local lang = { -- you may wanna fold these
         ko = "",
     },
 }
+
 local function get_text(key)
-    return lang[key] or (key .. " (missing text)")
+    local text = lang[key]
+    if not text then return end
+    return text[cur_lang_id] or text.en
 end
 
 local cc = (function() -- clikclak.lua, you may wanna fold these
     local clikclak = {}
 
-    function clikclak.load_lang(settings, lang)
-        local function get_text(key)
-            return lang[key] or (key .. " (missing text)")
-        end
+    function clikclak.load_lang(settings)
         local function recursive(setting)
             if setting.id then
                 setting.ui_name = get_text(setting.id)
@@ -952,31 +994,14 @@ local mod_settings = {
     cc.checkbox "no_weather.enabled" (false):extra { scope = MOD_SETTING_SCOPE_RUNTIME_RESTART },
     cc.checkbox "general.button_click_sound" (true),
     cc.checkbox "general.action_button_click_sound" (true),
-    cc.enum "spellbox_pack" { "GOKIS", "VANILLA" },
+    cc.enum "general.spellbox_pack" { "GOKIS", "VANILLA" },
 }
 
-local lang_id_map = {
-    ["한국어"] = "ko",
-    ["日本語"] = "jp",
-    ["русский"] = "ru",
-    ["Português (Brasil)"] = "pt_br",
-    ["Español"] = "es-es",
-    ["Deutsch"] = "de",
-    ["Français"] = "fr-fr",
-    ["Italiano"] = "it",
-    ["Polska"] = "pl",
-}
-local function load_mod_settings(cur_lang)
-    local lang_id = "en"
-    if cur_lang:find "中文" or cur_lang:find "汉化" then
-        lang_id = "zh_cn"
-    else
-        lang_id = lang_id_map[lang_id] or lang_id
-    end
-    cc.load_lang(mod_settings, lang_id)
+local function load_mod_settings()
+    cc.load_lang(mod_settings)
 end
 
-load_mod_settings(GameTextGet "$current_language")
+load_mod_settings()
 
 local mod_id = "spell_lab_shugged"
 
@@ -988,12 +1013,11 @@ function ModSettingsGuiCount()
     return mod_settings_gui_count(mod_id, mod_settings)
 end
 
-local last_cur_lang
 function ModSettingsGui(gui, in_main_menu)
-    local cur_lang = GameTextGet "$current_language"
-    if cur_lang ~= last_cur_lang then
-        load_mod_settings(cur_lang)
-        last_cur_lang = cur_lang
+    local cur_lang_ = GameTextGet "$current_language"
+    if cur_lang ~= cur_lang_ then
+        cur_lang = cur_lang_
+        load_mod_settings()
     end
     mod_settings_gui(mod_id, mod_settings, gui, in_main_menu)
 end
