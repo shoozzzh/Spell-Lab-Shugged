@@ -60,6 +60,7 @@ function player_option.on_disable(player)
         cp_comp[field_name] = values_comp[field_name]
     end
 
+    player_child:set_parent(nil)
     player_child:kill()
 end
 
