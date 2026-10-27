@@ -1,6 +1,6 @@
 ---@meta
 
----@class entity
+---@class tinklin.entity.methods.comp_getters
 local entity_methods = {}
 
 ---@overload fun(self, comp_type: "AIAttackComponent", tag: string?): AIAttackComponent?

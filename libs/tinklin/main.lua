@@ -31,12 +31,12 @@ local rawget = rawget
 ---@class tinklin.entity.layout
 ---@field id entity_id
 
----@class entity: tinklin.entity.methods
+---@class tinklin.entity: tinklin.entity.methods.comp_getters, tinklin.entity.methods
 ---@field id entity_id
 ---@field name string
----@field pos vector
----@field rot vector
----@field scale vector
+---@field pos tinklin.vector
+---@field rot tinklin.vector
+---@field scale tinklin.vector
 ---@field tag table<string,boolean>
 
 ---@type table<string,{["get"]: fun(self: tinklin.entity.layout): any; ["set"]: fun(self: tinklin.entity.layout, value: any)?}>
@@ -123,12 +123,12 @@ function entity_methods:apply_xform()
     EntityApplyTransform(self.id, EntityGetTransform(self.id))
 end
 
----@param child_entity entity
+---@param child_entity tinklin.entity
 function entity_methods:add_child(child_entity)
     EntityAddChild(self.id, child_entity.id)
 end
 
----@param parent_entity entity?
+---@param parent_entity tinklin.entity?
 function entity_methods:set_parent(parent_entity)
     if not parent_entity then
         EntityRemoveFromParent(self.id)
@@ -137,14 +137,14 @@ function entity_methods:set_parent(parent_entity)
     EntityAddChild(parent_entity.id, self.id)
 end
 
----@return entity? parent_entity
+---@return tinklin.entity? parent_entity
 ---@nodiscard
 function entity_methods:get_parent()
     return tinklin.entity_wrap(EntityGetParent(self.id))
 end
 
 ---@param tag string?
----@return iterator<entity> iter_child_entity
+---@return iterator<tinklin.entity> iter_child_entity
 ---@nodiscard
 function entity_methods:get_children(tag)
     local children_ids
@@ -157,7 +157,7 @@ function entity_methods:get_children(tag)
 end
 
 ---Returns the given entity if it has no parent, otherwise walks up the parent hierarchy to the topmost parent and returns it.
----@return entity root_entity
+---@return tinklin.entity root_entity
 ---@nodiscard
 function entity_methods:get_root()
     return tinklin.entity_wrap(EntityGetRootEntity(self.id))
@@ -165,7 +165,7 @@ end
 
 ---@param comp_type component_type
 ---@param tag string?
----@return comp?
+---@return tinklin.comp?
 ---@nodiscard
 function entity_methods:comp_first(comp_type, tag)
     local comp_id
@@ -179,7 +179,7 @@ end
 
 ---@param comp_type component_type
 ---@param tag string?
----@return comp?
+---@return tinklin.comp?
 ---@nodiscard
 function entity_methods:comp_first_enabled(comp_type, tag)
     local comp_id
@@ -239,10 +239,10 @@ local entity_mt = class_sim(entity_fields, entity_methods)
 ---@class tinklin.comp.layout
 ---@field _id comp_id
 
----@class comp
----@field meta comp.meta
+---@class tinklin.comp
+---@field meta tinklin.comp.meta
 
----@class comp.meta
+---@class tinklin.comp.meta
 ---@field id comp_id
 ---@field type string
 ---@field enabled boolean
@@ -254,7 +254,7 @@ local entity_mt = class_sim(entity_fields, entity_methods)
 local comp_fields = {}
 
 do
-    ---@type table<string,{["get"]: fun(self: comp.meta): any; ["set"]: fun(self: comp.meta, value: any)?}>
+    ---@type table<string,{["get"]: fun(self: tinklin.comp.meta): any; ["set"]: fun(self: tinklin.comp.meta, value: any)?}>
     local comp_meta_fields = {
         enabled = {
             get = function(self)
@@ -317,9 +317,9 @@ end
 
 do
     ---@class comp.xform
-    ---@field pos vector
+    ---@field pos tinklin.vector
     ---@field rot number
-    ---@field scale vector
+    ---@field scale tinklin.vector
     ---@field comp_id comp_id
 
     ---@type table<string,{["get"]: fun(self: comp.xform): any; ["set"]: fun(self: comp.xform, value: any)?}>
@@ -419,14 +419,14 @@ local comp_mt = class_sim(comp_fields, comp_methods, {
 })
 
 ---@param id entity_id
----@return entity entity
+---@return tinklin.entity entity
 ---@nodiscard
 function tinklin.entity_wrap(id)
-    ---@type entity
+    ---@type tinklin.entity
     return setmetatable({ id = id }, entity_mt)
 end
 
----@return entity entity
+---@return tinklin.entity entity
 ---@nodiscard
 function tinklin.entity_cur()
     return tinklin.entity_wrap(GetUpdatedEntityID())
@@ -435,15 +435,15 @@ end
 ---@param filename string
 ---@param x number? 0
 ---@param y number? 0
----@return entity entity
+---@return tinklin.entity entity
 ---@nodiscard
 function tinklin.entity_load(filename, x, y)
     return tinklin.entity_wrap(EntityLoad(filename, x, y))
 end
 
 ---@param filename string
----@param parent entity
----@return entity entity
+---@param parent tinklin.entity
+---@return tinklin.entity entity
 function tinklin.entity_load_child(filename, parent)
     local entity_id = EntityLoad(filename, unpack(parent.pos))
     EntityAddChild(parent.id, entity_id)
@@ -451,7 +451,7 @@ function tinklin.entity_load_child(filename, parent)
 end
 
 ---@param name string? ""
----@return entity entity
+---@return tinklin.entity entity
 ---@nodiscard
 function tinklin.entity_new(name)
     if name then
@@ -464,7 +464,7 @@ end
 ---@param center {[1]: number, [2]: number}
 ---@param radius number
 ---@param tag string?
----@return iterator<entity> entities
+---@return iterator<tinklin.entity> entities
 ---@nodiscard
 function tinklin.entity_in_radius(center, radius, tag)
     local x, y = unpack(center)
@@ -478,7 +478,7 @@ function tinklin.entity_in_radius(center, radius, tag)
 end
 
 ---@param tag string
----@return iterator<entity> entities
+---@return iterator<tinklin.entity> entities
 ---@nodiscard
 function tinklin.entity_tagged(tag)
     return fun.iter(EntityGetWithTag(tag)):map(tinklin.entity_wrap)
@@ -486,7 +486,7 @@ end
 
 ---@param to {[1]: number, [2]: number}
 ---@param tag string?
----@return entity? entity
+---@return tinklin.entity? entity
 ---@nodiscard
 function tinklin.entity_closest(to, tag)
     local x, y = unpack(to)
@@ -502,7 +502,7 @@ function tinklin.entity_closest(to, tag)
 end
 
 ---@param name string
----@return entity? entity
+---@return tinklin.entity? entity
 ---@nodiscard
 function tinklin.entity_with_name(name)
     local entity = EntityGetWithName(name)
@@ -512,14 +512,14 @@ function tinklin.entity_with_name(name)
 end
 
 ---@param id comp_id
----@return comp
+---@return tinklin.comp
 ---@nodiscard
 function tinklin.comp_wrap(id)
-    ---@type comp
+    ---@type tinklin.comp
     return setmetatable({ _id = id }, comp_mt)
 end
 
----@return comp
+---@return tinklin.comp
 ---@nodiscard
 function tinklin.comp_cur()
     return tinklin.comp_wrap(GetUpdatedComponentID())

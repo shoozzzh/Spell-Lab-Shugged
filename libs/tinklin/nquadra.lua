@@ -7,7 +7,7 @@ local npair = require "tinklin.npair"
 
 local nquadra = {}
 
----@class nquadra
+---@class tinklin.nquadra
 ---@field [1] number
 ---@field [2] number
 ---@field [3] number
@@ -30,32 +30,32 @@ end
 
 ---@param interval_x any
 ---@param interval_y any
----@return aabb
+---@return tinklin.aabb
 ---@nodiscard
 function nquadra.aabb_from_intervals(interval_x, interval_y)
-    return new(interval_x[1], interval_x[2], interval_y[1], interval_y[2]) --[[@as aabb]]
+    return new(interval_x[1], interval_x[2], interval_y[1], interval_y[2]) --[[@as tinklin.aabb]]
 end
 
----@param vector_min vector
----@param vector_max vector
----@return aabb
+---@param vector_min tinklin.vector
+---@param vector_max tinklin.vector
+---@return tinklin.aabb
 ---@nodiscard
 function nquadra.aabb_from_vecs(vector_min, vector_max)
-    return new(vector_min[1], vector_max[1], vector_min[2], vector_max[2]) --[[@as aabb]]
+    return new(vector_min[1], vector_max[1], vector_min[2], vector_max[2]) --[[@as tinklin.aabb]]
 end
 
 ---@param r number
 ---@param g number
 ---@param b number
 ---@param a number
----@return rgba_percent
+---@return tinklin.rgba_percent
 ---@nodiscard
 function nquadra.color(r, g, b, a)
-    return new(r, g, b, a) --[[@as rgba_percent]]
+    return new(r, g, b, a) --[[@as tinklin.rgba_percent]]
 end
 
 ---@param hexcode string
----@return rgba_percent
+---@return tinklin.rgba_percent
 ---@nodiscard
 function nquadra.color_from_hex(hexcode)
     hexcode = hexcode:gsub("#", "")
@@ -63,21 +63,21 @@ function nquadra.color_from_hex(hexcode)
     local g = tonumber("0x" .. hexcode:sub(3, 4))
     local b = tonumber("0x" .. hexcode:sub(5, 6))
     local a = tonumber("0x" .. hexcode:sub(7, 8))
-    return new(r, g, b, a) --[[@as rgba_percent]]
+    return new(r, g, b, a) --[[@as tinklin.rgba_percent]]
 end
 
 ---@param abgr integer
----@return rgba_percent
+---@return tinklin.rgba_percent
 ---@nodiscard
 function nquadra.color_from_0xABGR(abgr)
     local a = bit.rshift(abgr, 24) / 255
     local b = bit.band(bit.rshift(abgr, 16), 255) / 255
     local g = bit.band(bit.rshift(abgr, 8), 255) / 255
     local r = bit.band(abgr, 255) / 255
-    return new(r, g, b, a) --[[@as rgba_percent]]
+    return new(r, g, b, a) --[[@as tinklin.rgba_percent]]
 end
 
----@class aabb: nquadra
+---@class tinklin.aabb: tinklin.nquadra
 ---@field [1] number min_x
 ---@field [2] number max_x
 ---@field [3] number min_y
@@ -85,23 +85,23 @@ end
 local aabb_mt = {}
 aabb_mt.__index = aabb_mt
 
----@return interval
----@return interval
+---@return tinklin.interval
+---@return tinklin.interval
 ---@nodiscard
 function aabb_mt:split_range()
     ---@diagnostic disable-next-line: return-type-mismatch
     return npair.new(self[1], self[2]), npair.new(self[3], self[4])
 end
 
----@return vector
----@return vector
+---@return tinklin.vector
+---@return tinklin.vector
 ---@nodiscard
 function aabb_mt:split_vector()
     ---@diagnostic disable-next-line: return-type-mismatch
     return npair.new(self[1], self[3]), npair.new(self[2], self[4])
 end
 
----@class rgba_percent: nquadra
+---@class tinklin.rgba_percent: tinklin.nquadra
 ---@field [1] number r
 ---@field [2] number g
 ---@field [3] number b

@@ -83,10 +83,10 @@
 ---@field flock boolean? 1 [0, 1]
 ---@field avoid_predators boolean? 1 [0, 1]
 ---@field mHasTargetDirection boolean? 0 [0, 1]
----@field mTargetPos vector?
----@field mTargetVec vector?
----@field mLastFramesMovementAreaMin vector?
----@field mLastFramesMovementAreaMax vector?
+---@field mTargetPos tinklin.vector?
+---@field mTargetVec tinklin.vector?
+---@field mLastFramesMovementAreaMin tinklin.vector?
+---@field mLastFramesMovementAreaMax tinklin.vector?
 ---@field mNumFailedTargetSearches integer? 0 [0, 1]
 ---@field mNextFrameCheckAreWeStuck integer? -1 [0, 1]
 ---@field mNextFrameCheckFlockWants integer? -1 [0, 1]
@@ -200,17 +200,17 @@
 ---@field mEatNextFrame integer? 0 [0, 1] next frame we can eat
 ---@field mEatTime integer? 0 [0, 1] time we've been constantly eating
 ---@field mFrameNextGiveUp integer? 0 [0, 1] next frame we consider ourselves to be stuck
----@field mLastFramesMovementAreaMin vector? - AABB min of the area where we've been since the last time we got stuck
----@field mLastFramesMovementAreaMax vector? - AABB max of the area where we've been since the last time we got stuck
+---@field mLastFramesMovementAreaMin tinklin.vector? - AABB min of the area where we've been since the last time we got stuck
+---@field mLastFramesMovementAreaMax tinklin.vector? - AABB max of the area where we've been since the last time we got stuck
 ---@field mFoodMaterialId integer? -1 [0, 1] cached id of 'food_material'
 ---@field mFoodParticleEffectMaterialId integer? -1 [0, 1] cached id of 'food_particle_effect_material'
 ---@field mNextJumpLob number? 1 [0, 1] we use this for next jump
----@field mNextJumpTarget vector? - we use this for next jump
+---@field mNextJumpTarget tinklin.vector? - we use this for next jump
 ---@field mNextJumpHasVelocity boolean? 0 [0, 1] we use this for next jump
 ---@field mLastFrameJumped integer? -1 [0, 1] previous frame we launched into a jump
 ---@field mFramesWithoutTarget integer? 0 [0, 1]
 ---@field mLastFrameCanDamageOwnHerd integer? -1 [0, 1]
----@field mHomePosition vector? - where our home is located
+---@field mHomePosition tinklin.vector? - where our home is located
 ---@field mLastFrameAttackWasDone integer? 0 [0, 1] when was the last time we did an attack (not necessarily did damage to anyone though)
 ---@field mNextFrameCanCallFriend integer? 0 [0, 1]
 ---@field mNextFrameRespondFriend integer? -1 [0, 1]
@@ -235,8 +235,8 @@
 ---@field entity_responsible entity_id? 0 [0, 1] if NULL, will try to figure out who to blame
 ---@field death_cause string? $damage_curse [0, 60]
 ---@field entities_with_tag string? mortal [0, 1] damage entities with this tag
----@field aabb_min vector?
----@field aabb_max vector?
+---@field aabb_min tinklin.vector?
+---@field aabb_max tinklin.vector?
 ---@field damage_type damage_type? - the damage type
 
 ---@class AttachToEntityComponent.set
@@ -321,11 +321,11 @@
 ---@field projectile_2_count integer? 5 [0, 10]
 ---@field ragdoll_filename string?
 ---@field mTargetEntityId integer? 0 [0, 1]
----@field mTargetVec vector?
+---@field mTargetVec tinklin.vector?
 ---@field mGravVelocity number? 0 [0, 1]
 ---@field mSpeed number? 0 [0, 1]
----@field mRandomTarget vector?
----@field mLastLivingTargetPos vector?
+---@field mRandomTarget tinklin.vector?
+---@field mLastLivingTargetPos tinklin.vector?
 ---@field mNextTargetCheckFrame integer? 0 [0, 1]
 ---@field mNextHuntTargetCheckFrame integer? 0 [0, 1]
 ---@field mOnGroundPrev boolean? 0 [0, 1]
@@ -354,7 +354,7 @@
 ---@field horizontal_movement boolean? 1 [0, 1] allow horizontal movement
 ---@field vertical_movement boolean? 1 [0, 1] allow vertical movement
 ---@field intercardinal_movement boolean? 0 [0, 1] allow intercardinal movement
----@field mPrevPos vector?
+---@field mPrevPos tinklin.vector?
 
 ---@class CellEaterComponent.set
 ---@field radius number? 10 [0, 100]
@@ -414,7 +414,7 @@
 ---@field fly_time_max number? - how much flying energy + 
 ---@field mFramesOnGround integer? 0 [0, 1]
 ---@field mLastFrameOnGround integer? 0 [0, 1]
----@field mVelocity vector?
+---@field mVelocity tinklin.vector?
 ---@field mCollidedHorizontally boolean? 0 [0, 1] moved this here from CharacterCollisionComponent - since that is multithreaded and we needed a non multithreaded version
 
 ---@class CharacterPlatformingComponent.set
@@ -452,7 +452,7 @@
 ---@field fly_velocity_x number?
 ---@field fly_speed_max_up number?
 ---@field fly_speed_max_down number?
----@field mExAnimationPos vector?
+---@field mExAnimationPos tinklin.vector?
 ---@field mFramesInAirCounter integer? -1 [0, 1]
 ---@field mIsPrecisionJumping boolean? 0 [0, 1]
 ---@field mPrecisionJumpingTime integer? 0 [0, 1]
@@ -492,7 +492,7 @@
 ---@field id integer? 0 [0, 1]
 ---@field mNextUsableFrame integer? 0 [0, 1]
 ---@field mHasOtherEnd boolean? 0 [0, 1]
----@field target_location vector?
+---@field target_location tinklin.vector?
 
 ---@class ControllerGoombaAIComponent.set
 ---@field auto_turn_around_enabled boolean? 1 [0, 1] disable this if you don't want creature to 'look around', while standing still
@@ -575,17 +575,17 @@
 ---@field mButtonFrameTransformDown integer? 0 [0, 1] NOT IN USE!
 ---@field mButtonCountTransformDown integer? 0 [0, 1] NOT IN USE!
 ---@field mFlyingTargetY number? 0 [0, 1]
----@field mAimingVector vector?
----@field mAimingVectorNormalized vector? - Aiming vector normalized to unit sphere.
----@field mAimingVectorNonZeroLatest vector?
----@field mGamepadAimingVectorRaw vector?
----@field mJumpVelocity vector? - used mostly by AI only?
----@field mMousePosition vector?
----@field mMousePositionRaw vector?
----@field mMousePositionRawPrev vector?
----@field mMouseDelta vector?
----@field mGamepadIndirectAiming vector?
----@field mGamePadCursorInWorld vector? - where the aiming cursor is in the world, updated by platformshooterplayer_system 
+---@field mAimingVector tinklin.vector?
+---@field mAimingVectorNormalized tinklin.vector? - Aiming vector normalized to unit sphere.
+---@field mAimingVectorNonZeroLatest tinklin.vector?
+---@field mGamepadAimingVectorRaw tinklin.vector?
+---@field mJumpVelocity tinklin.vector? - used mostly by AI only?
+---@field mMousePosition tinklin.vector?
+---@field mMousePositionRaw tinklin.vector?
+---@field mMousePositionRawPrev tinklin.vector?
+---@field mMouseDelta tinklin.vector?
+---@field mGamepadIndirectAiming tinklin.vector?
+---@field mGamePadCursorInWorld tinklin.vector? - where the aiming cursor is in the world, updated by platformshooterplayer_system 
 ---@field mButtonDownDelayLineFire integer? 0 [0, 1] Used to delay input for some game effects
 ---@field mButtonDownDelayLineFire2 integer? 0 [0, 1] Used to delay input for some game effects
 ---@field mButtonDownDelayLineRight integer? 0 [0, 1] Used to delay input for some game effects
@@ -616,18 +616,18 @@
 ---@field mFrameNextGiveUp integer? 0 [0, 1]
 ---@field mFrameNextDamage integer? 0 [0, 1]
 ---@field mFrameNextAttackFromCeilingCheck integer? 0 [0, 1]
----@field mMin vector?
----@field mMax vector?
----@field mPrevNonSnappedPosition vector?
----@field mPrevCellPosition vector?
----@field mPrevCellPosition2 vector?
----@field mPrevCellPosition3 vector?
----@field mPrevCellPosition4 vector?
----@field mPrevCellPosition5 vector?
----@field mPrevCellPosition6 vector?
----@field mPrevCellPosition7 vector?
----@field mPrevCellPosition8 vector?
----@field mLatestPosition vector?
+---@field mMin tinklin.vector?
+---@field mMax tinklin.vector?
+---@field mPrevNonSnappedPosition tinklin.vector?
+---@field mPrevCellPosition tinklin.vector?
+---@field mPrevCellPosition2 tinklin.vector?
+---@field mPrevCellPosition3 tinklin.vector?
+---@field mPrevCellPosition4 tinklin.vector?
+---@field mPrevCellPosition5 tinklin.vector?
+---@field mPrevCellPosition6 tinklin.vector?
+---@field mPrevCellPosition7 tinklin.vector?
+---@field mPrevCellPosition8 tinklin.vector?
+---@field mLatestPosition tinklin.vector?
 ---@field mPrevFalling boolean? 0 [0, 1]
 ---@field mIsInitialized boolean? 0 [0, 1]
 ---@field mVelocityY number? 0 [0, 1]
@@ -715,7 +715,7 @@
 ---@field mFallDamageThisFrame number? 0 [0, 1] Amount of fall damage received this frame
 ---@field mElectricityDamageThisFrame number? 0 [0, 1] Amount of electricity damage received this frame
 ---@field mPhysicsDamageThisFrame number? 0 [0, 1] max physics damage we have taken this round
----@field mPhysicsDamageVecThisFrame vector? - direction of physics damage
+---@field mPhysicsDamageVecThisFrame tinklin.vector? - direction of physics damage
 ---@field mPhysicsDamageLastFrame integer? 0 [0, 1] frame number when we took physics damage
 ---@field mPhysicsDamageEntity integer? 0 [0, 1] the physics entity that hit us
 ---@field mPhysicsDamageTelekinesisCasterEntity integer? 0 [0, 1] who moved an object that hit us via telekinesis
@@ -735,7 +735,7 @@
 ---@field target_tag string? mortal [0, 1]
 ---@field damage_type damage_type? - the damage type
 ---@field ragdoll_fx ragdoll_fx?
----@field mVelocity vector?
+---@field mVelocity tinklin.vector?
 ---@field mNextDamageFrame integer? 0 [0, 1]
 
 ---@alias DebugFollowMouseComponent.set unsupported
@@ -783,8 +783,8 @@
 ---@field hack_is_set_fire boolean? 0 [0, 1] if set will set the thing on fire where this is located at
 ---@field mSplittingsLeft integer? 0 [0, 1]
 ---@field mSplittingEnergy integer? 0 [0, 1]
----@field mAvgDir vector?
----@field mPrevPos vector?
+---@field mAvgDir tinklin.vector?
+---@field mPrevPos tinklin.vector?
 ---@field mPrevMaterial integer? 0 [0, 1]
 ---@field mShouldPlaySound boolean? 1 [0, 1]
 
@@ -816,7 +816,7 @@
 ---@field recharge_speed number? 1 [0, 10]
 ---@field sector_degrees number? 360 [0, 360] if less than 180 we only provide partial cover to the current direction of the entity
 ---@field energy number? 0 [0, 3]
----@field mPrevPosition vector?
+---@field mPrevPosition tinklin.vector?
 
 ---@class ExplodeOnDamageComponent.set
 ---@field explode_on_death_percent number? 1 [0, 1] rolls a dice (0 - 1) if we explode on death
@@ -835,11 +835,11 @@
 ---@class FishAIComponent.set
 ---@field direction integer? 0 [-1, 1]
 ---@field speed number? 100 [1, 1000]
----@field aabb_min vector?
----@field aabb_max vector?
----@field velocity vector?
+---@field aabb_min tinklin.vector?
+---@field aabb_max tinklin.vector?
+---@field velocity tinklin.vector?
 ---@field stuck_counter integer? 0 [0, 1]
----@field mLastCheckPos vector?
+---@field mLastCheckPos tinklin.vector?
 
 ---@class FlyingComponent.set
 ---@field type integer? 0 [0, 1] type of flight, 1 = perlin noise
@@ -925,12 +925,12 @@
 ---@field max_distance_from_home number? 300 [0, 1] how far from home can we go?
 ---@field die_if_no_home boolean? 1 [0, 1] if set to false will die, if it can't find home
 ---@field target_tag string? player_unit [0, 1] if something else (like mortal), will attack the home
----@field velocity vector?
+---@field velocity tinklin.vector?
 ---@field mEntityHome entity_id? 0 [0, 1] where is our home?
 ---@field mFramesWithoutHome integer? 0 [0, 1]
----@field mTargetPosition vector?
+---@field mTargetPosition tinklin.vector?
 ---@field mTargetEntityId integer? 0 [0, 1]
----@field mRandomTarget vector?
+---@field mRandomTarget tinklin.vector?
 ---@field mNextTargetCheckFrame integer? 0 [0, 1]
 
 ---@class GodInfoComponent.set
@@ -957,7 +957,7 @@
 ---@field aabb_min_y number? -5 [-15, 15]
 ---@field aabb_max_y number? 5 [-15, 15]
 ---@field damage_multiplier number? 1 [0, 1] All damage from hits to this hitbox is multiplied with this value before applying it.
----@field offset vector?
+---@field offset tinklin.vector?
 ---@field dead boolean? 0 [0, 1]
 
 ---@class HomingComponent.set
@@ -974,7 +974,7 @@
 ---@class HotspotComponent.set
 ---@field transform_with_scale boolean? 1 [0, 1]
 ---@field sprite_hotspot_name string?
----@field offset vector?
+---@field offset tinklin.vector?
 
 ---@class IKLimbAttackerComponent.set
 ---@field radius number? 54 [0, 1]
@@ -982,7 +982,7 @@
 ---@field targeting_radius number? 120 [0, 1]
 ---@field targeting_raytrace boolean? 1 [0, 1]
 ---@field target_entities_with_tag string? mortal [0, 1]
----@field mTarget vector?
+---@field mTarget tinklin.vector?
 ---@field mTargetEntity entity_id? 0 [0, 1]
 ---@field mStateTimer number? 0 [0, 1]
 
@@ -990,12 +990,12 @@
 ---@field length number? 40 [0, 1]
 ---@field thigh_extra_lenght number? 2 [0, 1]
 ---@field mJointSideInterpolation number? 0 [0, 1]
----@field end_position vector?
----@field mJointWorldPos vector?
----@field mEndPrevPos vector?
----@field mPart0PrevPos vector?
+---@field end_position tinklin.vector?
+---@field mJointWorldPos tinklin.vector?
+---@field mEndPrevPos tinklin.vector?
+---@field mPart0PrevPos tinklin.vector?
 ---@field mPart0PrevRotation number? 0 [0, 1]
----@field mPart1PrevPos vector?
+---@field mPart1PrevPos tinklin.vector?
 ---@field mPart1PrevRotation number? 0 [0, 1]
 
 ---@class IKLimbWalkerComponent.set
@@ -1007,9 +1007,9 @@
 ---@field affect_flying boolean? 0 [0, 1] if set, will cause the mFlyingTime (in CharacterDataComponent) of the parent to be 0 or 1 depending on if we're touching anything
 ---@field mState integer? 0 [0, 1] 0 = detached, 1 = attached
 ---@field ray_skip_material integer? 0 [0, 1] String name of material to not cast rays against. Defaults to 'aluminium'
----@field mTarget vector?
----@field mPrevTarget vector?
----@field mPrevCenterPosition vector?
+---@field mTarget tinklin.vector?
+---@field mPrevTarget tinklin.vector?
+---@field mPrevCenterPosition tinklin.vector?
 
 ---@class IKLimbsAnimatorComponent.set
 ---@field future_state_samples integer? 10 [0, 1] The number of future animation states evaluated to find the next state
@@ -1020,7 +1020,7 @@
 ---@field no_ground_attachment_penalty_coeff number? 0.75 [0, 1] If a limb movement would make it not collide with ground, the movement score is multiplied with this value. Use lower values to make the limbs prioritize attaching to walls.
 ---@field is_limp boolean? 0 [0, 1] If 1, will apply verlet animation to simulate ragdoll-like limbs
 ---@field ray_skip_material integer? 0 [0, 1] String name of material to not cast rays against. Defaults to 'aluminium'
----@field mPrevBodyPosition vector?
+---@field mPrevBodyPosition tinklin.vector?
 ---@field mHasGroundAttachmentOnAnyLeg boolean? 0 [0, 1] Will be set to true if at least one leg is attached to ground.
 
 ---@class IngestionComponent.set
@@ -1067,15 +1067,15 @@
 ---@field mSmoothedItemXOffset number? 0 [0, 1]
 ---@field mLastItemSwitchFrame integer? 0 [0, 1]
 ---@field mIntroEquipItemLerp number? 1 [0, 1]
----@field mSmoothedItemAngleVec vector?
+---@field mSmoothedItemAngleVec tinklin.vector?
 
 ---@class InventoryComponent.set
 ---@field ui_container_type integer? 1 [0, 1] UI_CONTAINER_TYPES enum
 ---@field ui_element_sprite string? data/ui_gfx/inventory/inventory_box.png [0, 1] ui back sprite
 ---@field actions string? - list of actions, used for serialization
----@field ui_container_size vector? - ui size, how many items x*y we can fit in
----@field ui_element_size vector? - ui size
----@field ui_position_on_screen vector? - where do we load this on screen
+---@field ui_container_size tinklin.vector? - ui size, how many items x*y we can fit in
+---@field ui_element_size tinklin.vector? - ui size
+---@field ui_position_on_screen tinklin.vector? - where do we load this on screen
 
 ---@class InventoryGuiComponent.set
 ---@field has_opened_inventory_edit boolean? 0 [0, 1]
@@ -1163,9 +1163,9 @@
 ---@field camera_smooth_speed_multiplier number? 1 [0, 1] how quickly does the camera follow player?
 ---@field has_been_picked_by_player boolean? 0 [0, 1]
 ---@field mFramePickedUp integer? 0 [0, 1]
----@field spawn_pos vector? - the position where this item spawned
+---@field spawn_pos tinklin.vector? - the position where this item spawned
 ---@field preferred_inventory inventory_kind? - Which inventory do we go to when we're picked up, if it's not full.
----@field inventory_slot vector? - our preferred slot (x,y) in the inventory
+---@field inventory_slot tinklin.vector? - our preferred slot (x,y) in the inventory
 ---@field mItemUid integer? 0 [0, 1]
 ---@field mIsIdentified boolean? 1 [0, 1]
 
@@ -1180,7 +1180,7 @@
 ---@field is_immune_to_kicks boolean? 0 [0, 1] if set, won't drop the wand if kicked. Mainly used by wand ghosts.
 ---@field only_pick_this_entity entity_id? 0 [0, 1] picks up this entity and only this entity. Overrides the is_in_npc checks that try to limit things to pickuppable wands
 ---@field drop_items_on_death boolean? 1 [0, 1] if true, will drop all items. E.g. if true for player, player drops their wands
----@field mLatestItemOverlapInfoBoxPosition vector?
+---@field mLatestItemOverlapInfoBoxPosition tinklin.vector?
 
 ---@class ItemRechargeNearGroundComponent.set
 ---@field TEMP_TEMPY number? 0 [0, 3.5]
@@ -1221,7 +1221,7 @@
 ---@field serialize_duration boolean? 0 [0, 1] if 1, will retain kill_frame and creation_frame over serialization
 ---@field kill_frame_serialized integer? 0 [0, 1] frame that this is killed at
 ---@field creation_frame_serialized integer? 0 [0, 1] frame that this is killed at
----@field randomize_lifetime interval? - this is added to the lifetime
+---@field randomize_lifetime tinklin.interval? - this is added to the lifetime
 ---@field creation_frame integer? 0 [0, 1] we'll set this to GG.GetFrameNum() when this component is created
 ---@field kill_frame integer? 0 [0, 1] frame that this is killed at
 
@@ -1242,7 +1242,7 @@
 ---@field is_projectile boolean? 0 [0, 1] if this is true, it's a projectile lightning and looks for ProjectileComponent and uses the data from there to move it
 ---@field explosion_type integer? 1 [0, 1] 1 = lightning trail
 ---@field arc_lifetime integer? 60 [0, 1] remaining number of frames the arc exists
----@field mExPosition vector? - stores the ex position of this entity
+---@field mExPosition tinklin.vector? - stores the ex position of this entity
 ---@field mArcTarget entity_id? 0 [0, 1] if 'mArcTarget' points to an existing entity a lighting arc will be created between this entity and 'mArcTarget'
 
 ---@class LimbBossComponent.set
@@ -1263,7 +1263,7 @@
 ---@field kill_entity boolean? 1 [0, 1] if 1, we kill our entity when it is created
 ---@field timeout_frames integer? 0 [0, 180] for timer
 ---@field mTimerTriggerFrame integer? -1 [0, 1]
----@field count interval? - how many entities should be loaded (random range)
+---@field count tinklin.interval? - how many entities should be loaded (random range)
 
 ---@class LocationMarkerComponent.set
 ---@field id integer? 0 [0, 3]
@@ -1364,7 +1364,7 @@
 ---@field count_min integer? 0 [0, 1] If > 0, and look_for_failure=0, will send message if material count exceeds this number of cells
 ---@field always_check_fullness boolean? 0 [0, 1] if 1, and look_for_failure=0, will always check the whole area for cells
 ---@field kill_after_message boolean? 1 [0, 1] will kill this entity after sending the message
----@field area_aabb aabb? - aabb offset, we check that this aabb contains only material
+---@field area_aabb tinklin.aabb? - aabb offset, we check that this aabb contains only material
 ---@field material integer? 0 [0, 1] String name of material that we check that the aabb contains
 ---@field material2 integer? 0 [0, 1] String name of material2 that we check that the aabb contains
 ---@field mPosition integer? 0 [0, 1] keeps track where we are
@@ -1391,7 +1391,7 @@
 ---@field audio_collision_size_modifier_amount number? 0 [0, 1] if > 0, 'fullness of this container' * 'audio_collision_size_modifier_amount' is added to collision audio event size
 ---@field last_frame_drank integer? -100 [0, 1] last frame someone ingested from this via IngestionSystem
 ---@field is_death_handled boolean? 0 [0, 1]
----@field ex_position vector? - used to figure out movement velocity
+---@field ex_position tinklin.vector? - used to figure out movement velocity
 ---@field ex_angle number? 0 [0, 1] used to figure out movement velocity
 
 ---@class MaterialSeaSpawnerComponent.set
@@ -1403,8 +1403,8 @@
 ---@field m_position integer? 0 [0, 1]
 ---@field frames_run integer? 0 [0, 1] to help keep the effect
 ---@field material integer? 0 [0, 1] String name of material this creates
----@field size vector? - Size of the area to cover
----@field offset vector? - Offset of the center of the area to cover
+---@field size tinklin.vector? - Size of the area to cover
+---@field offset tinklin.vector? - Offset of the center of the area to cover
 
 ---@class MaterialSuckerComponent.set
 ---@field material_type integer? 0 [0, 3] 0 = liquid, 1 = sand, 2 = gas (arbitary order)
@@ -1417,7 +1417,7 @@
 ---@field suck_static_materials boolean? 0 [0, 1] will suck static materials from the world
 ---@field suck_tag string? - if set, will only suck materials with this tag. NOTE, will also require the correct material_type to be set
 ---@field mAmountUsed integer? 0 [0, 1] how full are we
----@field randomized_position aabb? - random offset for pos, where we look for pixels
+---@field randomized_position tinklin.aabb? - random offset for pos, where we look for pixels
 ---@field mGoldAccumulator integer? 0 [0, 1] accumulates amount of gold picked during consecutive frames
 ---@field mLastFramePickedGold integer? -2 [0, 1] last frame we picked gold
 
@@ -1503,18 +1503,18 @@
 ---@field image_animation_use_entity_rotation boolean? 0 [0, 1] if 1, image animation emission will be rotated based on entity rotation
 ---@field ignore_transform_updated_msg boolean? 0 [0, 1] if 1, mExPosition and m_last_emit_position will not be updated when receiving Message_TransformUpdated
 ---@field color integer? 0 [0, 1]
----@field offset vector?
----@field area_circle_radius interval? - If > 0, the particles will be emitted inside a circular area defined by the min and max bounds of 'area_circle_radius'.
----@field gravity vector?
+---@field offset tinklin.vector?
+---@field area_circle_radius tinklin.interval? - If > 0, the particles will be emitted inside a circular area defined by the min and max bounds of 'area_circle_radius'.
+---@field gravity tinklin.vector?
 ---@field count_min integer?
 ---@field count_max integer?
 ---@field custom_style particle_emitter_custom_style? - NONE or FIRE
----@field mExPosition vector? - is used with is_trail
+---@field mExPosition tinklin.vector? - is used with is_trail
 ---@field mMaterialInventoryMax integer? 1024 [0, 1] this is how we figure out the pressure, when using material_inventory
 ---@field m_material_id integer?
 ---@field m_next_emit_frame integer? 0 [0, 1]
 ---@field m_has_emitted boolean? 0 [0, 1]
----@field m_last_emit_position vector?
+---@field m_last_emit_position tinklin.vector?
 ---@field m_image_based_animation_time number? 0 [0, 1]
 ---@field m_particle_attractor_id integer? -1 [0, 1]
 
@@ -1544,7 +1544,7 @@
 ---@field read_state integer? 0 [0, 1] Read only value to get mState as an integer. Used to detect when the worst cheesers are trying to cheese our beloved squidward.
 ---@field waiting_for boolean? 0 [0, 1] TODO: Comment
 ---@field next_search_frame integer? 0 [0, 1] TODO: Comment
----@field path_next_node_vector_to vector? - TODO: Comment
+---@field path_next_node_vector_to tinklin.vector? - TODO: Comment
 ---@field path_next_node_distance_to number? 0 [0, 1] TODO: Comment
 ---@field path_frames_stuck integer? 0 [0, 1] TODO: Comment
 ---@field path_is_stuck boolean? 0 [0, 1] TODO: Comment
@@ -1590,7 +1590,7 @@
 ---@field mMainBodyFound boolean? 0 [0, 1]
 ---@field mNextFrameActive integer? 0 [0, 1]
 ---@field mRotationTarget number? 0 [0, 1]
----@field mLastPositionWhenHadPath vector?
+---@field mLastPositionWhenHadPath tinklin.vector?
 ---@field mHasLastPosition boolean? 0 [0, 1]
 
 ---@class PhysicsBody2Component.set
@@ -1618,7 +1618,7 @@
 ---@field init_offset_y number? 0 [0, 1] TODO"
 ---@field mActiveState boolean? 0 [0, 1] private variable, please don't mess around with this
 ---@field mPixelCountOrig integer? 0 [0, 1] the number of pixels the body had when it was originally created
----@field mLocalPosition vector? - private variable, please don't mess around with this
+---@field mLocalPosition tinklin.vector? - private variable, please don't mess around with this
 ---@field mInitialized boolean? 0 [0, 1] private variable, please don't mess around with this
 ---@field mPixelCount integer? 0 [0, 1] if set, tracks the number of csolidcells the body has
 ---@field mRefreshed boolean? 0 [0, 1] this is sure the bodies are only parsed once
@@ -1655,7 +1655,7 @@
 ---@field projectiles_rotate_toward_velocity boolean? 0 [0, 1] for physics projectiles, if true will initially rotate the body based on the velocity
 ---@field randomize_init_velocity boolean? 0 [0, 1] randomizes the init velocity
 ---@field mActiveState boolean? 0 [0, 1] private variable, please don't mess around with this
----@field initial_velocity vector? - if you want a velocity at the start, set it here
+---@field initial_velocity tinklin.vector? - if you want a velocity at the start, set it here
 ---@field mPixelCount integer? 0 [0, 1] if set, tracks the number of csolidcells the body has
 ---@field mRefreshed boolean? 0 [0, 1] this is sure the bodies are only parsed once
 
@@ -1715,16 +1715,16 @@
 ---@field check_whole_aabb boolean? 0 [0, 1] All that is needed is to include one of the components with PhysicsBodyComponent or PhysicsBody2Component and it will be frozen when it hits outer edges of the world. NOTE! This will override the auto_clean variable, auto_clean will be set to false. If this is true, will check all the 4 corners of the bounding box
 ---@field predict_aabb boolean? 0 [0, 1] Will add the velocity * 1.5 to the aabb to predict where the body will end up at. This will greatly help keep the body inside simulated world.
 ---@field keep_at_last_valid_pos boolean? 0 [0, 1] Will try to keep the object at the latest valid position
----@field mExPosition vector?
+---@field mExPosition tinklin.vector?
 ---@field mExRotation number? 0 [0, 1]
 
 ---@class PhysicsPickUpComponent.set
 ---@field pick_up_strength number? 200 [0, 1]
----@field original_left_joint_pos vector?
----@field original_right_joint_pos vector?
+---@field original_left_joint_pos tinklin.vector?
+---@field original_right_joint_pos tinklin.vector?
 ---@field isBroken boolean? 0 [0, 1]
----@field leftJointPos vector?
----@field rightJointPos vector?
+---@field leftJointPos tinklin.vector?
+---@field rightJointPos tinklin.vector?
 
 ---@class PhysicsRagdollComponent.set
 ---@field filename string? - file that should include just a list of other files, that have all the parts
@@ -1794,10 +1794,10 @@
 ---@field stoned_speed number? 0.1 [0, 1000]
 ---@field center_camera_on_this_entity boolean? 1 [0, 1]
 ---@field move_camera_with_aim boolean? 1 [0, 1] if true, moves camera with the aim.
----@field eating_area_min vector?
----@field eating_area_max vector?
----@field mSmoothedCameraPosition vector?
----@field mSmoothedAimingVector vector?
+---@field eating_area_min tinklin.vector?
+---@field eating_area_max tinklin.vector?
+---@field mSmoothedCameraPosition tinklin.vector?
+---@field mSmoothedAimingVector tinklin.vector?
 ---@field mCameraRecoil number? 0 [0, 1]
 ---@field mCameraRecoilTarget number? 0 [0, 1]
 ---@field mCrouching boolean? 0 [0, 1]
@@ -1805,14 +1805,14 @@
 ---@field mRequireTriggerPull boolean? 0 [0, 1]
 ---@field mWarpDelay integer? 0 [0, 1]
 ---@field mItemTemporarilyHidden integer? 0 [0, 1]
----@field mDesiredCameraPos vector?
+---@field mDesiredCameraPos tinklin.vector?
 ---@field mHasGamepadControlsPrev boolean? 0 [0, 1]
 ---@field mForceFireOnNextUpdate boolean? 0 [0, 1]
 ---@field mFastMovementParticlesAlphaSmoothed number? 0 [0, 1]
 ---@field mTeleBoltFramesDuringLastSecond integer? 0 [0, 1]
 ---@field mCamCorrectionTeleSmoothed number? 0 [0, 1]
----@field mCamCorrectionGainSmoothed vector?
----@field mCamErrorAveraged vector?
+---@field mCamCorrectionGainSmoothed tinklin.vector?
+---@field mCamErrorAveraged tinklin.vector?
 ---@field mCamMovingFastPrev boolean? 0 [0, 1]
 ---@field mCamFrameStartedMovingFast integer? 0 [0, 1]
 ---@field mCamFrameLastMovingFastExplosion integer? 0 [0, 1]
@@ -1851,8 +1851,8 @@
 ---@field check_every_x_frames integer? 30 [0, 1] how often do we check the world
 ---@field state integer? 0 [0, 1] 0 is up, 1 is down
 ---@field material_percent number? 0.75 [0, 1] how much material should there be in the aabbs that we go down 
----@field aabb_min vector?
----@field aabb_max vector?
+---@field aabb_min tinklin.vector?
+---@field aabb_max tinklin.vector?
 ---@field mNextFrame integer? 0 [0, 1]
 
 ---@class ProjectileComponent.set
@@ -1932,7 +1932,7 @@
 ---@field play_damage_sounds boolean? 1 [0, 1]
 ---@field mLastFrameDamaged integer? -1024 [0, 1]
 ---@field projectile_type projectile_type?
----@field shell_casing_offset vector? - where the shell casing will be created relative to projectile, y is flipped if projectile direction is to the left.
+---@field shell_casing_offset tinklin.vector? - where the shell casing will be created relative to projectile, y is flipped if projectile direction is to the left.
 ---@field ragdoll_fx_on_collision ragdoll_fx? - if not NORMAL, do a special ragdoll
 ---@field mWhoShot entity_id? 0 [0, 1] entity (creature) that shot this
 ---@field mWhoShotEntityTypeID integer? 0 [0, 1] used for stats
@@ -1946,12 +1946,12 @@
 
 ---@class SetLightAlphaFromVelocityComponent.set
 ---@field max_velocity number? 50 [1, 150]
----@field mPrevPosition vector?
+---@field mPrevPosition tinklin.vector?
 
 ---@class SetStartVelocityComponent.set
----@field velocity vector? - This is added together with random velocity
----@field randomize_angle interval? - Random angle min max range in radians, clockwise. 0.0 points directly rightward.
----@field randomize_speed interval? - Random speed min max range
+---@field velocity tinklin.vector? - This is added together with random velocity
+---@field randomize_angle tinklin.interval? - Random angle min max range in radians, clockwise. 0.0 points directly rightward.
+---@field randomize_speed tinklin.interval? - Random speed min max range
 
 ---@class ShotEffectComponent.set
 ---@field extra_modifier string? - name of modifier function executed per projectile from 'gun_extra_modifiers.lua'
@@ -1959,7 +1959,7 @@
 
 ---@class SimplePhysicsComponent.set
 ---@field can_go_up boolean? 1 [0, 1] if set, will not try to move this upwards
----@field mOldPosition vector? - used for box2d simple physics
+---@field mOldPosition tinklin.vector? - used for box2d simple physics
 
 ---@class SineWaveComponent.set
 ---@field sinewave_freq number? 1 [0, 1] sinewave_m * sinf( sinewave_freq * lifetime++)
@@ -1994,8 +1994,8 @@
 ---@field special_scale_x number? 1 [0, 1] this overrides the scale of the entity, if has_special_scale
 ---@field special_scale_y number? 1 [0, 1] this overrides the scale of the entity, if has_special_scale
 ---@field never_ragdollify_on_death boolean? 0 [0, 1]
----@field transform_offset vector?
----@field offset_animator_offset vector? - used by SpriteOffsetAnimator
+---@field transform_offset tinklin.vector?
+---@field offset_animator_offset tinklin.vector? - used by SpriteOffsetAnimator
 ---@field mRenderListHandle integer? -1 [0, 1]
 
 ---@class SpriteOffsetAnimatorComponent.set
@@ -2034,21 +2034,21 @@
 ---@field emission_interval_min_frames integer? 5 [0, 200] how often do we emit particles
 ---@field emission_interval_max_frames integer? 10 [0, 200] how often do we emit particles
 ---@field entity_file string? - if set, this entity is loaded to the emission position by the emitter when it emits
----@field color rgba_percent? - original color
----@field color_change rgba_percent? - how much the color changes in a second
----@field velocity vector? - original velocity
----@field gravity vector? - gravity"
----@field scale vector? - original scale
----@field scale_velocity vector? - scale velocity per second
----@field randomize_lifetime interval? - this is added to the lifetime
----@field randomize_position aabb? - random offset for pos
----@field randomize_velocity aabb? - add this randomized velocity inside this o the velocity
----@field randomize_scale aabb? - add this randomized vector2 to scale
----@field randomize_rotation interval? - this is added to the rotation 
----@field randomize_angular_velocity interval? - this is added to angular_velocity
----@field randomize_alpha interval? - this is added to the alpha
----@field randomize_animation_speed_coeff interval? - if set, animation speed is multiplied by a random value inside this range
----@field expand_randomize_position vector? - will add dt*this to randomize_position_aabb every frame
+---@field color tinklin.rgba_percent? - original color
+---@field color_change tinklin.rgba_percent? - how much the color changes in a second
+---@field velocity tinklin.vector? - original velocity
+---@field gravity tinklin.vector? - gravity"
+---@field scale tinklin.vector? - original scale
+---@field scale_velocity tinklin.vector? - scale velocity per second
+---@field randomize_lifetime tinklin.interval? - this is added to the lifetime
+---@field randomize_position tinklin.aabb? - random offset for pos
+---@field randomize_velocity tinklin.aabb? - add this randomized velocity inside this o the velocity
+---@field randomize_scale tinklin.aabb? - add this randomized vector2 to scale
+---@field randomize_rotation tinklin.interval? - this is added to the rotation 
+---@field randomize_angular_velocity tinklin.interval? - this is added to angular_velocity
+---@field randomize_alpha tinklin.interval? - this is added to the alpha
+---@field randomize_animation_speed_coeff tinklin.interval? - if set, animation speed is multiplied by a random value inside this range
+---@field expand_randomize_position tinklin.vector? - will add dt*this to randomize_position_aabb every frame
 ---@field mNextEmitFrame integer? 0 [0, 1]
 
 ---@class SpriteStainsComponent.set
@@ -2087,9 +2087,9 @@
 ---@field source_particle_fx_file string? data/entities/particles/teleportation_source.xml [0, 1] This entity is loaded at the source position when teleportation occurs
 ---@field target_particle_fx_file string? data/entities/particles/teleportation_target.xml [0, 1] This entity is loaded at the target position when teleportation occurs
 ---@field load_collapse_entity boolean? 1 [0, 1] if we don't want things to collapse after the teleport
----@field target vector? - Where should we teleport
+---@field target tinklin.vector? - Where should we teleport
 ---@field safety_counter integer? 0 [0, 1] used to keep track that we're not stuck in waiting for a pixel scene to load, that is not going to be loaded
----@field source_location_camera_aabb aabb?
+---@field source_location_camera_aabb tinklin.aabb?
 
 ---@class TeleportProjectileComponent.set
 ---@field min_distance_from_wall number? 16 [0, 16]
@@ -2144,11 +2144,11 @@
 ---@field limit_to_max_velocity boolean? 1 [0, 1] if true will limit the velocity to 61440. You can turn this off, but it's not recommended, since there are some nasty bugs that can happen with extremely high velocities.
 ---@field liquid_death_threshold integer? 0 [0, 1] if > 0, entity will die if liquid hit count is greater than this.
 ---@field liquid_drag number? 1 [0, 1] 1 = slows down in liquid, 0 = doesn't slow down at all
----@field mVelocity vector?
----@field mPrevVelocity vector? - used to update physics bodies
+---@field mVelocity tinklin.vector?
+---@field mPrevVelocity tinklin.vector? - used to update physics bodies
 ---@field mLatestLiquidHitCount integer? 0 [0, 1]
 ---@field mAverageLiquidHitCount integer? 0 [0, 1]
----@field mPrevPosition vector?
+---@field mPrevPosition tinklin.vector?
 
 ---@class VerletPhysicsComponent.set
 ---@field num_points integer? 2 [0, 1]
@@ -2176,10 +2176,10 @@
 ---@field stain_cells_probability integer? 0 [0, 1] 0 = never, 1 = most likely, 10 = less likely - and so on
 ---@field m_is_culled_previous boolean? 0 [0, 1] Developer note: this needs to be serialized in case we serialize SpriteComponent.is_visible
 ---@field type verlet_type?
----@field animation_target_offset vector?
+---@field animation_target_offset tinklin.vector?
 ---@field cloth_color_edge integer? 4288376730 [0, 1]
 ---@field cloth_color integer? 4286534774 [0, 1]
----@field m_position_previous vector?
+---@field m_position_previous tinklin.vector?
 
 ---@class VerletWeaponComponent.set
 ---@field damage_radius number? 5 [0, 10]
@@ -2194,7 +2194,7 @@
 
 ---@class VerletWorldJointComponent.set
 ---@field verlet_point_index integer? 0 [0, 32] Index of the verlet point we attach
----@field world_position vector? - Where we attach the verlet point
+---@field world_position tinklin.vector? - Where we attach the verlet point
 ---@field mUpdated boolean? 0 [0, 1]
 
 ---@class WalletComponent.set
@@ -2252,7 +2252,7 @@
 ---@field mFlashAlpha number? 0 [0, 1] to keep track of the animation
 ---@field DEBUG_LOADED_FROM_AUTOSAVE integer? 0 [0, 1] how many times have loaded from autosaves
 ---@field DEBUG_LOADED_FROM_OLD_VERSION integer? 0 [0, 1] how many times have we loaded from an old version of the game
----@field player_spawn_location vector?
+---@field player_spawn_location tinklin.vector?
 ---@field gore_multiplier integer?
 ---@field trick_kill_gold_multiplier integer?
 ---@field damage_flash_multiplier number?
@@ -2276,7 +2276,7 @@
 ---@field give_up_area_radius number? 50 [0, 10000]
 ---@field give_up_time_frames integer? 300 [0, 10000]
 ---@field debug_follow_mouse boolean? 0 [0, 1]
----@field mRandomTarget vector?
+---@field mRandomTarget tinklin.vector?
 ---@field mTargetEntityId integer? 0 [0, 1]
 ---@field mNextTargetCheckFrame integer? 0 [0, 1]
 ---@field mNextHuntTargetCheckFrame integer? 0 [0, 1]
@@ -2308,10 +2308,10 @@
 ---@field is_water_worm boolean? 0 [0, 1] if true, tries to stay in liquids
 ---@field max_speed number? 25 [0, 1] max speed, used when attracted to a point
 ---@field ground_decceleration number?
----@field mTargetVec vector?
+---@field mTargetVec tinklin.vector?
 ---@field mGravVelocity number? 0 [0, 1]
 ---@field mSpeed number? 0 [0, 1]
----@field mTargetPosition vector?
+---@field mTargetPosition tinklin.vector?
 ---@field mTargetSpeed number? 0 [0, 1]
 ---@field mOnGroundPrev boolean? 0 [0, 1]
 ---@field mMaterialIdPrev integer? 0 [0, 1]
@@ -2319,6 +2319,6 @@
 ---@field mDirectionAdjustSpeed number? 1 [0, 1]
 
 ---@class WormPlayerComponent.set
----@field mPrevPosition vector?
----@field mDirection vector? - if mDirection == 0,0 nothings works
+---@field mPrevPosition tinklin.vector?
+---@field mDirection tinklin.vector? - if mDirection == 0,0 nothings works
 
