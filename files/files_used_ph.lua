@@ -4,4 +4,5 @@ return {
     "parse_entity_xml.lua",
     "tr.lua",
     "tr_utils.lua",
+    "wand_utils.lua",
 }
