@@ -193,6 +193,7 @@ end
 
 ---@param comp_type component_type?
 ---@param tag string?
+---@return iterator<tinklin.comp>
 ---@nodiscard
 function entity_methods:comps(comp_type, tag)
     if comp_type == nil then
@@ -227,6 +228,26 @@ function entity_methods:comp_new(comp_type)
     end
 end
 
+---Immediately refreshes all SpriteComponents with the given tag. Might be useful with text sprites if you want them to update more often than once a second.
+---@param tag string?
+function entity_methods:refresh_sprite(tag)
+    self:comps("SpriteComponent", tag):each(function(comp)
+        EntityRefreshSprite(self.id, comp.meta.id)
+    end)
+end
+
+---Immediately refreshes the given SpriteComponent. Might be useful with text sprites if you want them to update more often than once a second.
+---@param sprite_comp SpriteComponent
+function entity_methods:refresh_sprite_comp(sprite_comp)
+    EntityRefreshSprite(self.id, sprite_comp.meta.id)
+end
+
+---@param tag string
+---@param enabled boolean
+function entity_methods:switch_comps(tag, enabled)
+    EntitySetComponentsWithTagEnabled(self.id, tag, enabled)
+end
+
 ---Return value example: 'data/entities/items/flute.xml'. Incorrect value is returned if the entity has passed through the world streaming system.
 ---@return string full_path
 ---@nodiscard
@@ -246,6 +267,7 @@ local entity_mt = class_sim(entity_fields, entity_methods)
 ---@field id comp_id
 ---@field type string
 ---@field enabled boolean
+---@field entity tinklin.entity
 ---@field tag table<string,boolean> alias for comp.meta.tag
 ---@field tags string a string where the tags are comma-separated
 ---@field remove fun(self)
@@ -262,6 +284,11 @@ do
             end,
             set = function(self, value)
                 return EntitySetComponentIsEnabled(ComponentGetEntity(self.id), self.id, value)
+            end,
+        },
+        entity = {
+            get = function(self)
+                return tinklin.entity_wrap(ComponentGetEntity(self.id))
             end,
         },
         tags = {
