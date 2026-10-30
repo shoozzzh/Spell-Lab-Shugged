@@ -255,19 +255,14 @@ function pop.text_pixel(text, props)
     GuiText(gui, x, y, text, scale, font, true)
 end
 
----@class pop.text_non_pixel.props
----@field color pop.general_props.color?
-
 ---@param text string
 ---@param font string
----@param props pop.text_non_pixel.props?
-function pop.text_non_pixel(text, font, props)
+---@param color pop.general_props.color?
+function pop.text_non_pixel(text, font, color)
     local x, y = pop.pos.get()
 
-    if props then
-        if props.color then
-            next_color(props.color)
-        end
+    if color then
+        next_color(color)
     end
 
     next_z_step()
@@ -316,21 +311,16 @@ function pop.button_text_pixel(text, props)
     return GuiButton(gui, get_id(), x, y, text, scale, font, true)
 end
 
----@class pop.button_text_non_pixel.props
----@field color pop.general_props.color?
-
 ---@param text string
 ---@param font string
----@param props pop.button_text_non_pixel.props?
+---@param color pop.general_props.color?
 ---@return boolean left_click
 ---@return boolean right_click
-function pop.button_text_non_pixel(text, font, props)
+function pop.button_text_non_pixel(text, font, color)
     local x, y = pop.pos.get()
 
-    if props then
-        if props.color then
-            next_color(props.color)
-        end
+    if color then
+        next_color(color)
     end
 
     next_z_step()
