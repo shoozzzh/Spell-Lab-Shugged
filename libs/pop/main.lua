@@ -438,55 +438,14 @@ function pop.slider(value, width)
     return GuiSlider(gui, get_id(), x, y, "", value, 0, 1, value, 0, "", width)
 end
 
---TODO: check if these max_length's are really used anywhere
-
 ---@param value string
 ---@param width number
----@param max_length integer
----@param allowed_chars string
----@return string
----@nodiscard
-function pop.input_text(value, width, max_length, allowed_chars)
+function pop.text_input_surface(value, width)
     local x, y = pop.pos.get()
     next_z_step()
-    return GuiTextInput(gui, get_id(), x, y, value, width, max_length, allowed_chars)
-end
 
----@param value string
----@param width number
----@param max_length integer
----@return string
----@nodiscard
-function pop.input_any_text(value, width, max_length)
-    local x, y = pop.pos.get()
-    next_z_step()
-    return GuiTextInput(gui, get_id(), x, y, value, width, max_length, "")
-end
-
----@param value integer
----@param width number
----@param max_length integer
----@return integer
----@nodiscard
-function pop.input_int(value, width, max_length)
-    local x, y = pop.pos.get()
-    local old_text = ("%.0f"):format(value)
-    next_z_step()
-    local new_text = GuiTextInput(gui, get_id(), x, y, old_text, width, max_length, "0123456789+-")
-    return tonumber(new_text)
-end
-
----@param value number
----@param width number
----@param max_length integer
----@return number
----@nodiscard
-function pop.input_float(value, width, max_length)
-    local x, y = pop.pos.get()
-    local old_text = ("%.3f"):format(value)
-    next_z_step()
-    local new_text = GuiTextInput(gui, get_id(), x, y, old_text, width, max_length, "0123456789+-.")
-    return tonumber(new_text)
+    ---@diagnostic disable-next-line: discard-returns
+    GuiTextInput(gui, get_id(), x, y, value, width, math.huge, "")
 end
 
 ---@param content_fn fun()
