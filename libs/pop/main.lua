@@ -337,6 +337,44 @@ function pop.button_text_non_pixel(text, font, props)
     return GuiButton(gui, get_id(), x, y, text, 1, font, false)
 end
 
+---@param text string
+---@param line_spacing number?
+---@return number width
+---@return number height
+function pop.measure_text(text, line_spacing)
+    return GuiGetTextDimensions(gui, text, 1, line_spacing or 2)
+end
+
+---@class pop.measure_text_pixel.options
+---@field font string?
+---@field scale number?
+---@field line_spacing number?
+
+---@param text string
+---@param options pop.measure_text_pixel.options?
+---@return number width
+---@return number height
+function pop.measure_text_pixel(text, options)
+    local font, scale, line_spacing = "data/fonts/font_pixel.xml", 1, 2
+
+    if options then
+        font = options.font or font
+        scale = options.scale or scale
+        line_spacing = options.line_spacing or line_spacing
+    end
+
+    return GuiGetTextDimensions(gui, text, scale, line_spacing, font, true)
+end
+
+---@param text string
+---@param font string
+---@param line_spacing number?
+---@return number width
+---@return number height
+function pop.measure_text_non_pixel(text, font, line_spacing)
+    return GuiGetTextDimensions(gui, text, 1, line_spacing or 2, font, false)
+end
+
 ---@class pop.image.props
 ---@field alpha number?
 ---@field scale number?
@@ -380,6 +418,14 @@ function pop.image_9piece(sprite_filename, width, height)
     local x, y = pop.pos.get()
     next_z_step()
     GuiImageNinePiece(gui, get_id(), x, y, width, height, 1, sprite_filename, sprite_filename)
+end
+
+---@param sprite_filename string
+---@param scale number
+---@return number width
+---@return number height
+function pop.measure_image(sprite_filename, scale)
+    return GuiGetImageDimensions(gui, sprite_filename, scale or 1)
 end
 
 ---@param sprite_filename string
