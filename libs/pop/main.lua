@@ -642,8 +642,6 @@ function pop.invis_end()
     GuiAnimateEnd(gui)
 end
 
--- dimension getters don't belong to a gui wrapper
-
 ---@nodiscard
 function pop.prev_clicked()
     local left_clicked, right_clicked = GuiGetPreviousWidgetInfo(gui)
