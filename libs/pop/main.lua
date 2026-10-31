@@ -163,6 +163,12 @@ function pop.option_next(option)
     return pop.option_next
 end
 
+---@return number x
+---@return number y
+function pop.get_mouse_pos()
+    return pc.world_to_screen(DEBUG_GetMouseWorld())
+end
+
 ---@class pop.general_props.color
 ---@field r integer
 ---@field g integer
