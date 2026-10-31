@@ -12,7 +12,8 @@ local id_allocator = require "pop.id_allocator"
 local pop = {
     gui_obj = gui,
     screen_size = { 1260, 720 },
-    text_line_height = 6,
+    text_line_height = 10,
+    text_height = 8,
     ---@type dragging_data?
     dragging = nil,
 }
@@ -149,7 +150,8 @@ function pop.start_frame()
     pop.screen_size = { GuiGetScreenDimensions(gui) }
     pop.z:new_frame()
     pop.option_clear()
-    _, pop.text_line_height = GuiGetTextDimensions(gui, "|")
+    _, pop.text_height = pop.measure_text "|"
+    pop.text_line_height = pop.text_height + 2
 end
 
 ---@param option pop.gui_option
