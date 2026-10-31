@@ -417,7 +417,7 @@ function pop.image_9piece(sprite_filename, width, height)
 end
 
 ---@param sprite_filename string
----@param scale number
+---@param scale number?
 ---@return number width
 ---@return number height
 function pop.measure_image(sprite_filename, scale)
