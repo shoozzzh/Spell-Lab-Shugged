@@ -7,13 +7,18 @@ local npair = require "tinklin.npair"
 
 local nquadra = {}
 
+local function new_prototype()
+    local res = {}
+    res.__index = res
+    return res
+end
+
 ---@class tinklin.nquadra
 ---@field [1] number
 ---@field [2] number
 ---@field [3] number
 ---@field [4] number
-local nquadra_mt = {}
-nquadra_mt.__index = nquadra_mt
+local nquadra_mt = new_prototype()
 
 local function new(value_1, value_2, value_3, value_4)
     return setmetatable({ value_1, value_2, value_3, value_4 }, nquadra_mt)
@@ -83,7 +88,6 @@ end
 ---@field [3] number min_y
 ---@field [4] number max_y
 local aabb_mt = {}
-aabb_mt.__index = aabb_mt
 
 ---@return tinklin.interval
 ---@return tinklin.interval
@@ -107,7 +111,6 @@ end
 ---@field [3] number b
 ---@field [4] number a
 local color_mt = {}
-color_mt.__index = color_mt
 
 local function percent2hex(frac)
     return math.floor(frac * 255 + 0.5)

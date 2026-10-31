@@ -1,5 +1,11 @@
 local npair = {}
 
+local function new_prototype()
+    local res = {}
+    res.__index = res
+    return res
+end
+
 ---@class tinklin.npair
 ---@field [1] number
 ---@field [2] number
@@ -8,8 +14,7 @@ local npair = {}
 ---@operator sub(tinklin.npair|number): tinklin.npair
 ---@operator mul(tinklin.npair|number): tinklin.npair
 ---@operator div(tinklin.npair|number): tinklin.npair
-local npair_mt = {}
-npair_mt.__index = npair_mt
+local npair_mt = new_prototype()
 
 local function new(value_left, value_right)
     return setmetatable({ value_left, value_right }, npair_mt)
