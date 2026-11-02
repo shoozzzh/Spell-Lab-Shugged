@@ -150,7 +150,7 @@ function pop.start_frame()
     pop.screen_size = { GuiGetScreenDimensions(gui) }
     pop.z:new_frame()
     pop.option_clear()
-    _, pop.text_height = pop.measure_text "|"
+    _, pop.text_height = pop.measure_text("|", 0)
     pop.text_line_height = pop.text_height + 2
 end
 
