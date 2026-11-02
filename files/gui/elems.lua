@@ -364,6 +364,35 @@ function gui_elems.line_of_buttons(button_fns)
     pop.pos.pop()
 end
 
+---@param text string
+---@return boolean left_click
+---@return boolean right_click
+function gui_elems.better_button_text(text, width)
+    local filler_text = ("l"):rep(math.floor(width / pop.measure_text "l"))
+
+    pop.invis_begin()
+
+    pop.pos.push(width / 2 - pop.measure_text(filler_text) / 2, 0)
+    local left_click, right_click = pop.button_text(filler_text)
+    pop.pos.pop()
+    local hovered = pop.prev_hovered()
+
+    pop.invis_end()
+
+    pop.pos.push(width / 2 - pop.measure_text(text) / 2, 0)
+    if hovered then
+        pop.button_text(text, { color = { r = 255, g = 255, b = 127, a = 255 } })
+    else
+        pop.button_text(text)
+    end
+    pop.pos.pop()
+
+    pop.image_9piece("%MODULE_PATH%/better_button_text.png", width, pop.text_height,
+        { alpha = hovered and 0.79 or 0.61, margin = -1.5 })
+
+    return left_click, right_click
+end
+
 function gui_elems.sound_button_clicked()
     if settings.get "general.button_click_sound" then
         GamePlaySound("data/audio/Desktop/ui.bank", "ui/button_click", GameGetCameraPos())
