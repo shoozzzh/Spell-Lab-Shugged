@@ -8,11 +8,8 @@ local tr_utils = require "tr_utils"
 local common_val = require "common_values"
 
 -- dofile_once "%MOD_PATH%/files/wand_spell_utils.lua"
-WANDS = dofile_once "%MOD_PATH%/libs/wands.lua"
 
 local entry_point = dofile_once "%MODULE_PATH%/entry_point/button.lua"
-
--- keyboard_focus = dofile_once( "mods/spell_lab_shugged/files/gui/keyboard_focus.lua" )
 
 -- wand_stats = dofile( "mods/spell_lab_shugged/files/gui/wand_stats.lua" )
 
