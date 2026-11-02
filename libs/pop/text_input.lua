@@ -16,11 +16,10 @@ local function new_prototype()
 end
 
 ---@class pop.text_input.object: pop.keyboard_focus.focusee
----@field text string
 ---@field input_anchor integer
 ---@field width number
 ---@field placeholder string
----@field allowed_chars {[string]: boolean}?
+---@field allowed_chars string?
 local object_mt = new_prototype()
 
 local function insert_character(str, char, index)
@@ -77,8 +76,13 @@ local character_keys = {
     { "Key_MINUS", "_" },
 }
 
-function object_mt:show()
-    pop.text_input_surface(self.text, self.width)
+---@param text string
+---@return boolean changed
+---@return string new_text
+function object_mt:show(text)
+    pop.text_input_surface(text, self.width)
+
+    self.input_anchor = math.min(self.input_anchor, #text + 1)
 
     local hovered = pop.prev_mouse_inside(2)
     local changed = false
@@ -96,14 +100,14 @@ function object_mt:show()
             local dist
             repeat
                 i = i + 1
-                dist = (pop.measure_text(self.text:sub(1, i)) + pop.measure_text(self.text:sub(1, i + 1))) / 2
-            until dist >= desired_anchor_x or i > #self.text
+                dist = (pop.measure_text(text:sub(1, i)) + pop.measure_text(text:sub(1, i + 1))) / 2
+            until dist >= desired_anchor_x or i > #text
 
             self.input_anchor = i
         end
     elseif InputIsKeyJustDown(keycodes.Key_LEFT) then
         if alt then
-            local str_left = self.text:sub(1, self.input_anchor - 1)
+            local str_left = text:sub(1, self.input_anchor - 1)
             local prev_word_idx, _, _ = str_left:find "[^ ]* *$"
             if prev_word_idx then
                 self.input_anchor = prev_word_idx
@@ -115,44 +119,44 @@ function object_mt:show()
         end
     elseif InputIsKeyJustDown(keycodes.Key_RIGHT) then
         if alt then
-            local str_right = self.text:sub(self.input_anchor, -1)
+            local str_right = text:sub(self.input_anchor, -1)
             local _, next_word_idx, _ = str_right:find "^ *[^ ]*"
             if next_word_idx then
                 self.input_anchor = self.input_anchor + next_word_idx
             end
         else
-            if self.input_anchor <= #self.text then
+            if self.input_anchor <= #text then
                 self.input_anchor = self.input_anchor + 1
             end
         end
     elseif InputIsKeyJustDown(keycodes.Key_HOME) then
         self.input_anchor = 1
     elseif InputIsKeyJustDown(keycodes.Key_END) then
-        self.input_anchor = #self.text + 1
+        self.input_anchor = #text + 1
     elseif InputIsKeyJustDown(keycodes.Key_BACKSPACE) then
         if self.input_anchor >= 2 then
-            self.text =
-                string.sub(self.text, 1, self.input_anchor - 2)
-                .. string.sub(self.text, self.input_anchor, -1)
+            text =
+                string.sub(text, 1, self.input_anchor - 2)
+                .. string.sub(text, self.input_anchor, -1)
             self.input_anchor = self.input_anchor - 1
             changed = true
         end
     elseif InputIsKeyJustDown(keycodes.Key_DELETE) then
-        if self.input_anchor <= #self.text then
-            self.text =
-                string.sub(self.text, 1, self.input_anchor - 1)
-                .. string.sub(self.text, self.input_anchor + 1, -1)
+        if self.input_anchor <= #text then
+            text =
+                string.sub(text, 1, self.input_anchor - 1)
+                .. string.sub(text, self.input_anchor + 1, -1)
             changed = true
         end
     elseif InputIsMouseButtonJustUp(keycodes.Mouse_right) and hovered then
-        self.text = ""
+        text = ""
         self.input_anchor = 1
         changed = true
     else
         if self.allowed_chars then
             for _, p in ipairs(character_keys) do
-                if InputIsKeyJustDown(keycodes[p[1]]) and self.allowed_chars[p[2]] then
-                    self.text = insert_character(self.text, p[2], self.input_anchor)
+                if InputIsKeyJustDown(keycodes[p[1]]) and self.allowed_chars:find(p[2], 1, true) then
+                    text = insert_character(text, p[2], self.input_anchor)
                     self.input_anchor = self.input_anchor + 1
                     changed = true
                     break
@@ -161,7 +165,7 @@ function object_mt:show()
         else
             for _, p in ipairs(character_keys) do
                 if InputIsKeyJustDown(keycodes[p[1]]) then
-                    self.text = insert_character(self.text, p[2], self.input_anchor)
+                    text = insert_character(text, p[2], self.input_anchor)
                     self.input_anchor = self.input_anchor + 1
                     changed = true
                     break
@@ -172,8 +176,8 @@ function object_mt:show()
 
     local has_focus = kbfocus.is_on(self)
 
-    if has_focus or self.text ~= "" then
-        local input_anchor_offset = pop.measure_text(self.text:sub(1, self.input_anchor - 1))
+    if has_focus or text ~= "" then
+        local input_anchor_offset = pop.measure_text(text:sub(1, self.input_anchor - 1))
         local _, anchor_image_height = pop.measure_image(path .. "input_anchor.png")
         local anchor_image_scale = (pop.text_line_height - 2) / anchor_image_height
         pop.pos.push(1 + input_anchor_offset, 2 * anchor_image_scale)
@@ -184,7 +188,7 @@ function object_mt:show()
         pop.text_input_surface(self.placeholder, self.width)
     end
 
-    return changed
+    return changed, text
 end
 
 ---@param width number
@@ -192,19 +196,11 @@ end
 ---@param allowed_chars string?
 ---@return pop.text_input.object
 function text_input.new(width, placeholder, allowed_chars)
-    local allowed_char_set = nil
-    if allowed_chars then
-        allowed_char_set = {}
-        for i = 1, #allowed_chars do
-            allowed_char_set[allowed_chars:sub(i, i)] = true
-        end
-    end
     return setmetatable({
-        text = "",
         input_anchor = 1,
         width = width,
         placeholder = placeholder or "",
-        allowed_chars = allowed_char_set,
+        allowed_chars = allowed_chars,
     }, object_mt)
 end
 
@@ -212,7 +208,7 @@ end
 ---@field inner pop.text_input.object
 ---@field formatter fun(any?): string
 ---@field parser fun(string): any?
----@field value any
+---@field text string
 local wrapper_mt = new_prototype()
 
 ---@generic V
@@ -225,33 +221,38 @@ function text_input.wrap(inner, formatter, parser)
         inner = inner,
         formatter = formatter,
         parser = parser,
-        value = parser(inner.text),
+        text = "",
     }
     local old = res.inner.on_lose_focus
     if old then
         res.inner.on_lose_focus = function()
             old()
-            res.inner.text = formatter(parser(res.inner.text))
+            res.text = formatter(parser(res.text))
         end
     else
         res.inner.on_lose_focus = function()
-            res.inner.text = formatter(parser(res.inner.text))
+            res.text = formatter(parser(res.text))
         end
     end
     return setmetatable(res, wrapper_mt)
 end
 
+---@generic V
+---@param value V
 ---@return boolean changed
----@return any value
+---@return V value
 ---@nodiscard
-function wrapper_mt:show()
-    local changed = self.inner:show()
+function wrapper_mt:show(value)
+    local changed, text
+    text = self.parser(self.text) == value and self.text or self.formatter(value)
+    changed, text = self.inner:show(text)
 
     if changed then
-        self.value = self.parser(self.inner.text)
+        self.text = text
+        return changed, self.parser(text)
     end
 
-    return changed
+    return changed, value
 end
 
 return text_input
