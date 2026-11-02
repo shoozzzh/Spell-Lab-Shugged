@@ -409,13 +409,29 @@ function pop.image(sprite_filename, props)
     GuiImage(gui, get_id(), x, y, sprite_filename, alpha, scale, scale_y, rotation, playback_type, animation_name)
 end
 
+---@class pop.image_9piece.props
+---@field alpha number?
+---@field margin number?
+
 ---@param sprite_filename string
 ---@param width number
 ---@param height number
-function pop.image_9piece(sprite_filename, width, height)
+---@param props pop.image_9piece.props?
+function pop.image_9piece(sprite_filename, width, height, props)
     local x, y = pop.pos.get()
+    local alpha = 1
+    if props then
+        alpha = props.alpha or alpha
+        local margin = props.margin
+        if margin then
+            x = x - margin
+            y = y - margin
+            width = width + 2 * margin
+            height = height + 2 * margin
+        end
+    end
     next_z_step()
-    GuiImageNinePiece(gui, get_id(), x, y, width, height, 1, sprite_filename, sprite_filename)
+    GuiImageNinePiece(gui, get_id(), x, y, width, height, alpha, sprite_filename, sprite_filename)
 end
 
 ---@param sprite_filename string
@@ -452,6 +468,7 @@ function pop.text_input_surface(value, width)
     local x, y = pop.pos.get()
     next_z_step()
 
+    pop.option_next "NonInteractive"
     ---@diagnostic disable-next-line: discard-returns
     GuiTextInput(gui, get_id(), x, y, value, width, math.huge, "")
 end

@@ -204,9 +204,9 @@ function object_mt:show(text)
     if has_focus or hovered then
         local input_anchor_offset = pop.measure_text(text:sub(1, self.input_anchor - 1))
         local _, anchor_image_height = pop.measure_image(path .. "input_anchor.png")
-        local anchor_image_scale = text_input_height / anchor_image_height
-        pop.pos.push(2 + input_anchor_offset, anchor_image_scale)
-        pop.image(path .. "input_anchor.png", { scale_y = anchor_image_scale })
+        local anchor_image_scale = (text_input_height - 4) / anchor_image_height
+        pop.pos.push(2 + input_anchor_offset, 2)
+        pop.image(path .. "input_anchor.png", { alpha = hovered and 0.79 or 0.61, scale_y = anchor_image_scale })
         pop.pos.pop()
     end
 
