@@ -63,9 +63,8 @@ function wand_utils.actions_get_ac_num(actions)
         :length()
 end
 
----@class wand_utils.wand_stats: s2w.wand_stats
+---@class wand_utils.wand_stats
 ---@field capacity integer
----@field deck_capacity integer
 ---@field shuffle_deck_when_empty boolean
 ---@field actions_per_round integer
 ---@field speed_multiplier number
@@ -74,7 +73,6 @@ end
 ---@field spread_degrees number
 ---@field mana_charge_speed integer
 ---@field mana_max integer
----@field mana integer
 
 ---@class wand_utils.wand: wand_utils.wand_stats
 ---@field ab_comp AbilityComponent
@@ -96,7 +94,6 @@ local stat_setters = {
     spread_degrees = stat_setter.GunAction,
     mana_charge_speed = stat_setter.Direct,
     mana_max = stat_setter.Direct,
-    mana = stat_setter.Direct,
 }
 
 local wand_mt = {
@@ -156,7 +153,6 @@ end
 ---@field spread_degrees number
 ---@field mana_charge_speed integer
 ---@field mana_max integer
----@field mana integer
 -- deck_capacity is more like a hidden technical volatile dirty thing
 -- ---@field deck_capacity integer
 
@@ -174,7 +170,6 @@ function wand_utils.get_owned_stats(wand)
         "spread_degrees",
         "mana_charge_speed",
         "mana_max",
-        "mana",
     } do
         res[field] = wand[field]
     end
@@ -240,6 +235,20 @@ function wand_utils.change_look(wand, look)
     end
 end
 
+---@param wand wand_utils.wand
+---@return s2w.wand_look[]
+function wand_utils.get_look_that_matches(wand)
+    local stats = {
+        fire_rate_wait = wand.fire_rate_wait,
+        actions_per_round = wand.actions_per_round,
+        shuffle_deck_when_empty = wand.shuffle_deck_when_empty,
+        deck_capacity = wand.ab_comp:object "gun_config".deck_capacity,
+        reload_time = wand.reload_time,
+        spread_degrees = wand.spread_degrees,
+    }
+    return s2w(stats)
+end
+
 ---@class wand_utils.wand_data
 ---@field stats wand_utils.owned_wand_stats
 ---@field all_actions wand_utils.action[]?
@@ -286,7 +295,7 @@ function wand_utils.apply_wand_data(wand, wand_data)
             end
         end
         if not is_special_wand then
-            wand_utils.change_look(wand.entity, s2w(wand)[1])
+            wand_utils.change_look(wand.entity, wand_utils.get_look_that_matches(wand)[1])
         end
     end
 end
@@ -318,7 +327,7 @@ function wand_utils.explode_actions_out_of_bound(wand)
     wand = wand_utils.wand_wrap(wand)
 
     local vel = tl.vec(0, -100)
-    iter_actions_out_of_bound(wand.entity, wand.deck_capacity):each(function(action)
+    iter_actions_out_of_bound(wand.entity, wand.ab_comp:object "gun_config".deck_capacity):each(function(action)
         wand_explode_action_impl(wand.entity, action, vel)
         vel[1] = vel[1] + 30
     end)
@@ -326,7 +335,7 @@ end
 
 function wand_utils.check_actions_out_of_bound(wand)
     wand = wand_utils.wand_wrap(wand)
-    return iter_actions_out_of_bound(wand.entity, wand.deck_capacity):is_null()
+    return iter_actions_out_of_bound(wand.entity, wand.ab_comp:object "gun_config".deck_capacity):is_null()
 end
 
 return wand_utils
