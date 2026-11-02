@@ -32,10 +32,10 @@ end
 -- expose this, to make hooks possible
 keyboard_focus.default_focusee = {
     on_gain_focus = function()
-        freeze_player_controls()
+        unfreeze_player_controls()
     end,
     on_lose_focus = function()
-        unfreeze_player_controls()
+        freeze_player_controls()
     end,
 }
 
@@ -46,7 +46,6 @@ local cur_focus = keyboard_focus.default_focusee
 ---@field on_gain_focus fun()?
 ---@field on_lose_focus fun()?
 ---@field focused_update fun()?
-
 
 ---@param f fun()?
 local function call_if_present(f)
@@ -59,7 +58,7 @@ local function change_focus(from, to)
     call_if_present(from.on_lose_focus)
     call_if_present(to.on_gain_focus)
 
-    cur_focus = from
+    cur_focus = to
 end
 
 ---@param focusee pop.keyboard_focus.focusee
