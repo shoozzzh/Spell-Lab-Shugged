@@ -28,8 +28,8 @@ local wand_look_index_selected = 1
 local need_refresh = true -- to init wand_looks with default values
 
 local icon_height = 7 + 2
-local icon_width = icon_height + 3
-local label_width = 75 - icon_width
+local icon_width = icon_height + 2
+local label_width = 72 - icon_width
 local text_input_width = 30
 local stat_width = label_width + text_input_width
 local stat_text_color = { r = 207, g = 207, b = 207, a = 255 }
@@ -41,7 +41,7 @@ local wand_sprite_max_scale = 8
 local panel_width = wand_sprite_x_offset + wand_sprite_space_width
 local space_above_buttons = 5
 
-local button_width = (panel_width - 3) / 3
+local button_width = panel_width / 3
 local button_look_width = wand_sprite_space_width / 2
 
 local int2str = function(value)
