@@ -21,7 +21,9 @@ return function(mb_utils)
         local player = common_val.player
         if player then
             gui_elems.sound_button_clicked()
-            if GlobalsGetValue(globals_x, "0") == "0" then
+            local x = GlobalsGetValue(globals_x, "NONE")
+            local y = GlobalsGetValue(globals_y, "NONE")
+            if x == "NONE" or y == "NONE" then
                 local px, py = unpack(player.pos)
                 GlobalsSetValue(globals_x, ("%.0f"):format(px))
                 GlobalsSetValue(globals_y, ("%.0f"):format(py))
@@ -29,8 +31,8 @@ return function(mb_utils)
                 GameSetCameraPos(14600, -6050)
             else
                 if not common_val.shift then
-                    local cx = tonumber(GlobalsGetValue(globals_x, "0"))
-                    local cy = tonumber(GlobalsGetValue(globals_y, "0")) - 10
+                    local cx = tonumber(x)
+                    local cy = tonumber(y) - 10
                     player.pos = tl.vec(cx, cy)
                     player:apply_xform()
                     GameSetCameraPos(cx, cy)
@@ -39,8 +41,8 @@ return function(mb_utils)
                     player:apply_xform()
                     GameSetCameraPos(250, -100)
                 end
-                GlobalsSetValue(globals_x, "0")
-                GlobalsSetValue(globals_y, "0")
+                GlobalsSetValue(globals_x, "NONE")
+                GlobalsSetValue(globals_y, "NONE")
             end
         end
     elseif right_click then
