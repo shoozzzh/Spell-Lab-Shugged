@@ -1,5 +1,5 @@
 local tl = require "tinklin"
-local s2w = require "stat_to_wand"
+local s2w = require "stats_to_wand"
 
 ---@class wand_utils
 local wand_utils = {}

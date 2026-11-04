@@ -5,7 +5,7 @@ local format = require "format"
 local common_val = require "common_values"
 local tr = require "tr"
 local module_tr = tr.as_prefix(tr["%MODULE_ID%"])
-local s2w = require "stat_to_wand"
+local s2w = require "stats_to_wand"
 local tl = require "tinklin"
 local wand_utils = require "wand_utils"
 
