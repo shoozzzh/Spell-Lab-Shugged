@@ -272,7 +272,7 @@ function wand_utils.apply_wand_data(wand, wand_data)
     local ab_comp = wand:comp_first "AbilityComponent"
     local item_comp = wand:comp_first "ItemComponent"
     if not ab_comp or not item_comp then
-        print_error "no AbilityComponent or no ItemComponent found"
+        print_error "Missing AbilityComponent or ItemComponent"
         return
     end
 
