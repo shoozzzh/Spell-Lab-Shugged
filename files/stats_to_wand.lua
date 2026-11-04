@@ -8,6 +8,14 @@
 ---@field spread_degrees integer
 ---@field reload_time integer
 
+---@class s2w.wand_stats0
+---@field fire_rate_wait integer
+---@field actions_per_round integer
+---@field shuffle_deck_when_empty integer
+---@field deck_capacity integer
+---@field spread_degrees integer
+---@field reload_time integer
+
 ---@class s2w.wand_look
 ---@field file string
 ---@field grip_x number
@@ -15,7 +23,7 @@
 ---@field tip_x number
 ---@field tip_y number
 
----@class s2w.wand_pattern: s2w.wand_stats, s2w.wand_look
+---@class s2w.wand_pattern: s2w.wand_stats0, s2w.wand_look
 ---@field name string
 
 local mutils = require "misc_utils"
@@ -34,6 +42,14 @@ end
 
 local function clamp(val, lower, upper)
     return math.max(lower, math.min(upper, val))
+end
+
+local function copy(t)
+    local copy = {}
+    for k, v in pairs(t) do
+        copy[k] = v
+    end
+    return copy
 end
 
 ---@param stats s2w.wand_stats
@@ -60,6 +76,11 @@ local function s2w(stats)
             best_score = score
         end
     end
+
+    for index, wand in ipairs(res) do
+        res[index] = copy(wand)
+    end
+
     return res
 end
 
