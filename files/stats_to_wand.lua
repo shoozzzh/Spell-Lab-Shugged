@@ -59,7 +59,7 @@ local function s2w(stats)
 
     stats_reduced.fire_rate_wait = clamp(((stats.fire_rate_wait + 5) / 7) - 1, 0, 4)
     stats_reduced.actions_per_round = clamp(stats.actions_per_round - 1, 0, 2)
-    stats_reduced.shuffle_deck_when_empty = stats.shuffle_deck_when_empty and 0 or 1
+    stats_reduced.shuffle_deck_when_empty = stats.shuffle_deck_when_empty and 1 or 0
     stats_reduced.deck_capacity = clamp((stats.deck_capacity - 3) / 3, 0, 7)
     stats_reduced.spread_degrees = clamp(((stats.spread_degrees + 5) / 5) - 1, 0, 2)
     stats_reduced.reload_time = clamp(((stats.reload_time + 5) / 25) - 1, 0, 2)
