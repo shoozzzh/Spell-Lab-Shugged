@@ -153,7 +153,7 @@ function entity_methods:get_children(tag)
     else
         children_ids = EntityGetAllChildren(self.id, tag)
     end
-    return fun.iter(children_ids):map(tinklin.entity_wrap)
+    return fun.iter(children_ids or {}):map(tinklin.entity_wrap)
 end
 
 ---Returns the given entity if it has no parent, otherwise walks up the parent hierarchy to the topmost parent and returns it.
@@ -429,6 +429,12 @@ do
 
     function comp_methods:object(name)
         return setmetatable({ comp_id = self._id, name = name }, object_mt)
+    end
+
+    function comp_methods:set(fields)
+        for name, value in pairs(fields) do
+            self[name] = value
+        end
     end
 end
 
