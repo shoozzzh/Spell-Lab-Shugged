@@ -143,7 +143,7 @@ function wand_utils.wand_wrap(wand)
     }, wand_mt)
 end
 
----@class wand_utils.owned_wand_stats
+---@class wand_utils.owned_wand_stats: wand_utils.wand_stats
 ---@field capacity integer
 ---@field shuffle_deck_when_empty boolean
 ---@field actions_per_round integer
