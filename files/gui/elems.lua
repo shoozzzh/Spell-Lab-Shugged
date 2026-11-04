@@ -365,9 +365,15 @@ function gui_elems.line_of_buttons(button_fns)
 end
 
 ---@param text string
+---@param width number
+---@param margin number?
 ---@return boolean left_click
 ---@return boolean right_click
-function gui_elems.better_button_text(text, width)
+function gui_elems.better_button_text(text, width, margin)
+    if margin then
+        width = width - 2 * margin
+        pop.pos.push(margin, 0)
+    end
     local filler_text = ("l"):rep(math.floor(width / pop.measure_text "l"))
 
     pop.invis_begin()
@@ -389,6 +395,10 @@ function gui_elems.better_button_text(text, width)
 
     pop.image_9piece("%MODULE_PATH%/better_button_text.png", width, pop.text_height_no_space,
         { alpha = hovered and 0.79 or 0.61, margin = -2.5 })
+
+    if margin then
+        pop.pos.pop()
+    end
 
     return left_click, right_click
 end
