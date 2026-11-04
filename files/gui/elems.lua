@@ -387,8 +387,8 @@ function gui_elems.better_button_text(text, width)
     end
     pop.pos.pop()
 
-    pop.image_9piece("%MODULE_PATH%/better_button_text.png", width, pop.text_height,
-        { alpha = hovered and 0.79 or 0.61, margin = -1.5 })
+    pop.image_9piece("%MODULE_PATH%/better_button_text.png", width, pop.text_height_no_space,
+        { alpha = hovered and 0.79 or 0.61, margin = -2.5 })
 
     return left_click, right_click
 end
