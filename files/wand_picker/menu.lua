@@ -36,7 +36,7 @@ local wand_sprite_space_width = 60
 local wand_sprite_max_scale = 8
 
 local panel_width = wand_sprite_x_offset + wand_sprite_space_width
-local space_above_buttons = 20
+local space_above_buttons = 5
 
 local button_width = (panel_width - 3) / 3
 local button_look_width = wand_sprite_space_width / 2
