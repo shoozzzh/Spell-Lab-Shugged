@@ -66,7 +66,7 @@ local function module_button_fns(modules)
 end
 
 local menus_line = module_button_fns {
-    "terrain_spell_lab", --[[ "spell_picker", "wand_picker", "wand_box", "spell_group_box", ]]
+    "terrain_spell_lab", --[[ "spell_picker",]] "wand_picker", --[[ "wand_box", "spell_group_box", ]]
     "shot_effects", "toggles_toggle", "damage_info", --[[ "wand_edit_panel", ]]
 }
 

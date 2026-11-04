@@ -29,6 +29,6 @@ return {
     "wand_clear",
     -- "wand_edit_panel",
     "wand_no_shooting",
-    -- "wand_picker",
+    "wand_picker",
     "wand_ready",
 }
