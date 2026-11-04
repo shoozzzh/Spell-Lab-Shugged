@@ -32,12 +32,10 @@ return function(mb_utils)
     }
 
     if num_effects_positive > 0 then
-        tooltip[#tooltip + 1] = module_tr.num:text(module_tr.twwe:text(),
-            format.decimal(a, 0), format.decimal(c, 0))
+        tooltip[#tooltip + 1] = module_tr.num:text(format.decimal(a, 0), format.decimal(c, 0), module_tr.twwe:text())
     end
     if num_effects_negative > 0 then
-        tooltip[#tooltip + 1] = module_tr.num:text(module_tr.nwt:text(),
-            format.decimal(b, 0), format.decimal(d, 0))
+        tooltip[#tooltip + 1] = module_tr.num:text(format.decimal(b, 0), format.decimal(d, 0), module_tr.nwt:text())
     end
 
     local expr = {}
