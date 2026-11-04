@@ -27,9 +27,12 @@ local wand_looks = {}
 local wand_look_index_selected = 1
 local need_refresh = true -- to init wand_looks with default values
 
-local label_width = 75
+local icon_height = 7 + 2
+local icon_width = icon_height + 3
+local label_width = 75 - icon_width
 local text_input_width = 30
 local stat_width = label_width + text_input_width
+local stat_text_color = { r = 207, g = 207, b = 207, a = 255 }
 
 local wand_sprite_x_offset = stat_width + 60 --[[ +60 is for "f (1.000s)" stuff]]
 local wand_sprite_space_width = 60
@@ -118,10 +121,12 @@ picker.menu = function()
         need_refresh = false
     end
 
-    local panel_height = pop.text_line_height * 9 + space_above_buttons + pop.text_line_height - 2
+    local stat_line_height = math.max(pop.text_line_height, icon_height)
+    local stats_height = stat_line_height * 9
+    local panel_height = stats_height + space_above_buttons + pop.text_line_height - 2
 
     local wand_look = wand_looks[wand_look_index_selected]
-    local wand_sprite_space_height = panel_height - pop.text_line_height
+    local wand_sprite_space_height = stats_height
     if #wand_looks > 1 then
         wand_sprite_space_height = wand_sprite_space_height - pop.text_line_height
     end
@@ -140,10 +145,16 @@ picker.menu = function()
     pop.image_9piece("data/ui_gfx/decorations/9piece0_gray.png", panel_width, panel_height, { margin = 2 })
 
     if pop.pos.push(0, 0) then
-        local layout = pop.layout_stack(0, pop.text_line_height)
+        local layout = pop.layout_stack(0, stat_line_height)
 
         layout:next(function()
-            pop.text "$inventory_shuffle"
+            pop.pos.push(0, stat_line_height / 2 - icon_height / 2)
+            pop.image "data/ui_gfx/inventory/icon_gun_shuffle.png"
+            pop.pos.pop()
+
+            pop.pos.push(icon_width, 0)
+            pop.text("$inventory_shuffle", { color = stat_text_color })
+
             pop.pos.push(label_width, 0)
 
             local value = wand_stats.shuffle_deck_when_empty
@@ -154,91 +165,144 @@ picker.menu = function()
             end
 
             pop.pos.pop()
+            pop.pos.pop()
         end)
 
         layout:next(function()
-            pop.text "$inventory_actionspercast"
+            pop.pos.push(0, stat_line_height / 2 - icon_height / 2)
+            pop.image "data/ui_gfx/inventory/icon_gun_actions_per_round.png"
+            pop.pos.pop()
+
+            pop.pos.push(icon_width, 0)
+            pop.text("$inventory_actionspercast", { color = stat_text_color })
 
             pop.pos.push(label_width, 0)
             stat_gui_fns.actions_per_round()
+
+            pop.pos.pop()
             pop.pos.pop()
         end)
 
         layout:next(function()
-            pop.text "$inventory_capacity"
+            pop.pos.push(0, stat_line_height / 2 - icon_height / 2)
+            pop.image "data/ui_gfx/inventory/icon_gun_capacity.png"
+            pop.pos.pop()
+
+            pop.pos.push(icon_width, 0)
+            pop.text("$inventory_capacity", { color = stat_text_color })
 
             pop.pos.push(label_width, 0)
             stat_gui_fns.capacity()
+
+            pop.pos.pop()
             pop.pos.pop()
         end)
 
         layout:next(function()
-            pop.text "$inventory_castdelay"
-            pop.pos.push(label_width, 0)
+            pop.pos.push(0, stat_line_height / 2 - icon_height / 2)
+            pop.image "data/ui_gfx/inventory/icon_fire_rate_wait.png"
+            pop.pos.pop()
 
+            pop.pos.push(icon_width, 0)
+            pop.text("$inventory_castdelay", { color = stat_text_color })
+
+            pop.pos.push(label_width, 0)
             stat_gui_fns.fire_rate_wait()
 
             pop.pos.push(text_input_width, 0)
             pop.text(tr.general.frames:text "" ..
                 (" (%s s)"):format(format.decimal(wand_stats.fire_rate_wait / 60, 3)))
-            pop.pos.pop()
 
+            pop.pos.pop()
+            pop.pos.pop()
             pop.pos.pop()
         end)
 
         layout:next(function()
-            pop.text "$inventory_rechargetime"
-            pop.pos.push(label_width, 0)
+            pop.pos.push(0, stat_line_height / 2 - icon_height / 2)
+            pop.image "data/ui_gfx/inventory/icon_gun_reload_time.png"
+            pop.pos.pop()
 
+            pop.pos.push(icon_width, 0)
+            pop.text("$inventory_rechargetime", { color = stat_text_color })
+
+            pop.pos.push(label_width, 0)
             stat_gui_fns.reload_time()
 
             pop.pos.push(text_input_width, 0)
             pop.text(tr.general.frames:text "" ..
                 (" (%s s)"):format(format.decimal(wand_stats.reload_time / 60, 3)))
-            pop.pos.pop()
 
+            pop.pos.pop()
+            pop.pos.pop()
             pop.pos.pop()
         end)
 
         layout:next(function()
-            pop.text "$inventory_manachargespeed"
+            pop.pos.push(0, stat_line_height / 2 - icon_height / 2)
+            pop.image "data/ui_gfx/inventory/icon_mana_charge_speed.png"
+            pop.pos.pop()
+
+            pop.pos.push(icon_width, 0)
+            pop.text("$inventory_manachargespeed", { color = stat_text_color })
 
             pop.pos.push(label_width, 0)
             stat_gui_fns.mana_charge_speed()
+
+            pop.pos.pop()
             pop.pos.pop()
         end)
 
         layout:next(function()
-            pop.text "$inventory_manamax"
+            pop.pos.push(0, stat_line_height / 2 - icon_height / 2)
+            pop.image "data/ui_gfx/inventory/icon_mana_max.png"
+            pop.pos.pop()
+
+            pop.pos.push(icon_width, 0)
+            pop.text("$inventory_manamax", { color = stat_text_color })
 
             pop.pos.push(label_width, 0)
             stat_gui_fns.mana_max()
+
+            pop.pos.pop()
             pop.pos.pop()
         end)
 
         layout:next(function()
-            pop.text "$inventory_spread"
-            pop.pos.push(label_width, 0)
+            pop.pos.push(0, stat_line_height / 2 - icon_height / 2)
+            pop.image "data/ui_gfx/inventory/icon_spread_degrees.png"
+            pop.pos.pop()
 
+            pop.pos.push(icon_width, 0)
+            pop.text("$inventory_spread", { color = stat_text_color })
+
+            pop.pos.push(label_width, 0)
             stat_gui_fns.spread_degrees()
 
             pop.pos.push(text_input_width, 0)
             pop.text(tr.action_metadata.degrees:text "")
-            pop.pos.pop()
 
+            pop.pos.pop()
+            pop.pos.pop()
             pop.pos.pop()
         end)
 
         layout:next(function()
-            pop.text(tr.action_metadata.speed_multiplier:key())
-            pop.pos.push(label_width, 0)
+            pop.pos.push(0, stat_line_height / 2 - icon_height / 2)
+            pop.image "data/ui_gfx/inventory/icon_speed_multiplier.png"
+            pop.pos.pop()
 
+            pop.pos.push(icon_width, 0)
+            pop.text(tr.action_metadata.speed_multiplier:key(), { color = stat_text_color })
+
+            pop.pos.push(label_width, 0)
             stat_gui_fns.speed_multiplier()
 
             pop.pos.push(text_input_width, 0)
             pop.text " x"
-            pop.pos.pop()
 
+            pop.pos.pop()
+            pop.pos.pop()
             pop.pos.pop()
         end)
 
