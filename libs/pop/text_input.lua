@@ -97,7 +97,7 @@ function object_mt:show(text)
     pop.text_input_surface(text_to_show, self.width)
     local _, text_input_height = pop.prev_size()
 
-    local hovered = pop.prev_mouse_inside(2)
+    local hovered = pop.prev_mouse_inside()
     local changed = false
 
     self.input_anchor = math.min(self.input_anchor, #text + 1)
