@@ -148,7 +148,7 @@ picker.menu = function()
 
             local value = wand_stats.shuffle_deck_when_empty
 
-            local changed = gui_elems.better_button_text(value and "$menu_no" or "$menu_yes", text_input_width)
+            local changed = gui_elems.better_button_text(value and "$menu_yes" or "$menu_no", text_input_width)
             wand_stats.shuffle_deck_when_empty = changed ~= value
             need_refresh = need_refresh or changed
 
