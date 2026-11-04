@@ -4,7 +4,9 @@ local text_input = require "pop.text_input"
 local format = require "format"
 local common_val = require "common_values"
 local tr = require "tr"
+local module_tr = tr.as_prefix(tr["%MODULE_ID%"])
 local s2w = require "stat_to_wand"
+local tl = require "tinklin"
 local wand_utils = require "wand_utils"
 
 ---@type wand_utils.wand_stats
@@ -25,13 +27,19 @@ local wand_looks = {}
 local wand_look_index_selected = 1
 local need_refresh = true -- to init wand_looks with default values
 
+local label_width = 75
 local text_input_width = 30
-local label_width = 60
 local stat_width = label_width + text_input_width
 
 local wand_sprite_x_offset = stat_width + 60 --[[ +60 is for "f (1.000s)" stuff]]
 local wand_sprite_space_width = 60
 local wand_sprite_max_scale = 8
+
+local panel_width = wand_sprite_x_offset + wand_sprite_space_width
+local space_above_buttons = 20
+
+local button_width = (panel_width - 3) / 3
+local button_look_width = wand_sprite_space_width / 2
 
 local int2str = function(value)
     return ("%.0f"):format(value)
@@ -45,7 +53,7 @@ local tonumber_ = function(str)
     return tonumber(str) or 0
 end
 
-local allowed_chars = "0123456789.+-e" --e for "1e10" stuff
+local allowed_chars = "0123456789.+-e" -- e for "1e10" stuff
 
 ---@generic V
 ---@param field string
@@ -53,10 +61,11 @@ local allowed_chars = "0123456789.+-e" --e for "1e10" stuff
 ---@param parser (fun(str: string): V)?
 ---@return fun()
 local function stat_gui(field, formatter, parser)
-    local object = text_input.wrap(
-        text_input.new(text_input_width, "", allowed_chars), formatter or int2str,
-        parser or tointeger
-    )
+    formatter = formatter or int2str
+    parser = parser or tointeger
+
+    local object = text_input.wrap(text_input.new(text_input_width, "", allowed_chars), formatter, parser)
+    object.text = formatter(parser(object.text))
     return function()
         pop.call_depth_mod(1)
 
@@ -109,13 +118,12 @@ picker.menu = function()
         need_refresh = false
     end
 
-    local panel_height = pop.text_line_height * 9 - 2
-    local panel_width = wand_sprite_x_offset + wand_sprite_space_width
+    local panel_height = pop.text_line_height * 9 + space_above_buttons + pop.text_line_height - 2
 
     local wand_look = wand_looks[wand_look_index_selected]
-    local wand_sprite_space_height = panel_height
+    local wand_sprite_space_height = panel_height - pop.text_line_height
     if #wand_looks > 1 then
-        wand_sprite_space_height = wand_sprite_space_height - (20 + 2)
+        wand_sprite_space_height = wand_sprite_space_height - pop.text_line_height
     end
     local wand_sprite_scale
     do
@@ -233,36 +241,69 @@ picker.menu = function()
             pop.pos.pop()
         end)
 
+        layout:shift(0, space_above_buttons)
+
+        layout:next(function()
+            local layout = pop.layout_stack(button_width, 0)
+
+            layout:next(function()
+                if common_val.held_wand then
+                    if gui_elems.better_button_text(module_tr.copy_held_wand:key(), button_width, 1) then
+                        wand_stats = wand_utils.get_owned_stats(wand_utils.wand_wrap(common_val.held_wand))
+                        need_refresh = true
+                    end
+                end
+            end)
+            layout:next(function()
+                if common_val.held_wand then
+                    if gui_elems.better_button_text(module_tr.update_held_wand:key(), button_width, 1) then
+                        wand_utils.apply_stats(wand_utils.wand_wrap(common_val.held_wand), wand_stats)
+                    end
+                end
+            end)
+            layout:next(function()
+                if gui_elems.better_button_text(module_tr.spawn_wand:key(), button_width, 1) then
+                    local wand = tl.entity_load("data/entities/items/wand_level_01.xml",
+                        unpack(common_val.world_dest_pos))
+                    wand_utils.clear(wand)
+                    wand_utils.apply_stats(wand_utils.wand_wrap(wand), wand_stats)
+                end
+            end)
+        end)
+
         pop.pos.pop()
     end
 
     if pop.pos.push(wand_sprite_x_offset, 0) then
+        local layout = pop.layout_hwrap(button_look_width, pop.text_line_height, 2)
+        if #wand_looks > 1 then
+            layout:next(function()
+                if wand_look_index_selected == 1 then
+                    pop.option_next "DrawSemiTransparent" "NonInteractive"
+                end
+                if gui_elems.better_button_text("<", button_look_width, 1) then
+                    wand_look_index_selected = wand_look_index_selected - 1
+                end
+            end)
+
+            layout:next(function()
+                if wand_look_index_selected == #wand_looks then
+                    pop.option_next "DrawSemiTransparent" "NonInteractive"
+                end
+                if gui_elems.better_button_text(">", button_look_width, 1) then
+                    wand_look_index_selected = wand_look_index_selected + 1
+                end
+            end)
+        end
         -- rotate by -pi/2, so width and height are transformed
         local temp_x = wand_sprite_space_width / 2 - wand_sprite_height / 2
         local temp_y = wand_sprite_space_height / 2 + wand_sprite_width / 2
+        if #wand_looks > 1 then
+            temp_y = temp_y + pop.text_line_height
+        end
         pop.pos.push(temp_x, temp_y)
         pop.image(wand_look.file, { scale = wand_sprite_scale, rotation = -math.pi / 2 })
         pop.pos.pop()
-
-        if #wand_look > 1 then
-            pop.pos.push(0, wand_sprite_space_height + 1)
-            if wand_look_index_selected == 1 then
-                pop.option_next "DrawSemiTransparent" "NonInteractive"
-            end
-            if pop.button "%MOD_PATH%/files/gui/arrowhead_left.png" then
-                wand_look_index_selected = wand_look_index_selected - 1
-            end
-            pop.pos.pop()
-
-            pop.pos.push(wand_sprite_space_width - (20 + 2), wand_sprite_space_height + 1)
-            if wand_look_index_selected == #wand_looks then
-                pop.option_next "DrawSemiTransparent" "NonInteractive"
-            end
-            if pop.button "%MOD_PATH%/files/gui/arrowhead_right.png" then
-                wand_look_index_selected = wand_look_index_selected + 1
-            end
-            pop.pos.pop()
-        end
 
         pop.pos.pop()
     end
