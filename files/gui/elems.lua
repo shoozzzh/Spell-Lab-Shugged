@@ -385,6 +385,13 @@ function gui_elems.better_button_text(text, width, margin)
 
     pop.invis_end()
 
+    pop.image_9piece("%MODULE_PATH%/better_button_text.png", width, pop.text_height_no_space,
+        { alpha = hovered and 0.79 or 0.61, margin = -2.5 })
+    if hovered then
+        pop.image_9piece("%MODULE_PATH%/better_button_text_underscore.png", width, pop.text_height_no_space,
+            { alpha = 0.79, margin = -2.5 }) -- alpha consistent with text input anchor
+    end
+
     pop.pos.push(width / 2 - pop.measure_text(text) / 2, 0)
     if hovered then
         pop.button_text(text, { color = { r = 255, g = 255, b = 127, a = 255 } })
@@ -392,9 +399,6 @@ function gui_elems.better_button_text(text, width, margin)
         pop.button_text(text)
     end
     pop.pos.pop()
-
-    pop.image_9piece("%MODULE_PATH%/better_button_text.png", width, pop.text_height_no_space,
-        { alpha = hovered and 0.79 or 0.61, margin = -2.5 })
 
     if margin then
         pop.pos.pop()
