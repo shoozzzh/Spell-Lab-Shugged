@@ -161,39 +161,45 @@ end
 -- deck_capacity is more like a hidden technical volatile dirty thing
 -- ---@field deck_capacity integer
 
+local wand_stats_fields = {
+    "capacity",
+    "shuffle_deck_when_empty",
+    "actions_per_round",
+    "speed_multiplier",
+    "reload_time",
+    "fire_rate_wait",
+    "spread_degrees",
+    "mana_charge_speed",
+    "mana_max",
+}
+
 ---@param wand wand_utils.wand
 ---@return wand_utils.owned_wand_stats res
 function wand_utils.get_owned_stats(wand)
     local res = {}
-    for _, field in ipairs {
-        "capacity",
-        "shuffle_deck_when_empty",
-        "actions_per_round",
-        "speed_multiplier",
-        "reload_time",
-        "fire_rate_wait",
-        "spread_degrees",
-        "mana_charge_speed",
-        "mana_max",
-    } do
+    for _, field in ipairs(wand_stats_fields) do
         res[field] = wand[field]
     end
     return res --[[@as wand_utils.owned_wand_stats]]
 end
 
--- ---@param wand entity
--- ---@return wand_utils.wand_stats
--- function wand_utils.wand_get_stats(wand)
---     local ab_comp = wand:comp_first "AbilityComponent"
---     if not ab_comp then return nil end
-
---     local result = {}
---     for k, v in pairs(stat_setters) do
---         result[k] = wand_utils.ability_component_get_stat(ab_comp, k)
---     end
---     result.capacity = EntityGetWandCapacity(wand.id)
---     return result --[[@as wand_utils.wand_stats]]
--- end
+---@param wand wand_utils.wand
+---@param wand_stats wand_utils.wand_stats
+function wand_utils.apply_stats(wand, wand_stats)
+    for _, field in ipairs(wand_stats_fields) do
+        wand[field] = wand_stats[field]
+    end
+    local is_special_wand = false
+    local sprite = wand.entity:comp_first_enabled("SpriteComponent", "item")
+    if sprite then
+        if not sprite.image_file:sub(-13, -1):match "wand_%d%d%d%d%.png" then
+            is_special_wand = true
+        end
+    end
+    if not is_special_wand then
+        wand_utils.change_look(wand.entity, wand_utils.get_look_that_matches(wand)[1])
+    end
+end
 
 ---@param wand entity
 ---@param all_actions wand_utils.action[]
@@ -255,7 +261,7 @@ function wand_utils.get_look_that_matches(wand)
 end
 
 ---@class wand_utils.wand_data
----@field stats wand_utils.owned_wand_stats
+---@field stats wand_utils.owned_wand_stats?
 ---@field all_actions wand_utils.action[]?
 ---@field name string?
 ---@field look s2w.wand_look?
@@ -284,24 +290,13 @@ function wand_utils.apply_wand_data(wand, wand_data)
         wand_utils.set_actions(wand.entity, wand_data.all_actions)
     end
 
-    for stat, value in pairs(wand_data.stats or {}) do
-        wand[stat] = value
+    if wand_data.stats then
+        wand_utils.apply_stats(wand, wand_data.stats)
     end
     ab_comp.mana = ab_comp.mana_max
 
     if wand_data.look then
         wand_utils.change_look(wand.entity, wand_data.look)
-    else
-        local is_special_wand = false
-        local sprite = wand.entity:comp_first_enabled("SpriteComponent", "item")
-        if sprite then
-            if not sprite.image_file:sub(-13, -1):match "wand_%d%d%d%d%.png" then
-                is_special_wand = true
-            end
-        end
-        if not is_special_wand then
-            wand_utils.change_look(wand.entity, wand_utils.get_look_that_matches(wand)[1])
-        end
     end
 end
 
