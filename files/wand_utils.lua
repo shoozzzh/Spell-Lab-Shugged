@@ -18,8 +18,13 @@ local function kill_action(action)
     action:kill()
 end
 
+---@param wand entity
 function wand_utils.clear(wand)
-    iter_actions(wand):each(kill_action)
+    local wand = wand_utils.wand_wrap(wand)
+
+    local capacity = wand.capacity
+    iter_actions(wand.entity):each(kill_action)
+    wand.capacity = capacity
 end
 
 ---@class wand_utils.action
