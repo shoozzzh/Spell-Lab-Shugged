@@ -185,21 +185,6 @@ picker.menu = function()
 
         layout:next(function()
             pop.pos.push(0, stat_line_height / 2 - icon_height / 2)
-            pop.image "data/ui_gfx/inventory/icon_gun_capacity.png"
-            pop.pos.pop()
-
-            pop.pos.push(icon_width, 0)
-            pop.text("$inventory_capacity", { color = stat_text_color })
-
-            pop.pos.push(label_width, 0)
-            stat_gui_fns.capacity()
-
-            pop.pos.pop()
-            pop.pos.pop()
-        end)
-
-        layout:next(function()
-            pop.pos.push(0, stat_line_height / 2 - icon_height / 2)
             pop.image "data/ui_gfx/inventory/icon_fire_rate_wait.png"
             pop.pos.pop()
 
@@ -240,6 +225,21 @@ picker.menu = function()
 
         layout:next(function()
             pop.pos.push(0, stat_line_height / 2 - icon_height / 2)
+            pop.image "data/ui_gfx/inventory/icon_mana_max.png"
+            pop.pos.pop()
+
+            pop.pos.push(icon_width, 0)
+            pop.text("$inventory_manamax", { color = stat_text_color })
+
+            pop.pos.push(label_width, 0)
+            stat_gui_fns.mana_max()
+
+            pop.pos.pop()
+            pop.pos.pop()
+        end)
+
+        layout:next(function()
+            pop.pos.push(0, stat_line_height / 2 - icon_height / 2)
             pop.image "data/ui_gfx/inventory/icon_mana_charge_speed.png"
             pop.pos.pop()
 
@@ -255,14 +255,14 @@ picker.menu = function()
 
         layout:next(function()
             pop.pos.push(0, stat_line_height / 2 - icon_height / 2)
-            pop.image "data/ui_gfx/inventory/icon_mana_max.png"
+            pop.image "data/ui_gfx/inventory/icon_gun_capacity.png"
             pop.pos.pop()
 
             pop.pos.push(icon_width, 0)
-            pop.text("$inventory_manamax", { color = stat_text_color })
+            pop.text("$inventory_capacity", { color = stat_text_color })
 
             pop.pos.push(label_width, 0)
-            stat_gui_fns.mana_max()
+            stat_gui_fns.capacity()
 
             pop.pos.pop()
             pop.pos.pop()
