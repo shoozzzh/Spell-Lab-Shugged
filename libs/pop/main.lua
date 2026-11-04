@@ -14,6 +14,7 @@ local pop = {
     screen_size = { 1260, 720 },
     text_line_height = 10,
     text_height = 8,
+    text_height_no_space = 8,
     ---@type dragging_data?
     dragging = nil,
 }
@@ -150,8 +151,14 @@ function pop.start_frame()
     pop.screen_size = { GuiGetScreenDimensions(gui) }
     pop.z:new_frame()
     pop.option_clear()
+    -- id = 1, make it conflict with all text, but that's fine
+    -- x, y = -1000, -1000, keep it out of screen
+    pop.option_next "NonInteractive"
+    local _ = GuiTextInput(gui, 1, -1000, -1000, "|", 1, math.huge)
+    local _, text_input_height = pop.prev_size()
+    pop.text_height_no_space = text_input_height
     _, pop.text_height = pop.measure_text("|", 0)
-    pop.text_line_height = pop.text_height + 2
+    pop.text_line_height = pop.text_height_no_space + 2
 end
 
 ---@param option pop.gui_option
