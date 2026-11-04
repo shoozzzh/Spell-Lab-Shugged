@@ -90,12 +90,12 @@ local stat_gui_fns = {
 
     spread_degrees = stat_gui(
         "spread_degrees",
-        function(value) return format.decimal(value, 1) end,
+        function(value) return ("%.1f"):format(value) end,
         tonumber_
     ),
     speed_multiplier = stat_gui(
         "speed_multiplier",
-        function(value) return format.decimal(value, 4) end,
+        function(value) return ("%.3f"):format(value) end,
         tonumber_
     ),
 }
