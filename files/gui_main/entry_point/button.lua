@@ -36,7 +36,7 @@ return function()
     pop.pos.pop()
 
     if not dragging then
-        pop.tooltip_custom(3, 10, true)(function()
+        pop.tooltip_custom(3, 10)(function()
             local layout = pop.layout_stack(0, pop.text_line_height)
 
             layout:next(function()

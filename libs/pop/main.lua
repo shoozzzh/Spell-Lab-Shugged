@@ -520,7 +520,7 @@ function pop.tooltip(...)
     local text = { ... }
 
     -- don't need to care about ids here
-    pop.tooltip_custom(2, 0, true)(function()
+    pop.tooltip_custom(2, 0)(function()
         local layout = pop.layout_stack(0, pop.text_line_height)
         for _, line in ipairs(text) do
             for t in string.gmatch(GameTextGetTranslatedOrNot(line), "[^\n]+") do
@@ -587,7 +587,7 @@ end
 ---@param animated boolean?
 ---@return fun(content_fn: fun())
 function pop.tooltip_custom(x_offset, y_offset, animated)
-    animated = animated ~= true
+    animated = animated == true
     return function(content_fn)
         if not pop.prev_hovered() then return end
         local x, y = pop.prev_pos()

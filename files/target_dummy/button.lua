@@ -33,7 +33,7 @@ return function(mb_utils)
             gui_elems.sound_button_clicked()
         end
     end
-    pop.tooltip_custom(3, 0, true)(function()
+    pop.tooltip_custom(3, 0)(function()
         local layout = pop.layout_stack(0, pop.text_line_height)
         for line in module_tr.tooltip:text():gmatch "[^\n]+" do
             layout:next(function()
