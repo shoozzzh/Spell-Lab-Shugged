@@ -26,9 +26,9 @@ return function(mb_utils)
                 x, y = snap(x), snap(y)
             end
             if left_click then
-                EntityLoad("%MODULE_PATH%/entity.xml", x, y)
+                EntityLoad("%MODULE_PATH%/entity/entity.xml", x, y)
             elseif right_click then
-                EntityLoad("%MODULE_PATH%/entity_final.xml", x, y)
+                EntityLoad("%MODULE_PATH%/entity/entity_final.xml", x, y)
             end
             gui_elems.sound_button_clicked()
         end

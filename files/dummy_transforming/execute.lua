@@ -103,7 +103,7 @@ target:comp_new "LuaComponent" {
     execute_every_n_frame = 1,
 }
 
-target:load_extra_entity "%MOD_PATH%/files/dummy_target/base_dummy_target.xml"
+target:load_extra_entity "%MOD_PATH%/files/target_dummy/entity/base.xml"
 target.tag["%MOD_ID%.target_dummy"] = true
 
 GamePrint(module_tr.done:text(tr_utils.maybe(target.name)))
