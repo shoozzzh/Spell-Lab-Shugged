@@ -144,7 +144,6 @@ function object_mt:show(text)
         changed = true
     end
 
-
     if has_focus then
         local alt = InputIsKeyDown(keycodes.Key_LALT) or InputIsKeyDown(keycodes.Key_RALT)
         if InputIsKeyJustDown(keycodes.Key_LEFT) then
