@@ -182,7 +182,7 @@ for _, shot_effect in ipairs(shot_effect_entries) do
         data.properties[#data.properties + 1] = { module_tr.max_count:key(), module_tr.max_count.infinite:key() }
     end
 
-    data.equivalent_action_type = shot_effect.equivalent_action_type or ACTION_TYPE_MODIFIER
+    data.equivalent_action_type = shot_effect.equivalent_action_type or 2 --[[ ACTION_TYPE_MODIFIER == 2 ]]
     data.no_unsafe = shot_effect.no_unsafe == true
 
     --[[@cast data shot_effect_data]]

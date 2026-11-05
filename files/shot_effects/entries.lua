@@ -2,6 +2,8 @@ local tr = require "tr"
 local module_tr = tr.as_prefix(tr["%MODULE_ID%"])
 local metadata_tr = tr.as_prefix(tr.action_metadata)
 
+dofile_once "data/scripts/gun/gun_enums.lua"
+
 ---@type shot_effect[]
 shot_effect_entries = {
     {
