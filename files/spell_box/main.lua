@@ -69,12 +69,7 @@ update()
 
 local spell_box = {}
 
-function spell_box.update()
-    if not settings.get "spellbox_pack_changed" then return end
-    settings.set("spellbox_pack_changed", false)
-
-    update()
-end
+spell_box.update = update
 
 ---@param action_type int
 ---@param selected bool

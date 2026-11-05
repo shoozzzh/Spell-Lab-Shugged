@@ -266,19 +266,19 @@ local lang = { -- you may wanna fold these
         jp = "呪文ボタンのクリック音",
         ko = "주문 버튼 클릭 소리",
     },
-    ["general.spellbox_pack"] = {
+    ["spellbox_pack"] = {
         zh_cn = "法术框贴图",
         en = "Spell Box Sprites",
         jp = "",
         ko = "",
     },
-    ["general.spellbox_pack.values.GOKIS"] = {
+    ["spellbox_pack.values.GOKIS"] = {
         zh_cn = "Goki 经典方案",
         en = "Goki's Classics",
         jp = "",
         ko = "",
     },
-    ["general.spellbox_pack.values.VANILLA"] = {
+    ["spellbox_pack.values.VANILLA"] = {
         zh_cn = "Noita 原版方案",
         en = "Noita Vanilla",
         jp = "",
@@ -981,7 +981,7 @@ local mod_settings = {
     cc.checkbox "no_weather.enabled" (false):extra { scope = MOD_SETTING_SCOPE_RUNTIME_RESTART },
     cc.checkbox "general.button_click_sound" (true),
     cc.checkbox "general.action_button_click_sound" (true),
-    cc.enum "general.spellbox_pack" { "GOKIS", "VANILLA" },
+    cc.enum "spellbox_pack" { "GOKIS", "VANILLA" },
 }
 
 local function load_mod_settings()
