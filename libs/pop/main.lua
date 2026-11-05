@@ -106,7 +106,7 @@ pop.pos = {
 pop.call_depth = 0
 
 local function get_id()
-    return id_allocator.get_id(2 + pop.call_depth)
+    return id_allocator.get_id(pop.call_depth)
 end
 
 ---@param mod integer
