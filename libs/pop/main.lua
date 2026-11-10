@@ -811,4 +811,29 @@ function pop.layout_hwrap(offset_x, offset_y, line_size)
     }, layout_hwrap_mt)
 end
 
+local very_large_y_abs = 10000
+local very_large_height = 2 * very_large_y_abs
+
+---@param width number
+---@param margin number?
+---@return boolean
+function pop.clip_h_begin(width, margin)
+    margin = margin or 0
+    local x, _ = pop.pos.get()
+
+    pop.invis_begin()
+    -- x plus 0.5, width don't need to change, I got those numbers by doing experiments
+    GuiBeginScrollContainer(gui, get_id(), x + 0.5 - margin, -very_large_y_abs, width + 2 * margin, very_large_height,
+        false, 0, 0)
+    pop.invis_end()
+
+    GuiLayoutEnd(gui)
+    return true
+end
+
+function pop.clip_h_end()
+    GuiLayoutBeginVertical(gui, 0, 0)
+    GuiEndScrollContainer(gui)
+end
+
 return pop
