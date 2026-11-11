@@ -605,10 +605,7 @@ function pop.scroll_box_begin(width, height, margin_x, margin_y)
     GuiBeginScrollContainer(gui, get_id(), x, y, width, height, true, margin_x, margin_y)
 
     pop.pos.layer(0, 0)(function()
-        -- pop.image "data/ui_gfx/decorations/9piece0_gray.png"
-        pop.invis_begin()
-        pop.text_pixel "|"
-        pop.invis_end()
+        pop.image("data/ui_gfx/decorations/9piece0_gray.png", { alpha = 0 })
     end)
     local _, test_y = pop.prev_pos()
     pop.pos.push(0, test_y - y)
