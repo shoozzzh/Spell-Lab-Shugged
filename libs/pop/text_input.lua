@@ -74,7 +74,7 @@ function text_input.simple_surface(width, bg_9piece, margin_bg)
                 cursor_offset = cursor_offset + space_between_chars / 2 - cursor_width / 2
 
                 pop.pos.push(cursor_offset, 1.5)
-                pop.image(image_cursor, { alpha = hovered and 0.79 or 0.61, scale_y = scale })
+                pop.image(image_cursor, { alpha = has_focus and 0.79 or 0.61, scale_y = scale })
                 pop.pos.pop()
             end
 
