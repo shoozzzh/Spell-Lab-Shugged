@@ -55,6 +55,7 @@ function text_input.simple_surface(width, bg_9piece, margin_bg)
             local hovered = pop.prev_mouse_inside()
 
             pop.pos.push(2, 0)
+
             if has_focus or hovered then
                 pop.text(text, text_props_highlight)
             else
