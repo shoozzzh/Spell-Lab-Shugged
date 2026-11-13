@@ -61,7 +61,7 @@ function text_input.simple_surface(width, bg_9piece, margin_bg)
 
             if has_focus or hovered then
                 local cursor_width, cursor_height = pop.measure_image(image_cursor)
-                local scale = (pop.text_height_no_space - 4) / cursor_height
+                local scale = (pop.text_height_no_space - 3) / cursor_height
 
                 local width_char_prev = pop.measure_text(text:sub(cursor - 1, cursor - 1))
                 local width_char_this = pop.measure_text(text:sub(cursor, cursor))
@@ -71,7 +71,7 @@ function text_input.simple_surface(width, bg_9piece, margin_bg)
                 local cursor_offset = pop.measure_text(text:sub(1, cursor - 1))
                 cursor_offset = cursor_offset + space_between_chars / 2 - cursor_width / 2
 
-                pop.pos.push(cursor_offset, 2)
+                pop.pos.push(cursor_offset, 1.5)
                 pop.image(image_cursor, { alpha = hovered and 0.79 or 0.61, scale_y = scale })
                 pop.pos.pop()
             end
