@@ -18,9 +18,65 @@ local function new_prototype()
     return res
 end
 
+---@class pop.text_input.surface
+---@field show fun(text: string, cursor: integer, has_focus: boolean): hovered: boolean
+---@field to_cursor_pos fun(text: string, mouse_x: number, mouse_y: number): integer?
+
+local function to_cursor_pos(text, offset_x, offset_y)
+    local desired_pos_in_text = offset_x - 2 -- -2 for text offset
+
+    local i = 0
+    local pos
+    repeat
+        i = i + 1
+        pos = (pop.measure_text(text:sub(1, i - 1)) + pop.measure_text(text:sub(1, i))) / 2
+    until pos >= desired_pos_in_text or i > #text
+
+    return i
+end
+
+---@type pop.text.props
+local text_props = { color = { r = 207, g = 207, b = 207, a = 207 } }
+---@type pop.text.props
+local text_props_hovered = { color = { r = 255, g = 255, b = 178, a = 255 } }
+local image_cursor = path .. "cursor.png"
+local bg_default = path .. "text_input_bg_default.png"
+
+---@param width number
+---@param bg_9piece string?
+---@param margin_bg number?
+---@return pop.text_input.surface
+function text_input.simple_surface(width, bg_9piece, margin_bg)
+    bg_9piece = bg_9piece or bg_default
+    margin_bg = margin_bg or -1
+
+    ---@type pop.text_input.surface
+    return {
+        show = function(text, cursor, has_focus)
+            pop.image_9piece(bg_9piece, width, pop.text_height_no_space, { margin = margin_bg })
+            local hovered = pop.prev_mouse_inside()
+
+            pop.pos.push(2, 0)
+            pop.text(text, hovered and text_props_hovered or text_props)
+            pop.pos.pop()
+
+            if has_focus or hovered then
+                local cursor_offset = pop.measure_text(text:sub(1, cursor - 1))
+                local _, anchor_image_height = pop.measure_image(image_cursor)
+                local anchor_image_scale = (pop.text_height_no_space - 4) / anchor_image_height
+                pop.pos.push(2 + cursor_offset, 2)
+                pop.image(path .. "cursor.png", { alpha = hovered and 0.79 or 0.61, scale_y = anchor_image_scale })
+                pop.pos.pop()
+            end
+            return hovered
+        end,
+        to_cursor_pos = to_cursor_pos,
+    }
+end
+
 ---@class pop.text_input.object: pop.keyboard_focus.focusee
----@field input_anchor integer
----@field width number
+---@field surface pop.text_input.surface
+---@field cursor integer
 ---@field placeholder string
 ---@field allowed_chars string?
 local object_mt = new_prototype()
@@ -114,38 +170,27 @@ function object_mt:show(text)
         text_to_show = self.placeholder
     end
 
-    pop.text_input_surface(text_to_show, self.width)
-    local _, text_input_height = pop.prev_size()
-
-    local hovered = pop.prev_mouse_inside()
+    local hovered = self.surface.show(text_to_show, self.cursor, has_focus)
     local changed = false
 
-    self.input_anchor = math.min(self.input_anchor, #text + 1)
-    if not has_focus and hovered then
-        self.input_anchor = #text + 1
+    self.cursor = math.min(self.cursor, #text + 1)
+    if not has_focus then
+        self.cursor = #text + 1
     end
 
     -- TODO: Maybe make the region customizable? Like a click sensor?
     if InputIsMouseButtonJustDown(keycodes.Mouse_left) then
         kbfocus.set(self, hovered)
         if hovered then
-            local x, _ = pop.pos.get()
-            local mx, _ = pop.get_mouse_pos()
-            local desired_anchor_x = mx - (x + 1) -- + 1 for the margin of box
+            local x, y = pop.pos.get()
+            local mx, my = pop.get_mouse_pos()
 
-            local i = 0
-            local dist
-            repeat
-                i = i + 1
-                dist = (pop.measure_text(text:sub(1, i)) + pop.measure_text(text:sub(1, i + 1))) / 2
-            until dist >= desired_anchor_x or i > #text
-
-            self.input_anchor = i
+            self.cursor = self.surface.to_cursor_pos(text, mx - x, my - y)
         end
     elseif InputIsMouseButtonJustUp(keycodes.Mouse_right) and hovered then
         kbfocus.set(self, true)
         text = ""
-        self.input_anchor = 1
+        self.cursor = 1
         changed = true
     end
 
@@ -153,45 +198,45 @@ function object_mt:show(text)
         local alt = InputIsKeyDown(keycodes.Key_LALT) or InputIsKeyDown(keycodes.Key_RALT)
         if InputIsKeyJustDown(keycodes.Key_LEFT) then
             if alt then
-                local str_left = text:sub(1, self.input_anchor - 1)
+                local str_left = text:sub(1, self.cursor - 1)
                 local prev_word_idx, _, _ = str_left:find "[^ ]* *$"
                 if prev_word_idx then
-                    self.input_anchor = prev_word_idx
+                    self.cursor = prev_word_idx
                 end
             else
-                if self.input_anchor > 1 then
-                    self.input_anchor = self.input_anchor - 1
+                if self.cursor > 1 then
+                    self.cursor = self.cursor - 1
                 end
             end
         elseif InputIsKeyJustDown(keycodes.Key_RIGHT) then
             if alt then
-                local str_right = text:sub(self.input_anchor, -1)
+                local str_right = text:sub(self.cursor, -1)
                 local _, next_word_idx, _ = str_right:find "^ *[^ ]*"
                 if next_word_idx then
-                    self.input_anchor = self.input_anchor + next_word_idx
+                    self.cursor = self.cursor + next_word_idx
                 end
             else
-                if self.input_anchor <= #text then
-                    self.input_anchor = self.input_anchor + 1
+                if self.cursor <= #text then
+                    self.cursor = self.cursor + 1
                 end
             end
         elseif InputIsKeyJustDown(keycodes.Key_HOME) then
-            self.input_anchor = 1
+            self.cursor = 1
         elseif InputIsKeyJustDown(keycodes.Key_END) then
-            self.input_anchor = #text + 1
+            self.cursor = #text + 1
         elseif InputIsKeyJustDown(keycodes.Key_BACKSPACE) then
-            if self.input_anchor >= 2 then
+            if self.cursor >= 2 then
                 text =
-                    string.sub(text, 1, self.input_anchor - 2)
-                    .. string.sub(text, self.input_anchor, -1)
-                self.input_anchor = self.input_anchor - 1
+                    string.sub(text, 1, self.cursor - 2)
+                    .. string.sub(text, self.cursor, -1)
+                self.cursor = self.cursor - 1
                 changed = true
             end
         elseif InputIsKeyJustDown(keycodes.Key_DELETE) then
-            if self.input_anchor <= #text then
+            if self.cursor <= #text then
                 text =
-                    string.sub(text, 1, self.input_anchor - 1)
-                    .. string.sub(text, self.input_anchor + 1, -1)
+                    string.sub(text, 1, self.cursor - 1)
+                    .. string.sub(text, self.cursor + 1, -1)
                 changed = true
             end
         else
@@ -200,8 +245,8 @@ function object_mt:show(text)
                 for _, p in ipairs(character_keys) do
                     local char = shift and p[3] or p[2]
                     if InputIsKeyJustDown(keycodes[p[1]]) and self.allowed_chars:find(char, 1, true) then
-                        text = insert_character(text, char, self.input_anchor)
-                        self.input_anchor = self.input_anchor + 1
+                        text = insert_character(text, char, self.cursor)
+                        self.cursor = self.cursor + 1
                         changed = true
                         break
                     end
@@ -210,8 +255,8 @@ function object_mt:show(text)
                 for _, p in ipairs(character_keys) do
                     local char = shift and p[3] or p[2]
                     if InputIsKeyJustDown(keycodes[p[1]]) then
-                        text = insert_character(text, char, self.input_anchor)
-                        self.input_anchor = self.input_anchor + 1
+                        text = insert_character(text, char, self.cursor)
+                        self.cursor = self.cursor + 1
                         changed = true
                         break
                     end
@@ -220,27 +265,18 @@ function object_mt:show(text)
         end
     end
 
-    if has_focus or hovered then
-        local input_anchor_offset = pop.measure_text(text:sub(1, self.input_anchor - 1))
-        local _, anchor_image_height = pop.measure_image(path .. "input_anchor.png")
-        local anchor_image_scale = (text_input_height - 4) / anchor_image_height
-        pop.pos.push(2 + input_anchor_offset, 2)
-        pop.image(path .. "input_anchor.png", { alpha = hovered and 0.79 or 0.61, scale_y = anchor_image_scale })
-        pop.pos.pop()
-    end
-
     pop.call_depth_mod(-1)
     return changed, text
 end
 
----@param width number
+---@param surface pop.text_input.surface
 ---@param placeholder string?
 ---@param allowed_chars string?
 ---@return pop.text_input.object
-function text_input.new(width, placeholder, allowed_chars)
+function text_input.new(surface, placeholder, allowed_chars)
     return setmetatable({
-        input_anchor = 1,
-        width = width,
+        surface = surface,
+        cursor = 1,
         placeholder = placeholder or "",
         allowed_chars = allowed_chars,
     }, object_mt)

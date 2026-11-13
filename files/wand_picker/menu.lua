@@ -67,7 +67,8 @@ local function stat_gui(field, formatter, parser)
     formatter = formatter or int2str
     parser = parser or tointeger
 
-    local object = text_input.wrap(text_input.new(text_input_width, "", allowed_chars), formatter, parser)
+    local surface = text_input.simple_surface(text_input_width)
+    local object = text_input.wrap(text_input.new(surface, "", allowed_chars), formatter, parser)
     object.text = formatter(parser(object.text))
     return function()
         pop.call_depth_mod(1)
