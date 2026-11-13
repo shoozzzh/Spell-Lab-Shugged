@@ -36,9 +36,7 @@ local function to_cursor_pos(text, offset_x, offset_y)
 end
 
 ---@type pop.text.props
-local text_props = { color = { r = 207, g = 207, b = 207, a = 207 } }
----@type pop.text.props
-local text_props_hovered = { color = { r = 255, g = 255, b = 178, a = 255 } }
+local text_props_highlight = { color = { r = 255, g = 255, b = 178, a = 255 } }
 local image_cursor = path .. "cursor.png"
 local bg_default = path .. "text_input_bg_default.png"
 
@@ -57,7 +55,11 @@ function text_input.simple_surface(width, bg_9piece, margin_bg)
             local hovered = pop.prev_mouse_inside()
 
             pop.pos.push(2, 0)
-            pop.text(text, hovered and text_props_hovered or text_props)
+            if has_focus or hovered then
+                pop.text(text, text_props_highlight)
+            else
+                pop.text(text)
+            end
 
             if has_focus or hovered then
                 local cursor_width, cursor_height = pop.measure_image(image_cursor)
