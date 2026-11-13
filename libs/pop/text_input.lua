@@ -58,16 +58,25 @@ function text_input.simple_surface(width, bg_9piece, margin_bg)
 
             pop.pos.push(2, 0)
             pop.text(text, hovered and text_props_hovered or text_props)
-            pop.pos.pop()
 
             if has_focus or hovered then
+                local cursor_width, cursor_height = pop.measure_image(image_cursor)
+                local scale = (pop.text_height_no_space - 4) / cursor_height
+
+                local width_char_prev = pop.measure_text(text:sub(cursor - 1, cursor - 1))
+                local width_char_this = pop.measure_text(text:sub(cursor, cursor))
+                local width_2_chars = pop.measure_text(text:sub(cursor - 1, cursor))
+                local space_between_chars = width_2_chars - width_char_prev - width_char_this
+
                 local cursor_offset = pop.measure_text(text:sub(1, cursor - 1))
-                local _, anchor_image_height = pop.measure_image(image_cursor)
-                local anchor_image_scale = (pop.text_height_no_space - 4) / anchor_image_height
-                pop.pos.push(2 + cursor_offset, 2)
-                pop.image(path .. "cursor.png", { alpha = hovered and 0.79 or 0.61, scale_y = anchor_image_scale })
+                cursor_offset = cursor_offset + space_between_chars / 2 - cursor_width / 2
+
+                pop.pos.push(cursor_offset, 2)
+                pop.image(image_cursor, { alpha = hovered and 0.79 or 0.61, scale_y = scale })
                 pop.pos.pop()
             end
+
+            pop.pos.pop()
             return hovered
         end,
         to_cursor_pos = to_cursor_pos,
