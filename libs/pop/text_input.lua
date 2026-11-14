@@ -101,7 +101,6 @@ end
 ---@param margin_bg number?
 ---@return pop.text_input.surface
 function text_input.simple_surface(width, bg_9piece, margin_bg)
-    ---@type pop.text_input.surface
     return setmetatable({
         width = width,
         bg_9piece = bg_9piece or bg_default,
