@@ -22,7 +22,7 @@ end
 ---@field width integer
 ---@field bg_9piece string
 ---@field margin_bg number
----@field text_offset number
+---@field text_left_shift number
 local surface_mt = new_prototype()
 
 ---@type pop.text.props
@@ -36,11 +36,10 @@ function surface_mt:show(text, cursor, has_focus)
 
     pop.pos.push(2, 0)
 
-    if has_focus or hovered then
-        pop.text(text, text_props_highlight)
-    else
-        pop.text(text)
-    end
+    local text_clip_width = self.width - 4
+
+    self.text_left_shift = math.min(self.text_left_shift, pop.measure_text(text) - text_clip_width)
+    self.text_left_shift = math.max(self.text_left_shift, 0)
 
     if has_focus or hovered then
         local cursor_width, cursor_height = pop.measure_image(image_cursor)
@@ -51,13 +50,34 @@ function surface_mt:show(text, cursor, has_focus)
         local width_2_chars = pop.measure_text(text:sub(cursor - 1, cursor))
         local space_between_chars = width_2_chars - width_char_prev - width_char_this
 
-        local cursor_offset = pop.measure_text(text:sub(1, cursor - 1))
-        cursor_offset = cursor_offset + space_between_chars / 2 - cursor_width / 2
+        local cursor_offset = pop.measure_text(text:sub(1, cursor - 1)) + space_between_chars / 2
 
+        cursor_offset = cursor_offset - self.text_left_shift
+        if cursor_offset < -1 then
+            self.text_left_shift = self.text_left_shift + cursor_offset + 1
+            cursor_offset = -1
+        elseif cursor_offset > text_clip_width + 1 then
+            self.text_left_shift = self.text_left_shift + (cursor_offset - (text_clip_width + 1))
+            cursor_offset = text_clip_width + 1
+        end
+
+        cursor_offset = cursor_offset - cursor_width / 2
         pop.pos.push(cursor_offset, 1.5)
         pop.image(image_cursor, { alpha = has_focus and 0.79 or 0.61, scale_y = scale })
         pop.pos.pop()
     end
+
+    pop.clip_h_begin(text_clip_width)
+
+    pop.pos.push(-self.text_left_shift, 0)
+    if has_focus or hovered then
+        pop.text(text, text_props_highlight)
+    else
+        pop.text(text)
+    end
+    pop.pos.pop()
+
+    pop.clip_h_end()
 
     pop.pos.pop()
     return hovered
@@ -86,6 +106,7 @@ function text_input.simple_surface(width, bg_9piece, margin_bg)
         width = width,
         bg_9piece = bg_9piece or bg_default,
         margin_bg = margin_bg or -1,
+        text_left_shift = 0,
     }, surface_mt)
 end
 
