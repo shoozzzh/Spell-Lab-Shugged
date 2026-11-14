@@ -22,7 +22,8 @@ end
 ---@field width integer
 ---@field bg_9piece string
 ---@field margin_bg number
-local surface_mt = {}
+---@field text_offset number
+local surface_mt = new_prototype()
 
 ---@type pop.text.props
 local text_props_highlight = { color = { r = 255, g = 255, b = 178, a = 255 } }
