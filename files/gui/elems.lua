@@ -380,8 +380,8 @@ function gui_elems.better_button_text(text, width, margin)
 
     pop.pos.push(width / 2 - pop.measure_text(filler_text) / 2, 0)
     local left_click, right_click = pop.button_text(filler_text)
-    pop.pos.pop()
     local hovered = pop.prev_hovered()
+    pop.pos.pop()
 
     pop.invis_end()
 
