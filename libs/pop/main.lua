@@ -469,17 +469,6 @@ function pop.slider(value, width)
     return GuiSlider(gui, get_id(), x, y, "", value, 0, 1, value, 0, "", width)
 end
 
----@param value string
----@param width number
-function pop.text_input_surface(value, width)
-    local x, y = pop.pos.get()
-    next_z_step()
-
-    pop.option_next "NonInteractive"
-    ---@diagnostic disable-next-line: discard-returns
-    GuiTextInput(gui, get_id(), x, y, value, width, math.huge, "")
-end
-
 ---@param content_fn fun()
 ---@return number x
 ---@return number y
