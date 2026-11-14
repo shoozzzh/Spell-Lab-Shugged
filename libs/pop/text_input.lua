@@ -19,10 +19,50 @@ local function new_prototype()
 end
 
 ---@class pop.text_input.surface
----@field show fun(text: string, cursor: integer, has_focus: boolean): hovered: boolean
----@field to_cursor_pos fun(text: string, mouse_x: number, mouse_y: number): integer?
+---@field width integer
+---@field bg_9piece string
+---@field margin_bg number
+local surface_mt = {}
 
-local function to_cursor_pos(text, offset_x, offset_y)
+---@type pop.text.props
+local text_props_highlight = { color = { r = 255, g = 255, b = 178, a = 255 } }
+local image_cursor = path .. "cursor.png"
+local bg_default = path .. "text_input_bg_default.png"
+
+function surface_mt:show(text, cursor, has_focus)
+    pop.image_9piece(self.bg_9piece, self.width, pop.text_height_no_space, { margin = self.margin_bg })
+    local hovered = pop.prev_mouse_inside()
+
+    pop.pos.push(2, 0)
+
+    if has_focus or hovered then
+        pop.text(text, text_props_highlight)
+    else
+        pop.text(text)
+    end
+
+    if has_focus or hovered then
+        local cursor_width, cursor_height = pop.measure_image(image_cursor)
+        local scale = (pop.text_height_no_space - 3) / cursor_height
+
+        local width_char_prev = pop.measure_text(text:sub(cursor - 1, cursor - 1))
+        local width_char_this = pop.measure_text(text:sub(cursor, cursor))
+        local width_2_chars = pop.measure_text(text:sub(cursor - 1, cursor))
+        local space_between_chars = width_2_chars - width_char_prev - width_char_this
+
+        local cursor_offset = pop.measure_text(text:sub(1, cursor - 1))
+        cursor_offset = cursor_offset + space_between_chars / 2 - cursor_width / 2
+
+        pop.pos.push(cursor_offset, 1.5)
+        pop.image(image_cursor, { alpha = has_focus and 0.79 or 0.61, scale_y = scale })
+        pop.pos.pop()
+    end
+
+    pop.pos.pop()
+    return hovered
+end
+
+function surface_mt:to_cursor_pos(text, offset_x, offset_y)
     local desired_pos_in_text = offset_x - 2 -- -2 for text offset
 
     local i = 0
@@ -35,55 +75,17 @@ local function to_cursor_pos(text, offset_x, offset_y)
     return i
 end
 
----@type pop.text.props
-local text_props_highlight = { color = { r = 255, g = 255, b = 178, a = 255 } }
-local image_cursor = path .. "cursor.png"
-local bg_default = path .. "text_input_bg_default.png"
-
 ---@param width number
 ---@param bg_9piece string?
 ---@param margin_bg number?
 ---@return pop.text_input.surface
 function text_input.simple_surface(width, bg_9piece, margin_bg)
-    bg_9piece = bg_9piece or bg_default
-    margin_bg = margin_bg or -1
-
     ---@type pop.text_input.surface
-    return {
-        show = function(text, cursor, has_focus)
-            pop.image_9piece(bg_9piece, width, pop.text_height_no_space, { margin = margin_bg })
-            local hovered = pop.prev_mouse_inside()
-
-            pop.pos.push(2, 0)
-
-            if has_focus or hovered then
-                pop.text(text, text_props_highlight)
-            else
-                pop.text(text)
-            end
-
-            if has_focus or hovered then
-                local cursor_width, cursor_height = pop.measure_image(image_cursor)
-                local scale = (pop.text_height_no_space - 3) / cursor_height
-
-                local width_char_prev = pop.measure_text(text:sub(cursor - 1, cursor - 1))
-                local width_char_this = pop.measure_text(text:sub(cursor, cursor))
-                local width_2_chars = pop.measure_text(text:sub(cursor - 1, cursor))
-                local space_between_chars = width_2_chars - width_char_prev - width_char_this
-
-                local cursor_offset = pop.measure_text(text:sub(1, cursor - 1))
-                cursor_offset = cursor_offset + space_between_chars / 2 - cursor_width / 2
-
-                pop.pos.push(cursor_offset, 1.5)
-                pop.image(image_cursor, { alpha = has_focus and 0.79 or 0.61, scale_y = scale })
-                pop.pos.pop()
-            end
-
-            pop.pos.pop()
-            return hovered
-        end,
-        to_cursor_pos = to_cursor_pos,
-    }
+    return setmetatable({
+        width = width,
+        bg_9piece = bg_9piece or bg_default,
+        margin_bg = margin_bg or -1,
+    }, surface_mt)
 end
 
 ---@class pop.text_input.object: pop.keyboard_focus.focusee
@@ -182,7 +184,7 @@ function object_mt:show(text)
         text_to_show = self.placeholder
     end
 
-    local hovered = self.surface.show(text_to_show, self.cursor, has_focus)
+    local hovered = self.surface:show(text_to_show, self.cursor, has_focus)
     local changed = false
 
     self.cursor = math.min(self.cursor, #text + 1)
@@ -197,7 +199,7 @@ function object_mt:show(text)
             local x, y = pop.pos.get()
             local mx, my = pop.get_mouse_pos()
 
-            self.cursor = self.surface.to_cursor_pos(text, mx - x, my - y)
+            self.cursor = self.surface:to_cursor_pos(text, mx - x, my - y)
         end
     elseif InputIsMouseButtonJustUp(keycodes.Mouse_right) and hovered then
         kbfocus.set(self, true)
