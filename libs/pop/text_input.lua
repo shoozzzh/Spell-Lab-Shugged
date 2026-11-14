@@ -20,30 +20,37 @@ end
 
 ---@class pop.text_input.surface
 ---@field width integer
----@field bg_9piece string
----@field margin_bg number
+---@field bg_sprite_filename string
+---@field bg_margin number
 ---@field text_left_shift number
+---@field text_align_left boolean
+---@field text_margin number
+---@field cursor_margin number
 local surface_mt = new_prototype()
 
 ---@type pop.text.props
 local text_props_highlight = { color = { r = 255, g = 255, b = 178, a = 255 } }
 local image_cursor = path .. "cursor.png"
-local bg_default = path .. "text_input_bg_default.png"
 
 function surface_mt:show(text, cursor, has_focus)
-    pop.image_9piece(self.bg_9piece, self.width, pop.text_height_no_space, { margin = self.margin_bg })
+    pop.image_9piece(self.bg_sprite_filename, self.width, pop.text_height_no_space, { margin = self.bg_margin })
     local hovered = pop.prev_mouse_inside()
 
-    pop.pos.push(2, 0)
+    pop.pos.push(self.text_margin, 0)
 
-    local text_clip_width = self.width - 4
+    local text_clip_width = self.width - 2 * self.text_margin
 
-    self.text_left_shift = math.min(self.text_left_shift, pop.measure_text(text) - text_clip_width)
-    self.text_left_shift = math.max(self.text_left_shift, 0)
+    if self.text_align_left then
+        self.text_left_shift = math.max(self.text_left_shift, 0)
+        self.text_left_shift = math.min(self.text_left_shift, pop.measure_text(text) - text_clip_width)
+    else
+        self.text_left_shift = math.min(self.text_left_shift, pop.measure_text(text) - text_clip_width)
+        self.text_left_shift = math.max(self.text_left_shift, 0)
+    end
 
     if has_focus or hovered then
         local cursor_width, cursor_height = pop.measure_image(image_cursor)
-        local scale = (pop.text_height_no_space - 3) / cursor_height
+        local scale = (pop.text_height_no_space - 2 * self.cursor_margin) / cursor_height
 
         local width_char_prev = pop.measure_text(text:sub(cursor - 1, cursor - 1))
         local width_char_this = pop.measure_text(text:sub(cursor, cursor))
@@ -62,7 +69,7 @@ function surface_mt:show(text, cursor, has_focus)
         end
 
         cursor_offset = cursor_offset - cursor_width / 2
-        pop.pos.push(cursor_offset, 1.5)
+        pop.pos.push(cursor_offset, self.cursor_margin)
         pop.image(image_cursor, { alpha = has_focus and 0.79 or 0.61, scale_y = scale })
         pop.pos.pop()
     end
@@ -84,7 +91,7 @@ function surface_mt:show(text, cursor, has_focus)
 end
 
 function surface_mt:to_cursor_pos(text, offset_x, offset_y)
-    local desired_pos_in_text = offset_x + self.text_left_shift - 2 -- -2 for text margin
+    local desired_pos_in_text = offset_x + self.text_left_shift - self.text_margin
 
     local i = 0
     local pos
@@ -96,16 +103,39 @@ function surface_mt:to_cursor_pos(text, offset_x, offset_y)
     return i
 end
 
+---@class pop.text_input.simple_surface.options
+---@field bg_sprite_filename string?
+---@field bg_margin number?
+---@field text_align_left boolean?
+---@field text_margin number?
+---@field cursor_margin number?
+
 ---@param width number
----@param bg_9piece string?
----@param margin_bg number?
+---@param options pop.text_input.simple_surface.options?
 ---@return pop.text_input.surface
-function text_input.simple_surface(width, bg_9piece, margin_bg)
+function text_input.simple_surface(width, options)
+    local bg_sprite_filename = path .. "text_input_bg_default.png"
+    local bg_margin = -1
+    local text_align_left = false
+    local text_margin = 2
+    local cursor_margin = 1.5
+
+    if options then
+        bg_sprite_filename = options.bg_sprite_filename or bg_sprite_filename
+        bg_margin = options.bg_margin or bg_margin
+        text_align_left = options.text_align_left or text_align_left
+        text_margin = options.text_margin or text_margin
+        cursor_margin = options.cursor_margin or cursor_margin
+    end
+
     return setmetatable({
         width = width,
-        bg_9piece = bg_9piece or bg_default,
-        margin_bg = margin_bg or -1,
+        bg_sprite_filename = bg_sprite_filename,
+        bg_margin = bg_margin,
         text_left_shift = 0,
+        text_align_left = text_align_left,
+        text_margin = text_margin,
+        cursor_margin = cursor_margin,
     }, surface_mt)
 end
 
