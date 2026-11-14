@@ -88,12 +88,12 @@ function text_input.simple_surface(width, bg_9piece, margin_bg)
     }, surface_mt)
 end
 
----@class pop.text_input.object: pop.keyboard_focus.focusee
+---@class pop.text_input.raw: pop.keyboard_focus.focusee
 ---@field surface pop.text_input.surface
 ---@field cursor integer
 ---@field placeholder string
 ---@field allowed_chars string?
-local object_mt = new_prototype()
+local raw_mt = new_prototype()
 
 local function insert_character(str, char, index)
     return string.sub(str, 1, index - 1) .. char .. string.sub(str, index, -1)
@@ -175,7 +175,7 @@ local character_keys = {
 ---@param text string
 ---@return boolean changed
 ---@return string new_text
-function object_mt:show(text)
+function raw_mt:show(text)
     pop.call_depth_mod(1)
     local has_focus = kbfocus.is_on(self)
 
@@ -286,28 +286,28 @@ end
 ---@param surface pop.text_input.surface
 ---@param placeholder string?
 ---@param allowed_chars string?
----@return pop.text_input.object
+---@return pop.text_input.raw
 function text_input.new(surface, placeholder, allowed_chars)
     return setmetatable({
         surface = surface,
         cursor = 1,
         placeholder = placeholder or "",
         allowed_chars = allowed_chars,
-    }, object_mt)
+    }, raw_mt)
 end
 
----@class pop.text_input.object_wrapper
----@field inner pop.text_input.object
+---@class pop.text_input.wrapped
+---@field inner pop.text_input.raw
 ---@field formatter fun(any?): string
 ---@field parser fun(string): any?
 ---@field text string
-local wrapper_mt = new_prototype()
+local wrapped_mt = new_prototype()
 
 ---@generic V
----@param inner pop.text_input.object
+---@param inner pop.text_input.raw
 ---@param formatter fun(value: V): string
 ---@param parser fun(text: string): V
----@return pop.text_input.object_wrapper
+---@return pop.text_input.wrapped
 function text_input.wrap(inner, formatter, parser)
     local res = {
         inner = inner,
@@ -326,7 +326,7 @@ function text_input.wrap(inner, formatter, parser)
             res.text = formatter(parser(res.text))
         end
     end
-    return setmetatable(res, wrapper_mt)
+    return setmetatable(res, wrapped_mt)
 end
 
 ---@generic V
@@ -334,7 +334,7 @@ end
 ---@return boolean changed
 ---@return V value
 ---@nodiscard
-function wrapper_mt:show(value)
+function wrapped_mt:show(value)
     local changed, text
     text = self.parser(self.text) == value and self.text or self.formatter(value)
     changed, text = self.inner:show(text)
