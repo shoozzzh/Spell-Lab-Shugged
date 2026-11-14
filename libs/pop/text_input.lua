@@ -18,9 +18,21 @@ local function new_prototype()
     return res
 end
 
----@class pop.text_input.surface
----@field show fun(self: pop.text_input.surface, text: string, cursor: integer, has_focus: boolean): hovered: boolean
----@field to_cursor_pos fun(self: pop.text_input.surface, text: string, offset_x: number, offset_y: number): integer
+if false then
+    ---@class pop.text_input.surface
+    local surface_mt = {}
+    ---@param text string
+    ---@param cursor integer
+    ---@param has_focus boolean
+    ---@return boolean hovered
+    function surface_mt:show(text, cursor, has_focus) return false end
+
+    ---@param text string
+    ---@param offset_x number
+    ---@param offset_y number
+    ---@return integer
+    function surface_mt:to_cursor_pos(text, offset_x, offset_y) return 1 end
+end
 
 ---@class pop.text_input.simple_surface: pop.text_input.surface
 ---@field width integer
@@ -30,13 +42,13 @@ end
 ---@field text_align_left boolean
 ---@field text_margin number
 ---@field cursor_margin number
-local surface_mt = new_prototype()
+local simple_surface_mt = new_prototype()
 
 ---@type pop.text.options
 local text_options_highlight = { color = { r = 255, g = 255, b = 178, a = 255 } }
 local image_cursor = path .. "cursor.png"
 
-function surface_mt:show(text, cursor, has_focus)
+function simple_surface_mt:show(text, cursor, has_focus)
     pop.image_9piece(self.bg_sprite_filename, self.width, pop.text_height_no_space, { margin = self.bg_margin })
     local hovered = pop.prev_mouse_inside()
 
@@ -94,7 +106,7 @@ function surface_mt:show(text, cursor, has_focus)
     return hovered
 end
 
-function surface_mt:to_cursor_pos(text, offset_x, offset_y)
+function simple_surface_mt:to_cursor_pos(text, offset_x, offset_y)
     local desired_pos_in_text = offset_x + self.text_left_shift - self.text_margin
 
     local i = 0
@@ -140,7 +152,7 @@ function text_input.simple_surface(width, options)
         text_align_left = text_align_left,
         text_margin = text_margin,
         cursor_margin = cursor_margin,
-    }, surface_mt)
+    }, simple_surface_mt)
 end
 
 ---@class pop.text_input.raw: pop.keyboard_focus.focusee
