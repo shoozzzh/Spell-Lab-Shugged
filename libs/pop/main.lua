@@ -178,7 +178,7 @@ function pop.get_mouse_pos()
     return pc.world_to_screen(DEBUG_GetMouseWorld())
 end
 
----@class pop.general_props.color
+---@class pop.general.color
 ---@field r integer
 ---@field g integer
 ---@field b integer
@@ -188,7 +188,7 @@ local function hex2dec(h)
     return (h + 1) / 256
 end
 
----@param color pop.general_props.color
+---@param color pop.general.color
 local function next_color(color)
     GuiColorSetForNextWidget(gui, hex2dec(color.r), hex2dec(color.g), hex2dec(color.b), hex2dec(color.a))
 end
@@ -227,17 +227,17 @@ function pop.animate_scale_in(acceleration, reset)
     GuiAnimateScaleIn(gui, get_id(), acceleration, reset)
 end
 
----@class pop.text.props
----@field color pop.general_props.color?
+---@class pop.text.options
+---@field color pop.general.color?
 
 ---@param text string
----@param props pop.text.props?
-function pop.text(text, props)
+---@param options pop.text.options?
+function pop.text(text, options)
     local x, y = pop.pos.get()
 
-    if props then
-        if props.color then
-            next_color(props.color)
+    if options then
+        if options.color then
+            next_color(options.color)
         end
     end
 
@@ -246,23 +246,23 @@ function pop.text(text, props)
     GuiText(gui, x, y, text)
 end
 
----@class pop.text_pixel.props
+---@class pop.text_pixel.options
 ---@field font string?
 ---@field scale number?
----@field color pop.general_props.color?
+---@field color pop.general.color?
 
 -- well maybe you can make sure you use xml fonts
 ---@param text string
----@param props pop.text_pixel.props?
-function pop.text_pixel(text, props)
+---@param options pop.text_pixel.options?
+function pop.text_pixel(text, options)
     local x, y = pop.pos.get()
     local font, scale = "data/fonts/font_pixel.xml", 1
 
-    if props then
-        font = props.font or font
-        scale = props.scale or scale
-        if props.color then
-            next_color(props.color)
+    if options then
+        font = options.font or font
+        scale = options.scale or scale
+        if options.color then
+            next_color(options.color)
         end
     end
 
@@ -272,7 +272,7 @@ end
 
 ---@param text string
 ---@param font string
----@param color pop.general_props.color?
+---@param color pop.general.color?
 function pop.text_non_pixel(text, font, color)
     local x, y = pop.pos.get()
 
@@ -284,17 +284,17 @@ function pop.text_non_pixel(text, font, color)
     GuiText(gui, x, y, text, 1, font, false)
 end
 
----@class pop.button_text.props
----@field color pop.general_props.color?
+---@class pop.button_text.options
+---@field color pop.general.color?
 
 ---@param text string
----@param props pop.button_text.props?
-function pop.button_text(text, props)
+---@param options pop.button_text.options?
+function pop.button_text(text, options)
     local x, y = pop.pos.get()
 
-    if props then
-        if props.color then
-            next_color(props.color)
+    if options then
+        if options.color then
+            next_color(options.color)
         end
     end
 
@@ -303,22 +303,22 @@ function pop.button_text(text, props)
     return GuiButton(gui, get_id(), x, y, text)
 end
 
----@class pop.button_text_pixel.props
+---@class pop.button_text_pixel.options
 ---@field font string?
 ---@field scale number?
----@field color pop.general_props.color?
+---@field color pop.general.color?
 
 ---@param text string
----@param props pop.button_text_pixel.props?
-function pop.button_text_pixel(text, props)
+---@param options pop.button_text_pixel.options?
+function pop.button_text_pixel(text, options)
     local x, y = pop.pos.get()
     local font, scale = "data/fonts/font_pixel.xml", 1
 
-    if props then
-        font = props.font or font
-        scale = props.scale or scale
-        if props.color then
-            next_color(props.color)
+    if options then
+        font = options.font or font
+        scale = options.scale or scale
+        if options.color then
+            next_color(options.color)
         end
     end
 
@@ -328,7 +328,7 @@ end
 
 ---@param text string
 ---@param font string
----@param color pop.general_props.color?
+---@param color pop.general.color?
 ---@return boolean left_click
 ---@return boolean right_click
 function pop.button_text_non_pixel(text, font, color)
@@ -380,35 +380,35 @@ function pop.measure_text_non_pixel(text, font, line_spacing)
     return GuiGetTextDimensions(gui, text, 1, line_spacing or 2, font, false)
 end
 
----@class pop.image.props
+---@class pop.image.options
 ---@field alpha number?
 ---@field scale number?
 ---@field scale_y number?
 ---@field rotation number?
----@field animation pop.image.props.animation?
+---@field animation pop.image.options.animation?
 
----@class pop.image.props.animation
+---@class pop.image.options.animation
 ---@field playback_type pop.playback_type?
 ---@field name string?
 
 ---@param sprite_filename string
----@param props pop.image.props?
-function pop.image(sprite_filename, props)
+---@param options pop.image.options?
+function pop.image(sprite_filename, options)
     local x, y = pop.pos.get()
     local alpha, scale, scale_y, rotation = 1, 1, 0, 0
     local playback_type, animation_name = 0, ""
 
-    if props then
-        alpha = props.alpha or alpha
-        scale = props.scale or scale
-        scale_y = props.scale_y or scale_y
-        rotation = props.rotation or rotation
+    if options then
+        alpha = options.alpha or alpha
+        scale = options.scale or scale
+        scale_y = options.scale_y or scale_y
+        rotation = options.rotation or rotation
 
-        if props.animation then
-            if props.animation.playback_type then
-                playback_type = const.playback_types[props.animation.playback_type] or playback_type
+        if options.animation then
+            if options.animation.playback_type then
+                playback_type = const.playback_types[options.animation.playback_type] or playback_type
             end
-            animation_name = props.animation.name or animation_name
+            animation_name = options.animation.name or animation_name
         end
     end
 
@@ -416,20 +416,20 @@ function pop.image(sprite_filename, props)
     GuiImage(gui, get_id(), x, y, sprite_filename, alpha, scale, scale_y, rotation, playback_type, animation_name)
 end
 
----@class pop.image_9piece.props
+---@class pop.image_9piece.options
 ---@field alpha number?
 ---@field margin number?
 
 ---@param sprite_filename string
 ---@param width number
 ---@param height number
----@param props pop.image_9piece.props?
-function pop.image_9piece(sprite_filename, width, height, props)
+---@param options pop.image_9piece.options?
+function pop.image_9piece(sprite_filename, width, height, options)
     local x, y = pop.pos.get()
     local alpha = 1
-    if props then
-        alpha = props.alpha or alpha
-        local margin = props.margin
+    if options then
+        alpha = options.alpha or alpha
+        local margin = options.margin
         if margin then
             x = x - margin
             y = y - margin
@@ -595,6 +595,7 @@ function pop.scroll_box_begin(width, height, margin_x, margin_y)
     local y_orig = y
     x = x - margin_x
     y = y - margin_y
+    next_z_step()
     GuiBeginScrollContainer(gui, get_id(), x, y, width, height, true, margin_x, margin_y)
 
     pop.pos.layer(0, 0)(function()

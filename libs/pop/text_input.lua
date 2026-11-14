@@ -28,8 +28,8 @@ end
 ---@field cursor_margin number
 local surface_mt = new_prototype()
 
----@type pop.text.props
-local text_props_highlight = { color = { r = 255, g = 255, b = 178, a = 255 } }
+---@type pop.text.options
+local text_options_highlight = { color = { r = 255, g = 255, b = 178, a = 255 } }
 local image_cursor = path .. "cursor.png"
 
 function surface_mt:show(text, cursor, has_focus)
@@ -78,7 +78,7 @@ function surface_mt:show(text, cursor, has_focus)
 
     pop.pos.push(-self.text_left_shift, 0)
     if has_focus or hovered then
-        pop.text(text, text_props_highlight)
+        pop.text(text, text_options_highlight)
     else
         pop.text(text)
     end

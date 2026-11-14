@@ -91,7 +91,7 @@ end
 ---@param g number
 ---@param b number
 ---@param a number
----@return pop.general_props.color
+---@return pop.general.color
 ---@nodiscard
 function mutils.rgba(r, g, b, a)
     return { r = r, g = g, b = b, a = a }
