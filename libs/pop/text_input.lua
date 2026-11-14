@@ -84,7 +84,7 @@ function surface_mt:show(text, cursor, has_focus)
 end
 
 function surface_mt:to_cursor_pos(text, offset_x, offset_y)
-    local desired_pos_in_text = offset_x - 2 -- -2 for text offset
+    local desired_pos_in_text = offset_x + self.text_left_shift - 2 -- -2 for text margin
 
     local i = 0
     local pos
