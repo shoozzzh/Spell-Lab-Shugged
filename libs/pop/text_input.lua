@@ -19,6 +19,10 @@ local function new_prototype()
 end
 
 ---@class pop.text_input.surface
+---@field show fun(self: pop.text_input.surface, text: string, cursor: integer, has_focus: boolean): hovered: boolean
+---@field to_cursor_pos fun(self: pop.text_input.surface, text: string, offset_x: number, offset_y: number): integer
+
+---@class pop.text_input.simple_surface: pop.text_input.surface
 ---@field width integer
 ---@field bg_sprite_filename string
 ---@field bg_margin number
@@ -112,7 +116,7 @@ end
 
 ---@param width number
 ---@param options pop.text_input.simple_surface.options?
----@return pop.text_input.surface
+---@return pop.text_input.simple_surface
 function text_input.simple_surface(width, options)
     local bg_sprite_filename = path .. "text_input_bg_default.png"
     local bg_margin = -1
